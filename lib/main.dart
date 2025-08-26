@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wms_app/common/user_manager.dart';
+import 'package:wms_app/pages/home/home_paeg.dart';
 import '/pages/login/login_page.dart';
-import '/common/user_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
       routes: {
-        '/home': (context) => const MainHomePage(),
+        '/home': (context) => const HomePage(),
         '/login': (context) => const UserLoginPage(),
       },
     );
@@ -77,11 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // 应用图标
-            const Icon(
-              Icons.inventory_2,
-              size: 100,
-              color: Colors.white,
-            ),
+            const Icon(Icons.inventory_2, size: 100, color: Colors.white),
             const SizedBox(height: 24),
             // 应用名称
             const Text(
@@ -96,10 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // 副标题
             const Text(
               '仓库管理系统',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white70,
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.white70),
             ),
             const SizedBox(height: 48),
             // 加载指示器
@@ -108,89 +102,6 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// 主页面 - 用户已登录后显示
-class MainHomePage extends StatefulWidget {
-  const MainHomePage({super.key});
-
-  @override
-  State<MainHomePage> createState() => _MainHomePageState();
-}
-
-class _MainHomePageState extends State<MainHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  /// 退出登录
-  Future<void> _logout() async {
-    await UserManager().clearUserInfo();
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/login');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final userInfo = UserManager().userInfo;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('金风WMS系统'),
-        actions: [
-          // 用户信息显示
-          if (userInfo != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                child: Text(
-                  '欢迎，${userInfo.username}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
-          // 退出登录按钮
-          IconButton(
-            onPressed: _logout,
-            icon: const Icon(Icons.logout),
-            tooltip: '退出登录',
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('您已成功登录系统！'),
-            const SizedBox(height: 16),
-            const Text('点击按钮增加计数：'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/login');
-              },
-              child: const Text('重新进入登录页'),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

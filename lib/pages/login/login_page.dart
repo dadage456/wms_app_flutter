@@ -77,6 +77,11 @@ class _UserLoginPageView extends HookWidget {
               SnackBar(content: Text(state.error)),
             );
           }
+          
+          //用于测试
+          Future.delayed(Duration(seconds: 5)).then((value){
+            Navigator.of(context).pushReplacementNamed('/home');
+          });
         },
         child: SafeArea(
           child: SingleChildScrollView(
