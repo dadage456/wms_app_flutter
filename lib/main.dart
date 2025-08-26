@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wms_app/common/user_manager.dart';
-import 'package:wms_app/pages/home/home_paeg.dart';
+import 'package:wms_app/pages/home/home_page.dart';
 import '/pages/login/login_page.dart';
 
 void main() {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
       routes: {
-        '/home': (context) => const HomePage(),
+        '/home': (context) => const WMSHomePage(),
         '/login': (context) => const UserLoginPage(),
       },
     );
