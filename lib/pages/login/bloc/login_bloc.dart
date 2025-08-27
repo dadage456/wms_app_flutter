@@ -4,6 +4,7 @@ import 'package:wms_app/models/user_info_model.dart';
 import 'package:wms_app/pages/login/bloc/login_event.dart';
 import 'package:wms_app/pages/login/bloc/login_state.dart';
 import 'package:wms_app/services/api_service.dart';
+import 'package:wms_app/utils/error_handler.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final ApiService apiService;
@@ -24,7 +25,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         await apiService.login(event.username, event.password);
         emit(LoginSuccess());
       } catch (error) {
-        emit(LoginFailure(error: '登录失败：${error.toString()}'));
+        emit(LoginFailure(error: ErrorHandler.handleError(error)));
       }
     });
   }

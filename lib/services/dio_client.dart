@@ -63,6 +63,11 @@ class DioClient {
         return handler.next(options);
       },
       onError: (DioException e, handler) async {
+        // 检查是否为网络异常
+        if (_isNetworkError(e)) {
+          return handler.reject(_createNetworkException(e));
+        }
+
         // 如果是 401，说明 token 过期
         if (e.response?.statusCode == 401 &&
             _username?.isNotEmpty == true &&
@@ -102,6 +107,46 @@ class DioClient {
     } catch (e) {
       throw Exception('刷新 token 失败：$e');
     }
+  }
+
+  /// 检查是否为网络异常
+  bool _isNetworkError(DioException e) {
+    return e.type == DioExceptionType.connectionTimeout ||
+           e.type == DioExceptionType.sendTimeout ||
+           e.type == DioExceptionType.receiveTimeout ||
+           e.type == DioExceptionType.connectionError ||
+           e.type == DioExceptionType.unknown;
+  }
+
+  /// 创建网络异常
+  DioException _createNetworkException(DioException originalException) {
+    String message;
+    switch (originalException.type) {
+      case DioExceptionType.connectionTimeout:
+        message = '连接超时，请检查网络连接';
+        break;
+      case DioExceptionType.sendTimeout:
+        message = '发送数据超时，请检查网络连接';
+        break;
+      case DioExceptionType.receiveTimeout:
+        message = '接收数据超时，请检查网络连接';
+        break;
+      case DioExceptionType.connectionError:
+        message = '网络连接失败，请检查网络设置';
+        break;
+      case DioExceptionType.unknown:
+        message = '网络异常，请检查网络连接';
+        break;
+      default:
+        message = '网络请求失败';
+    }
+
+    return DioException(
+      requestOptions: originalException.requestOptions,
+      message: message,
+      type: originalException.type,
+      error: originalException.error,
+    );
   }
 
   /// 日志拦截器（开发阶段很有用）
