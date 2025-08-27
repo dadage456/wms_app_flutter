@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:wms_app/common/user_manager.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/pages/home/home_page.dart';
 import '/pages/login/login_page.dart';
+import 'app_module.dart';
 
 void main() {
-  runApp(const MyApp());
+  // 加载用户信息
+  UserManager().loadUserInfo();
+
+  runApp(ModularApp(module: AppModule(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,17 +18,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: '金风WMS应用',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
-      routes: {
-        '/home': (context) => const WMSHomePage(),
-        '/login': (context) => const UserLoginPage(),
-      },
+      routerConfig: Modular.routerConfig,
     );
   }
 }
@@ -73,36 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 应用图标
-            const Icon(Icons.inventory_2, size: 100, color: Colors.white),
-            const SizedBox(height: 24),
-            // 应用名称
-            const Text(
-              '金风WMS',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // 副标题
-            const Text(
-              '仓库管理系统',
-              style: TextStyle(fontSize: 18, color: Colors.white70),
-            ),
-            const SizedBox(height: 48),
-            // 加载指示器
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ],
-        ),
-      ),
+      body: Center(child: Column()),
     );
   }
 }

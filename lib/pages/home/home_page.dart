@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class WMSHomePage extends StatelessWidget {
   const WMSHomePage({super.key});
@@ -186,10 +187,13 @@ class WMSHomePage extends StatelessWidget {
                         Icons.move_to_inbox,
                         const Color(0xFF2BC883),
                       ),
-                      _buildFunctionCard(
-                        '平库出库',
-                        Icons.outbox,
-                        const Color(0xFFDE406C),
+                      GestureDetector(
+                        onTap: () => Modular.to.pushNamed('/outbound/'),
+                        child: _buildFunctionCard(
+                          '平库出库',
+                          Icons.outbox,
+                          const Color(0xFFDE406C),
+                        ),
                       ),
                       _buildFunctionCard(
                         '在线拣选',

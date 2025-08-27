@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wms_app/common/user_manager.dart';
+import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/models/user_info_model.dart';
 import 'package:wms_app/pages/login/bloc/login_event.dart';
 import 'package:wms_app/pages/login/bloc/login_state.dart';
@@ -10,7 +10,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final UserManager userManager;
 
   LoginBloc({required this.apiService, required this.userManager})
-      : super(LoginInitial()) {
+    : super(LoginInitial()) {
     on<LoginButtonTap>((event, emit) async {
       // 验证用户名和密码不为空
       if (event.username.isEmpty || event.password.isEmpty) {
@@ -21,9 +21,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(LoginLoading());
 
       try {
-        final token = await apiService.login(event.username, event.password);
-        await userManager.saveUserInfo(
-            UserInfoModel(username: event.username), token);
+        await apiService.login(event.username, event.password);
         emit(LoginSuccess());
       } catch (error) {
         emit(LoginFailure(error: '登录失败：${error.toString()}'));
