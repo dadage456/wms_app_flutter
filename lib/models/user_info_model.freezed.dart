@@ -21,9 +21,14 @@ UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserInfoModel {
-  String get userId => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
-  String get password => throw _privateConstructorUsedError;
+  int get userId => throw _privateConstructorUsedError;
+  int get deptId => throw _privateConstructorUsedError;
+  String get userName => throw _privateConstructorUsedError;
+  String get nickName => throw _privateConstructorUsedError;
+  String get sex => throw _privateConstructorUsedError;
+  String? get avatar => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
+  String get delFlag => throw _privateConstructorUsedError;
 
   /// Serializes this UserInfoModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,7 +47,16 @@ abstract class $UserInfoModelCopyWith<$Res> {
     $Res Function(UserInfoModel) then,
   ) = _$UserInfoModelCopyWithImpl<$Res, UserInfoModel>;
   @useResult
-  $Res call({String userId, String username, String password});
+  $Res call({
+    int userId,
+    int deptId,
+    String userName,
+    String nickName,
+    String sex,
+    String? avatar,
+    String status,
+    String delFlag,
+  });
 }
 
 /// @nodoc
@@ -61,22 +75,47 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
   @override
   $Res call({
     Object? userId = null,
-    Object? username = null,
-    Object? password = null,
+    Object? deptId = null,
+    Object? userName = null,
+    Object? nickName = null,
+    Object? sex = null,
+    Object? avatar = freezed,
+    Object? status = null,
+    Object? delFlag = null,
   }) {
     return _then(
       _value.copyWith(
             userId: null == userId
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
+                      as int,
+            deptId: null == deptId
+                ? _value.deptId
+                : deptId // ignore: cast_nullable_to_non_nullable
+                      as int,
+            userName: null == userName
+                ? _value.userName
+                : userName // ignore: cast_nullable_to_non_nullable
                       as String,
-            username: null == username
-                ? _value.username
-                : username // ignore: cast_nullable_to_non_nullable
+            nickName: null == nickName
+                ? _value.nickName
+                : nickName // ignore: cast_nullable_to_non_nullable
                       as String,
-            password: null == password
-                ? _value.password
-                : password // ignore: cast_nullable_to_non_nullable
+            sex: null == sex
+                ? _value.sex
+                : sex // ignore: cast_nullable_to_non_nullable
+                      as String,
+            avatar: freezed == avatar
+                ? _value.avatar
+                : avatar // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as String,
+            delFlag: null == delFlag
+                ? _value.delFlag
+                : delFlag // ignore: cast_nullable_to_non_nullable
                       as String,
           )
           as $Val,
@@ -93,7 +132,16 @@ abstract class _$$UserInfoModelImplCopyWith<$Res>
   ) = __$$UserInfoModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String userId, String username, String password});
+  $Res call({
+    int userId,
+    int deptId,
+    String userName,
+    String nickName,
+    String sex,
+    String? avatar,
+    String status,
+    String delFlag,
+  });
 }
 
 /// @nodoc
@@ -111,22 +159,47 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? userId = null,
-    Object? username = null,
-    Object? password = null,
+    Object? deptId = null,
+    Object? userName = null,
+    Object? nickName = null,
+    Object? sex = null,
+    Object? avatar = freezed,
+    Object? status = null,
+    Object? delFlag = null,
   }) {
     return _then(
       _$UserInfoModelImpl(
         userId: null == userId
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
+                  as int,
+        deptId: null == deptId
+            ? _value.deptId
+            : deptId // ignore: cast_nullable_to_non_nullable
+                  as int,
+        userName: null == userName
+            ? _value.userName
+            : userName // ignore: cast_nullable_to_non_nullable
                   as String,
-        username: null == username
-            ? _value.username
-            : username // ignore: cast_nullable_to_non_nullable
+        nickName: null == nickName
+            ? _value.nickName
+            : nickName // ignore: cast_nullable_to_non_nullable
                   as String,
-        password: null == password
-            ? _value.password
-            : password // ignore: cast_nullable_to_non_nullable
+        sex: null == sex
+            ? _value.sex
+            : sex // ignore: cast_nullable_to_non_nullable
+                  as String,
+        avatar: freezed == avatar
+            ? _value.avatar
+            : avatar // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as String,
+        delFlag: null == delFlag
+            ? _value.delFlag
+            : delFlag // ignore: cast_nullable_to_non_nullable
                   as String,
       ),
     );
@@ -138,23 +211,38 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
 class _$UserInfoModelImpl implements _UserInfoModel {
   const _$UserInfoModelImpl({
     required this.userId,
-    required this.username,
-    required this.password,
+    required this.deptId,
+    required this.userName,
+    required this.nickName,
+    required this.sex,
+    this.avatar,
+    required this.status,
+    required this.delFlag,
   });
 
   factory _$UserInfoModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserInfoModelImplFromJson(json);
 
   @override
-  final String userId;
+  final int userId;
   @override
-  final String username;
+  final int deptId;
   @override
-  final String password;
+  final String userName;
+  @override
+  final String nickName;
+  @override
+  final String sex;
+  @override
+  final String? avatar;
+  @override
+  final String status;
+  @override
+  final String delFlag;
 
   @override
   String toString() {
-    return 'UserInfoModel(userId: $userId, username: $username, password: $password)';
+    return 'UserInfoModel(userId: $userId, deptId: $deptId, userName: $userName, nickName: $nickName, sex: $sex, avatar: $avatar, status: $status, delFlag: $delFlag)';
   }
 
   @override
@@ -163,15 +251,30 @@ class _$UserInfoModelImpl implements _UserInfoModel {
         (other.runtimeType == runtimeType &&
             other is _$UserInfoModelImpl &&
             (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
-            (identical(other.password, password) ||
-                other.password == password));
+            (identical(other.deptId, deptId) || other.deptId == deptId) &&
+            (identical(other.userName, userName) ||
+                other.userName == userName) &&
+            (identical(other.nickName, nickName) ||
+                other.nickName == nickName) &&
+            (identical(other.sex, sex) || other.sex == sex) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.delFlag, delFlag) || other.delFlag == delFlag));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, userId, username, password);
+  int get hashCode => Object.hash(
+    runtimeType,
+    userId,
+    deptId,
+    userName,
+    nickName,
+    sex,
+    avatar,
+    status,
+    delFlag,
+  );
 
   /// Create a copy of UserInfoModel
   /// with the given fields replaced by the non-null parameter values.
@@ -189,20 +292,35 @@ class _$UserInfoModelImpl implements _UserInfoModel {
 
 abstract class _UserInfoModel implements UserInfoModel {
   const factory _UserInfoModel({
-    required final String userId,
-    required final String username,
-    required final String password,
+    required final int userId,
+    required final int deptId,
+    required final String userName,
+    required final String nickName,
+    required final String sex,
+    final String? avatar,
+    required final String status,
+    required final String delFlag,
   }) = _$UserInfoModelImpl;
 
   factory _UserInfoModel.fromJson(Map<String, dynamic> json) =
       _$UserInfoModelImpl.fromJson;
 
   @override
-  String get userId;
+  int get userId;
   @override
-  String get username;
+  int get deptId;
   @override
-  String get password;
+  String get userName;
+  @override
+  String get nickName;
+  @override
+  String get sex;
+  @override
+  String? get avatar;
+  @override
+  String get status;
+  @override
+  String get delFlag;
 
   /// Create a copy of UserInfoModel
   /// with the given fields replaced by the non-null parameter values.

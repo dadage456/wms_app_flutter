@@ -18,15 +18,17 @@ class OutboundTaskListPage extends HookWidget {
   Widget build(BuildContext context) {
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
-    final refreshIndicatorKey = useMemoized(() => GlobalKey<RefreshIndicatorState>());
-    
+    final refreshIndicatorKey = useMemoized(
+      () => GlobalKey<RefreshIndicatorState>(),
+    );
+
     // 当前筛选状态
     final currentFilter = useState<String>('0'); // '0': 采集中, '1': 所有
     final currentPage = useState<int>(1);
-    
+
     // 获取BLoC实例
     final outboundTaskBloc = Modular.get<OutboundTaskBloc>();
-    
+
     // 初始化加载数据
     useEffect(() {
       final defaultQuery = outboundTaskBloc.getDefaultQuery();
@@ -35,11 +37,11 @@ class OutboundTaskListPage extends HookWidget {
       }
       return null;
     }, []);
-    
+
     // 监听滚动事件，实现分页加载
     useEffect(() {
       void onScroll() {
-        if (scrollController.position.pixels >= 
+        if (scrollController.position.pixels >=
             scrollController.position.maxScrollExtent - 200) {
           // 接近底部时加载下一页
           final state = outboundTaskBloc.state;
@@ -48,11 +50,13 @@ class OutboundTaskListPage extends HookWidget {
           }
         }
       }
-      
+
       scrollController.addListener(onScroll);
       return () => scrollController.removeListener(onScroll);
     }, [scrollController]);
-    
+
+    return Container(color: Colors.blue);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('平库下架'),
@@ -61,12 +65,14 @@ class OutboundTaskListPage extends HookWidget {
           // 筛选按钮
           IconButton(
             icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilterDialog(context, currentFilter, outboundTaskBloc),
+            onPressed: () =>
+                _showFilterDialog(context, currentFilter, outboundTaskBloc),
           ),
           // 刷新按钮
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => outboundTaskBloc.add(const RefreshOutboundTasksEvent()),
+            onPressed: () =>
+                outboundTaskBloc.add(const RefreshOutboundTasksEvent()),
           ),
         ],
       ),
@@ -83,7 +89,7 @@ class OutboundTaskListPage extends HookWidget {
               outboundTaskBloc.add(SearchOutboundTasksEvent(code));
             },
           ),
-          
+
           // 任务列表
           Expanded(
             child: BlocBuilder<OutboundTaskBloc, OutboundTaskState>(
@@ -96,7 +102,12 @@ class OutboundTaskListPage extends HookWidget {
                     // 等待刷新完成
                     await Future.delayed(const Duration(milliseconds: 500));
                   },
-                  child: _buildTaskList(context, state, scrollController, outboundTaskBloc),
+                  child: _buildTaskList(
+                    context,
+                    state,
+                    scrollController,
+                    outboundTaskBloc,
+                  ),
                 );
               },
             ),
@@ -105,7 +116,7 @@ class OutboundTaskListPage extends HookWidget {
       ),
     );
   }
-  
+
   /// 构建任务列表
   Widget _buildTaskList(
     BuildContext context,
@@ -114,11 +125,9 @@ class OutboundTaskListPage extends HookWidget {
     OutboundTaskBloc bloc,
   ) {
     if (state is OutboundTaskLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
-    
+
     if (state is OutboundTaskError) {
       return Center(
         child: Column(
@@ -130,10 +139,7 @@ class OutboundTaskListPage extends HookWidget {
               color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 16),
-            Text(
-              '加载失败',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('加载失败', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               state.message,
@@ -149,16 +155,15 @@ class OutboundTaskListPage extends HookWidget {
         ),
       );
     }
-    
-    if (state is OutboundTaskLoaded || 
+
+    if (state is OutboundTaskLoaded ||
         state is OutboundTaskRefreshing ||
         state is OutboundTaskPageLoading) {
-      
       List<OutboundTask> tasks = [];
       int total = 0;
       bool isRefreshing = false;
       bool isPageLoading = false;
-      
+
       if (state is OutboundTaskLoaded) {
         tasks = state.tasks;
         total = state.total;
@@ -171,30 +176,23 @@ class OutboundTaskListPage extends HookWidget {
         total = state.total;
         isPageLoading = true;
       }
-      
+
       if (tasks.isEmpty) {
         return const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.inbox_outlined,
-                size: 64,
-                color: Colors.grey,
-              ),
+              Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
               SizedBox(height: 16),
               Text(
                 '当前任务列表没有待处理任务',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
         );
       }
-      
+
       return ListView.builder(
         controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
@@ -204,12 +202,10 @@ class OutboundTaskListPage extends HookWidget {
             // 分页加载指示器
             return const Padding(
               padding: EdgeInsets.all(16.0),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           }
-          
+
           final task = tasks[index];
           return OutboundTaskListItem(
             task: task,
@@ -219,10 +215,10 @@ class OutboundTaskListPage extends HookWidget {
         },
       );
     }
-    
+
     return const SizedBox.shrink();
   }
-  
+
   /// 显示筛选对话框
   void _showFilterDialog(
     BuildContext context,
@@ -240,24 +236,20 @@ class OutboundTaskListPage extends HookWidget {
       ),
     );
   }
-  
+
   /// 导航到采集页面
   void _navigateToCollect(BuildContext context, OutboundTask task) {
     // TODO: 实现导航到采集页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('导航到采集页面: ${task.outTaskNo}'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('导航到采集页面: ${task.outTaskNo}')));
   }
-  
+
   /// 导航到明细页面
   void _navigateToDetail(BuildContext context, OutboundTask task) {
     // TODO: 实现导航到明细页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('导航到明细页面: ${task.outTaskNo}'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('导航到明细页面: ${task.outTaskNo}')));
   }
 }

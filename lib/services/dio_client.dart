@@ -34,7 +34,7 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "https://api.example.com/", // 基础请求地址
+        baseUrl: "http://10.12.8.123:8086", // 基础请求地址
         connectTimeout: const Duration(seconds: 10), // 连接超时时间
         receiveTimeout: const Duration(seconds: 10), // 接收数据超时时间
         sendTimeout: const Duration(seconds: 10), // 发送数据超时时间
@@ -112,10 +112,10 @@ class DioClient {
   /// 检查是否为网络异常
   bool _isNetworkError(DioException e) {
     return e.type == DioExceptionType.connectionTimeout ||
-           e.type == DioExceptionType.sendTimeout ||
-           e.type == DioExceptionType.receiveTimeout ||
-           e.type == DioExceptionType.connectionError ||
-           e.type == DioExceptionType.unknown;
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.unknown;
   }
 
   /// 创建网络异常

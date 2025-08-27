@@ -9,12 +9,6 @@ class WMSHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        toolbarHeight: 0,
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

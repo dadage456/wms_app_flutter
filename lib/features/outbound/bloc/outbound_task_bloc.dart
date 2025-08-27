@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import '../models/outbound_task.dart';
 import '../services/outbound_task_service.dart';
 import '../../../services/user_manager.dart';
@@ -94,11 +95,12 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
       }
     } else {
       // 如果当前状态不是已加载状态，则使用默认查询参数进行刷新
-      final userInfo = _userManager.userInfo;
+      final userInfo = Modular.get<UserManager>().userInfo;
+
       if (userInfo != null) {
         final defaultQuery = OutboundTaskQuery(
-          userId: userInfo.userId,
-          roleOrUserId: userInfo.userId,
+          userId: "${userInfo.userId}",
+          roleOrUserId: "${userInfo.userId}",
         );
         add(LoadOutboundTasksEvent(defaultQuery));
       }
@@ -119,14 +121,14 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
         pageIndex: 1,
       );
     } else {
-      final userInfo = _userManager.userInfo;
+      final userInfo = Modular.get<UserManager>().userInfo;
       if (userInfo == null) {
         emit(const OutboundTaskError('用户信息获取失败'));
         return;
       }
       searchQuery = OutboundTaskQuery(
-        userId: userInfo.userId,
-        roleOrUserId: userInfo.userId,
+        userId: "${userInfo.userId}",
+        roleOrUserId: "${userInfo.userId}",
         searchKey: event.searchKey,
       );
     }
@@ -148,14 +150,14 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
         pageIndex: 1,
       );
     } else {
-      final userInfo = _userManager.userInfo;
+      final userInfo = Modular.get<UserManager>().userInfo;
       if (userInfo == null) {
         emit(const OutboundTaskError('用户信息获取失败'));
         return;
       }
       filterQuery = OutboundTaskQuery(
-        userId: userInfo.userId,
-        roleOrUserId: userInfo.userId,
+        userId: "${userInfo.userId}",
+        roleOrUserId: "${userInfo.userId}",
         finishFlag: event.finishFlag,
       );
     }
@@ -221,14 +223,14 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
         pageIndex: 1,
       );
     } else {
-      final userInfo = _userManager.userInfo;
+      final userInfo = Modular.get<UserManager>().userInfo;
       if (userInfo == null) {
         emit(const OutboundTaskError('用户信息获取失败'));
         return;
       }
       sortQuery = OutboundTaskQuery(
-        userId: userInfo.userId,
-        roleOrUserId: userInfo.userId,
+        userId: "${userInfo.userId}",
+        roleOrUserId: "${userInfo.userId}",
         sortColumn: event.sortColumn,
         sortType: event.sortType,
       );
@@ -239,12 +241,12 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
 
   /// 获取默认查询参数
   OutboundTaskQuery? getDefaultQuery() {
-    final userInfo = _userManager.userInfo;
+    final userInfo = Modular.get<UserManager>().userInfo;
     if (userInfo == null) return null;
 
     return OutboundTaskQuery(
-      userId: userInfo.userId,
-      roleOrUserId: userInfo.userId,
+      userId: "${userInfo.userId}",
+      roleOrUserId: "${userInfo.userId}",
     );
   }
 }
