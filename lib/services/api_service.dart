@@ -16,31 +16,21 @@ class ApiService {
 
   // 登录
   Future<String> login(String account, String password) async {
-    try {
-      final response = await _dio.post(
-        '/login',
-        data: {'username': account, 'password': password},
-      );
+    final response = await _dio.post(
+      '/login',
+      data: {'username': account, 'password': password},
+    );
 
-      final token = ApiResponseHandler.handleDirectResponse<String>(
-        response: response,
-        fieldName: 'token',
-      );
+    final token = ApiResponseHandler.handleDirectResponse<String>(
+      response: response,
+      fieldName: 'token',
+    );
 
-      // 保存token
-      _dioClient.configToken(
-        token: token,
-        username: account,
-        password: password,
-      );
+    // 保存token
+    _dioClient.configToken(token: token, username: account, password: password);
 
-      // 使用ApiResponseHandler处理响应
-      return token;
-    } on DioException catch (e) {
-      throw Exception(ApiResponseHandler.handleDioException(e));
-    } catch (e) {
-      throw Exception('未知错误：$e');
-    }
+    // 使用ApiResponseHandler处理响应
+    return token;
   }
 
   /// 退出登录

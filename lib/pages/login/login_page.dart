@@ -6,15 +6,19 @@ import 'package:flutter_svg/svg.dart';
 import 'package:wms_app/pages/login/bloc/login_bloc.dart';
 import 'package:wms_app/pages/login/bloc/login_event.dart';
 import 'package:wms_app/pages/login/bloc/login_state.dart';
+import 'package:wms_app/widgets/keyboard_dismiss_ontap.dart';
+import 'package:wms_app/widgets/loading_dialog_manager.dart';
 
 class UserLoginPage extends StatelessWidget {
   const UserLoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => Modular.get<LoginBloc>(),
-      child: const LoginScreen(),
+    return KeyboardDismissOnTap(
+      child: BlocProvider(
+        create: (context) => Modular.get<LoginBloc>(),
+        child: const LoginScreen(),
+      ),
     );
   }
 }
@@ -29,26 +33,46 @@ class LoginScreen extends HookWidget {
     final passwordController = useTextEditingController(text: '');
     final obscurePassword = useState(true);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            child: SvgPicture.asset('assets/images/login_top_circle.svg'),
-          ),
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF0067FC), Color(0xFF0067FC)],
+    return BlocListener<LoginBloc, LoginState>(
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          // 登录成功，跳转到主页面
+          context.hideLoadingDialog();
+          _showSuccessMessage(context, '登录成功');
+          // 延迟跳转，让用户看到成功提示
+          Future.delayed(const Duration(milliseconds: 800), () {
+            Modular.to.pushReplacementNamed('/home');
+          });
+        } else if (state is LoginFailure) {
+          // 登录失败，显示错误信息
+          context.hideLoadingDialog();
+          _showErrorMessage(context, state.error);
+        } else if (state is LoginLoading) {
+          // 显示加载对话框
+          context.showLoadingDialog(message: '正在登录...');
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF0067FC), Color(0xFF0067FC)],
+                ),
               ),
             ),
-            child: SafeArea(
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SvgPicture.asset('assets/images/login_top_circle.svg'),
+            ),
+            SafeArea(
               child: Column(
                 children: [
                   // Header section with title
@@ -64,8 +88,8 @@ class LoginScreen extends HookWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -138,6 +162,8 @@ class LoginScreen extends HookWidget {
               controller: usernameController,
               icon: Icons.person_outline,
               iconColor: const Color(0xFF222B3C),
+              hintText: '请输入用户名',
+              keyboardType: TextInputType.text,
             ),
             const SizedBox(height: 26),
             // Password field
@@ -147,7 +173,17 @@ class LoginScreen extends HookWidget {
             ),
             const SizedBox(height: 52),
             // Login button
-            _buildLoginButton(() {}),
+            Builder(
+              builder: (context) {
+                return _buildLoginButton(
+                  onPressed: () => _handleLogin(
+                    context,
+                    usernameController.text.trim(),
+                    passwordController.text.trim(),
+                  ),
+                );
+              },
+            ),
             // 添加底部间距，确保键盘弹出时有足够空间
             const SizedBox(height: 20),
           ],
@@ -163,6 +199,8 @@ class LoginScreen extends HookWidget {
     required Color iconColor,
     bool obscureText = false,
     Widget? suffixIcon,
+    String? hintText,
+    TextInputType? keyboardType,
   }) {
     return Container(
       height: 48,
@@ -185,15 +223,22 @@ class LoginScreen extends HookWidget {
             child: TextFormField(
               controller: controller,
               obscureText: obscureText,
+              keyboardType: keyboardType,
               style: const TextStyle(
                 color: Color(0xFF222B3C),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
+                hintText: hintText,
+                hintStyle: const TextStyle(
+                  color: Color(0xFF999999),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ),
@@ -214,6 +259,8 @@ class LoginScreen extends HookWidget {
       icon: Icons.lock_outline,
       iconColor: const Color(0xFF272636),
       obscureText: obscurePassword.value,
+      hintText: '请输入密码',
+      keyboardType: TextInputType.visiblePassword,
       suffixIcon: GestureDetector(
         onTap: () {
           obscurePassword.value = !obscurePassword.value;
@@ -224,7 +271,7 @@ class LoginScreen extends HookWidget {
           child: Icon(
             obscurePassword.value ? Icons.visibility_off : Icons.visibility,
             size: 20,
-            color: Colors.black,
+            color: const Color(0xFF666666),
           ),
         ),
       ),
@@ -232,7 +279,7 @@ class LoginScreen extends HookWidget {
   }
 
   /// 登录按钮组件
-  Widget _buildLoginButton(void Function() onPressed) {
+  Widget _buildLoginButton({required void Function() onPressed}) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -253,6 +300,105 @@ class LoginScreen extends HookWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
+      ),
+    );
+  }
+
+  /// 处理登录逻辑
+  void _handleLogin(BuildContext context, String username, String password) {
+    // 表单验证
+    final validationResult = _validateLoginForm(username, password);
+    if (validationResult != null) {
+      _showErrorMessage(context, validationResult);
+      return;
+    }
+
+    // 发送登录事件
+    BlocProvider.of<LoginBloc>(
+      context,
+    ).add(LoginButtonTap(username: username, password: password));
+  }
+
+  /// 表单验证
+  String? _validateLoginForm(String username, String password) {
+    if (username.isEmpty && password.isEmpty) {
+      return '请输入用户名和密码';
+    }
+    if (username.isEmpty) {
+      return '请输入用户名';
+    }
+    if (password.isEmpty) {
+      return '请输入密码';
+    }
+    if (username.length < 2) {
+      return '用户名至少需要2个字符';
+    }
+    if (password.length < 6) {
+      return '密码至少需要6个字符';
+    }
+    return null;
+  }
+
+  /// 显示错误消息
+  void _showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  /// 显示成功消息
+  void _showSuccessMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
