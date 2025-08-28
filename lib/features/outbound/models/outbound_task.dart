@@ -9,41 +9,41 @@ part 'outbound_task.g.dart';
 class OutboundTask with _$OutboundTask {
   const factory OutboundTask({
     /// 出库任务ID - 任务的唯一标识
-    @JsonKey(name: 'outtaskid') required String outTaskId,
-    
+    @JsonKey(name: 'outtaskid') required int outTaskId,
+
     /// 任务号 - 业务任务编号
     @JsonKey(name: 'outtaskno') required String outTaskNo,
-    
+
     /// 出库单号 - 业务单据编号
     @JsonKey(name: 'orderno') required String orderNo,
-    
+
     /// 来源单号 - 原始订单编号
     @JsonKey(name: 'po_number') required String poNumber,
-    
+
     /// 库房号 - 物料所在库房编号
     @JsonKey(name: 'storeroomno') required String storeRoomNo,
-    
+
     /// 工位 - 执行任务的工作站
     @JsonKey(name: 'workstation') required String workStation,
-    
+
     /// 凭证号 - 财务凭证编号
     @JsonKey(name: 'taskcomment') required String taskComment,
-    
+
     /// 班组 - 执行任务的班组名称
-    @JsonKey(name: 'schedule_group_name') required String scheduleGroupName,
-    
+    @JsonKey(name: 'schedule_group_name') required String? scheduleGroupName,
+
     /// 紧急补单 - 是否为紧急补单标识
     @JsonKey(name: 'wip_supplement_flag') required String wipSupplementFlag,
-    
+
     /// 创建时间 - 任务创建的时间戳
-    @JsonKey(name: 'createtime') required String createTime,
-    
+    @JsonKey(name: 'createtime') required String? createTime,
+
     /// 状态 - 任务当前执行状态
-    @JsonKey(name: 'status') required String status,
-    
+    @JsonKey(name: 'status') required String? status,
+
     /// 任务数量 - 计划出库的总数量
     @JsonKey(name: 'taskqty') @Default(0) int taskQty,
-    
+
     /// 完成数量 - 已完成出库的数量
     @JsonKey(name: 'finishqty') @Default(0) int finishQty,
   }) = _OutboundTask;
@@ -71,55 +71,55 @@ class OutboundTaskQuery extends Equatable {
 
   /// 排序类型 - 控制数据排序方向 (ASC/DESC)
   final String sortType;
-  
+
   /// 排序字段 - 指定按哪个字段排序
   final String sortColumn;
-  
+
   /// 搜索关键字 - 支持扫码输入的单号搜索
   final String searchKey;
-  
+
   /// 用户ID - 当前登录用户的唯一标识
   final String userId;
-  
+
   /// 角色或用户ID - 权限控制相关
   final String roleOrUserId;
-  
+
   /// 库房标签 - 区分不同类型的库房 ('0': 平库)
   final String roomTag;
-  
+
   /// 批次标志 - 批次管理相关标识
   final String batchFlag;
-  
+
   /// 转移类型 - 物料转移操作类型
   final String transferType;
-  
+
   /// 节拍标志 - 是否按节拍执行 ('N': 否, 'Y': 是)
   final String beatFlag;
-  
+
   /// 页码 - 当前查询的页面索引 (从1开始)
   final int pageIndex;
-  
+
   /// 页面大小 - 每页显示的记录数
   final int pageSize;
-  
+
   /// 完成标志 - 任务状态筛选 ('0': 采集中, '1': 所有)
   final String finishFlag;
 
   @override
   List<Object?> get props => [
-        sortType,
-        sortColumn,
-        searchKey,
-        userId,
-        roleOrUserId,
-        roomTag,
-        batchFlag,
-        transferType,
-        beatFlag,
-        pageIndex,
-        pageSize,
-        finishFlag,
-      ];
+    sortType,
+    sortColumn,
+    searchKey,
+    userId,
+    roleOrUserId,
+    roomTag,
+    batchFlag,
+    transferType,
+    beatFlag,
+    pageIndex,
+    pageSize,
+    finishFlag,
+  ];
 
   OutboundTaskQuery copyWith({
     String? sortType,
@@ -153,8 +153,8 @@ class OutboundTaskQuery extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'sortType': sortType,
-      'sortColumn': sortColumn,
+      // 'sortType': sortType,
+      // 'sortColumn': sortColumn,
       'searchKey': searchKey,
       'userId': userId,
       'roleoRuserId': roleOrUserId,

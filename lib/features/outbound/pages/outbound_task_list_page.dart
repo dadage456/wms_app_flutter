@@ -55,8 +55,6 @@ class OutboundTaskListPage extends HookWidget {
       return () => scrollController.removeListener(onScroll);
     }, [scrollController]);
 
-    return Container(color: Colors.blue);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('平库下架'),

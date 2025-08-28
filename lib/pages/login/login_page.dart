@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:wms_app/pages/login/bloc/login_bloc.dart';
 import 'package:wms_app/pages/login/bloc/login_event.dart';
 import 'package:wms_app/pages/login/bloc/login_state.dart';
+import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/widgets/keyboard_dismiss_ontap.dart';
 import 'package:wms_app/widgets/loading_dialog_manager.dart';
 
@@ -29,7 +30,9 @@ class LoginScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     // 使用 hooks 管理状态
-    final usernameController = useTextEditingController(text: '');
+    final userManager = Modular.get<UserManager>();
+    final userName = userManager.userLoginInfo?.username ?? '';
+    final usernameController = useTextEditingController(text: userName);
     final passwordController = useTextEditingController(text: '');
     final obscurePassword = useState(true);
 

@@ -8,17 +8,17 @@ part of 'outbound_task.dart';
 
 _$OutboundTaskImpl _$$OutboundTaskImplFromJson(Map<String, dynamic> json) =>
     _$OutboundTaskImpl(
-      outTaskId: json['outtaskid'] as String,
+      outTaskId: (json['outtaskid'] as num).toInt(),
       outTaskNo: json['outtaskno'] as String,
       orderNo: json['orderno'] as String,
       poNumber: json['po_number'] as String,
       storeRoomNo: json['storeroomno'] as String,
       workStation: json['workstation'] as String,
       taskComment: json['taskcomment'] as String,
-      scheduleGroupName: json['schedule_group_name'] as String,
+      scheduleGroupName: json['schedule_group_name'] as String?,
       wipSupplementFlag: json['wip_supplement_flag'] as String,
-      createTime: json['createtime'] as String,
-      status: json['status'] as String,
+      createTime: json['createtime'] as String?,
+      status: json['status'] as String?,
       taskQty: (json['taskqty'] as num?)?.toInt() ?? 0,
       finishQty: (json['finishqty'] as num?)?.toInt() ?? 0,
     );

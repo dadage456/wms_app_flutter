@@ -23,7 +23,7 @@ OutboundTask _$OutboundTaskFromJson(Map<String, dynamic> json) {
 mixin _$OutboundTask {
   /// 出库任务ID - 任务的唯一标识
   @JsonKey(name: 'outtaskid')
-  String get outTaskId => throw _privateConstructorUsedError;
+  int get outTaskId => throw _privateConstructorUsedError;
 
   /// 任务号 - 业务任务编号
   @JsonKey(name: 'outtaskno')
@@ -51,7 +51,7 @@ mixin _$OutboundTask {
 
   /// 班组 - 执行任务的班组名称
   @JsonKey(name: 'schedule_group_name')
-  String get scheduleGroupName => throw _privateConstructorUsedError;
+  String? get scheduleGroupName => throw _privateConstructorUsedError;
 
   /// 紧急补单 - 是否为紧急补单标识
   @JsonKey(name: 'wip_supplement_flag')
@@ -59,11 +59,11 @@ mixin _$OutboundTask {
 
   /// 创建时间 - 任务创建的时间戳
   @JsonKey(name: 'createtime')
-  String get createTime => throw _privateConstructorUsedError;
+  String? get createTime => throw _privateConstructorUsedError;
 
   /// 状态 - 任务当前执行状态
   @JsonKey(name: 'status')
-  String get status => throw _privateConstructorUsedError;
+  String? get status => throw _privateConstructorUsedError;
 
   /// 任务数量 - 计划出库的总数量
   @JsonKey(name: 'taskqty')
@@ -91,17 +91,17 @@ abstract class $OutboundTaskCopyWith<$Res> {
   ) = _$OutboundTaskCopyWithImpl<$Res, OutboundTask>;
   @useResult
   $Res call({
-    @JsonKey(name: 'outtaskid') String outTaskId,
+    @JsonKey(name: 'outtaskid') int outTaskId,
     @JsonKey(name: 'outtaskno') String outTaskNo,
     @JsonKey(name: 'orderno') String orderNo,
     @JsonKey(name: 'po_number') String poNumber,
     @JsonKey(name: 'storeroomno') String storeRoomNo,
     @JsonKey(name: 'workstation') String workStation,
     @JsonKey(name: 'taskcomment') String taskComment,
-    @JsonKey(name: 'schedule_group_name') String scheduleGroupName,
+    @JsonKey(name: 'schedule_group_name') String? scheduleGroupName,
     @JsonKey(name: 'wip_supplement_flag') String wipSupplementFlag,
-    @JsonKey(name: 'createtime') String createTime,
-    @JsonKey(name: 'status') String status,
+    @JsonKey(name: 'createtime') String? createTime,
+    @JsonKey(name: 'status') String? status,
     @JsonKey(name: 'taskqty') int taskQty,
     @JsonKey(name: 'finishqty') int finishQty,
   });
@@ -129,10 +129,10 @@ class _$OutboundTaskCopyWithImpl<$Res, $Val extends OutboundTask>
     Object? storeRoomNo = null,
     Object? workStation = null,
     Object? taskComment = null,
-    Object? scheduleGroupName = null,
+    Object? scheduleGroupName = freezed,
     Object? wipSupplementFlag = null,
-    Object? createTime = null,
-    Object? status = null,
+    Object? createTime = freezed,
+    Object? status = freezed,
     Object? taskQty = null,
     Object? finishQty = null,
   }) {
@@ -141,7 +141,7 @@ class _$OutboundTaskCopyWithImpl<$Res, $Val extends OutboundTask>
             outTaskId: null == outTaskId
                 ? _value.outTaskId
                 : outTaskId // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as int,
             outTaskNo: null == outTaskNo
                 ? _value.outTaskNo
                 : outTaskNo // ignore: cast_nullable_to_non_nullable
@@ -166,22 +166,22 @@ class _$OutboundTaskCopyWithImpl<$Res, $Val extends OutboundTask>
                 ? _value.taskComment
                 : taskComment // ignore: cast_nullable_to_non_nullable
                       as String,
-            scheduleGroupName: null == scheduleGroupName
+            scheduleGroupName: freezed == scheduleGroupName
                 ? _value.scheduleGroupName
                 : scheduleGroupName // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             wipSupplementFlag: null == wipSupplementFlag
                 ? _value.wipSupplementFlag
                 : wipSupplementFlag // ignore: cast_nullable_to_non_nullable
                       as String,
-            createTime: null == createTime
+            createTime: freezed == createTime
                 ? _value.createTime
                 : createTime // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
+                      as String?,
+            status: freezed == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             taskQty: null == taskQty
                 ? _value.taskQty
                 : taskQty // ignore: cast_nullable_to_non_nullable
@@ -206,17 +206,17 @@ abstract class _$$OutboundTaskImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'outtaskid') String outTaskId,
+    @JsonKey(name: 'outtaskid') int outTaskId,
     @JsonKey(name: 'outtaskno') String outTaskNo,
     @JsonKey(name: 'orderno') String orderNo,
     @JsonKey(name: 'po_number') String poNumber,
     @JsonKey(name: 'storeroomno') String storeRoomNo,
     @JsonKey(name: 'workstation') String workStation,
     @JsonKey(name: 'taskcomment') String taskComment,
-    @JsonKey(name: 'schedule_group_name') String scheduleGroupName,
+    @JsonKey(name: 'schedule_group_name') String? scheduleGroupName,
     @JsonKey(name: 'wip_supplement_flag') String wipSupplementFlag,
-    @JsonKey(name: 'createtime') String createTime,
-    @JsonKey(name: 'status') String status,
+    @JsonKey(name: 'createtime') String? createTime,
+    @JsonKey(name: 'status') String? status,
     @JsonKey(name: 'taskqty') int taskQty,
     @JsonKey(name: 'finishqty') int finishQty,
   });
@@ -243,10 +243,10 @@ class __$$OutboundTaskImplCopyWithImpl<$Res>
     Object? storeRoomNo = null,
     Object? workStation = null,
     Object? taskComment = null,
-    Object? scheduleGroupName = null,
+    Object? scheduleGroupName = freezed,
     Object? wipSupplementFlag = null,
-    Object? createTime = null,
-    Object? status = null,
+    Object? createTime = freezed,
+    Object? status = freezed,
     Object? taskQty = null,
     Object? finishQty = null,
   }) {
@@ -255,7 +255,7 @@ class __$$OutboundTaskImplCopyWithImpl<$Res>
         outTaskId: null == outTaskId
             ? _value.outTaskId
             : outTaskId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as int,
         outTaskNo: null == outTaskNo
             ? _value.outTaskNo
             : outTaskNo // ignore: cast_nullable_to_non_nullable
@@ -280,22 +280,22 @@ class __$$OutboundTaskImplCopyWithImpl<$Res>
             ? _value.taskComment
             : taskComment // ignore: cast_nullable_to_non_nullable
                   as String,
-        scheduleGroupName: null == scheduleGroupName
+        scheduleGroupName: freezed == scheduleGroupName
             ? _value.scheduleGroupName
             : scheduleGroupName // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         wipSupplementFlag: null == wipSupplementFlag
             ? _value.wipSupplementFlag
             : wipSupplementFlag // ignore: cast_nullable_to_non_nullable
                   as String,
-        createTime: null == createTime
+        createTime: freezed == createTime
             ? _value.createTime
             : createTime // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
+                  as String?,
+        status: freezed == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         taskQty: null == taskQty
             ? _value.taskQty
             : taskQty // ignore: cast_nullable_to_non_nullable
@@ -334,7 +334,7 @@ class _$OutboundTaskImpl implements _OutboundTask {
   /// 出库任务ID - 任务的唯一标识
   @override
   @JsonKey(name: 'outtaskid')
-  final String outTaskId;
+  final int outTaskId;
 
   /// 任务号 - 业务任务编号
   @override
@@ -369,7 +369,7 @@ class _$OutboundTaskImpl implements _OutboundTask {
   /// 班组 - 执行任务的班组名称
   @override
   @JsonKey(name: 'schedule_group_name')
-  final String scheduleGroupName;
+  final String? scheduleGroupName;
 
   /// 紧急补单 - 是否为紧急补单标识
   @override
@@ -379,12 +379,12 @@ class _$OutboundTaskImpl implements _OutboundTask {
   /// 创建时间 - 任务创建的时间戳
   @override
   @JsonKey(name: 'createtime')
-  final String createTime;
+  final String? createTime;
 
   /// 状态 - 任务当前执行状态
   @override
   @JsonKey(name: 'status')
-  final String status;
+  final String? status;
 
   /// 任务数量 - 计划出库的总数量
   @override
@@ -466,7 +466,7 @@ class _$OutboundTaskImpl implements _OutboundTask {
 
 abstract class _OutboundTask implements OutboundTask {
   const factory _OutboundTask({
-    @JsonKey(name: 'outtaskid') required final String outTaskId,
+    @JsonKey(name: 'outtaskid') required final int outTaskId,
     @JsonKey(name: 'outtaskno') required final String outTaskNo,
     @JsonKey(name: 'orderno') required final String orderNo,
     @JsonKey(name: 'po_number') required final String poNumber,
@@ -474,11 +474,11 @@ abstract class _OutboundTask implements OutboundTask {
     @JsonKey(name: 'workstation') required final String workStation,
     @JsonKey(name: 'taskcomment') required final String taskComment,
     @JsonKey(name: 'schedule_group_name')
-    required final String scheduleGroupName,
+    required final String? scheduleGroupName,
     @JsonKey(name: 'wip_supplement_flag')
     required final String wipSupplementFlag,
-    @JsonKey(name: 'createtime') required final String createTime,
-    @JsonKey(name: 'status') required final String status,
+    @JsonKey(name: 'createtime') required final String? createTime,
+    @JsonKey(name: 'status') required final String? status,
     @JsonKey(name: 'taskqty') final int taskQty,
     @JsonKey(name: 'finishqty') final int finishQty,
   }) = _$OutboundTaskImpl;
@@ -489,7 +489,7 @@ abstract class _OutboundTask implements OutboundTask {
   /// 出库任务ID - 任务的唯一标识
   @override
   @JsonKey(name: 'outtaskid')
-  String get outTaskId;
+  int get outTaskId;
 
   /// 任务号 - 业务任务编号
   @override
@@ -524,7 +524,7 @@ abstract class _OutboundTask implements OutboundTask {
   /// 班组 - 执行任务的班组名称
   @override
   @JsonKey(name: 'schedule_group_name')
-  String get scheduleGroupName;
+  String? get scheduleGroupName;
 
   /// 紧急补单 - 是否为紧急补单标识
   @override
@@ -534,12 +534,12 @@ abstract class _OutboundTask implements OutboundTask {
   /// 创建时间 - 任务创建的时间戳
   @override
   @JsonKey(name: 'createtime')
-  String get createTime;
+  String? get createTime;
 
   /// 状态 - 任务当前执行状态
   @override
   @JsonKey(name: 'status')
-  String get status;
+  String? get status;
 
   /// 任务数量 - 计划出库的总数量
   @override

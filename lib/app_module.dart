@@ -18,7 +18,7 @@ class AppModule extends Module {
       () => ApiService(i.get<DioClient>(), i.get<UserManager>()),
     );
     i.addSingleton<UserManager>(() => UserManager());
-
+    
     i.add<LoginBloc>(
       () => LoginBloc(
         apiService: i.get<ApiService>(),

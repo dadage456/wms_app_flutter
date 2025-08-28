@@ -33,23 +33,19 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
     emit(const OutboundTaskLoading());
 
     try {
-      final response = await _outboundTaskService.getOutboundTaskList(
+      final data = await _outboundTaskService.getOutboundTaskList(
         query: event.query,
       );
 
-      if (response.code == '200') {
-        emit(
-          OutboundTaskLoaded(
-            tasks: response.data.rows,
-            total: response.data.total,
-            currentPage: event.query.pageIndex,
-            query: event.query,
-            hasReachedMax: response.data.rows.length < event.query.pageSize,
-          ),
-        );
-      } else {
-        emit(OutboundTaskError(response.message));
-      }
+      emit(
+        OutboundTaskLoaded(
+          tasks: data.rows,
+          total: data.total,
+          currentPage: event.query.pageIndex,
+          query: event.query,
+          hasReachedMax: data.rows.length < event.query.pageSize,
+        ),
+      );
     } catch (e) {
       emit(OutboundTaskError(e.toString()));
     }
@@ -73,23 +69,19 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
 
       try {
         final refreshQuery = currentState.query.copyWith(pageIndex: 1);
-        final response = await _outboundTaskService.getOutboundTaskList(
+        final data = await _outboundTaskService.getOutboundTaskList(
           query: refreshQuery,
         );
 
-        if (response.code == '200') {
-          emit(
-            OutboundTaskLoaded(
-              tasks: response.data.rows,
-              total: response.data.total,
-              currentPage: 1,
-              query: refreshQuery,
-              hasReachedMax: response.data.rows.length < refreshQuery.pageSize,
-            ),
-          );
-        } else {
-          emit(OutboundTaskError(response.message));
-        }
+        emit(
+          OutboundTaskLoaded(
+            tasks: data.rows,
+            total: data.total,
+            currentPage: 1,
+            query: refreshQuery,
+            hasReachedMax: data.rows.length < refreshQuery.pageSize,
+          ),
+        );
       } catch (e) {
         emit(OutboundTaskError(e.toString()));
       }
@@ -185,23 +177,20 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
         final pageQuery = currentState.query.copyWith(
           pageIndex: event.pageIndex,
         );
-        final response = await _outboundTaskService.getOutboundTaskList(
+
+        final data = await _outboundTaskService.getOutboundTaskList(
           query: pageQuery,
         );
 
-        if (response.code == '200') {
-          emit(
-            OutboundTaskLoaded(
-              tasks: response.data.rows,
-              total: response.data.total,
-              currentPage: event.pageIndex,
-              query: pageQuery,
-              hasReachedMax: response.data.rows.length < pageQuery.pageSize,
-            ),
-          );
-        } else {
-          emit(OutboundTaskError(response.message));
-        }
+        emit(
+          OutboundTaskLoaded(
+            tasks: data.rows,
+            total: data.total,
+            currentPage: pageQuery.pageIndex,
+            query: pageQuery,
+            hasReachedMax: data.rows.length < pageQuery.pageSize,
+          ),
+        );
       } catch (e) {
         emit(OutboundTaskError(e.toString()));
       }
