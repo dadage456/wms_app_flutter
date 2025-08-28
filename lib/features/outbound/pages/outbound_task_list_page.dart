@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import '../models/outbound_task.dart';
 import '../widgets/outbound_task_list_item.dart';
 import '../widgets/outbound_task_filter_dialog.dart';
 import '../widgets/outbound_search_bar.dart';
+import '../../../services/user_manager.dart';
 
 /// 出库任务列表页面
 class OutboundTaskListPage extends HookWidget {
@@ -27,7 +29,7 @@ class OutboundTaskListPage extends HookWidget {
     final currentPage = useState<int>(1);
 
     // 获取BLoC实例
-    final outboundTaskBloc = Modular.get<OutboundTaskBloc>();
+    final outboundTaskBloc = BlocProvider.of<OutboundTaskBloc>(context);
 
     // 初始化加载数据
     useEffect(() {
@@ -245,9 +247,27 @@ class OutboundTaskListPage extends HookWidget {
 
   /// 导航到明细页面
   void _navigateToDetail(BuildContext context, OutboundTask task) {
-    // TODO: 实现导航到明细页面
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('导航到明细页面: ${task.outTaskNo}')));
+    // 获取用户信息
+    final userManager = Modular.get<UserManager>();
+    final userInfo = userManager.userInfo;
+
+    if (userInfo == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
+      return;
+    }
+
+    log('Loading task items with query: ');
+    // 导航到出库任务明细页面
+    Modular.to.pushNamed(
+      '/outbound/detail/${task.outTaskId}',
+      arguments: {
+        'outTaskId': task.outTaskId.toString(),
+        'workStation': task.workStation,
+        'userId': userInfo.userId,
+        'roleOrUserId': userInfo.userId,
+      },
+    );
   }
 }

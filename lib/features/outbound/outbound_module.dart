@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,8 +7,10 @@ import 'package:wms_app/app_module.dart';
 import 'package:wms_app/features/outbound/bloc/outbound_task_state.dart';
 
 import 'bloc/outbound_task_bloc.dart';
+import 'bloc/outbound_task_detail_bloc.dart';
 import 'services/outbound_task_service.dart';
 import 'pages/outbound_task_list_page.dart';
+import 'pages/outbound_task_detail_page.dart';
 import '../../services/user_manager.dart';
 import '../../services/dio_client.dart';
 
@@ -23,11 +27,16 @@ class OutboundModule extends Module {
     );
 
     // 注册BLoC
-    i.addLazySingleton<OutboundTaskBloc>(
+    i.add<OutboundTaskBloc>(
       () => OutboundTaskBloc(
         outboundTaskService: i.get<OutboundTaskService>(),
         userManager: i.get<UserManager>(),
       ),
+    );
+
+    // 注册出库任务明细BLoC
+    i.add<OutboundTaskDetailBloc>(
+      () => OutboundTaskDetailBloc(i.get<OutboundTaskService>()),
     );
   }
 
@@ -49,6 +58,32 @@ class OutboundModule extends Module {
         create: (context) => Modular.get<OutboundTaskBloc>(),
         child: const OutboundTaskListPage(),
       ),
+    );
+
+    // 出库任务明细页面
+    r.child(
+      '/detail/:outTaskId',
+      child: (context) {
+        final args = Modular.args;
+        final outTaskId = args.params['outTaskId'] ?? '';
+        final workStation = args.data['workStation'] ?? '';
+        final int userId = args.data['userId'];
+        final int roleOrUserId = args.data['roleOrUserId'];
+
+        developer.log(
+          'Navigating to detail page: $outTaskId $workStation $userId $roleOrUserId',
+        );
+
+        return BlocProvider(
+          create: (context) => Modular.get<OutboundTaskDetailBloc>(),
+          child: OutboundTaskDetailPage(
+            outTaskId: outTaskId,
+            workStation: workStation,
+            userId: userId,
+            roleOrUserId: roleOrUserId,
+          ),
+        );
+      },
     );
   }
 }
