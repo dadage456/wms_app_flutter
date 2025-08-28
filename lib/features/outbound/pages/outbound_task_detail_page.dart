@@ -297,7 +297,7 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
 
                                   final taskItem = taskItems[index];
                                   final isSelected = selectedItemIds.contains(
-                                    taskItem.outTaskItemId,
+                                    taskItem.outTaskItemId.toString(),
                                   );
 
                                   return OutboundTaskItemCard(

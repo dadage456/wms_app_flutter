@@ -70,24 +70,17 @@ class OutboundTaskService {
   /// [operationType] 操作类型（'0'表示撤销）
   /// [confirm] 确认标志
   /// 返回撤销操作响应
-  Future<CancelTaskResponse> cancelOutboundTaskItems({
+  Future<void> cancelOutboundTaskItems({
     required List<String> taskItemIds,
     String operationType = '0',
     String confirm = 'true',
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/CommitRCOutTaskItem',
+      '/system/terminal/commitRCOutTaskItem',
       data: {
-        'taskItemIds': taskItemIds,
-        'operationType': operationType,
-        'confirm': confirm,
-      },
-    );
-
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) {
-        return CancelTaskResponse.fromJson(data);
+        'outtaskitemids': taskItemIds,
+        'roomTag': operationType,
+        'isCanel': confirm,
       },
     );
   }

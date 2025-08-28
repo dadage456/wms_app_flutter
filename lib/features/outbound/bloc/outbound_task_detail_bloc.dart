@@ -304,8 +304,7 @@ class OutboundTaskDetailBloc
             if (selectedItemIds.isEmpty) return;
 
             try {
-              log('Cancelling selected items: ${selectedItemIds.toList()}');
-
+              log('取消界面上的选中的项: ${selectedItemIds.toList()}');
               emit(
                 OutboundTaskDetailState.cancelling(
                   taskItems: taskItems,
@@ -313,28 +312,20 @@ class OutboundTaskDetailBloc
                 ),
               );
 
-              final response = await _outboundTaskService
-                  .cancelOutboundTaskItems(
-                    taskItemIds: selectedItemIds.toList(),
-                  );
+              log('请求取消任务: ${selectedItemIds.toList()}');
+              await _outboundTaskService.cancelOutboundTaskItems(
+                taskItemIds: selectedItemIds.toList(),
+              );
 
-              if (response.code == '200') {
-                log('Items cancelled successfully');
-
-                // 撤销成功后刷新列表
-                if (currentQuery != null) {
-                  add(
-                    OutboundTaskDetailEvent.loadTaskItems(query: currentQuery),
-                  );
-                }
-              } else {
-                throw Exception(response.message);
+              // 撤销成功后刷新列表
+              if (currentQuery != null) {
+                add(OutboundTaskDetailEvent.loadTaskItems(query: currentQuery));
               }
             } catch (e) {
               log('Failed to cancel selected items: $e');
               emit(
                 OutboundTaskDetailState.error(
-                  message: e.toString(),
+                  message: ErrorHandler.handleError(e),
                   taskItems: taskItems,
                   selectedItemIds: selectedItemIds,
                 ),
