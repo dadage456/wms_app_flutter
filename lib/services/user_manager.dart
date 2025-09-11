@@ -19,7 +19,14 @@ class UserManager {
   static final UserManager _instance = UserManager._internal();
 
   // 用户是否登录
-  bool get isLogin => _userInfo != null;
+  bool get isLogin {
+    if (_userInfo != null) return true;
+
+    // 如果内存中没有用户信息，检查本地存储是否有登录信息
+    return _userLoginInfo != null;
+  }
+
+
 
   /// 用户登录
   void login(UserInfoModel userInfo, String name, String password) {

@@ -49,6 +49,8 @@ class CommonDataGrid<T> extends StatefulWidget {
 
   /* 高度 */
   final double? height;
+  final double? headerHeight;
+  final double? rowHeight;
 
   const CommonDataGrid({
     super.key,
@@ -63,7 +65,7 @@ class CommonDataGrid<T> extends StatefulWidget {
     this.allowSelect = false,
     this.dataGridController,
     this.dataPagerController,
-    this.height,
+    this.height, this.headerHeight, this.rowHeight,
   });
 
   @override
@@ -133,6 +135,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
             ? constraints.maxHeight
             : bodyHeight;
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             /* 表格 */
             Expanded(
@@ -190,8 +193,8 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   checkboxColumnSettings: const DataGridCheckboxColumnSettings(
                     width: 50,
                   ),
-                  headerRowHeight: 32,
-                  rowHeight: 32,
+                  headerRowHeight: widget.headerHeight ?? 32,
+                  rowHeight:  widget.rowHeight ?? 32,
                   columns: widget.columns
                       .map((e) => _buildGridColumn(e))
                       .toList(),
@@ -209,6 +212,8 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   Widget _buildPager() {
     return Container(
       height: 64,
+      alignment: Alignment.center,
+      // width: double.infinity,
       decoration: const BoxDecoration(color: Colors.white),
       child: SfDataPagerTheme(
         data: SfDataPagerThemeData(

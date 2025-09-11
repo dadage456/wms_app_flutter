@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 /* ---------------- 入口 ---------------- */
@@ -287,6 +288,7 @@ class _FunctionGrid extends StatelessWidget {
       child: InkWell(
         onTap: () {
           if (f.title == '平库出库') {
+            Modular.to.pushNamed('/outbound');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
