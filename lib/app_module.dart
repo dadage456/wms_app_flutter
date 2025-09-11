@@ -1,12 +1,12 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:wms_app/pages/lauch_page/splash_page.dart';
-import 'package:wms_app/pages/login/bloc/login_bloc.dart';
+import 'package:wms_app/modules/home/lauch_page/splash_page.dart';
+import 'package:wms_app/modules/home/login/bloc/login_bloc.dart';
 import 'package:wms_app/services/dio_client.dart';
 import 'package:wms_app/services/user_manager.dart';
-import 'package:wms_app/pages/home/home_page.dart';
-import 'package:wms_app/pages/login/login_page.dart';
+import 'package:wms_app/modules/home/home_page.dart';
+import 'package:wms_app/modules/home/login/login_page.dart';
 import 'package:wms_app/services/api_service.dart';
-import 'features/outbound/outbound_module.dart';
+import 'modules/outbound/outbound_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -18,7 +18,7 @@ class AppModule extends Module {
       () => ApiService(i.get<DioClient>(), i.get<UserManager>()),
     );
     i.addSingleton<UserManager>(() => UserManager());
-    
+
     i.add<LoginBloc>(
       () => LoginBloc(
         apiService: i.get<ApiService>(),
