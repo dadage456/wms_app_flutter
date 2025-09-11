@@ -1,115 +1,181 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import 'bloc/outbound_task_bloc.dart';
-import 'bloc/outbound_task_event.dart';
-import 'bloc/outbound_task_state.dart';
-import 'models/outbound_task.dart';
-import 'widgets/outbound_task_list_item.dart';
-import 'widgets/outbound_task_filter_dialog.dart';
-import 'widgets/outbound_search_bar.dart';
-import '../../../services/user_manager.dart';
+import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
+import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
+import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
+import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
+import 'package:wms_app/common_widgets/custom_app_bar.dart';
+import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/modules/outbound/task_list/config/outbound_task_grid_config.dart';
+import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
 
-/// 出库任务列表页面
-class OutboundTaskListPage extends HookWidget {
+const Color _bgColor = Color(0xFFF6F6F6);
+const TextStyle _appBarTextStyle = TextStyle(
+  color: Colors.white,
+  fontSize: 18,
+  fontWeight: FontWeight.w600,
+);
+const TextStyle _infoTextStyle = const TextStyle(
+  fontSize: 14,
+  fontWeight: FontWeight.w400,
+);
+
+class OutboundTaskListPage extends StatefulWidget {
   const OutboundTaskListPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final searchController = useTextEditingController();
-    final scrollController = useScrollController();
-    final refreshIndicatorKey = useMemoized(
-      () => GlobalKey<RefreshIndicatorState>(),
+  State<OutboundTaskListPage> createState() => _OutboundTaskListPageState();
+}
+
+class _OutboundTaskListPageState extends State<OutboundTaskListPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final TextEditingController _scanController = TextEditingController();
+  late final CommonDataGridBloc<OutboundTask> _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    _bloc = CommonDataGridBloc<OutboundTask>(
+      dataLoader: (pageIndex) async {
+        await Future.delayed(const Duration(seconds: 1));
+        return DataGridResponseData(totalPages: 1, data: []);
+      },
     );
+  }
 
-    // 当前筛选状态
-    final currentFilter = useState<String>('0'); // '0': 采集中, '1': 所有
-    final currentPage = useState<int>(1);
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scanController.dispose();
+    super.dispose();
+  }
 
-    // 获取BLoC实例
-    final outboundTaskBloc = BlocProvider.of<OutboundTaskBloc>(context);
-
-    // 初始化加载数据
-    useEffect(() {
-      final defaultQuery = outboundTaskBloc.getDefaultQuery();
-      if (defaultQuery != null) {
-        outboundTaskBloc.add(LoadOutboundTasksEvent(defaultQuery));
-      }
-      return null;
-    }, []);
-
-    // 监听滚动事件，实现分页加载
-    useEffect(() {
-      void onScroll() {
-        if (scrollController.position.pixels >=
-            scrollController.position.maxScrollExtent - 200) {
-          // 接近底部时加载下一页
-          final state = outboundTaskBloc.state;
-          if (state is OutboundTaskLoaded && !state.hasReachedMax) {
-            outboundTaskBloc.add(LoadPageEvent(state.currentPage + 1));
-          }
-        }
-      }
-
-      scrollController.addListener(onScroll);
-      return () => scrollController.removeListener(onScroll);
-    }, [scrollController]);
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('平库下架'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          // 筛选按钮
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () =>
-                _showFilterDialog(context, currentFilter, outboundTaskBloc),
-          ),
-          // 刷新按钮
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                outboundTaskBloc.add(const RefreshOutboundTasksEvent()),
-          ),
-        ],
-      ),
+      backgroundColor: _bgColor,
+      appBar: CustomAppBar(
+        title: '出库任务列表',
+        onBackPressed: () {
+          Navigator.of(context).pop();
+        },
+      ).appBar,
       body: Column(
         children: [
-          // 搜索栏
-          OutboundSearchBar(
-            controller: searchController,
-            onSearch: (searchKey) {
-              outboundTaskBloc.add(SearchOutboundTasksEvent(searchKey));
-            },
-            onScanCode: (code) {
-              searchController.text = code;
-              outboundTaskBloc.add(SearchOutboundTasksEvent(code));
+          _buildScanInput(),
+          const SizedBox(height: 0),
+          _buildTable(),
+          _buildBottomButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanInput() {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(8.0)),
+      ),
+      child: TextField(
+        controller: _scanController,
+        decoration: InputDecoration(
+          hintText: '请扫描或输入库位/物料',
+          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8), // 输入框 8 圆角
+            borderSide: BorderSide.none, // 去掉默认边框
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTable() {
+    return BlocProvider(
+      create: (context) => _bloc,
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<OutboundTask>,
+            CommonDataGridState<OutboundTask>
+          >(
+            listener:
+                (
+                  BuildContext context,
+                  CommonDataGridState<OutboundTask> state,
+                ) {
+                  if (state.status == GridStatus.loading) {
+                    LoadingDialogManager.instance.showLoadingDialog(context);
+                  } else {
+                    LoadingDialogManager.instance.hideLoadingDialog(context);
+                  }
+
+                  if (state.status == GridStatus.error) {
+                    LoadingDialogManager.instance.showErrorDialog(
+                      context,
+                      state.errorMessage ?? '未知错误',
+                    );
+                  }
+                },
+            builder: (context, state) {
+              debugPrint('------------------构建表格 ------------------');
+              print(
+                '--------rows: ${state.status}  ${state.errorMessage ?? ''}',
+              );
+              debugPrint('--------selected rows: ${state.selectedRows}');
+              return CommonDataGrid<OutboundTask>(
+                columns: OutboundTaskGridConfig.getColumns(),
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                onLoadData: (pageIndex) async {
+                  debugPrint('load page data $pageIndex');
+                  await Future.delayed(const Duration(microseconds: 1));
+
+                  _bloc.add(LoadDataEvent(pageIndex));
+                },
+
+                selectedRows: state.selectedRows,
+                onSelectionChanged: (list) {
+                  debugPrint('selectedRows: $list');
+                  _bloc.add(ChangeSelectedRowsEvent(list));
+                },
+                datas: state.data,
+                allowPager: true,
+                allowSelect: true,
+              );
             },
           ),
+    );
+  }
 
-          // 任务列表
+  Widget _buildBottomButtons() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(color: Colors.white),
+      height: 40,
+      child: Row(
+        children: [
           Expanded(
-            child: BlocBuilder<OutboundTaskBloc, OutboundTaskState>(
-              bloc: outboundTaskBloc,
-              builder: (context, state) {
-                return RefreshIndicator(
-                  key: refreshIndicatorKey,
-                  onRefresh: () async {
-                    outboundTaskBloc.add(const RefreshOutboundTasksEvent());
-                    // 等待刷新完成
-                    await Future.delayed(const Duration(milliseconds: 500));
-                  },
-                  child: _buildTaskList(
-                    context,
-                    state,
-                    scrollController,
-                    outboundTaskBloc,
-                  ),
-                );
-              },
+            child: OutlinedButton(
+              onPressed: () {},
+              style: _buildOutlinedButtonStyle(),
+              child: const Text('采集结果'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {},
+              style: _buildButtonStyle(),
+              child: const Text('提交'),
             ),
           ),
         ],
@@ -117,175 +183,22 @@ class OutboundTaskListPage extends HookWidget {
     );
   }
 
-  /// 构建任务列表
-  Widget _buildTaskList(
-    BuildContext context,
-    OutboundTaskState state,
-    ScrollController scrollController,
-    OutboundTaskBloc bloc,
-  ) {
-    if (state is OutboundTaskLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state is OutboundTaskError) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text('加载失败', style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              state.message,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => bloc.add(const RefreshOutboundTasksEvent()),
-              child: const Text('重试'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (state is OutboundTaskLoaded ||
-        state is OutboundTaskRefreshing ||
-        state is OutboundTaskPageLoading) {
-      List<OutboundTask> tasks = [];
-      int total = 0;
-      bool isRefreshing = false;
-      bool isPageLoading = false;
-
-      if (state is OutboundTaskLoaded) {
-        tasks = state.tasks;
-        total = state.total;
-      } else if (state is OutboundTaskRefreshing) {
-        tasks = state.tasks;
-        total = state.total;
-        isRefreshing = true;
-      } else if (state is OutboundTaskPageLoading) {
-        tasks = state.tasks;
-        total = state.total;
-        isPageLoading = true;
-      }
-
-      if (tasks.isEmpty) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                '当前任务列表没有待处理任务',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        controller: scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: tasks.length + (isPageLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= tasks.length) {
-            // 分页加载指示器
-            return const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          final task = tasks[index];
-          return OutboundTaskListItem(
-            task: task,
-            onCollectTap: () => _navigateToCollect(context, task),
-            onDetailTap: () => _navigateToDetail(context, task),
-          );
-        },
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-
-  /// 显示筛选对话框
-  void _showFilterDialog(
-    BuildContext context,
-    ValueNotifier<String> currentFilter,
-    OutboundTaskBloc bloc,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => OutboundTaskFilterDialog(
-        currentFilter: currentFilter.value,
-        onFilterChanged: (filter) {
-          currentFilter.value = filter;
-          bloc.add(FilterOutboundTasksEvent(filter));
-        },
-      ),
+  ButtonStyle _buildOutlinedButtonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xFF1976D2), // 文字 + 图标色
+      backgroundColor: Colors.transparent, // 背景透明
+      side: const BorderSide(color: Color(0xFF1976D2)), // 蓝色边框
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: EdgeInsets.zero,
     );
   }
 
-  /// 导航到采集页面
-  void _navigateToCollect(BuildContext context, OutboundTask task) {
-    // 获取用户信息
-    final userManager = Modular.get<UserManager>();
-    final userInfo = userManager.userInfo;
-
-    if (userInfo == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
-      return;
-    }
-
-    log('Navigating to collect page with task: ${task.outTaskNo}');
-    // 导航到出库采集页面
-    Modular.to.pushNamed(
-      '/outbound/collect/${task.outTaskNo}',
-      arguments: {
-        'outTaskNo': task.outTaskNo,
-        'workStation': task.workStation,
-        'userId': userInfo.userId,
-        'roleOrUserId': userInfo.userId,
-      },
-    );
-  }
-
-  /// 导航到明细页面
-  void _navigateToDetail(BuildContext context, OutboundTask task) {
-    // 获取用户信息
-    final userManager = Modular.get<UserManager>();
-    final userInfo = userManager.userInfo;
-
-    if (userInfo == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
-      return;
-    }
-
-    log('Loading task items with query: ');
-    // 导航到出库任务明细页面
-    Modular.to.pushNamed(
-      '/outbound/detail/${task.outTaskId}',
-      arguments: {
-        'outTaskId': task.outTaskId.toString(),
-        'workStation': task.workStation,
-        'userId': userInfo.userId,
-        'roleOrUserId': userInfo.userId,
-      },
+  ButtonStyle _buildButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF1976D2),
+      foregroundColor: Colors.white,
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 }

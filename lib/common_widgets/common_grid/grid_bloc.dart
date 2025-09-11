@@ -3,8 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 
-typedef DataLoader<T> = Future<List<T>> Function(int pageIndex);
+typedef DataLoader<T> = Future<DataGridResponseData<T>> Function(int pageIndex);
 typedef DataDeleter<T> = Future<void> Function(List<T> items);
+
+class DataGridResponseData<T> {
+  final int totalPages;
+  final List<T> data;
+
+  const DataGridResponseData({required this.totalPages, required this.data});
+}
 
 class CommonDataGridBloc<T>
     extends Bloc<CommonDataGridEvent<T>, CommonDataGridState<T>> {
@@ -30,14 +37,14 @@ class CommonDataGridBloc<T>
 
       final data = await dataLoader(event.pageIndex);
 
-      debugPrint('加载数据成功: $data');
+      debugPrint('加载数据成功: ${data.data} total: ${data.totalPages}');
 
       emit(
         state.copyWith(
           status: GridStatus.loaded,
           currentPage: event.pageIndex,
-          totalPages: 20,
-          data: data,
+          totalPages: data.totalPages,
+          data: data.data,
           selectedRows: [],
         ),
       );
