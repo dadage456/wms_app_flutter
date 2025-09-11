@@ -7,8 +7,8 @@ import 'package:wms_app/pages/login/bloc/login_bloc.dart';
 import 'package:wms_app/pages/login/bloc/login_event.dart';
 import 'package:wms_app/pages/login/bloc/login_state.dart';
 import 'package:wms_app/services/user_manager.dart';
-import 'package:wms_app/widgets/keyboard_dismiss_ontap.dart';
-import 'package:wms_app/widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/keyboard_dismiss_ontap.dart';
+import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
 
 class UserLoginPage extends StatelessWidget {
   const UserLoginPage({super.key});
