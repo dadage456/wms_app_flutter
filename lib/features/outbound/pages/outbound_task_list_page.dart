@@ -239,10 +239,28 @@ class OutboundTaskListPage extends HookWidget {
 
   /// 导航到采集页面
   void _navigateToCollect(BuildContext context, OutboundTask task) {
-    // TODO: 实现导航到采集页面
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('导航到采集页面: ${task.outTaskNo}')));
+    // 获取用户信息
+    final userManager = Modular.get<UserManager>();
+    final userInfo = userManager.userInfo;
+
+    if (userInfo == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
+      return;
+    }
+
+    log('Navigating to collect page with task: ${task.outTaskNo}');
+    // 导航到出库采集页面
+    Modular.to.pushNamed(
+      '/outbound/collect/${task.outTaskNo}',
+      arguments: {
+        'outTaskNo': task.outTaskNo,
+        'workStation': task.workStation,
+        'userId': userInfo.userId,
+        'roleOrUserId': userInfo.userId,
+      },
+    );
   }
 
   /// 导航到明细页面

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/pages/home/home_page.dart';
 import '/pages/login/login_page.dart';

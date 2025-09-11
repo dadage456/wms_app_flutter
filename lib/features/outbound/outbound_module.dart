@@ -8,9 +8,11 @@ import 'package:wms_app/features/outbound/bloc/outbound_task_state.dart';
 
 import 'bloc/outbound_task_bloc.dart';
 import 'bloc/outbound_task_detail_bloc.dart';
+import 'bloc/outbound_collect_bloc.dart';
 import 'services/outbound_task_service.dart';
 import 'pages/outbound_task_list_page.dart';
 import 'pages/outbound_task_detail_page.dart';
+import 'pages/outbound_collect_page.dart';
 import '../../services/user_manager.dart';
 import '../../services/dio_client.dart';
 
@@ -37,6 +39,11 @@ class OutboundModule extends Module {
     // 注册出库任务明细BLoC
     i.add<OutboundTaskDetailBloc>(
       () => OutboundTaskDetailBloc(i.get<OutboundTaskService>()),
+    );
+
+    // 注册出库采集BLoC
+    i.add<OutboundCollectBloc>(
+      () => OutboundCollectBloc(i.get<OutboundTaskService>()),
     );
   }
 
@@ -81,6 +88,32 @@ class OutboundModule extends Module {
             workStation: workStation,
             userId: userId,
             roleOrUserId: roleOrUserId,
+          ),
+        );
+      },
+    );
+
+    // 出库采集页面
+    r.child(
+      '/collect/:outTaskNo',
+      child: (context) {
+        final args = Modular.args;
+        final outTaskNo = args.params['outTaskNo'] ?? '';
+        final workStation = args.data['workStation'] ?? '';
+        final int userId = args.data['userId'];
+        final int roleOrUserId = args.data['roleOrUserId'];
+
+        developer.log(
+          'Navigating to collect page: $outTaskNo $workStation $userId $roleOrUserId',
+        );
+
+        return BlocProvider(
+          create: (context) => Modular.get<OutboundCollectBloc>(),
+          child: OutboundCollectPage(
+            outTaskNo: outTaskNo,
+            workStation: workStation,
+            userId: userId,
+            roleOrUserId: roleOrUserId.toString(),
           ),
         );
       },
