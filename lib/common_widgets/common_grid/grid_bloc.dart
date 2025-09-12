@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
+import 'package:wms_app/utils/error_handler.dart';
 
 typedef DataLoader<T> = Future<DataGridResponseData<T>> Function(int pageIndex);
 typedef DataDeleter<T> = Future<void> Function(List<T> items);
@@ -48,10 +49,21 @@ class CommonDataGridBloc<T>
           selectedRows: [],
         ),
       );
+
+      // 始终完成 caller 给的 completer（告知调用方这次请求的结果）
+      if (event.completer != null && !event.completer!.isCompleted) {
+        event.completer!.complete(data);
+      }
     } catch (e) {
       emit(
-        state.copyWith(status: GridStatus.error, errorMessage: e.toString()),
+        state.copyWith(
+          status: GridStatus.error,
+          errorMessage: ErrorHandler.handleError(e),
+        ),
       );
+      if (event.completer != null && !event.completer!.isCompleted) {
+        event.completer!.completeError(e);
+      }
     }
   }
 

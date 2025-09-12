@@ -8,8 +8,6 @@ abstract class OutboundTaskEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-
-
 /// 搜索出库任务事件
 class SearchOutboundTasksEvent extends OutboundTaskEvent {
   const SearchOutboundTasksEvent(this.searchKey);
@@ -30,4 +28,10 @@ class FilterOutboundTasksEvent extends OutboundTaskEvent {
   List<Object?> get props => [finishFlag];
 }
 
+/// 搜索出库任务事件
+class RefrenshOutboundTasksEvent extends OutboundTaskEvent {
+  const RefrenshOutboundTasksEvent();
 
+  @override
+  List<Object?> get props => [];
+}

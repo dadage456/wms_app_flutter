@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
+import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 
 abstract class CommonDataGridEvent<T> extends Equatable {
   const CommonDataGridEvent();
@@ -10,8 +13,9 @@ abstract class CommonDataGridEvent<T> extends Equatable {
 /// 加载数据事件
 class LoadDataEvent<T> extends CommonDataGridEvent<T> {
   final int pageIndex;
+  final Completer<DataGridResponseData<T>>? completer;
 
-  const LoadDataEvent(this.pageIndex);
+  const LoadDataEvent(this.pageIndex, {this.completer});
 
   @override
   List<Object?> get props => [pageIndex];
