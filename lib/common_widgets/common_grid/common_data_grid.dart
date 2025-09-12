@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-typedef Future<List<T>> LoadFunction<T>(int pageIndex);
-typedef Future<void> LoadDataFunction(int pageIndex);
+typedef LoadFunction<T> = Future<List<T>> Function(int pageIndex);
+typedef OnPageChanged = Future<void> Function(int pageIndex);
 
 /* ------------------ 样式常量（沿用你已有的） ------------------ */
 const TextStyle _titleStyle = TextStyle(
@@ -33,7 +33,7 @@ class CommonDataGrid<T> extends StatefulWidget {
   final int currentPage;
   final int totalPages;
 
-  final LoadDataFunction onLoadData;
+  final OnPageChanged onLoadData;
 
   /* 选中控制 */
   final List<int> selectedRows;
@@ -77,6 +77,8 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   late _CommonDataSource<T> _source;
   late DataGridController _controller;
   late DataPagerController _dataPagerController;
+  late ScrollController _verticalScrollController;
+  late ScrollController _horizontalScrollController;
   Set<int> _selectedIndexInPage = {};
 
   @override
@@ -84,11 +86,13 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     super.initState();
     _controller = widget.dataGridController ?? DataGridController();
     _dataPagerController = widget.dataPagerController ?? DataPagerController();
+    _verticalScrollController = ScrollController(); 
+    _horizontalScrollController = ScrollController(); 
 
     _source = _CommonDataSource<T>(
       datas: widget.datas,
       columns: widget.columns,
-      onLoadData: widget.onLoadData,
+      onPageChanged: _onPageChanged,
     );
 
     // 加载数据
@@ -104,7 +108,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
       _source = _CommonDataSource<T>(
         datas: widget.datas,
         columns: widget.columns,
-        onLoadData: widget.onLoadData,
+        onPageChanged: _onPageChanged,
       );
       // _dataPagerController.selectedPageIndex = widget.currentPage;
 
@@ -115,10 +119,30 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     }
   }
 
+  // 页面切换
+  Future<void> _onPageChanged(int pageIndex) async {
+    _scrollToOrigin();
+    await widget.onLoadData.call(pageIndex);
+  }
+
+  void _scrollToOrigin() {
+  // 确保下一帧渲染完再滚，避免空白
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (_horizontalScrollController.hasClients) {
+      _horizontalScrollController.jumpTo(0);
+    }
+    if (_verticalScrollController.hasClients) {
+      _verticalScrollController.jumpTo(0);
+    }
+  });
+}
+
   @override
   void dispose() {
     _controller.dispose();
     _dataPagerController.dispose();
+    _verticalScrollController.dispose();
+    _horizontalScrollController.dispose();
     super.dispose();
   }
 
@@ -172,6 +196,8 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                 ),
                 child: SfDataGrid(
                   controller: _controller,
+                  verticalScrollController: _verticalScrollController,
+                  horizontalScrollController: _horizontalScrollController,
                   source: _source,
                   allowSorting: true,
                   allowColumnsResizing: true,
@@ -285,12 +311,12 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
 class _CommonDataSource<T> extends DataGridSource {
   final List<T> datas;
   final List<GridColumnConfig<T>> columns;
-  final LoadDataFunction onLoadData;
+  final OnPageChanged onPageChanged;
 
   _CommonDataSource({
     required this.datas,
     required this.columns,
-    required this.onLoadData,
+    required this.onPageChanged,
   }) {
     _mapDataGridRows();
   }
@@ -330,7 +356,7 @@ class _CommonDataSource<T> extends DataGridSource {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               alignment: Alignment.centerLeft,
-              child: Text(cell.value?.toString() ?? '', style: _infoStyle),
+              child: SelectableText(cell.value?.toString() ?? '', style: _infoStyle),
             );
       }).toList(),
     );
@@ -338,12 +364,14 @@ class _CommonDataSource<T> extends DataGridSource {
 
   @override
   Future<bool> handlePageChange(int oldPageIndex, int newPageIndex) async {
-    if (oldPageIndex != newPageIndex) {
-      await onLoadData(newPageIndex);
-      return true;
-    }
     debugPrint('------------- page change ----------');
     debugPrint('old: $oldPageIndex, new: $newPageIndex');
+
+    if (oldPageIndex != newPageIndex) {
+      await onPageChanged(newPageIndex);
+      return true;
+    }
+    
     // return super.handlePageChange(oldPageIndex, newPageIndex);
     return false;
   }

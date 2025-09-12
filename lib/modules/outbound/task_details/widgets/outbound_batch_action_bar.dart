@@ -52,45 +52,45 @@ class OutboundBatchActionBar extends StatelessWidget {
               ),
             ),
             // 全选/取消全选按钮
-            TextButton.icon(
-              onPressed: totalCount > 0
-                  ? (isAllSelected ? onDeselectAll : onSelectAll)
-                  : null,
-              icon: Icon(
-                isAllSelected ? Icons.check_box : Icons.check_box_outline_blank,
-                size: 20,
-                color: totalCount > 0
-                    ? (isAllSelected ? Colors.blue : Colors.grey[600])
-                    : Colors.grey[400],
-              ),
-              label: Text(
-                isAllSelected ? '取消全选' : '全选',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: totalCount > 0
-                      ? (isAllSelected ? Colors.blue : Colors.grey[600])
-                      : Colors.grey[400],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            // 清除选择按钮
-            if (hasSelection)
-              TextButton.icon(
-                onPressed: onClearSelection,
-                icon: const Icon(
-                  Icons.clear,
-                  size: 20,
-                  color: Colors.orange,
-                ),
-                label: const Text(
-                  '清除',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.orange,
-                  ),
-                ),
-              ),
+            // TextButton.icon(
+            //   onPressed: totalCount > 0
+            //       ? (isAllSelected ? onDeselectAll : onSelectAll)
+            //       : null,
+            //   icon: Icon(
+            //     isAllSelected ? Icons.check_box : Icons.check_box_outline_blank,
+            //     size: 20,
+            //     color: totalCount > 0
+            //         ? (isAllSelected ? Colors.blue : Colors.grey[600])
+            //         : Colors.grey[400],
+            //   ),
+            //   label: Text(
+            //     isAllSelected ? '取消全选' : '全选',
+            //     style: TextStyle(
+            //       fontSize: 14,
+            //       color: totalCount > 0
+            //           ? (isAllSelected ? Colors.blue : Colors.grey[600])
+            //           : Colors.grey[400],
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(width: 8),
+            // // 清除选择按钮
+            // if (hasSelection)
+            //   TextButton.icon(
+            //     onPressed: onClearSelection,
+            //     icon: const Icon(
+            //       Icons.clear,
+            //       size: 20,
+            //       color: Colors.orange,
+            //     ),
+            //     label: const Text(
+            //       '清除',
+            //       style: TextStyle(
+            //         fontSize: 14,
+            //         color: Colors.orange,
+            //       ),
+            //     ),
+            //   ),
             const SizedBox(width: 8),
             // 撤销按钮
             ElevatedButton.icon(

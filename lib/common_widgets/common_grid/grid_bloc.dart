@@ -36,7 +36,7 @@ class CommonDataGridBloc<T>
     try {
       emit(state.copyWith(status: GridStatus.loading));
 
-      final data = await dataLoader(event.pageIndex);
+      final data = await dataLoader(event.pageIndex + 1);
 
       debugPrint('加载数据成功: ${data.data} total: ${data.totalPages}');
 

@@ -38,7 +38,10 @@ class OutboundModule extends Module {
 
     // 注册出库任务明细BLoC
     i.add<OutboundTaskDetailBloc>(
-      () => OutboundTaskDetailBloc(i.get<OutboundTaskService>()),
+      () => OutboundTaskDetailBloc(
+        i.get<OutboundTaskService>(),
+        i.get<UserManager>(),
+      ),
     );
 
     // 注册出库采集BLoC
