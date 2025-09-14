@@ -1,9 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
-import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 import 'package:wms_app/utils/error_handler.dart';
 import '../../services/outbound_task_service.dart';
 import '../../../../services/user_manager.dart';
@@ -18,7 +16,7 @@ class OutboundTaskDetailBloc
   final UserManager _userManager;
 
   OutboundTaskDetailBloc(this._outboundTaskService, this._userManager)
-    : super(const OutboundTaskDetailState()) {
+    : super(OutboundTaskDetailState()) {
     log('OutboundTaskDetailBloc initialized');
 
     on<SearchEvent>(_onSearch);
@@ -37,21 +35,34 @@ class OutboundTaskDetailBloc
   void _initializeGridBloc() {
     gridBloc = CommonDataGridBloc<OutboundTaskItem>(
       dataLoader: createDataLoader(),
+      dataDeleter: createDataDeleter(),
     );
   }
 
   /// 创建数据加载器
-  DataLoader<OutboundTaskItem> createDataLoader() {
+  DataGridLoader<OutboundTaskItem> createDataLoader() {
     return (int pageIndex) async {
       currentQuery = currentQuery.copyWith(pageIndex: pageIndex);
-      final data = await _outboundTaskService.getOutboundTaskItemList(query: currentQuery);
-      
+      final data = await _outboundTaskService.getOutboundTaskItemList(
+        query: currentQuery,
+      );
+
       final totalPages = (data.total / currentQuery.pageSize).ceil();
-      
+
       return DataGridResponseData<OutboundTaskItem>(
         totalPages: totalPages,
         data: data.rows,
       );
+    };
+  }
+
+  /// 创建数据删除器
+  DataGridDeleter createDataDeleter() {
+    return (indexs) async {
+      final datas = gridBloc.state.data;
+      final ids = indexs.map((i) => datas[i].outTaskItemId.toString()).toList();
+      await _outboundTaskService.cancelOutboundTaskItems(taskItemIds: ids);
+      gridBloc.add(RefrenshLoadDataEvent());
     };
   }
 
@@ -64,7 +75,7 @@ class OutboundTaskDetailBloc
         workStation: workStation,
         userId: userInfo.userId,
         roleOrUserId: userInfo.userId,
-        pageIndex: 0,
+        pageIndex: 1,
         pageSize: 100,
       );
     }
@@ -75,23 +86,12 @@ class OutboundTaskDetailBloc
     SearchEvent event,
     Emitter<OutboundTaskDetailState> emit,
   ) async {
-    try {
-      log('Searching with key: ${event.searchKey}');
-      emit(state.copyWith(searchKey: event.searchKey, isLoading: true));
-
-      currentQuery = currentQuery.copyWith(searchKey: event.searchKey, pageIndex: 0);
-      
-      // 通知表格BLoC重新加载数据
-      gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
-      
-      emit(state.copyWith(isLoading: false));
-    } catch (e) {
-      log('Failed to search: $e');
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: ErrorHandler.handleError(e),
-      ));
-    }
+    currentQuery = currentQuery.copyWith(
+      searchKey: event.searchKey,
+      pageIndex: 1,
+    );
+    // 通知表格BLoC重新加载数据
+    gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
   }
 
   /// 处理扫码事件
@@ -101,7 +101,7 @@ class OutboundTaskDetailBloc
   ) async {
     try {
       log('Scanning QR code: ${event.qrContent}');
-      emit(state.copyWith(isLoading: true));
+      // emit(state.copyWith(isLoading: true));
 
       // 首先尝试解析二维码内容
       final materialCode = _outboundTaskService.parseQRContent(event.qrContent);
@@ -119,16 +119,18 @@ class OutboundTaskDetailBloc
         );
 
         log('Material info retrieved: ${response.data.matCode}');
-        
+
         // 使用解析出的物料编码进行搜索
         add(SearchEvent(searchKey: response.data.matCode));
       }
     } catch (e) {
       log('Failed to scan QR code: $e');
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: ErrorHandler.handleError(e),
-      ));
+      // emit(
+      //   state.copyWith(
+      //     isLoading: false,
+      //     errorMessage: ErrorHandler.handleError(e),
+      //   ),
+      // );
     }
   }
 
@@ -137,9 +139,10 @@ class OutboundTaskDetailBloc
     CancelSelectedItemsEvent event,
     Emitter<OutboundTaskDetailState> emit,
   ) async {
+    //gridBloc.add(DeleteSelectedRowsEvent(event.selectedItemIds))
+
     try {
       log('取消选中的任务项: ${event.selectedItemIds}');
-      emit(state.copyWith(isLoading: true));
 
       await _outboundTaskService.cancelOutboundTaskItems(
         taskItemIds: event.selectedItemIds,
@@ -147,13 +150,15 @@ class OutboundTaskDetailBloc
 
       // 撤销成功后刷新列表
       gridBloc.add(const LoadDataEvent(0));
-      emit(state.copyWith(isLoading: false));
+      // emit(state.copyWith(isLoading: false));
     } catch (e) {
       log('Failed to cancel selected items: $e');
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: ErrorHandler.handleError(e),
-      ));
+      // emit(
+      // state.copyWith(
+      //   isLoading: false,
+      //   errorMessage: ErrorHandler.handleError(e),
+      // ),
+      // );
     }
   }
 
@@ -164,18 +169,20 @@ class OutboundTaskDetailBloc
   ) async {
     try {
       log('Refreshing task items');
-      emit(state.copyWith(isLoading: true));
-      
+      // emit(state.copyWith(isLoading: true));
+
       // 通知表格BLoC重新加载数据
       gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
-      
-      emit(state.copyWith(isLoading: false));
+
+      // emit(state.copyWith(isLoading: false));
     } catch (e) {
       log('Failed to refresh: $e');
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: ErrorHandler.handleError(e),
-      ));
+      // emit(
+      // state.copyWith(
+      //   isLoading: false,
+      //   errorMessage: ErrorHandler.handleError(e),
+      // ),
+      // );
     }
   }
 }

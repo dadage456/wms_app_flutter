@@ -32,7 +32,7 @@ class OutboundTaskBloc extends Bloc<OutboundTaskEvent, OutboundTaskState> {
   }
 
   /// 创建数据加载器函数，供CommonDataGridBloc使用
-  DataLoader<OutboundTask> createDataLoader() {
+  DataGridLoader<OutboundTask> createDataLoader() {
     return (int pageIndex) async {
       final query = currentQuery.copyWith(pageIndex: pageIndex);
       final data = await outboundTaskService.getOutboundTaskList(query: query);

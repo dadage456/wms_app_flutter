@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-typedef LoadFunction<T> = Future<List<T>> Function(int pageIndex);
 typedef OnPageChanged = Future<void> Function(int pageIndex);
 
 /* ------------------ 样式常量（沿用你已有的） ------------------ */
@@ -56,7 +55,7 @@ class CommonDataGrid<T> extends StatefulWidget {
     super.key,
     required this.columns,
     required this.datas,
-    this.currentPage = 0,
+    this.currentPage = 1,
     this.totalPages = 1,
     required this.onLoadData,
     this.selectedRows = const [],
@@ -65,7 +64,9 @@ class CommonDataGrid<T> extends StatefulWidget {
     this.allowSelect = false,
     this.dataGridController,
     this.dataPagerController,
-    this.height, this.headerHeight, this.rowHeight,
+    this.height,
+    this.headerHeight,
+    this.rowHeight,
   });
 
   @override
@@ -79,15 +80,15 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   late DataPagerController _dataPagerController;
   late ScrollController _verticalScrollController;
   late ScrollController _horizontalScrollController;
-  Set<int> _selectedIndexInPage = {};
+  final Set<int> _selectedIndexInPage = {};
 
   @override
   void initState() {
     super.initState();
     _controller = widget.dataGridController ?? DataGridController();
     _dataPagerController = widget.dataPagerController ?? DataPagerController();
-    _verticalScrollController = ScrollController(); 
-    _horizontalScrollController = ScrollController(); 
+    _verticalScrollController = ScrollController();
+    _horizontalScrollController = ScrollController();
 
     _source = _CommonDataSource<T>(
       datas: widget.datas,
@@ -122,20 +123,20 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   // 页面切换
   Future<void> _onPageChanged(int pageIndex) async {
     _scrollToOrigin();
-    await widget.onLoadData.call(pageIndex);
+    await widget.onLoadData.call(pageIndex + 1);
   }
 
   void _scrollToOrigin() {
-  // 确保下一帧渲染完再滚，避免空白
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (_horizontalScrollController.hasClients) {
-      _horizontalScrollController.jumpTo(0);
-    }
-    if (_verticalScrollController.hasClients) {
-      _verticalScrollController.jumpTo(0);
-    }
-  });
-}
+    // 确保下一帧渲染完再滚，避免空白
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_horizontalScrollController.hasClients) {
+        _horizontalScrollController.jumpTo(0);
+      }
+      if (_verticalScrollController.hasClients) {
+        _verticalScrollController.jumpTo(0);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -220,7 +221,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                     width: 50,
                   ),
                   headerRowHeight: widget.headerHeight ?? 32,
-                  rowHeight:  widget.rowHeight ?? 32,
+                  rowHeight: widget.rowHeight ?? 32,
                   columns: widget.columns
                       .map((e) => _buildGridColumn(e))
                       .toList(),
@@ -356,7 +357,10 @@ class _CommonDataSource<T> extends DataGridSource {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               alignment: Alignment.centerLeft,
-              child: SelectableText(cell.value?.toString() ?? '', style: _infoStyle),
+              child: SelectableText(
+                cell.value?.toString() ?? '',
+                style: _infoStyle,
+              ),
             );
       }).toList(),
     );
@@ -371,7 +375,7 @@ class _CommonDataSource<T> extends DataGridSource {
       await onPageChanged(newPageIndex);
       return true;
     }
-    
+
     // return super.handlePageChange(oldPageIndex, newPageIndex);
     return false;
   }

@@ -21,6 +21,16 @@ class LoadDataEvent<T> extends CommonDataGridEvent<T> {
   List<Object?> get props => [pageIndex];
 }
 
+/// 重新加载数据事件
+class RefrenshLoadDataEvent<T> extends CommonDataGridEvent<T> {
+  final Completer<DataGridResponseData<T>>? completer;
+
+  const RefrenshLoadDataEvent({this.completer});
+
+  @override
+  List<Object?> get props => [];
+}
+
 /// 删除选中行事件
 class DeleteSelectedRowsEvent<T> extends CommonDataGridEvent<T> {
   final List<int> selectedRows;

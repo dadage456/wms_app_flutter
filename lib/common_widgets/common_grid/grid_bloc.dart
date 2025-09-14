@@ -4,8 +4,9 @@ import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 import 'package:wms_app/utils/error_handler.dart';
 
-typedef DataLoader<T> = Future<DataGridResponseData<T>> Function(int pageIndex);
-typedef DataDeleter<T> = Future<void> Function(List<T> items);
+typedef DataGridLoader<T> =
+    Future<DataGridResponseData<T>> Function(int pageIndex);
+typedef DataGridDeleter = Future<void> Function(List<int> items);
 
 class DataGridResponseData<T> {
   final int totalPages;
@@ -16,8 +17,8 @@ class DataGridResponseData<T> {
 
 class CommonDataGridBloc<T>
     extends Bloc<CommonDataGridEvent<T>, CommonDataGridState<T>> {
-  final DataLoader<T> dataLoader;
-  final DataDeleter<T>? dataDeleter;
+  final DataGridLoader<T> dataLoader;
+  final DataGridDeleter? dataDeleter;
 
   CommonDataGridBloc({required this.dataLoader, this.dataDeleter})
     : super(CommonDataGridState<T>()) {
@@ -26,6 +27,7 @@ class CommonDataGridBloc<T>
 
     on<ChangeSelectedRowsEvent<T>>(_onChangeSelectedRows);
     on<UpdateTableDataEvent<T>>(_onUpdateData);
+    on<RefrenshLoadDataEvent<T>>(_onRefrenshData);
   }
 
   /// 处理加载数据事件
@@ -36,7 +38,7 @@ class CommonDataGridBloc<T>
     try {
       emit(state.copyWith(status: GridStatus.loading));
 
-      final data = await dataLoader(event.pageIndex + 1);
+      final data = await dataLoader(event.pageIndex);
 
       debugPrint('加载数据成功: ${data.data} total: ${data.totalPages}');
 
@@ -81,28 +83,28 @@ class CommonDataGridBloc<T>
       // 发出删除中状态
       emit(state.copyWith(status: GridStatus.loading));
       // 执行删除操作
-      //await dataDeleter!();
+      await dataDeleter!(event.selectedRows);
 
       // 删除成功后，从当前数据中移除被删除的项
-      final updatedData = <T>[];
+      // final updatedData = <T>[];
 
-      for (var i = 0; i < state.data.length; i++) {
-        if (!event.selectedRows.contains(i)) {
-          updatedData.add(state.data[i]);
-        }
-      }
+      // for (var i = 0; i < state.data.length; i++) {
+      //   if (!event.selectedRows.contains(i)) {
+      //     updatedData.add(state.data[i]);
+      //   }
+      // }
 
-      // 清空选中项并更新数据
-      emit(
-        state.copyWith(
-          status: GridStatus.loaded,
-          data: updatedData,
-          selectedRows: [],
-        ),
-      );
+      // // 清空选中项并更新数据
+      // emit(
+      //   state.copyWith(
+      //     status: GridStatus.loaded,
+      //     data: updatedData,
+      //     selectedRows: [],
+      //   ),
+      // );
 
       // 重新加载当前页数据以确保数据同步
-      // add(LoadDataEvent<T>(state.currentPage));
+      await _onLoadData(LoadDataEvent(state.currentPage), emit);
     } catch (e) {
       emit(
         state.copyWith(
@@ -129,16 +131,14 @@ class CommonDataGridBloc<T>
     emit(state.copyWith(data: event.data));
   }
 
-  /// 是否可以刷新
-  bool canUpdate(
-    CommonDataGridState<T> previousState,
-    CommonDataGridState<T> currentState,
-  ) {
-    return previousState.status != currentState.status ||
-        previousState.data != currentState.data ||
-        previousState.currentPage != currentState.currentPage ||
-        previousState.totalPages != currentState.totalPages ||
-        previousState.selectedRows != currentState.selectedRows ||
-        previousState.errorMessage != currentState.errorMessage;
+  /// 更新表格中的数据
+  Future<void> _onRefrenshData(
+    RefrenshLoadDataEvent<T> event,
+    Emitter<CommonDataGridState<T>> emit,
+  ) async {
+    await _onLoadData(
+      LoadDataEvent(state.currentPage, completer: event.completer),
+      emit,
+    );
   }
 }
