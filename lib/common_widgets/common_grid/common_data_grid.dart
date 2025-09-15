@@ -455,7 +455,9 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
         child: SfDataPager(
           controller: _dataPagerController,
           delegate: _source,
-          pageCount: widget.totalPages.toDouble(),
+          pageCount: widget.totalPages.toDouble() > 0
+              ? widget.totalPages.toDouble()
+              : 1,
           visibleItemsCount: 6,
           itemWidth: 40,
           itemHeight: 40,

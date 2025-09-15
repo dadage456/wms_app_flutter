@@ -43,9 +43,7 @@ class LoginScreen extends HookWidget {
           context.hideLoadingDialog();
           _showSuccessMessage(context, '登录成功');
           // 延迟跳转，让用户看到成功提示
-          Future.delayed(const Duration(milliseconds: 800), () {
-            Modular.to.pushReplacementNamed('/home');
-          });
+          Modular.to.pushReplacementNamed('/home');
         } else if (state is LoginFailure) {
           // 登录失败，显示错误信息
           context.hideLoadingDialog();
