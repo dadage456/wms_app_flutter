@@ -233,10 +233,11 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   source: _source,
                   allowSorting: true,
                   allowColumnsResizing: true,
-                  columnWidthMode: ColumnWidthMode.auto,
+                  columnWidthMode: ColumnWidthMode.none,
                   gridLinesVisibility: GridLinesVisibility.both,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   onSelectionChanged: _handleSelectionChanged,
+                  columnResizeMode: ColumnResizeMode.onResize,
 
                   onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                     setState(() {
@@ -253,9 +254,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   ),
                   headerRowHeight: widget.headerHeight ?? 32,
                   rowHeight: widget.rowHeight ?? 32,
-                  columns: widget.columns
-                      .map((e) => _buildGridColumn(e))
-                      .toList(),
+                  columns: _buildColumnsWithSpacer(),
                 ),
               ),
             ),
@@ -297,12 +296,28 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     );
   }
 
+
+  List<GridColumn> _buildColumnsWithSpacer() {
+    final columns = widget.columns.map((e) => _buildGridColumn(e)).toList();
+    
+    // 添加一个隐藏的占位列，为最后一列提供拖拽空间
+    columns.add(GridColumn(
+      columnName: '_spacer_column',
+      width: 50.0, // 提供50px的拖拽空间
+      label: Container(), // 空的标题
+    ));
+    
+    return columns;
+  }
+
   GridColumn _buildGridColumn(GridColumnConfig cfg) {
-    final effectiveWidth = columnWidths[cfg.name] ?? cfg.width ?? double.nan;
+    final effectiveWidth = columnWidths[cfg.name] ?? cfg.width ?? 120.0;
 
     return GridColumn(
       columnName: cfg.name,
-      width: effectiveWidth.isNaN ? double.nan : effectiveWidth,
+      width: effectiveWidth,
+      minimumWidth: cfg.minimumWidth ?? 80.0,
+      maximumWidth: cfg.maximumWidth ?? double.infinity,
       autoFitPadding: const EdgeInsets.symmetric(horizontal: 8),
       label: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -367,6 +382,8 @@ class _CommonDataSource<T> extends DataGridSource {
         final value = col.valueGetter(item);
         cells.add(DataGridCell<dynamic>(columnName: col.name, value: value));
       }
+      // 为占位列添加空数据单元格
+      cells.add(DataGridCell<dynamic>(columnName: '_spacer_column', value: ''));
       return DataGridRow(cells: cells);
     }).toList();
 
@@ -387,7 +404,8 @@ class _CommonDataSource<T> extends DataGridSource {
     return DataGridRowAdapter(
       color: color,
       cells: row.getCells().map<Widget>((cell) {
-        final col = _columnMap[cell.columnName]!;
+        final col = _columnMap[cell.columnName];
+        if (col == null) return Container(); // 占位列返回空容器
 
         final custom = col.cellBuilder?.call(
           item as T,
@@ -443,6 +461,8 @@ class GridColumnConfig<T> {
   final String name;
   final String headerText;
   final double? width;
+  final double? minimumWidth;
+  final double? maximumWidth;
   final HeaderBuilder? headerBuilder;
   final CellBuilder<T>? cellBuilder;
   final dynamic Function(T row) valueGetter;
@@ -460,6 +480,8 @@ class GridColumnConfig<T> {
     required this.name,
     required this.headerText,
     this.width,
+    this.minimumWidth,
+    this.maximumWidth,
     this.headerBuilder,
     required this.valueGetter,
     this.cellBuilder,
