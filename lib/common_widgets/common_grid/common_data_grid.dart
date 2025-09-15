@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -84,6 +85,12 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   late ScrollController _horizontalScrollController;
   final Set<int> _selectedIndexInPage = {};
 
+  // 列内容宽度缓存
+  Map<String, double> _columnContentWidths = {};
+
+  // 拖动开始时的宽度记录
+  Map<String, double> _dragStartWidths = {};
+
   // 生命周期管理标记
   bool _ownGridController = false;
   bool _ownPagerController = false;
@@ -117,6 +124,9 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
       onPageChanged: _onPageChanged,
     );
 
+    // 预计算列宽度
+    _preCalculateAllColumnWidths();
+
     // 加载数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
       log('---------- init load page index: ${widget.currentPage}');
@@ -130,6 +140,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   void didUpdateWidget(covariant CommonDataGrid<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.datas != widget.datas ||
+        oldWidget.columns != widget.columns ||
         oldWidget.currentPage != widget.currentPage) {
       _dataPagerController.selectedPageIndex = widget.currentPage - 1;
       _source = _CommonDataSource<T>(
@@ -137,7 +148,12 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
         columns: widget.columns,
         onPageChanged: _onPageChanged,
       );
-      // _dataPagerController.selectedPageIndex = widget.currentPage;
+
+      // 如果数据或列配置发生变化，重新计算列宽度缓存
+      if (oldWidget.datas != widget.datas ||
+          oldWidget.columns != widget.columns) {
+        _preCalculateAllColumnWidths();
+      }
 
       _selectedIndexInPage.clear(); // 数据变了就清空
       debugPrint(
@@ -178,18 +194,76 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     super.dispose();
   }
 
+  // 计算文本内容的宽度
+  double _measureTextWidth(String text, TextStyle style) {
+    if (text.isEmpty) return 0.0;
+
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    );
+    textPainter.layout();
+    return textPainter.size.width;
+  }
+
+  // 预计算所有列的内容宽度并缓存
+  void _preCalculateAllColumnWidths() {
+    _columnContentWidths.clear();
+
+    for (final column in widget.columns) {
+      _columnContentWidths[column.name] = _calculateColumnContentWidth(
+        column.name,
+      );
+    }
+
+    log(
+      'Pre-calculated ${_columnContentWidths.length} column widths: $_columnContentWidths',
+    );
+  }
+
+  // 计算某列所有内容的最大宽度
+  double _calculateColumnContentWidth(String columnName) {
+    final column = widget.columns.firstWhere((col) => col.name == columnName);
+    double maxWidth = 0.0;
+
+    // 计算表头宽度
+    final headerWidth =
+        _measureTextWidth(column.headerText, _titleStyle) + 16; // 加上padding
+    maxWidth = math.max(maxWidth, headerWidth);
+
+    // 计算所有行数据的宽度
+    for (final item in widget.datas) {
+      final value = column.valueGetter(item);
+      String displayText;
+
+      if (column.formatter != null) {
+        displayText = column.formatter!(value, item);
+      } else {
+        displayText = value?.toString() ?? '';
+      }
+
+      final textStyle = column.textStyle ?? _infoStyle;
+      final contentWidth =
+          _measureTextWidth(displayText, textStyle) + 18; // 加上padding
+      maxWidth = math.max(maxWidth, contentWidth);
+    }
+
+    // 确保不小于最小宽度
+    final minWidth = column.minimumWidth ?? 80.0;
+    return math.max(maxWidth, minWidth);
+  }
+
+  // 获取缓存的列内容宽度
+  double _getCachedColumnContentWidth(String columnName) {
+    return _columnContentWidths[columnName] ??
+        _calculateColumnContentWidth(columnName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pagerHeight = widget.allowPager ? 64.0 : 0.0;
-    final bodyHeight = widget.height != null
-        ? widget.height! - pagerHeight
-        : double.infinity;
-
     return LayoutBuilder(
       builder: (_, constraints) {
-        final maxHeight = bodyHeight == double.infinity
-            ? constraints.maxHeight
-            : bodyHeight;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -239,12 +313,104 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   onSelectionChanged: _handleSelectionChanged,
                   columnResizeMode: ColumnResizeMode.onResize,
 
-                  onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
-                    setState(() {
-                      columnWidths[details.column.columnName] = details.width;
-                    });
+                  onColumnResizeStart: (ColumnResizeStartDetails details) {
+                    // 跳过占位列
+                    if (details.column.columnName == '_spacer_column') {
+                      return false;
+                    }
+
+                    // 记录拖动开始时的宽度
+                    final currentWidth =
+                        columnWidths[details.column.columnName] ??
+                        widget.columns
+                            .firstWhere(
+                              (col) => col.name == details.column.columnName,
+                            )
+                            .width ??
+                        120.0;
+
+                    _dragStartWidths[details.column.columnName] = currentWidth;
+
+                    log(
+                      'Column ${details.column.columnName} resize started at width: $currentWidth',
+                    );
                     return true;
                   },
+
+                  onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
+                    // 跳过占位列
+                    if (details.column.columnName == '_spacer_column') {
+                      return false;
+                    }
+
+                    final columnName = details.column.columnName;
+                    final newWidth = details.width;
+                    final startWidth = _dragStartWidths[columnName] ?? 120.0;
+                    final contentWidth = _getCachedColumnContentWidth(
+                      columnName,
+                    );
+
+                    // 判断拖动方向
+                    final isDraggingRight = newWidth > startWidth;
+                    final isDraggingLeft = newWidth < startWidth;
+
+                    double finalWidth = newWidth;
+                    bool shouldEndResize = false;
+
+                    if (isDraggingRight) {
+                      // 往右拖动（增加宽度）
+                      if (startWidth < contentWidth) {
+                        // 内容没有显示全，直接跳到内容宽度并结束拖动
+                        finalWidth = contentWidth;
+                        shouldEndResize = true;
+                        log(
+                          'Column $columnName: Right drag with truncated content, auto-fit to $finalWidth and end resize',
+                        );
+                      } else {
+                        // 内容已经显示全，可以自由调整
+                        finalWidth = newWidth;
+                        log(
+                          'Column $columnName: Right drag with full content visible, free resize to $finalWidth',
+                        );
+                      }
+                    } else if (isDraggingLeft) {
+                      // 往左拖动（减小宽度），直接减小
+                      finalWidth = newWidth;
+                      log(
+                        'Column $columnName: Left drag, reduce width to $finalWidth',
+                      );
+                    }
+
+                    setState(() {
+                      columnWidths[columnName] = finalWidth;
+                      // 如果最终宽度大于内容宽度，更新缓存
+                      if (finalWidth > contentWidth) {
+                        _columnContentWidths[columnName] = finalWidth;
+                      }
+                    });
+
+                    // 如果需要结束拖动，返回 false 来停止拖动
+                    return !shouldEndResize;
+                  },
+
+                  onColumnResizeEnd: (ColumnResizeEndDetails details) {
+                    // 跳过占位列
+                    if (details.column.columnName == '_spacer_column') {
+                      return;
+                    }
+
+                    final columnName = details.column.columnName;
+                    final finalWidth =
+                        columnWidths[columnName] ?? details.width;
+
+                    // 清理拖动开始宽度记录
+                    _dragStartWidths.remove(columnName);
+
+                    log(
+                      'Column $columnName resize ended at width: $finalWidth',
+                    );
+                  },
+
                   showCheckboxColumn: widget.allowSelect,
                   selectionMode: widget.allowSelect
                       ? SelectionMode.multiple
@@ -296,17 +462,18 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     );
   }
 
-
   List<GridColumn> _buildColumnsWithSpacer() {
     final columns = widget.columns.map((e) => _buildGridColumn(e)).toList();
-    
+
     // 添加一个隐藏的占位列，为最后一列提供拖拽空间
-    columns.add(GridColumn(
-      columnName: '_spacer_column',
-      width: 50.0, // 提供50px的拖拽空间
-      label: Container(), // 空的标题
-    ));
-    
+    columns.add(
+      GridColumn(
+        columnName: '_spacer_column',
+        width: 50.0, // 提供50px的拖拽空间
+        label: Container(), // 空的标题
+      ),
+    );
+
     return columns;
   }
 

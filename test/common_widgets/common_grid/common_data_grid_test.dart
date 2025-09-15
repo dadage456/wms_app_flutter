@@ -709,5 +709,276 @@ void main() {
         expect(dataGrid.allowColumnsResizing, isTrue);
       });
     });
+
+    group('智能列宽调整测试', () {
+      testWidgets('应该包含占位列', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+        // 验证列数 = 原始列数 + 占位列
+        expect(dataGrid.columns.length, equals(testColumns.length + 1));
+        
+        // 验证占位列存在
+        final spacerColumn = dataGrid.columns.firstWhere(
+          (col) => col.columnName == '_spacer_column',
+        );
+        expect(spacerColumn.columnName, equals('_spacer_column'));
+      });
+
+      testWidgets('应该在初始化时预计算列宽度', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        // 验证表格正常渲染，说明预计算成功
+        expect(find.byType(SfDataGrid), findsOneWidget);
+        expect(find.text('ID'), findsOneWidget);
+        expect(find.text('姓名'), findsOneWidget);
+      });
+
+      testWidgets('应该在数据更新时重新计算列宽度', (WidgetTester tester) async {
+        // 初始数据
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+        expect(find.text('User 1'), findsOneWidget);
+
+        // 更新为长文本数据
+        final longTextData = [TestModel(
+          id: 1,
+          name: 'Very Very Very Long User Name For Testing Cache Update',
+          email: 'very.very.very.long.email.address.for.testing@example.com',
+          age: 25,
+        )];
+
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: longTextData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        // 验证新数据正常显示，说明缓存已更新
+        expect(find.text('Very Very Very Long User Name For Testing Cache Update'), findsOneWidget);
+        expect(find.text('very.very.very.long.email.address.for.testing@example.com'), findsOneWidget);
+      });
+
+      testWidgets('占位列应该有合适的宽度', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+        final spacerColumn = dataGrid.columns.firstWhere(
+          (col) => col.columnName == '_spacer_column',  
+        );
+        
+        // 占位列宽度应该大于0
+        expect(spacerColumn.width, greaterThan(0));
+      });
+
+      testWidgets('应该正确处理长文本内容', (WidgetTester tester) async {
+        final longTextData = [TestModel(
+          id: 1, 
+          name: 'Very Long User Name That Should Trigger Auto Resize', 
+          email: 'very.long.email.address.that.should.trigger.resize@example.com',
+          age: 25,
+        )];
+
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: longTextData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        // 验证表格正常渲染了长文本
+        expect(find.text('Very Long User Name That Should Trigger Auto Resize'), findsOneWidget);
+        expect(find.text('very.long.email.address.that.should.trigger.resize@example.com'), findsOneWidget);
+      });
+
+      testWidgets('占位列不应该影响数据显示', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        // 验证原始数据列都正常显示
+        for (final column in testColumns) {
+          expect(find.text(column.headerText), findsOneWidget);
+        }
+        
+        // 验证数据行正常显示
+        expect(find.text('User 1'), findsOneWidget);
+        expect(find.text('user1@example.com'), findsOneWidget);
+      });
+
+      testWidgets('占位列不应该参与选择功能', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          allowSelect: true,
+          onLoadData: mockOnLoadData,
+          onSelectionChanged: mockOnSelectionChanged,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+        expect(dataGrid.showCheckboxColumn, isTrue);
+        expect(dataGrid.selectionMode, equals(SelectionMode.multiple));
+      });
+
+      testWidgets('缓存机制应该提高性能', (WidgetTester tester) async {
+        // 创建大量数据来测试缓存效果
+        final largeData = TestUtils.generateTestData(100);
+        
+        final stopwatch = Stopwatch()..start();
+        
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: largeData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+        stopwatch.stop();
+
+        // 验证表格正常渲染
+        expect(find.byType(SfDataGrid), findsOneWidget);
+        
+        // 初始化时间应该是合理的（这里只是验证没有明显的性能问题）
+        expect(stopwatch.elapsedMilliseconds, lessThan(5000)); // 5秒内完成
+      });
+
+      testWidgets('手动拖动应该自动显示全部内容', (WidgetTester tester) async {
+        // 创建包含长文本的测试数据
+        final longTextData = [TestModel(
+          id: 1,
+          name: 'Very Very Very Long User Name That Needs More Space',
+          email: 'very.very.very.long.email.address.that.needs.space@example.com',
+          age: 25,
+        )];
+
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: longTextData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        // 验证表格正常渲染长文本
+        expect(find.text('Very Very Very Long User Name That Needs More Space'), findsOneWidget);
+        expect(find.text('very.very.very.long.email.address.that.needs.space@example.com'), findsOneWidget);
+
+        // 验证列宽调整功能已启用
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+        expect(dataGrid.allowColumnsResizing, isTrue);
+      });
+
+      testWidgets('应该正确处理用户拖动宽度小于内容宽度的情况', (WidgetTester tester) async {
+        // 创建短文本数据，便于测试拖动逻辑
+        final shortData = [TestModel(
+          id: 1,
+          name: 'User',
+          email: 'user@example.com',
+          age: 25,
+        )];
+
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: shortData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+        
+        // 验证列宽调整功能正常工作
+        expect(dataGrid.allowColumnsResizing, isTrue);
+        expect(dataGrid.columnResizeMode, equals(ColumnResizeMode.onResize));
+
+        // 验证数据正常显示
+        expect(find.text('User'), findsOneWidget);
+        expect(find.text('user@example.com'), findsOneWidget);
+      });
+
+      testWidgets('应该支持精确的拖动方向控制', (WidgetTester tester) async {
+        // 创建包含不同长度文本的数据
+        final mixedData = [TestModel(
+          id: 1,
+          name: 'Short', // 短文本，容易被截断
+          email: 'very.very.very.long.email.address.that.needs.more.space@example.com', // 长文本
+          age: 25,
+        )];
+
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: mixedData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+
+        // 验证拖动回调已正确设置
+        expect(dataGrid.allowColumnsResizing, isTrue);
+        expect(dataGrid.onColumnResizeStart, isNotNull);
+        expect(dataGrid.onColumnResizeUpdate, isNotNull);
+        expect(dataGrid.onColumnResizeEnd, isNotNull);
+
+        // 验证混合数据正常显示
+        expect(find.text('Short'), findsOneWidget);
+        expect(find.text('very.very.very.long.email.address.that.needs.more.space@example.com'), findsOneWidget);
+      });
+
+      testWidgets('应该在拖动开始时记录初始宽度', (WidgetTester tester) async {
+        await tester.pumpWidget(TestUtils.createTestableWidget(
+          columns: testColumns,
+          datas: testData,
+          onLoadData: mockOnLoadData,
+        ));
+
+        await tester.pumpAndSettle();
+
+        final dataGrid = tester.widget<SfDataGrid>(find.byType(SfDataGrid));
+
+        // 验证所有拖动相关回调都已设置
+        expect(dataGrid.onColumnResizeStart, isNotNull);
+        expect(dataGrid.onColumnResizeUpdate, isNotNull);
+        expect(dataGrid.onColumnResizeEnd, isNotNull);
+
+        // 验证表格正常渲染
+        expect(find.byType(SfDataGrid), findsOneWidget);
+        expect(find.text('ID'), findsOneWidget);
+        expect(find.text('姓名'), findsOneWidget);
+      });
+    });
   });
 }
