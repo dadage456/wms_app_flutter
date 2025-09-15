@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -82,6 +84,10 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   late ScrollController _horizontalScrollController;
   final Set<int> _selectedIndexInPage = {};
 
+  // 生命周期管理标记
+  bool _ownGridController = false;
+  bool _ownPagerController = false;
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +96,21 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     _verticalScrollController = ScrollController();
     _horizontalScrollController = ScrollController();
 
+    // 生命周期安全化管理
+    if (widget.dataGridController != null) {
+      _controller = widget.dataGridController!;
+    } else {
+      _controller = DataGridController();
+      _ownGridController = true;
+    }
+
+    if (widget.dataPagerController != null) {
+      _dataPagerController = widget.dataPagerController!;
+    } else {
+      _dataPagerController = DataPagerController();
+      _ownPagerController = true;
+    }
+
     _source = _CommonDataSource<T>(
       datas: widget.datas,
       columns: widget.columns,
@@ -97,7 +118,11 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     );
 
     // 加载数据
-    widget.onLoadData(widget.currentPage);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      log('---------- init load page index: ${widget.currentPage}');
+      widget.onLoadData(widget.currentPage);
+    });
+
     debugPrint('INIT currentPage: ${widget.currentPage}');
   }
 
@@ -106,6 +131,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.datas != widget.datas ||
         oldWidget.currentPage != widget.currentPage) {
+      _dataPagerController.selectedPageIndex = widget.currentPage - 1;
       _source = _CommonDataSource<T>(
         datas: widget.datas,
         columns: widget.columns,
@@ -123,7 +149,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   // 页面切换
   Future<void> _onPageChanged(int pageIndex) async {
     _scrollToOrigin();
-    await widget.onLoadData.call(pageIndex + 1);
+    await widget.onLoadData.call(pageIndex);
   }
 
   void _scrollToOrigin() {
@@ -140,8 +166,13 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
 
   @override
   void dispose() {
-    _controller.dispose();
-    _dataPagerController.dispose();
+    // 仅销毁自己创建的控制器
+    if (_ownGridController) {
+      _controller.dispose();
+    }
+    if (_ownPagerController) {
+      _dataPagerController.dispose();
+    }
     _verticalScrollController.dispose();
     _horizontalScrollController.dispose();
     super.dispose();
@@ -314,11 +345,16 @@ class _CommonDataSource<T> extends DataGridSource {
   final List<GridColumnConfig<T>> columns;
   final OnPageChanged onPageChanged;
 
+  // 列配置映射缓存，O(1)查找
+  late Map<String, GridColumnConfig<T>> _columnMap;
+  late Map<DataGridRow, T> _rowMap;
+
   _CommonDataSource({
     required this.datas,
     required this.columns,
     required this.onPageChanged,
   }) {
+    _columnMap = {for (final col in columns) col.name: col};
     _mapDataGridRows();
   }
 
@@ -333,6 +369,10 @@ class _CommonDataSource<T> extends DataGridSource {
       }
       return DataGridRow(cells: cells);
     }).toList();
+
+    _rowMap = {
+      for (int i = 0; i < _dataGridRows.length; i++) _dataGridRows[i]: datas[i],
+    };
   }
 
   @override
@@ -340,29 +380,46 @@ class _CommonDataSource<T> extends DataGridSource {
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
-    final index = rows.indexOf(row);
+    final item = _rowMap[row];
     final effectiveIndex = effectiveRows.indexOf(row);
     final color = effectiveIndex % 2 == 0 ? Colors.white : _infoBgColor;
 
     return DataGridRowAdapter(
       color: color,
       cells: row.getCells().map<Widget>((cell) {
-        final col = columns.firstWhere((e) => e.name == cell.columnName);
+        final col = _columnMap[cell.columnName]!;
+
         final custom = col.cellBuilder?.call(
-          datas[index],
+          item as T,
           cell.columnName,
           cell.value,
         );
-        return custom ??
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              alignment: Alignment.centerLeft,
-              child: SelectableText(
-                cell.value?.toString() ?? '',
-                style: _infoStyle,
-              ),
-            );
+        return custom ?? _buildCellContent(cell.value, col, item as T);
       }).toList(),
+    );
+  }
+
+  // 构建单元格内容
+  Widget _buildCellContent(
+    dynamic value,
+    GridColumnConfig<T> config,
+    T rowData,
+  ) {
+    final text =
+        config.formatter?.call(value, rowData) ?? value?.toString() ?? '';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      alignment: Alignment.centerLeft,
+      child: config.enableSelectableText
+          ? SelectableText(text, style: config.textStyle ?? _infoStyle)
+          : Text(
+              text,
+              style: config.textStyle ?? _infoStyle,
+              maxLines: config.maxLines,
+              overflow: config.overflow ?? TextOverflow.ellipsis,
+              textAlign: config.textAlign,
+            ),
     );
   }
 
@@ -372,7 +429,7 @@ class _CommonDataSource<T> extends DataGridSource {
     debugPrint('old: $oldPageIndex, new: $newPageIndex');
 
     if (oldPageIndex != newPageIndex) {
-      await onPageChanged(newPageIndex);
+      await onPageChanged(newPageIndex + 1);
       return true;
     }
 
@@ -389,13 +446,27 @@ class GridColumnConfig<T> {
   final HeaderBuilder? headerBuilder;
   final CellBuilder<T>? cellBuilder;
   final dynamic Function(T row) valueGetter;
+  final bool enableSelectableText; // 是否允许文本选择
+
+  // 新增配置选项
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final TextStyle? textStyle;
+  final String Function(dynamic value, T row)? formatter;
 
   GridColumnConfig({
+    this.enableSelectableText = false,
     required this.name,
     required this.headerText,
     this.width,
     this.headerBuilder,
     required this.valueGetter,
     this.cellBuilder,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    this.textStyle,
+    this.formatter,
   });
 }

@@ -36,7 +36,12 @@ class CommonDataGridBloc<T>
     Emitter<CommonDataGridState<T>> emit,
   ) async {
     try {
-      emit(state.copyWith(status: GridStatus.loading));
+      emit(
+        state.copyWith(
+          status: GridStatus.loading,
+          currentPage: event.pageIndex,
+        ),
+      );
 
       final data = await dataLoader(event.pageIndex);
 

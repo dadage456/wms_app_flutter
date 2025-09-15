@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
@@ -41,8 +43,8 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   void initState() {
     super.initState();
     _bloc = BlocProvider.of<OutboundTaskDetailBloc>(context);
+    _bloc.initializeQuery(widget.outTaskId, widget.workStation);
     _gridBloc = _bloc.gridBloc;
-    _initializePage();
   }
 
   @override
@@ -52,10 +54,10 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   }
 
   /// 初始化页面
-  void _initializePage() {
-    _bloc.initializeQuery(widget.outTaskId, widget.workStation);
-    _gridBloc.add(const LoadDataEvent(1));
-  }
+  // void _initializePage() {
+
+  //   _gridBloc.add(const LoadDataEvent(1));
+  // }
 
   /// 处理搜索
   void _handleSearch(String searchKey) {
@@ -69,7 +71,11 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
 
   /// 处理撤销选中项
   void _handleCancelSelected(List<String> selectedItemIds) {
-    _bloc.add(OutboundTaskDetailEvent.cancelSelectedItems(selectedItemIds: selectedItemIds));
+    _bloc.add(
+      OutboundTaskDetailEvent.cancelSelectedItems(
+        selectedItemIds: selectedItemIds,
+      ),
+    );
   }
 
   /// 处理刷新
@@ -80,7 +86,7 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   @override
   Widget build(BuildContext context) {
     const Color bgColor = Color(0xFFF6F6F6);
-    
+
     return SelectionArea(
       child: Scaffold(
         backgroundColor: bgColor,
@@ -113,9 +119,7 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
     return Container(
       height: 56,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+      decoration: const BoxDecoration(color: Colors.white),
       child: Row(
         children: [
           Expanded(
@@ -147,7 +151,7 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
               ),
             ),
           ),
-          ],
+        ],
       ),
     );
   }
@@ -156,52 +160,51 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   Widget _buildTable() {
     return BlocProvider(
       create: (context) => _gridBloc,
-      child: BlocConsumer<
-        CommonDataGridBloc<OutboundTaskItem>,
-        CommonDataGridState<OutboundTaskItem>
-      >(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<OutboundTaskItem>,
+            CommonDataGridState<OutboundTaskItem>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '未知错误',
-            );
-          }
-        },
-        builder: (context, state) {
-          return Column(
-            children: [
-              Expanded(
-                child: CommonDataGrid<OutboundTaskItem>(
-                  columns: OutboundTaskDetailGridConfig.getColumns(),
-                  currentPage: state.currentPage,
-                  totalPages: state.totalPages,
-                  onLoadData: (pageIndex) async {
-                    await Future.delayed(const Duration(microseconds: 1));
-                    _gridBloc.add(LoadDataEvent(pageIndex));
-                  },
-                  selectedRows: state.selectedRows,
-                  onSelectionChanged: (list) {
-                    _gridBloc.add(ChangeSelectedRowsEvent(list));
-                  },
-                  datas: state.data,
-                  allowPager: true,
-                  allowSelect: true,
-                  headerHeight: 44,
-                  rowHeight: 48,
-                ),
-              ),
-              _buildBatchActionBar(),
-            ],
-          );
-        },
-      ),
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '未知错误',
+                );
+              }
+            },
+            builder: (context, state) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: CommonDataGrid<OutboundTaskItem>(
+                      columns: OutboundTaskDetailGridConfig.getColumns(),
+                      currentPage: state.currentPage,
+                      totalPages: state.totalPages,
+                      onLoadData: (pageIndex) async {
+                        await Future.delayed(const Duration(microseconds: 1));
+                        _gridBloc.add(LoadDataEvent(pageIndex));
+                      },
+                      selectedRows: state.selectedRows,
+                      onSelectionChanged: (list) {
+                        _gridBloc.add(ChangeSelectedRowsEvent(list));
+                      },
+                      datas: state.data,
+                      allowPager: true,
+                      allowSelect: true,
+                    ),
+                  ),
+                  _buildBatchActionBar(),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -212,9 +215,9 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
       CommonDataGridState<OutboundTaskItem>
     >(
       builder: (context, state) {
-
         final selectedCount = state.selectedRows.length;
         final totalCount = state.data.length;
+        log('------- totalCount: $totalCount');
 
         if (selectedCount == 0) {
           return const SizedBox.shrink();
@@ -226,14 +229,17 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
             selectedCount: selectedCount,
             totalCount: totalCount,
             onSelectAll: () {
-              final allIds = state.data.map((item) => item.outTaskItemId).toList() ?? [];
+              final allIds =
+                  state.data.map((item) => item.outTaskItemId).toList() ?? [];
               _gridBloc.add(ChangeSelectedRowsEvent(allIds));
             },
             onDeselectAll: () {
               _gridBloc.add(const ChangeSelectedRowsEvent([]));
             },
             onCancelSelected: () {
-              final selectedItemIds = state.selectedRows.map((id) => id.toString()).toList();
+              final selectedItemIds = state.selectedRows
+                  .map((id) => id.toString())
+                  .toList();
               _handleCancelSelected(selectedItemIds);
             },
             onClearSelection: () {
@@ -244,5 +250,4 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
       },
     );
   }
-
-  }
+}

@@ -46,7 +46,6 @@ class OutboundTaskDetailBloc
       final data = await _outboundTaskService.getOutboundTaskItemList(
         query: currentQuery,
       );
-
       final totalPages = (data.total / currentQuery.pageSize).ceil();
 
       return DataGridResponseData<OutboundTaskItem>(

@@ -13,7 +13,7 @@ class CommonDataGridState<T> extends Equatable {
   const CommonDataGridState({
     this.status = GridStatus.initial,
     this.data = const [],
-    this.currentPage = 0,
+    this.currentPage = 1,
     this.totalPages = 1,
     this.selectedRows = const [],
     this.errorMessage,

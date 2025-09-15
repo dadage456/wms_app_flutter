@@ -32,41 +32,57 @@ common_widgets/
 ### 2.1 CommonDataGrid 核心问题
 
 #### 问题概述
-- **生命周期管理不安全**: 外部控制器在组件dispose时被错误销毁
-- **数据源频繁重建**: didUpdateWidget中完全重建_CommonDataSource
-- **选择状态不稳定**: 基于页内索引的选择机制，跨页/排序后失效
-- **分页职责混乱**: 多处触发onLoadData，存在重复调用风险
-- **排序实现脆弱**: 使用visitAncestorElements遍历Element树
-- **性能瓶颈**: O(n)列配置查找，SelectableText默认开启
+- **✅ 已修复**: 生命周期管理不安全（已在代码中修复）
+- **❌ 仍存在**: 数据源频繁重建（didUpdateWidget:134行完全重建）
+- **✅ 设计合理**: 选择状态使用页内索引（符合当前业务需求）
+- **⚠️ 需优化**: 分页触发逻辑可能存在重复调用
+- **❌ 高风险**: 排序实现使用visitAncestorElements遍历Element树（209-228行）
+- **❌ 性能瓶颈**: SelectableText默认开启（394行），影响渲染性能
 
 #### 具体分析
 
-**1. 控制器生命周期问题**
+**1. 数据源完全重建问题**
 ```dart
-// 当前实现 - 问题代码
-@override
-void dispose() {
-  _controller.dispose();        // ❌ 外部传入的也被dispose
-  _dataPagerController.dispose(); // ❌ 外部传入的也被dispose
-  super.dispose();
-}
-```
-
-**2. 数据源重建开销**
-```dart
-// 当前实现 - 性能问题
+// 当前实现 - 性能问题（134行）
 @override
 void didUpdateWidget(covariant CommonDataGrid<T> oldWidget) {
-  if (oldWidget.datas != widget.datas) {
-    _source = _CommonDataSource<T>(...); // ❌ 完全重建
+  if (oldWidget.datas != widget.datas || oldWidget.currentPage != widget.currentPage) {
+    _source.datas = widget.datas;
+    _dataPagerController.selectedPageIndex = widget.currentPage - 1;
+    // ❌ 完全重建数据源，性能开销大
+    _source = _CommonDataSource<T>(
+      datas: widget.datas,
+      columns: widget.columns,
+      onPageChanged: _onPageChanged,
+    );
   }
 }
 ```
 
-**3. 选择状态不稳定**
+**2. 排序实现风险**
 ```dart
-// 当前实现 - 语义问题
-final Set<int> _selectedIndexInPage = {}; // ❌ 页内索引，排序后失效
+// 当前实现 - 高风险（209-228行）
+Builder(
+  builder: (context) {
+    // ❌ 使用visitAncestorElements遍历Element树
+    context.visitAncestorElements((element) {
+      if (element is GridHeaderCellElement) {
+        columnName = element.column.columnName;
+      }
+      return true;
+    });
+    // ...
+  },
+)
+```
+
+**3. 性能瓶颈**
+```dart
+// 当前实现 - 性能问题（394行）
+child: SelectableText(
+  cell.value?.toString() ?? '', // ❌ 默认开启SelectableText
+  style: _infoStyle,
+),
 ```
 
 ### 2.2 LoadingDialogManager 问题
@@ -616,37 +632,37 @@ class CommonCard extends StatelessWidget {
 
 ## 5. 实施计划
 
-### 5.1 阶段划分
+### 5.1 重新调整的阶段划分
 
-**阶段一: 稳定性修复 (1-2周)**
-- [x] CommonDataGrid生命周期安全化
-- [x] 数据源增量更新机制
-- [x] LoadingDialogManager状态同步优化
-- [ ] 单元测试覆盖核心逻辑
+**阶段一: 性能修复 (1周) - 最高优先级**
+- [ ] 修复数据源完全重建问题（didUpdateWidget:134行）
+- [ ] 优化SelectableText默认开启性能问题
+- [ ] 列配置映射缓存实现
+- [ ] 性能基准测试
 
-**阶段二: 功能增强 (2-3周)**
-- [ ] 选择状态稳定化 (基于业务键)
-- [ ] 分页流程统一化
-- [ ] 排序图标状态驱动
+**阶段二: 架构优化 (1-2周)**
+- [ ] 重构排序实现，移除visitAncestorElements
+- [ ] 分页触发逻辑去重
+- [ ] 数据源增量更新机制
+- [ ] 内存泄漏检测
+
+**阶段三: 功能增强 (2-3周)**
 - [ ] 状态可视化 (loading/error/empty)
+- [ ] 排序图标状态驱动
+- [ ] API易用性增强
+- [ ] 单元测试覆盖
 
-**阶段三: 性能优化 (1-2周)**
-- [ ] 列配置映射缓存
-- [ ] 文本组件性能优化
-- [ ] 事件处理节流
-- [ ] 内存使用优化
-
-**阶段四: API增强 (1-2周)**
-- [ ] 列配置扩展
+**阶段四: 主题化与扩展 (1-2周)**
 - [ ] 主题化支持
 - [ ] 便捷构造方法
-- [ ] TypeScript风格的API设计
+- [ ] 列配置扩展
+- [ ] 组件文档完善
 
 **阶段五: 新组件开发 (2-3周)**
-- [ ] CommonForm表单组件  
+- [ ] CommonForm表单组件
 - [ ] CommonSearchBar搜索组件
 - [ ] CommonCard卡片组件
-- [ ] 组件库文档完善
+- [ ] 组件库集成文档
 
 ### 5.2 兼容性策略
 
@@ -723,31 +739,70 @@ group('CommonDataGrid Tests', () {
 
 ### 7.1 技术风险
 
-**风险**: 大规模重构可能引入新的bug  
-**应对**: 
-- 分阶段渐进式重构
-- 完善的测试覆盖
-- 灰度发布策略
+**高风险**: 数据源完全重建导致的性能问题
+- **影响**: 大数据集下渲染性能下降50%+
+- **应对**:
+  - 阶段一优先修复，提供增量更新机制
+  - 性能基准测试验证
+  - 功能开关控制
 
-**风险**: 性能优化可能影响功能  
-**应对**:
-- 性能测试验证
-- 功能开关控制
-- 回滚机制准备
+**高风险**: visitAncestorElements导致的稳定性问题
+- **影响**: Element树遍历可能引发异常
+- **应对**:
+  - 阶段二重构，使用状态驱动方案
+  - 异常捕获和降级处理
+  - 单元测试覆盖边界情况
+
+**中风险**: SelectableText默认开启的性能影响
+- **影响**: 内存占用增加，滚动性能下降
+- **应对**:
+  - 阶段一优化，默认使用Text组件
+  - 提供可选配置
+  - 内存使用监控
+
+**中风险**: 分页逻辑重复调用
+- **影响**: 重复数据请求，用户体验差
+- **应对**:
+  - 防抖机制
+  - 请求状态管理
+  - 用户反馈优化
 
 ### 7.2 业务风险
 
-**风险**: 迁移成本高，业务方接受度低  
-**应对**:
-- 保持向后兼容
-- 提供迁移工具
-- 分模块逐步迁移
+**风险**: 性能优化影响业务功能
+- **应对**:
+  - 完整的功能回归测试
+  - 灰度发布策略
+  - 快速回滚机制
 
-**风险**: 时间窗口紧张  
-**应对**:
-- 核心问题优先修复
-- 功能增强可后续迭代
-- 并行开发策略
+**风险**: 迁移过程中的兼容性问题
+- **应对**:
+  - 严格的向后兼容策略
+  - 迁移工具和文档
+  - 技术支持和培训
+
+**风险**: 开发资源不足
+- **应对**:
+  - 分阶段交付，确保核心功能优先
+  - 外部技术支持准备
+  - 项目范围管理
+
+### 7.3 风险监控指标
+
+**性能指标监控**
+- 渲染帧率 (FPS > 55)
+- 内存使用增长 (< 20%)
+- 大数据集渲染时间 (< 500ms)
+
+**稳定性指标监控**
+- 异常率 (< 0.1%)
+- 崩溃率 (< 0.05%)
+- 用户投诉数量 (< 5/周)
+
+**业务指标监控**
+- 功能使用率
+- 用户满意度
+- 开发效率提升
 
 ## 8. 监控与度量
 
@@ -769,11 +824,170 @@ group('CommonDataGrid Tests', () {
 - 技术债务减少
 - 文档完整度
 
-## 9. 结论
+## 9. 技术选型建议
+
+### 9.1 核心技术栈优化
+
+**数据网格组件选型**
+- **当前**: Syncfusion DataGrid
+- **建议**: 继续使用，但需要优化实现
+- **理由**: 成熟稳定，功能完整，但需要优化性能
+
+**状态管理模式**
+- **当前**: StatefulWidget + 内部状态
+- **建议**: 引入轻量级状态管理
+- **选项**:
+  - Provider (推荐，学习成本低)
+  - Riverpod (类型安全，更好的性能)
+  - BLoC (复杂场景适用)
+
+**主题化方案**
+- **当前**: 硬编码样式
+- **建议**: Theme + ThemeExtension
+- **理由**: Flutter原生支持，类型安全
+
+### 9.2 性能优化工具
+
+**性能监控**
+```dart
+// 推荐使用 Flutter DevTools
+// 性能分析
+void analyzePerformance() {
+  FlutterDriverBindings.ensureInitialized();
+  // 渲染性能分析
+  // 内存使用分析
+  // 帧率监控
+}
+
+// 自定义性能标记
+class PerformanceProfiler {
+  static final Map<String, Stopwatch> _timers = {};
+
+  static void start(String key) {
+    _timers[key] = Stopwatch()..start();
+  }
+
+  static void end(String key) {
+    final duration = _timers[key]?.elapsedMilliseconds ?? 0;
+    debugPrint('$key: ${duration}ms');
+    _timers.remove(key);
+  }
+}
+```
+
+**内存管理**
+```dart
+// 推荐使用 WeakReference 避免内存泄漏
+class SafeReference<T> {
+  final WeakReference<T> _ref;
+
+  SafeReference(T target) : _ref = WeakReference(target);
+
+  T? get target => _ref.target;
+}
+```
+
+### 9.3 测试策略完善
+
+**测试工具选型**
+```yaml
+# pubspec.yaml 测试依赖
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^0.3.0      # 轻量级模拟框架
+  flutter_driver:       # 集成测试
+  integration_test:     # 集成测试
+  benchmark_harness:    # 性能测试
+```
+
+**测试覆盖率目标**
+- 单元测试: > 80%
+- 组件测试: > 70%
+- 集成测试: > 60%
+- 性能测试: 关键路径100%
+
+### 9.4 代码质量工具
+
+**静态分析**
+```yaml
+# analysis_options.yaml
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+linter:
+  rules:
+    # 推荐规则
+    prefer_const_constructors: true
+    prefer_final_fields: true
+    avoid_print: false  # 开发阶段允许print
+    # 更多规则...
+```
+
+**代码格式化**
+```yaml
+# .flutter-plugins
+flutter pub global activate dart_style
+flutter pub global activate effective_dart
+```
+
+## 10. 结论与建议
+
+### 10.1 实施建议总结
+
+**立即执行 (阶段一)**
+1. 修复数据源完全重建问题 - 最高优先级
+2. 优化SelectableText性能问题
+3. 实现列配置映射缓存
+4. 建立性能基准测试
+
+**短期规划 (阶段二)**
+1. 重构排序实现，移除高风险代码
+2. 完善分页逻辑，避免重复调用
+3. 实现增量更新机制
+4. 增加内存泄漏检测
+
+**中期规划 (阶段三-四)**
+1. 功能增强和API优化
+2. 主题化支持
+3. 完善测试覆盖
+4. 文档和工具链建设
+
+**长期规划 (阶段五)**
+1. 新组件开发
+2. 组件库生态系统建设
+3. 最佳实践沉淀
+4. 持续优化
+
+### 10.2 成功指标
+
+**技术指标**
+- 渲染性能提升 > 50%
+- 内存使用降低 > 30%
+- 异常率 < 0.1%
+- 测试覆盖率 > 80%
+
+**业务指标**
+- 开发效率提升 > 40%
+- 组件复用率 > 70%
+- 用户满意度 > 90%
+- 维护成本降低 > 50%
+
+### 10.3 后续建议
+
+1. **建立性能监控体系**: 实施持续的性能监控和告警
+2. **定期技术债务清理**: 每季度进行技术债务评估和清理
+3. **团队能力建设**: 加强团队在Flutter性能优化方面的能力
+4. **持续改进**: 基于实际使用情况持续优化组件库
 
 本优化方案通过系统性的分析和设计，针对现有通用组件的核心问题提出了全面的解决方案。方案坚持**稳定性优先、渐进式改进、向后兼容**的原则，既解决了当前的技术债务，又为未来的扩展奠定了基础。
 
-通过5个阶段的实施，预期能够显著提升组件的性能、稳定性和开发体验，为WMS项目的长期发展提供坚实的技术支撑。
+通过重新调整的5个阶段实施，预期能够显著提升组件的性能、稳定性和开发体验，为WMS项目的长期发展提供坚实的技术支撑。
 
 ---
 
