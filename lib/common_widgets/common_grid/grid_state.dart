@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum GridStatus { initial, loading, loaded, deleting, error }
+enum GridStatus { initial, loading, loaded, deleting, success, error }
 
 class CommonDataGridState<T> extends Equatable {
   final GridStatus status;

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 class LoadingDialogManager {
   static LoadingDialogManager? _instance;
   bool _isDialogShowing = false;
-  
+
   // 私有构造函数
   LoadingDialogManager._();
-  
+
   // 单例模式
   static LoadingDialogManager get instance {
     _instance ??= LoadingDialogManager._();
@@ -20,30 +20,30 @@ class LoadingDialogManager {
   /// [message] - 错误信息
   void showSnackErrorMsg(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
   void showSnackWarningMsg(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.orange),
     );
   }
 
   /// 显示成功信息
   /// [context] - 上下文
   /// [message] - 成功信息
-  void showSnackSuccessMsg(BuildContext context, String message) {
+  void showSnackSuccessMsg(
+    BuildContext context,
+    String message, {
+    Duration duration = const Duration(seconds: 2),
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
+        duration: duration, // 外部可传，默认 2 秒
+        behavior: SnackBarBehavior.floating, // 圆角悬浮样式，可选
       ),
     );
   }
@@ -68,7 +68,7 @@ class LoadingDialogManager {
       },
     );
   }
-  
+
   /// 显示加载对话框
   /// [context] - 上下文
   /// [message] - 加载提示文字，默认为"正在加载..."
@@ -81,9 +81,9 @@ class LoadingDialogManager {
     if (_isDialogShowing) {
       return; // 如果对话框已经显示，则不重复显示
     }
-    
+
     _isDialogShowing = true;
-    
+
     showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
@@ -114,25 +114,25 @@ class LoadingDialogManager {
       },
     );
   }
-  
+
   /// 隐藏加载对话框
   /// [context] - 上下文
   void hideLoadingDialog(BuildContext context) {
     if (!_isDialogShowing) {
       return; // 如果对话框没有显示，则不执行关闭操作
     }
-    
+
     _isDialogShowing = false;
-    
+
     // 安全地关闭对话框
     if (Navigator.canPop(context)) {
       Navigator.of(context).pop();
     }
   }
-  
+
   /// 检查对话框是否正在显示
   bool get isDialogShowing => _isDialogShowing;
-  
+
   /// 重置状态（用于特殊情况下的状态重置）
   void reset() {
     _isDialogShowing = false;
@@ -145,7 +145,7 @@ extension LoadingDialogExtension on BuildContext {
   void showLoadingDialog({String message = '正在加载...'}) {
     LoadingDialogManager.instance.showLoadingDialog(this, message: message);
   }
-  
+
   /// 隐藏加载对话框
   void hideLoadingDialog() {
     LoadingDialogManager.instance.hideLoadingDialog(this);

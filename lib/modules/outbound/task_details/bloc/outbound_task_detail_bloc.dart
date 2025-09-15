@@ -151,8 +151,8 @@ class OutboundTaskDetailBloc
       // emit(state.copyWith(isLoading: true));
 
       // 通知表格BLoC重新加载数据
-      gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
-
+      // gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
+      gridBloc.add(LoadDataEvent(1));
       // emit(state.copyWith(isLoading: false));
     } catch (e) {
       log('Failed to refresh: $e');

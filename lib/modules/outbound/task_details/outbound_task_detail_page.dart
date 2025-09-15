@@ -178,6 +178,14 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
                   state.errorMessage ?? '未知错误',
                 );
               }
+
+              if (state.status == GridStatus.success) {
+                LoadingDialogManager.instance.showSnackSuccessMsg(
+                  context,
+                  '撤销成功',
+                  duration: Duration(milliseconds: 800),
+                );
+              }
             },
             buildWhen: (previous, current) {
               return previous.data != current.data ||

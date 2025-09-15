@@ -107,9 +107,19 @@ class CommonDataGridBloc<T>
       //     selectedRows: [],
       //   ),
       // );
-
       // 重新加载当前页数据以确保数据同步
-      await _onLoadData(LoadDataEvent(state.currentPage), emit);
+      final data = await dataLoader(state.currentPage);
+
+      emit(state.copyWith(status: GridStatus.success));
+
+      emit(
+        state.copyWith(
+          status: GridStatus.loaded,
+          totalPages: data.totalPages,
+          data: data.data,
+          selectedRows: [],
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(
