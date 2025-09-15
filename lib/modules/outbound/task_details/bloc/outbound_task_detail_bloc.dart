@@ -138,27 +138,7 @@ class OutboundTaskDetailBloc
     CancelSelectedItemsEvent event,
     Emitter<OutboundTaskDetailState> emit,
   ) async {
-    //gridBloc.add(DeleteSelectedRowsEvent(event.selectedItemIds))
-
-    try {
-      log('取消选中的任务项: ${event.selectedItemIds}');
-
-      await _outboundTaskService.cancelOutboundTaskItems(
-        taskItemIds: event.selectedItemIds,
-      );
-
-      // 撤销成功后刷新列表
-      gridBloc.add(const LoadDataEvent(0));
-      // emit(state.copyWith(isLoading: false));
-    } catch (e) {
-      log('Failed to cancel selected items: $e');
-      // emit(
-      // state.copyWith(
-      //   isLoading: false,
-      //   errorMessage: ErrorHandler.handleError(e),
-      // ),
-      // );
-    }
+    gridBloc.add(DeleteSelectedRowsEvent(event.selectedRows));
   }
 
   /// 处理刷新事件

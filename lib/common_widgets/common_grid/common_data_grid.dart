@@ -140,7 +140,6 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   void didUpdateWidget(covariant CommonDataGrid<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.datas != widget.datas ||
-        oldWidget.columns != widget.columns ||
         oldWidget.currentPage != widget.currentPage) {
       _dataPagerController.selectedPageIndex = widget.currentPage - 1;
       _source = _CommonDataSource<T>(
@@ -148,6 +147,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
         columns: widget.columns,
         onPageChanged: _onPageChanged,
       );
+      debugPrint('-------- Data count: ${widget.datas.length}');
 
       // 如果数据或列配置发生变化，重新计算列宽度缓存
       if (oldWidget.datas != widget.datas ||
@@ -156,6 +156,11 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
       }
 
       _selectedIndexInPage.clear(); // 数据变了就清空
+      debugPrint('---- datas 不相同吗： ${oldWidget.datas != widget.datas}');
+      debugPrint('---- columns 不相同吗： ${oldWidget.columns != widget.columns}');
+      debugPrint(
+        '---- current page 不相同吗：${oldWidget.currentPage != widget.currentPage}',
+      );
       debugPrint(
         '----- table didUpdateWidget currentPage: ${widget.currentPage}',
       );
@@ -313,6 +318,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   onSelectionChanged: _handleSelectionChanged,
                   columnResizeMode: ColumnResizeMode.onResize,
 
+                  // rowsPerPage: _source.datas.length,
                   onColumnResizeStart: (ColumnResizeStartDetails details) {
                     // 跳过占位列
                     if (details.column.columnName == '_spacer_column') {

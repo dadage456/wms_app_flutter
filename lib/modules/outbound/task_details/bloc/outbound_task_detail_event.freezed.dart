@@ -21,21 +21,21 @@ mixin _$OutboundTaskDetailEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String searchKey) search,
     required TResult Function(String qrContent) scanQRCode,
-    required TResult Function(List<String> selectedItemIds) cancelSelectedItems,
+    required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
-    TResult? Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
     TResult Function(String qrContent)? scanQRCode,
-    TResult Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
@@ -162,7 +162,7 @@ class _$SearchEventImpl implements SearchEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String searchKey) search,
     required TResult Function(String qrContent) scanQRCode,
-    required TResult Function(List<String> selectedItemIds) cancelSelectedItems,
+    required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
   }) {
     return search(searchKey);
@@ -173,7 +173,7 @@ class _$SearchEventImpl implements SearchEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
-    TResult? Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
   }) {
     return search?.call(searchKey);
@@ -184,7 +184,7 @@ class _$SearchEventImpl implements SearchEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
     TResult Function(String qrContent)? scanQRCode,
-    TResult Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
   }) {
@@ -322,7 +322,7 @@ class _$ScanQRCodeEventImpl implements ScanQRCodeEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String searchKey) search,
     required TResult Function(String qrContent) scanQRCode,
-    required TResult Function(List<String> selectedItemIds) cancelSelectedItems,
+    required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
   }) {
     return scanQRCode(qrContent);
@@ -333,7 +333,7 @@ class _$ScanQRCodeEventImpl implements ScanQRCodeEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
-    TResult? Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
   }) {
     return scanQRCode?.call(qrContent);
@@ -344,7 +344,7 @@ class _$ScanQRCodeEventImpl implements ScanQRCodeEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
     TResult Function(String qrContent)? scanQRCode,
-    TResult Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
   }) {
@@ -413,7 +413,7 @@ abstract class _$$CancelSelectedItemsEventImplCopyWith<$Res> {
     $Res Function(_$CancelSelectedItemsEventImpl) then,
   ) = __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<String> selectedItemIds});
+  $Res call({List<int> selectedRows});
 }
 
 /// @nodoc
@@ -433,13 +433,13 @@ class __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedItemIds = null}) {
+  $Res call({Object? selectedRows = null}) {
     return _then(
       _$CancelSelectedItemsEventImpl(
-        selectedItemIds: null == selectedItemIds
-            ? _value._selectedItemIds
-            : selectedItemIds // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
+        selectedRows: null == selectedRows
+            ? _value._selectedRows
+            : selectedRows // ignore: cast_nullable_to_non_nullable
+                  as List<int>,
       ),
     );
   }
@@ -448,21 +448,20 @@ class __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
-  const _$CancelSelectedItemsEventImpl({
-    required final List<String> selectedItemIds,
-  }) : _selectedItemIds = selectedItemIds;
+  const _$CancelSelectedItemsEventImpl({required final List<int> selectedRows})
+    : _selectedRows = selectedRows;
 
-  final List<String> _selectedItemIds;
+  final List<int> _selectedRows;
   @override
-  List<String> get selectedItemIds {
-    if (_selectedItemIds is EqualUnmodifiableListView) return _selectedItemIds;
+  List<int> get selectedRows {
+    if (_selectedRows is EqualUnmodifiableListView) return _selectedRows;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_selectedItemIds);
+    return EqualUnmodifiableListView(_selectedRows);
   }
 
   @override
   String toString() {
-    return 'OutboundTaskDetailEvent.cancelSelectedItems(selectedItemIds: $selectedItemIds)';
+    return 'OutboundTaskDetailEvent.cancelSelectedItems(selectedRows: $selectedRows)';
   }
 
   @override
@@ -471,15 +470,15 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
         (other.runtimeType == runtimeType &&
             other is _$CancelSelectedItemsEventImpl &&
             const DeepCollectionEquality().equals(
-              other._selectedItemIds,
-              _selectedItemIds,
+              other._selectedRows,
+              _selectedRows,
             ));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    const DeepCollectionEquality().hash(_selectedItemIds),
+    const DeepCollectionEquality().hash(_selectedRows),
   );
 
   /// Create a copy of OutboundTaskDetailEvent
@@ -498,10 +497,10 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String searchKey) search,
     required TResult Function(String qrContent) scanQRCode,
-    required TResult Function(List<String> selectedItemIds) cancelSelectedItems,
+    required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
   }) {
-    return cancelSelectedItems(selectedItemIds);
+    return cancelSelectedItems(selectedRows);
   }
 
   @override
@@ -509,10 +508,10 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
-    TResult? Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
   }) {
-    return cancelSelectedItems?.call(selectedItemIds);
+    return cancelSelectedItems?.call(selectedRows);
   }
 
   @override
@@ -520,12 +519,12 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
     TResult Function(String qrContent)? scanQRCode,
-    TResult Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
   }) {
     if (cancelSelectedItems != null) {
-      return cancelSelectedItems(selectedItemIds);
+      return cancelSelectedItems(selectedRows);
     }
     return orElse();
   }
@@ -571,10 +570,10 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
 
 abstract class CancelSelectedItemsEvent implements OutboundTaskDetailEvent {
   const factory CancelSelectedItemsEvent({
-    required final List<String> selectedItemIds,
+    required final List<int> selectedRows,
   }) = _$CancelSelectedItemsEventImpl;
 
-  List<String> get selectedItemIds;
+  List<int> get selectedRows;
 
   /// Create a copy of OutboundTaskDetailEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -628,7 +627,7 @@ class _$RefreshEventImpl implements RefreshEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String searchKey) search,
     required TResult Function(String qrContent) scanQRCode,
-    required TResult Function(List<String> selectedItemIds) cancelSelectedItems,
+    required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
   }) {
     return refresh();
@@ -639,7 +638,7 @@ class _$RefreshEventImpl implements RefreshEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
-    TResult? Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
   }) {
     return refresh?.call();
@@ -650,7 +649,7 @@ class _$RefreshEventImpl implements RefreshEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
     TResult Function(String qrContent)? scanQRCode,
-    TResult Function(List<String> selectedItemIds)? cancelSelectedItems,
+    TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
   }) {

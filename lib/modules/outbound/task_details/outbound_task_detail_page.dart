@@ -73,7 +73,7 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   void _handleCancelSelected(List<String> selectedItemIds) {
     _bloc.add(
       OutboundTaskDetailEvent.cancelSelectedItems(
-        selectedItemIds: selectedItemIds,
+        selectedRows: _gridBloc.state.selectedRows,
       ),
     );
   }
@@ -179,6 +179,11 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
                 );
               }
             },
+            buildWhen: (previous, current) {
+              return previous.data != current.data ||
+                  previous.currentPage != current.currentPage ||
+                  previous.totalPages != current.totalPages;
+            },
             builder: (context, state) {
               return Column(
                 children: [
@@ -193,6 +198,9 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
                       },
                       selectedRows: state.selectedRows,
                       onSelectionChanged: (list) {
+                        debugPrint(
+                          '------ detail page onSelectionChanged: $list',
+                        );
                         _gridBloc.add(ChangeSelectedRowsEvent(list));
                       },
                       datas: state.data,
