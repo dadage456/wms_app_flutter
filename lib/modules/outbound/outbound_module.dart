@@ -1,18 +1,18 @@
-import 'dart:developer' as developer;
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/app_module.dart';
-import 'package:wms_app/modules/outbound/task_list/bloc/outbound_task_state.dart';
+import 'package:wms_app/modules/outbound/collection_task/bloc/collection_bloc.dart';
+import 'package:wms_app/modules/outbound/collection_task/outbound_collection_page.dart';
+import 'package:wms_app/modules/outbound/collection_task/services/collection_service.dart';
 
 import 'task_list/bloc/outbound_task_bloc.dart';
 import 'task_details/bloc/outbound_task_detail_bloc.dart';
-import 'collection_task/bloc/outbound_collect_bloc.dart';
 import 'services/outbound_task_service.dart';
 import 'task_list/outbound_task_list_page.dart';
 import 'task_details/outbound_task_detail_page.dart';
-import 'collection_task/outbound_collect_page.dart';
 import '../../services/user_manager.dart';
 import '../../services/dio_client.dart';
 
@@ -26,6 +26,10 @@ class OutboundModule extends Module {
     // 注册服务
     i.addSingleton<OutboundTaskService>(
       () => OutboundTaskService(i.get<DioClient>().dio),
+    );
+
+    i.addSingleton<CollectionService>(
+      () => CollectionService(i.get<DioClient>().dio),
     );
 
     // 注册BLoC
@@ -45,9 +49,7 @@ class OutboundModule extends Module {
     );
 
     // 注册出库采集BLoC
-    i.add<OutboundCollectBloc>(
-      () => OutboundCollectBloc(i.get<OutboundTaskService>()),
-    );
+    i.add<CollectionBloc>(() => CollectionBloc(i.get<CollectionService>()));
   }
 
   @override
@@ -80,7 +82,7 @@ class OutboundModule extends Module {
         final int userId = args.data['userId'];
         final int roleOrUserId = args.data['roleOrUserId'];
 
-        developer.log(
+        log(
           'Navigating to detail page: $outTaskId $workStation $userId $roleOrUserId',
         );
 
@@ -101,23 +103,14 @@ class OutboundModule extends Module {
       '/collect/:outTaskNo',
       child: (context) {
         final args = Modular.args;
-        final outTaskNo = args.params['outTaskNo'] ?? '';
-        final workStation = args.data['workStation'] ?? '';
-        final int userId = args.data['userId'];
-        final int roleOrUserId = args.data['roleOrUserId'];
 
-        developer.log(
-          'Navigating to collect page: $outTaskNo $workStation $userId $roleOrUserId',
+        log(
+          'Navigating to collect page: ${args.data}',
         );
 
         return BlocProvider(
-          create: (context) => Modular.get<OutboundCollectBloc>(),
-          child: OutboundCollectPage(
-            outTaskNo: outTaskNo,
-            workStation: workStation,
-            userId: userId,
-            roleOrUserId: roleOrUserId.toString(),
-          ),
+          create: (context) => Modular.get<CollectionBloc>(),
+          child: OutboundCollectionPage(task: args.data['task'],),
         );
       },
     );

@@ -12,8 +12,7 @@ part of 'outbound_task_detail_event.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$OutboundTaskDetailEvent {
@@ -23,14 +22,16 @@ mixin _$OutboundTaskDetailEvent {
     required TResult Function(String qrContent) scanQRCode,
     required TResult Function(List<int> selectedRows) cancelSelectedItems,
     required TResult Function() refresh,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String searchKey)? search,
     TResult? Function(String qrContent)? scanQRCode,
     TResult? Function(List<int> selectedRows)? cancelSelectedItems,
     TResult? Function()? refresh,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String searchKey)? search,
@@ -38,22 +39,25 @@ mixin _$OutboundTaskDetailEvent {
     TResult Function(List<int> selectedRows)? cancelSelectedItems,
     TResult Function()? refresh,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SearchEvent value) search,
     required TResult Function(ScanQRCodeEvent value) scanQRCode,
     required TResult Function(CancelSelectedItemsEvent value)
-    cancelSelectedItems,
+        cancelSelectedItems,
     required TResult Function(RefreshEvent value) refresh,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SearchEvent value)? search,
     TResult? Function(ScanQRCodeEvent value)? scanQRCode,
     TResult? Function(CancelSelectedItemsEvent value)? cancelSelectedItems,
     TResult? Function(RefreshEvent value)? refresh,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SearchEvent value)? search,
@@ -61,22 +65,20 @@ mixin _$OutboundTaskDetailEvent {
     TResult Function(CancelSelectedItemsEvent value)? cancelSelectedItems,
     TResult Function(RefreshEvent value)? refresh,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $OutboundTaskDetailEventCopyWith<$Res> {
-  factory $OutboundTaskDetailEventCopyWith(
-    OutboundTaskDetailEvent value,
-    $Res Function(OutboundTaskDetailEvent) then,
-  ) = _$OutboundTaskDetailEventCopyWithImpl<$Res, OutboundTaskDetailEvent>;
+  factory $OutboundTaskDetailEventCopyWith(OutboundTaskDetailEvent value,
+          $Res Function(OutboundTaskDetailEvent) then) =
+      _$OutboundTaskDetailEventCopyWithImpl<$Res, OutboundTaskDetailEvent>;
 }
 
 /// @nodoc
-class _$OutboundTaskDetailEventCopyWithImpl<
-  $Res,
-  $Val extends OutboundTaskDetailEvent
->
+class _$OutboundTaskDetailEventCopyWithImpl<$Res,
+        $Val extends OutboundTaskDetailEvent>
     implements $OutboundTaskDetailEventCopyWith<$Res> {
   _$OutboundTaskDetailEventCopyWithImpl(this._value, this._then);
 
@@ -84,17 +86,13 @@ class _$OutboundTaskDetailEventCopyWithImpl<
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
 abstract class _$$SearchEventImplCopyWith<$Res> {
   factory _$$SearchEventImplCopyWith(
-    _$SearchEventImpl value,
-    $Res Function(_$SearchEventImpl) then,
-  ) = __$$SearchEventImplCopyWithImpl<$Res>;
+          _$SearchEventImpl value, $Res Function(_$SearchEventImpl) then) =
+      __$$SearchEventImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String searchKey});
 }
@@ -104,23 +102,20 @@ class __$$SearchEventImplCopyWithImpl<$Res>
     extends _$OutboundTaskDetailEventCopyWithImpl<$Res, _$SearchEventImpl>
     implements _$$SearchEventImplCopyWith<$Res> {
   __$$SearchEventImplCopyWithImpl(
-    _$SearchEventImpl _value,
-    $Res Function(_$SearchEventImpl) _then,
-  ) : super(_value, _then);
+      _$SearchEventImpl _value, $Res Function(_$SearchEventImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? searchKey = null}) {
-    return _then(
-      _$SearchEventImpl(
-        searchKey: null == searchKey
-            ? _value.searchKey
-            : searchKey // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? searchKey = null,
+  }) {
+    return _then(_$SearchEventImpl(
+      searchKey: null == searchKey
+          ? _value.searchKey
+          : searchKey // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -149,9 +144,7 @@ class _$SearchEventImpl implements SearchEvent {
   @override
   int get hashCode => Object.hash(runtimeType, searchKey);
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SearchEventImplCopyWith<_$SearchEventImpl> get copyWith =>
@@ -200,7 +193,7 @@ class _$SearchEventImpl implements SearchEvent {
     required TResult Function(SearchEvent value) search,
     required TResult Function(ScanQRCodeEvent value) scanQRCode,
     required TResult Function(CancelSelectedItemsEvent value)
-    cancelSelectedItems,
+        cancelSelectedItems,
     required TResult Function(RefreshEvent value) refresh,
   }) {
     return search(this);
@@ -238,20 +231,16 @@ abstract class SearchEvent implements OutboundTaskDetailEvent {
       _$SearchEventImpl;
 
   String get searchKey;
-
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SearchEventImplCopyWith<_$SearchEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class _$$ScanQRCodeEventImplCopyWith<$Res> {
-  factory _$$ScanQRCodeEventImplCopyWith(
-    _$ScanQRCodeEventImpl value,
-    $Res Function(_$ScanQRCodeEventImpl) then,
-  ) = __$$ScanQRCodeEventImplCopyWithImpl<$Res>;
+  factory _$$ScanQRCodeEventImplCopyWith(_$ScanQRCodeEventImpl value,
+          $Res Function(_$ScanQRCodeEventImpl) then) =
+      __$$ScanQRCodeEventImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String qrContent});
 }
@@ -261,23 +250,20 @@ class __$$ScanQRCodeEventImplCopyWithImpl<$Res>
     extends _$OutboundTaskDetailEventCopyWithImpl<$Res, _$ScanQRCodeEventImpl>
     implements _$$ScanQRCodeEventImplCopyWith<$Res> {
   __$$ScanQRCodeEventImplCopyWithImpl(
-    _$ScanQRCodeEventImpl _value,
-    $Res Function(_$ScanQRCodeEventImpl) _then,
-  ) : super(_value, _then);
+      _$ScanQRCodeEventImpl _value, $Res Function(_$ScanQRCodeEventImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? qrContent = null}) {
-    return _then(
-      _$ScanQRCodeEventImpl(
-        qrContent: null == qrContent
-            ? _value.qrContent
-            : qrContent // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? qrContent = null,
+  }) {
+    return _then(_$ScanQRCodeEventImpl(
+      qrContent: null == qrContent
+          ? _value.qrContent
+          : qrContent // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -306,16 +292,12 @@ class _$ScanQRCodeEventImpl implements ScanQRCodeEvent {
   @override
   int get hashCode => Object.hash(runtimeType, qrContent);
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ScanQRCodeEventImplCopyWith<_$ScanQRCodeEventImpl> get copyWith =>
       __$$ScanQRCodeEventImplCopyWithImpl<_$ScanQRCodeEventImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -360,7 +342,7 @@ class _$ScanQRCodeEventImpl implements ScanQRCodeEvent {
     required TResult Function(SearchEvent value) search,
     required TResult Function(ScanQRCodeEvent value) scanQRCode,
     required TResult Function(CancelSelectedItemsEvent value)
-    cancelSelectedItems,
+        cancelSelectedItems,
     required TResult Function(RefreshEvent value) refresh,
   }) {
     return scanQRCode(this);
@@ -398,10 +380,7 @@ abstract class ScanQRCodeEvent implements OutboundTaskDetailEvent {
       _$ScanQRCodeEventImpl;
 
   String get qrContent;
-
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$ScanQRCodeEventImplCopyWith<_$ScanQRCodeEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -409,39 +388,34 @@ abstract class ScanQRCodeEvent implements OutboundTaskDetailEvent {
 /// @nodoc
 abstract class _$$CancelSelectedItemsEventImplCopyWith<$Res> {
   factory _$$CancelSelectedItemsEventImplCopyWith(
-    _$CancelSelectedItemsEventImpl value,
-    $Res Function(_$CancelSelectedItemsEventImpl) then,
-  ) = __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>;
+          _$CancelSelectedItemsEventImpl value,
+          $Res Function(_$CancelSelectedItemsEventImpl) then) =
+      __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>;
   @useResult
   $Res call({List<int> selectedRows});
 }
 
 /// @nodoc
 class __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>
-    extends
-        _$OutboundTaskDetailEventCopyWithImpl<
-          $Res,
-          _$CancelSelectedItemsEventImpl
-        >
+    extends _$OutboundTaskDetailEventCopyWithImpl<$Res,
+        _$CancelSelectedItemsEventImpl>
     implements _$$CancelSelectedItemsEventImplCopyWith<$Res> {
   __$$CancelSelectedItemsEventImplCopyWithImpl(
-    _$CancelSelectedItemsEventImpl _value,
-    $Res Function(_$CancelSelectedItemsEventImpl) _then,
-  ) : super(_value, _then);
+      _$CancelSelectedItemsEventImpl _value,
+      $Res Function(_$CancelSelectedItemsEventImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedRows = null}) {
-    return _then(
-      _$CancelSelectedItemsEventImpl(
-        selectedRows: null == selectedRows
-            ? _value._selectedRows
-            : selectedRows // ignore: cast_nullable_to_non_nullable
-                  as List<int>,
-      ),
-    );
+  $Res call({
+    Object? selectedRows = null,
+  }) {
+    return _then(_$CancelSelectedItemsEventImpl(
+      selectedRows: null == selectedRows
+          ? _value._selectedRows
+          : selectedRows // ignore: cast_nullable_to_non_nullable
+              as List<int>,
+    ));
   }
 }
 
@@ -449,7 +423,7 @@ class __$$CancelSelectedItemsEventImplCopyWithImpl<$Res>
 
 class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
   const _$CancelSelectedItemsEventImpl({required final List<int> selectedRows})
-    : _selectedRows = selectedRows;
+      : _selectedRows = selectedRows;
 
   final List<int> _selectedRows;
   @override
@@ -469,28 +443,20 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CancelSelectedItemsEventImpl &&
-            const DeepCollectionEquality().equals(
-              other._selectedRows,
-              _selectedRows,
-            ));
+            const DeepCollectionEquality()
+                .equals(other._selectedRows, _selectedRows));
   }
 
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_selectedRows),
-  );
+      runtimeType, const DeepCollectionEquality().hash(_selectedRows));
 
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CancelSelectedItemsEventImplCopyWith<_$CancelSelectedItemsEventImpl>
-  get copyWith =>
-      __$$CancelSelectedItemsEventImplCopyWithImpl<
-        _$CancelSelectedItemsEventImpl
-      >(this, _$identity);
+      get copyWith => __$$CancelSelectedItemsEventImplCopyWithImpl<
+          _$CancelSelectedItemsEventImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -535,7 +501,7 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
     required TResult Function(SearchEvent value) search,
     required TResult Function(ScanQRCodeEvent value) scanQRCode,
     required TResult Function(CancelSelectedItemsEvent value)
-    cancelSelectedItems,
+        cancelSelectedItems,
     required TResult Function(RefreshEvent value) refresh,
   }) {
     return cancelSelectedItems(this);
@@ -569,25 +535,20 @@ class _$CancelSelectedItemsEventImpl implements CancelSelectedItemsEvent {
 }
 
 abstract class CancelSelectedItemsEvent implements OutboundTaskDetailEvent {
-  const factory CancelSelectedItemsEvent({
-    required final List<int> selectedRows,
-  }) = _$CancelSelectedItemsEventImpl;
+  const factory CancelSelectedItemsEvent(
+      {required final List<int> selectedRows}) = _$CancelSelectedItemsEventImpl;
 
   List<int> get selectedRows;
-
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CancelSelectedItemsEventImplCopyWith<_$CancelSelectedItemsEventImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class _$$RefreshEventImplCopyWith<$Res> {
   factory _$$RefreshEventImplCopyWith(
-    _$RefreshEventImpl value,
-    $Res Function(_$RefreshEventImpl) then,
-  ) = __$$RefreshEventImplCopyWithImpl<$Res>;
+          _$RefreshEventImpl value, $Res Function(_$RefreshEventImpl) then) =
+      __$$RefreshEventImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -595,12 +556,8 @@ class __$$RefreshEventImplCopyWithImpl<$Res>
     extends _$OutboundTaskDetailEventCopyWithImpl<$Res, _$RefreshEventImpl>
     implements _$$RefreshEventImplCopyWith<$Res> {
   __$$RefreshEventImplCopyWithImpl(
-    _$RefreshEventImpl _value,
-    $Res Function(_$RefreshEventImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of OutboundTaskDetailEvent
-  /// with the given fields replaced by the non-null parameter values.
+      _$RefreshEventImpl _value, $Res Function(_$RefreshEventImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -665,7 +622,7 @@ class _$RefreshEventImpl implements RefreshEvent {
     required TResult Function(SearchEvent value) search,
     required TResult Function(ScanQRCodeEvent value) scanQRCode,
     required TResult Function(CancelSelectedItemsEvent value)
-    cancelSelectedItems,
+        cancelSelectedItems,
     required TResult Function(RefreshEvent value) refresh,
   }) {
     return refresh(this);

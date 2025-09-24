@@ -231,10 +231,7 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
     Modular.to.pushNamed(
       '/outbound/collect/${task.outTaskNo}',
       arguments: {
-        'outTaskNo': task.outTaskNo,
-        'workStation': task.workStation,
-        'userId': userInfo.userId,
-        'roleOrUserId': userInfo.userId,
+        'task': task,
       },
     );
   }
@@ -251,6 +248,7 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
       ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
       return;
     }
+    
 
     // 导航到出库任务明细页面
     Modular.to.pushNamed(

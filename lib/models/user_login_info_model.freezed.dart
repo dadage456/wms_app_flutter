@@ -12,8 +12,7 @@ part of 'user_login_info_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 UserLoginInfoModel _$UserLoginInfoModelFromJson(Map<String, dynamic> json) {
   return _UserLoginInfoModel.fromJson(json);
@@ -24,12 +23,8 @@ mixin _$UserLoginInfoModel {
   String get username => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
 
-  /// Serializes this UserLoginInfoModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserLoginInfoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UserLoginInfoModelCopyWith<UserLoginInfoModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -37,9 +32,8 @@ mixin _$UserLoginInfoModel {
 /// @nodoc
 abstract class $UserLoginInfoModelCopyWith<$Res> {
   factory $UserLoginInfoModelCopyWith(
-    UserLoginInfoModel value,
-    $Res Function(UserLoginInfoModel) then,
-  ) = _$UserLoginInfoModelCopyWithImpl<$Res, UserLoginInfoModel>;
+          UserLoginInfoModel value, $Res Function(UserLoginInfoModel) then) =
+      _$UserLoginInfoModelCopyWithImpl<$Res, UserLoginInfoModel>;
   @useResult
   $Res call({String username, String password});
 }
@@ -54,34 +48,31 @@ class _$UserLoginInfoModelCopyWithImpl<$Res, $Val extends UserLoginInfoModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UserLoginInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? username = null, Object? password = null}) {
-    return _then(
-      _value.copyWith(
-            username: null == username
-                ? _value.username
-                : username // ignore: cast_nullable_to_non_nullable
-                      as String,
-            password: null == password
-                ? _value.password
-                : password // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? username = null,
+    Object? password = null,
+  }) {
+    return _then(_value.copyWith(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+      password: null == password
+          ? _value.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$UserLoginInfoModelImplCopyWith<$Res>
     implements $UserLoginInfoModelCopyWith<$Res> {
-  factory _$$UserLoginInfoModelImplCopyWith(
-    _$UserLoginInfoModelImpl value,
-    $Res Function(_$UserLoginInfoModelImpl) then,
-  ) = __$$UserLoginInfoModelImplCopyWithImpl<$Res>;
+  factory _$$UserLoginInfoModelImplCopyWith(_$UserLoginInfoModelImpl value,
+          $Res Function(_$UserLoginInfoModelImpl) then) =
+      __$$UserLoginInfoModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String username, String password});
@@ -91,38 +82,34 @@ abstract class _$$UserLoginInfoModelImplCopyWith<$Res>
 class __$$UserLoginInfoModelImplCopyWithImpl<$Res>
     extends _$UserLoginInfoModelCopyWithImpl<$Res, _$UserLoginInfoModelImpl>
     implements _$$UserLoginInfoModelImplCopyWith<$Res> {
-  __$$UserLoginInfoModelImplCopyWithImpl(
-    _$UserLoginInfoModelImpl _value,
-    $Res Function(_$UserLoginInfoModelImpl) _then,
-  ) : super(_value, _then);
+  __$$UserLoginInfoModelImplCopyWithImpl(_$UserLoginInfoModelImpl _value,
+      $Res Function(_$UserLoginInfoModelImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of UserLoginInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? username = null, Object? password = null}) {
-    return _then(
-      _$UserLoginInfoModelImpl(
-        username: null == username
-            ? _value.username
-            : username // ignore: cast_nullable_to_non_nullable
-                  as String,
-        password: null == password
-            ? _value.password
-            : password // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? username = null,
+    Object? password = null,
+  }) {
+    return _then(_$UserLoginInfoModelImpl(
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+      password: null == password
+          ? _value.password
+          : password // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$UserLoginInfoModelImpl implements _UserLoginInfoModel {
-  const _$UserLoginInfoModelImpl({
-    required this.username,
-    required this.password,
-  });
+  const _$UserLoginInfoModelImpl(
+      {required this.username, required this.password});
 
   factory _$UserLoginInfoModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserLoginInfoModelImplFromJson(json);
@@ -148,32 +135,29 @@ class _$UserLoginInfoModelImpl implements _UserLoginInfoModel {
                 other.password == password));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, username, password);
 
-  /// Create a copy of UserLoginInfoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UserLoginInfoModelImplCopyWith<_$UserLoginInfoModelImpl> get copyWith =>
       __$$UserLoginInfoModelImplCopyWithImpl<_$UserLoginInfoModelImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserLoginInfoModelImplToJson(this);
+    return _$$UserLoginInfoModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _UserLoginInfoModel implements UserLoginInfoModel {
-  const factory _UserLoginInfoModel({
-    required final String username,
-    required final String password,
-  }) = _$UserLoginInfoModelImpl;
+  const factory _UserLoginInfoModel(
+      {required final String username,
+      required final String password}) = _$UserLoginInfoModelImpl;
 
   factory _UserLoginInfoModel.fromJson(Map<String, dynamic> json) =
       _$UserLoginInfoModelImpl.fromJson;
@@ -182,11 +166,8 @@ abstract class _UserLoginInfoModel implements UserLoginInfoModel {
   String get username;
   @override
   String get password;
-
-  /// Create a copy of UserLoginInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UserLoginInfoModelImplCopyWith<_$UserLoginInfoModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

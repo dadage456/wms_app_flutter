@@ -41,32 +41,34 @@ Map<String, dynamic> _$$OutboundTaskImplToJson(_$OutboundTaskImpl instance) =>
     };
 
 _$OutboundTaskListResponseImpl _$$OutboundTaskListResponseImplFromJson(
-  Map<String, dynamic> json,
-) => _$OutboundTaskListResponseImpl(
-  code: json['code'] as String,
-  message: json['msg'] as String,
-  data: OutboundTaskListData.fromJson(json['data'] as Map<String, dynamic>),
-);
+        Map<String, dynamic> json) =>
+    _$OutboundTaskListResponseImpl(
+      code: json['code'] as String,
+      message: json['msg'] as String,
+      data: OutboundTaskListData.fromJson(json['data'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$$OutboundTaskListResponseImplToJson(
-  _$OutboundTaskListResponseImpl instance,
-) => <String, dynamic>{
-  'code': instance.code,
-  'msg': instance.message,
-  'data': instance.data,
-};
+        _$OutboundTaskListResponseImpl instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'msg': instance.message,
+      'data': instance.data,
+    };
 
 _$OutboundTaskListDataImpl _$$OutboundTaskListDataImplFromJson(
-  Map<String, dynamic> json,
-) => _$OutboundTaskListDataImpl(
-  rows:
-      (json['rows'] as List<dynamic>?)
-          ?.map((e) => OutboundTask.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-  total: (json['total'] as num?)?.toInt() ?? 0,
-);
+        Map<String, dynamic> json) =>
+    _$OutboundTaskListDataImpl(
+      rows: (json['rows'] as List<dynamic>?)
+              ?.map((e) => OutboundTask.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      total: (json['total'] as num?)?.toInt() ?? 0,
+    );
 
 Map<String, dynamic> _$$OutboundTaskListDataImplToJson(
-  _$OutboundTaskListDataImpl instance,
-) => <String, dynamic>{'rows': instance.rows, 'total': instance.total};
+        _$OutboundTaskListDataImpl instance) =>
+    <String, dynamic>{
+      'rows': instance.rows,
+      'total': instance.total,
+    };

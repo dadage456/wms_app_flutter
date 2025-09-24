@@ -1,0 +1,78 @@
+import 'package:equatable/equatable.dart';
+import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
+
+abstract class CollectionEvent extends Equatable {
+  const CollectionEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class InitializeTaskEvent extends CollectionEvent {
+  final OutboundTask task;
+
+  final int userId;
+
+  const InitializeTaskEvent(this.task, this.userId);
+
+  @override
+  List<Object> get props => [task];
+}
+
+class PerformBarcodeEvent extends CollectionEvent {
+  final String barcode;
+
+  const PerformBarcodeEvent(this.barcode);
+
+  @override
+  List<Object> get props => [barcode];
+}
+
+class ChangeTabEvent extends CollectionEvent {
+  final int index;
+
+  const ChangeTabEvent(this.index);
+
+  @override
+  List<Object> get props => [index];
+}
+
+class ToggleItemSelectionEvent extends CollectionEvent {
+  final String itemId;
+  final bool selected;
+
+  const ToggleItemSelectionEvent(this.itemId, this.selected);
+
+  @override
+  List<Object> get props => [itemId, selected];
+}
+
+class ToggleAllSelectionEvent extends CollectionEvent {
+  final bool selected;
+
+  const ToggleAllSelectionEvent(this.selected);
+
+  @override
+  List<Object> get props => [selected];
+}
+
+class CommitCollectionEvent extends CollectionEvent {
+  const CommitCollectionEvent();
+}
+
+class ReportShortageEvent extends CollectionEvent {
+  const ReportShortageEvent();
+}
+
+class ClearErrorEvent extends CollectionEvent {
+  const ClearErrorEvent();
+}
+
+class SetFocusEvent extends CollectionEvent {
+  final bool focus;
+
+  const SetFocusEvent(this.focus);
+
+  @override
+  List<Object> get props => [focus];
+}

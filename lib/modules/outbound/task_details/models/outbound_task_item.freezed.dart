@@ -12,8 +12,7 @@ part of 'outbound_task_item.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 OutboundTaskItem _$OutboundTaskItemFromJson(Map<String, dynamic> json) {
   return _OutboundTaskItem.fromJson(json);
@@ -65,12 +64,8 @@ mixin _$OutboundTaskItem {
   @JsonKey(name: 'orderno')
   String get orderNo => throw _privateConstructorUsedError;
 
-  /// Serializes this OutboundTaskItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of OutboundTaskItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $OutboundTaskItemCopyWith<OutboundTaskItem> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -78,23 +73,21 @@ mixin _$OutboundTaskItem {
 /// @nodoc
 abstract class $OutboundTaskItemCopyWith<$Res> {
   factory $OutboundTaskItemCopyWith(
-    OutboundTaskItem value,
-    $Res Function(OutboundTaskItem) then,
-  ) = _$OutboundTaskItemCopyWithImpl<$Res, OutboundTaskItem>;
+          OutboundTaskItem value, $Res Function(OutboundTaskItem) then) =
+      _$OutboundTaskItemCopyWithImpl<$Res, OutboundTaskItem>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'outtaskitemid') int outTaskItemId,
-    @JsonKey(name: 'matcode') String matCode,
-    @JsonKey(name: 'matname') String matName,
-    @JsonKey(name: 'matinnercode') String? matInnerCode,
-    @JsonKey(name: 'storesiteno') String storeSiteNo,
-    @JsonKey(name: 'storeroomno') String storeRoomNo,
-    @JsonKey(name: 'subinventoryCode') String subInventoryCode,
-    @JsonKey(name: 'hintqty') int hintQty,
-    @JsonKey(name: 'hintbatchno') String? hintBatchNo,
-    @JsonKey(name: 'sn') String? sn,
-    @JsonKey(name: 'orderno') String orderNo,
-  });
+  $Res call(
+      {@JsonKey(name: 'outtaskitemid') int outTaskItemId,
+      @JsonKey(name: 'matcode') String matCode,
+      @JsonKey(name: 'matname') String matName,
+      @JsonKey(name: 'matinnercode') String? matInnerCode,
+      @JsonKey(name: 'storesiteno') String storeSiteNo,
+      @JsonKey(name: 'storeroomno') String storeRoomNo,
+      @JsonKey(name: 'subinventoryCode') String subInventoryCode,
+      @JsonKey(name: 'hintqty') int hintQty,
+      @JsonKey(name: 'hintbatchno') String? hintBatchNo,
+      @JsonKey(name: 'sn') String? sn,
+      @JsonKey(name: 'orderno') String orderNo});
 }
 
 /// @nodoc
@@ -107,8 +100,6 @@ class _$OutboundTaskItemCopyWithImpl<$Res, $Val extends OutboundTaskItem>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of OutboundTaskItem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -124,93 +115,85 @@ class _$OutboundTaskItemCopyWithImpl<$Res, $Val extends OutboundTaskItem>
     Object? sn = freezed,
     Object? orderNo = null,
   }) {
-    return _then(
-      _value.copyWith(
-            outTaskItemId: null == outTaskItemId
-                ? _value.outTaskItemId
-                : outTaskItemId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            matCode: null == matCode
-                ? _value.matCode
-                : matCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            matName: null == matName
-                ? _value.matName
-                : matName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            matInnerCode: freezed == matInnerCode
-                ? _value.matInnerCode
-                : matInnerCode // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            storeSiteNo: null == storeSiteNo
-                ? _value.storeSiteNo
-                : storeSiteNo // ignore: cast_nullable_to_non_nullable
-                      as String,
-            storeRoomNo: null == storeRoomNo
-                ? _value.storeRoomNo
-                : storeRoomNo // ignore: cast_nullable_to_non_nullable
-                      as String,
-            subInventoryCode: null == subInventoryCode
-                ? _value.subInventoryCode
-                : subInventoryCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            hintQty: null == hintQty
-                ? _value.hintQty
-                : hintQty // ignore: cast_nullable_to_non_nullable
-                      as int,
-            hintBatchNo: freezed == hintBatchNo
-                ? _value.hintBatchNo
-                : hintBatchNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            sn: freezed == sn
-                ? _value.sn
-                : sn // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            orderNo: null == orderNo
-                ? _value.orderNo
-                : orderNo // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      outTaskItemId: null == outTaskItemId
+          ? _value.outTaskItemId
+          : outTaskItemId // ignore: cast_nullable_to_non_nullable
+              as int,
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matName: null == matName
+          ? _value.matName
+          : matName // ignore: cast_nullable_to_non_nullable
+              as String,
+      matInnerCode: freezed == matInnerCode
+          ? _value.matInnerCode
+          : matInnerCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      storeSiteNo: null == storeSiteNo
+          ? _value.storeSiteNo
+          : storeSiteNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeRoomNo: null == storeRoomNo
+          ? _value.storeRoomNo
+          : storeRoomNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      subInventoryCode: null == subInventoryCode
+          ? _value.subInventoryCode
+          : subInventoryCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      hintQty: null == hintQty
+          ? _value.hintQty
+          : hintQty // ignore: cast_nullable_to_non_nullable
+              as int,
+      hintBatchNo: freezed == hintBatchNo
+          ? _value.hintBatchNo
+          : hintBatchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sn: freezed == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNo: null == orderNo
+          ? _value.orderNo
+          : orderNo // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$OutboundTaskItemImplCopyWith<$Res>
     implements $OutboundTaskItemCopyWith<$Res> {
-  factory _$$OutboundTaskItemImplCopyWith(
-    _$OutboundTaskItemImpl value,
-    $Res Function(_$OutboundTaskItemImpl) then,
-  ) = __$$OutboundTaskItemImplCopyWithImpl<$Res>;
+  factory _$$OutboundTaskItemImplCopyWith(_$OutboundTaskItemImpl value,
+          $Res Function(_$OutboundTaskItemImpl) then) =
+      __$$OutboundTaskItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'outtaskitemid') int outTaskItemId,
-    @JsonKey(name: 'matcode') String matCode,
-    @JsonKey(name: 'matname') String matName,
-    @JsonKey(name: 'matinnercode') String? matInnerCode,
-    @JsonKey(name: 'storesiteno') String storeSiteNo,
-    @JsonKey(name: 'storeroomno') String storeRoomNo,
-    @JsonKey(name: 'subinventoryCode') String subInventoryCode,
-    @JsonKey(name: 'hintqty') int hintQty,
-    @JsonKey(name: 'hintbatchno') String? hintBatchNo,
-    @JsonKey(name: 'sn') String? sn,
-    @JsonKey(name: 'orderno') String orderNo,
-  });
+  $Res call(
+      {@JsonKey(name: 'outtaskitemid') int outTaskItemId,
+      @JsonKey(name: 'matcode') String matCode,
+      @JsonKey(name: 'matname') String matName,
+      @JsonKey(name: 'matinnercode') String? matInnerCode,
+      @JsonKey(name: 'storesiteno') String storeSiteNo,
+      @JsonKey(name: 'storeroomno') String storeRoomNo,
+      @JsonKey(name: 'subinventoryCode') String subInventoryCode,
+      @JsonKey(name: 'hintqty') int hintQty,
+      @JsonKey(name: 'hintbatchno') String? hintBatchNo,
+      @JsonKey(name: 'sn') String? sn,
+      @JsonKey(name: 'orderno') String orderNo});
 }
 
 /// @nodoc
 class __$$OutboundTaskItemImplCopyWithImpl<$Res>
     extends _$OutboundTaskItemCopyWithImpl<$Res, _$OutboundTaskItemImpl>
     implements _$$OutboundTaskItemImplCopyWith<$Res> {
-  __$$OutboundTaskItemImplCopyWithImpl(
-    _$OutboundTaskItemImpl _value,
-    $Res Function(_$OutboundTaskItemImpl) _then,
-  ) : super(_value, _then);
+  __$$OutboundTaskItemImplCopyWithImpl(_$OutboundTaskItemImpl _value,
+      $Res Function(_$OutboundTaskItemImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskItem
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -226,73 +209,70 @@ class __$$OutboundTaskItemImplCopyWithImpl<$Res>
     Object? sn = freezed,
     Object? orderNo = null,
   }) {
-    return _then(
-      _$OutboundTaskItemImpl(
-        outTaskItemId: null == outTaskItemId
-            ? _value.outTaskItemId
-            : outTaskItemId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        matCode: null == matCode
-            ? _value.matCode
-            : matCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        matName: null == matName
-            ? _value.matName
-            : matName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        matInnerCode: freezed == matInnerCode
-            ? _value.matInnerCode
-            : matInnerCode // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        storeSiteNo: null == storeSiteNo
-            ? _value.storeSiteNo
-            : storeSiteNo // ignore: cast_nullable_to_non_nullable
-                  as String,
-        storeRoomNo: null == storeRoomNo
-            ? _value.storeRoomNo
-            : storeRoomNo // ignore: cast_nullable_to_non_nullable
-                  as String,
-        subInventoryCode: null == subInventoryCode
-            ? _value.subInventoryCode
-            : subInventoryCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        hintQty: null == hintQty
-            ? _value.hintQty
-            : hintQty // ignore: cast_nullable_to_non_nullable
-                  as int,
-        hintBatchNo: freezed == hintBatchNo
-            ? _value.hintBatchNo
-            : hintBatchNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        sn: freezed == sn
-            ? _value.sn
-            : sn // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        orderNo: null == orderNo
-            ? _value.orderNo
-            : orderNo // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+    return _then(_$OutboundTaskItemImpl(
+      outTaskItemId: null == outTaskItemId
+          ? _value.outTaskItemId
+          : outTaskItemId // ignore: cast_nullable_to_non_nullable
+              as int,
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matName: null == matName
+          ? _value.matName
+          : matName // ignore: cast_nullable_to_non_nullable
+              as String,
+      matInnerCode: freezed == matInnerCode
+          ? _value.matInnerCode
+          : matInnerCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      storeSiteNo: null == storeSiteNo
+          ? _value.storeSiteNo
+          : storeSiteNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeRoomNo: null == storeRoomNo
+          ? _value.storeRoomNo
+          : storeRoomNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      subInventoryCode: null == subInventoryCode
+          ? _value.subInventoryCode
+          : subInventoryCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      hintQty: null == hintQty
+          ? _value.hintQty
+          : hintQty // ignore: cast_nullable_to_non_nullable
+              as int,
+      hintBatchNo: freezed == hintBatchNo
+          ? _value.hintBatchNo
+          : hintBatchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sn: freezed == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNo: null == orderNo
+          ? _value.orderNo
+          : orderNo // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$OutboundTaskItemImpl implements _OutboundTaskItem {
-  const _$OutboundTaskItemImpl({
-    @JsonKey(name: 'outtaskitemid') required this.outTaskItemId,
-    @JsonKey(name: 'matcode') required this.matCode,
-    @JsonKey(name: 'matname') required this.matName,
-    @JsonKey(name: 'matinnercode') this.matInnerCode,
-    @JsonKey(name: 'storesiteno') required this.storeSiteNo,
-    @JsonKey(name: 'storeroomno') required this.storeRoomNo,
-    @JsonKey(name: 'subinventoryCode') required this.subInventoryCode,
-    @JsonKey(name: 'hintqty') required this.hintQty,
-    @JsonKey(name: 'hintbatchno') this.hintBatchNo,
-    @JsonKey(name: 'sn') this.sn,
-    @JsonKey(name: 'orderno') required this.orderNo,
-  });
+  const _$OutboundTaskItemImpl(
+      {@JsonKey(name: 'outtaskitemid') required this.outTaskItemId,
+      @JsonKey(name: 'matcode') required this.matCode,
+      @JsonKey(name: 'matname') required this.matName,
+      @JsonKey(name: 'matinnercode') this.matInnerCode,
+      @JsonKey(name: 'storesiteno') required this.storeSiteNo,
+      @JsonKey(name: 'storeroomno') required this.storeRoomNo,
+      @JsonKey(name: 'subinventoryCode') required this.subInventoryCode,
+      @JsonKey(name: 'hintqty') required this.hintQty,
+      @JsonKey(name: 'hintbatchno') this.hintBatchNo,
+      @JsonKey(name: 'sn') this.sn,
+      @JsonKey(name: 'orderno') required this.orderNo});
 
   factory _$OutboundTaskItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$OutboundTaskItemImplFromJson(json);
@@ -381,124 +361,118 @@ class _$OutboundTaskItemImpl implements _OutboundTaskItem {
             (identical(other.orderNo, orderNo) || other.orderNo == orderNo));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    outTaskItemId,
-    matCode,
-    matName,
-    matInnerCode,
-    storeSiteNo,
-    storeRoomNo,
-    subInventoryCode,
-    hintQty,
-    hintBatchNo,
-    sn,
-    orderNo,
-  );
+      runtimeType,
+      outTaskItemId,
+      matCode,
+      matName,
+      matInnerCode,
+      storeSiteNo,
+      storeRoomNo,
+      subInventoryCode,
+      hintQty,
+      hintBatchNo,
+      sn,
+      orderNo);
 
-  /// Create a copy of OutboundTaskItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$OutboundTaskItemImplCopyWith<_$OutboundTaskItemImpl> get copyWith =>
       __$$OutboundTaskItemImplCopyWithImpl<_$OutboundTaskItemImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OutboundTaskItemImplToJson(this);
+    return _$$OutboundTaskItemImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _OutboundTaskItem implements OutboundTaskItem {
-  const factory _OutboundTaskItem({
-    @JsonKey(name: 'outtaskitemid') required final int outTaskItemId,
-    @JsonKey(name: 'matcode') required final String matCode,
-    @JsonKey(name: 'matname') required final String matName,
-    @JsonKey(name: 'matinnercode') final String? matInnerCode,
-    @JsonKey(name: 'storesiteno') required final String storeSiteNo,
-    @JsonKey(name: 'storeroomno') required final String storeRoomNo,
-    @JsonKey(name: 'subinventoryCode') required final String subInventoryCode,
-    @JsonKey(name: 'hintqty') required final int hintQty,
-    @JsonKey(name: 'hintbatchno') final String? hintBatchNo,
-    @JsonKey(name: 'sn') final String? sn,
-    @JsonKey(name: 'orderno') required final String orderNo,
-  }) = _$OutboundTaskItemImpl;
+  const factory _OutboundTaskItem(
+      {@JsonKey(name: 'outtaskitemid') required final int outTaskItemId,
+      @JsonKey(name: 'matcode') required final String matCode,
+      @JsonKey(name: 'matname') required final String matName,
+      @JsonKey(name: 'matinnercode') final String? matInnerCode,
+      @JsonKey(name: 'storesiteno') required final String storeSiteNo,
+      @JsonKey(name: 'storeroomno') required final String storeRoomNo,
+      @JsonKey(name: 'subinventoryCode') required final String subInventoryCode,
+      @JsonKey(name: 'hintqty') required final int hintQty,
+      @JsonKey(name: 'hintbatchno') final String? hintBatchNo,
+      @JsonKey(name: 'sn') final String? sn,
+      @JsonKey(name: 'orderno')
+      required final String orderNo}) = _$OutboundTaskItemImpl;
 
   factory _OutboundTaskItem.fromJson(Map<String, dynamic> json) =
       _$OutboundTaskItemImpl.fromJson;
 
-  /// 任务明细ID
   @override
+
+  /// 任务明细ID
   @JsonKey(name: 'outtaskitemid')
   int get outTaskItemId;
+  @override
 
   /// 物料编码
-  @override
   @JsonKey(name: 'matcode')
   String get matCode;
+  @override
 
   /// 物料名称
-  @override
   @JsonKey(name: 'matname')
   String get matName;
+  @override
 
   /// 物料旧编码
-  @override
   @JsonKey(name: 'matinnercode')
   String? get matInnerCode;
+  @override
 
   /// 库位编号
-  @override
   @JsonKey(name: 'storesiteno')
   String get storeSiteNo;
+  @override
 
   /// 库房编号
-  @override
   @JsonKey(name: 'storeroomno')
   String get storeRoomNo;
+  @override
 
   /// 子库编码
-  @override
   @JsonKey(name: 'subinventoryCode')
   String get subInventoryCode;
+  @override
 
   /// 任务数量
-  @override
   @JsonKey(name: 'hintqty')
   int get hintQty;
+  @override
 
   /// 批次号
-  @override
   @JsonKey(name: 'hintbatchno')
   String? get hintBatchNo;
+  @override
 
   /// 序列号
-  @override
   @JsonKey(name: 'sn')
   String? get sn;
+  @override
 
   /// 出库单号
-  @override
   @JsonKey(name: 'orderno')
   String get orderNo;
-
-  /// Create a copy of OutboundTaskItem
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$OutboundTaskItemImplCopyWith<_$OutboundTaskItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 OutboundTaskItemQuery _$OutboundTaskItemQueryFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _OutboundTaskItemQuery.fromJson(json);
 }
 
@@ -548,43 +522,35 @@ mixin _$OutboundTaskItemQuery {
   @JsonKey(name: 'PageSize')
   int get pageSize => throw _privateConstructorUsedError;
 
-  /// Serializes this OutboundTaskItemQuery to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of OutboundTaskItemQuery
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $OutboundTaskItemQueryCopyWith<OutboundTaskItemQuery> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $OutboundTaskItemQueryCopyWith<$Res> {
-  factory $OutboundTaskItemQueryCopyWith(
-    OutboundTaskItemQuery value,
-    $Res Function(OutboundTaskItemQuery) then,
-  ) = _$OutboundTaskItemQueryCopyWithImpl<$Res, OutboundTaskItemQuery>;
+  factory $OutboundTaskItemQueryCopyWith(OutboundTaskItemQuery value,
+          $Res Function(OutboundTaskItemQuery) then) =
+      _$OutboundTaskItemQueryCopyWithImpl<$Res, OutboundTaskItemQuery>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'outtaskid') String outTaskId,
-    @JsonKey(name: 'workstation') String workStation,
-    @JsonKey(name: 'searchKey') String searchKey,
-    @JsonKey(name: 'userId') int userId,
-    @JsonKey(name: 'roleoRuserId') int roleOrUserId,
-    @JsonKey(name: 'roomTag') String roomTag,
-    @JsonKey(name: 'batchflag') String batchFlag,
-    @JsonKey(name: 'transferType') String transferType,
-    @JsonKey(name: 'beatflag') String beatFlag,
-    @JsonKey(name: 'PageIndex') int pageIndex,
-    @JsonKey(name: 'PageSize') int pageSize,
-  });
+  $Res call(
+      {@JsonKey(name: 'outtaskid') String outTaskId,
+      @JsonKey(name: 'workstation') String workStation,
+      @JsonKey(name: 'searchKey') String searchKey,
+      @JsonKey(name: 'userId') int userId,
+      @JsonKey(name: 'roleoRuserId') int roleOrUserId,
+      @JsonKey(name: 'roomTag') String roomTag,
+      @JsonKey(name: 'batchflag') String batchFlag,
+      @JsonKey(name: 'transferType') String transferType,
+      @JsonKey(name: 'beatflag') String beatFlag,
+      @JsonKey(name: 'PageIndex') int pageIndex,
+      @JsonKey(name: 'PageSize') int pageSize});
 }
 
 /// @nodoc
-class _$OutboundTaskItemQueryCopyWithImpl<
-  $Res,
-  $Val extends OutboundTaskItemQuery
->
+class _$OutboundTaskItemQueryCopyWithImpl<$Res,
+        $Val extends OutboundTaskItemQuery>
     implements $OutboundTaskItemQueryCopyWith<$Res> {
   _$OutboundTaskItemQueryCopyWithImpl(this._value, this._then);
 
@@ -593,8 +559,6 @@ class _$OutboundTaskItemQueryCopyWithImpl<
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of OutboundTaskItemQuery
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -610,55 +574,52 @@ class _$OutboundTaskItemQueryCopyWithImpl<
     Object? pageIndex = null,
     Object? pageSize = null,
   }) {
-    return _then(
-      _value.copyWith(
-            outTaskId: null == outTaskId
-                ? _value.outTaskId
-                : outTaskId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            workStation: null == workStation
-                ? _value.workStation
-                : workStation // ignore: cast_nullable_to_non_nullable
-                      as String,
-            searchKey: null == searchKey
-                ? _value.searchKey
-                : searchKey // ignore: cast_nullable_to_non_nullable
-                      as String,
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            roleOrUserId: null == roleOrUserId
-                ? _value.roleOrUserId
-                : roleOrUserId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            roomTag: null == roomTag
-                ? _value.roomTag
-                : roomTag // ignore: cast_nullable_to_non_nullable
-                      as String,
-            batchFlag: null == batchFlag
-                ? _value.batchFlag
-                : batchFlag // ignore: cast_nullable_to_non_nullable
-                      as String,
-            transferType: null == transferType
-                ? _value.transferType
-                : transferType // ignore: cast_nullable_to_non_nullable
-                      as String,
-            beatFlag: null == beatFlag
-                ? _value.beatFlag
-                : beatFlag // ignore: cast_nullable_to_non_nullable
-                      as String,
-            pageIndex: null == pageIndex
-                ? _value.pageIndex
-                : pageIndex // ignore: cast_nullable_to_non_nullable
-                      as int,
-            pageSize: null == pageSize
-                ? _value.pageSize
-                : pageSize // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      outTaskId: null == outTaskId
+          ? _value.outTaskId
+          : outTaskId // ignore: cast_nullable_to_non_nullable
+              as String,
+      workStation: null == workStation
+          ? _value.workStation
+          : workStation // ignore: cast_nullable_to_non_nullable
+              as String,
+      searchKey: null == searchKey
+          ? _value.searchKey
+          : searchKey // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int,
+      roleOrUserId: null == roleOrUserId
+          ? _value.roleOrUserId
+          : roleOrUserId // ignore: cast_nullable_to_non_nullable
+              as int,
+      roomTag: null == roomTag
+          ? _value.roomTag
+          : roomTag // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchFlag: null == batchFlag
+          ? _value.batchFlag
+          : batchFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      transferType: null == transferType
+          ? _value.transferType
+          : transferType // ignore: cast_nullable_to_non_nullable
+              as String,
+      beatFlag: null == beatFlag
+          ? _value.beatFlag
+          : beatFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageIndex: null == pageIndex
+          ? _value.pageIndex
+          : pageIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
   }
 }
 
@@ -666,38 +627,34 @@ class _$OutboundTaskItemQueryCopyWithImpl<
 abstract class _$$OutboundTaskItemQueryImplCopyWith<$Res>
     implements $OutboundTaskItemQueryCopyWith<$Res> {
   factory _$$OutboundTaskItemQueryImplCopyWith(
-    _$OutboundTaskItemQueryImpl value,
-    $Res Function(_$OutboundTaskItemQueryImpl) then,
-  ) = __$$OutboundTaskItemQueryImplCopyWithImpl<$Res>;
+          _$OutboundTaskItemQueryImpl value,
+          $Res Function(_$OutboundTaskItemQueryImpl) then) =
+      __$$OutboundTaskItemQueryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'outtaskid') String outTaskId,
-    @JsonKey(name: 'workstation') String workStation,
-    @JsonKey(name: 'searchKey') String searchKey,
-    @JsonKey(name: 'userId') int userId,
-    @JsonKey(name: 'roleoRuserId') int roleOrUserId,
-    @JsonKey(name: 'roomTag') String roomTag,
-    @JsonKey(name: 'batchflag') String batchFlag,
-    @JsonKey(name: 'transferType') String transferType,
-    @JsonKey(name: 'beatflag') String beatFlag,
-    @JsonKey(name: 'PageIndex') int pageIndex,
-    @JsonKey(name: 'PageSize') int pageSize,
-  });
+  $Res call(
+      {@JsonKey(name: 'outtaskid') String outTaskId,
+      @JsonKey(name: 'workstation') String workStation,
+      @JsonKey(name: 'searchKey') String searchKey,
+      @JsonKey(name: 'userId') int userId,
+      @JsonKey(name: 'roleoRuserId') int roleOrUserId,
+      @JsonKey(name: 'roomTag') String roomTag,
+      @JsonKey(name: 'batchflag') String batchFlag,
+      @JsonKey(name: 'transferType') String transferType,
+      @JsonKey(name: 'beatflag') String beatFlag,
+      @JsonKey(name: 'PageIndex') int pageIndex,
+      @JsonKey(name: 'PageSize') int pageSize});
 }
 
 /// @nodoc
 class __$$OutboundTaskItemQueryImplCopyWithImpl<$Res>
-    extends
-        _$OutboundTaskItemQueryCopyWithImpl<$Res, _$OutboundTaskItemQueryImpl>
+    extends _$OutboundTaskItemQueryCopyWithImpl<$Res,
+        _$OutboundTaskItemQueryImpl>
     implements _$$OutboundTaskItemQueryImplCopyWith<$Res> {
-  __$$OutboundTaskItemQueryImplCopyWithImpl(
-    _$OutboundTaskItemQueryImpl _value,
-    $Res Function(_$OutboundTaskItemQueryImpl) _then,
-  ) : super(_value, _then);
+  __$$OutboundTaskItemQueryImplCopyWithImpl(_$OutboundTaskItemQueryImpl _value,
+      $Res Function(_$OutboundTaskItemQueryImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskItemQuery
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -713,73 +670,70 @@ class __$$OutboundTaskItemQueryImplCopyWithImpl<$Res>
     Object? pageIndex = null,
     Object? pageSize = null,
   }) {
-    return _then(
-      _$OutboundTaskItemQueryImpl(
-        outTaskId: null == outTaskId
-            ? _value.outTaskId
-            : outTaskId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        workStation: null == workStation
-            ? _value.workStation
-            : workStation // ignore: cast_nullable_to_non_nullable
-                  as String,
-        searchKey: null == searchKey
-            ? _value.searchKey
-            : searchKey // ignore: cast_nullable_to_non_nullable
-                  as String,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        roleOrUserId: null == roleOrUserId
-            ? _value.roleOrUserId
-            : roleOrUserId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        roomTag: null == roomTag
-            ? _value.roomTag
-            : roomTag // ignore: cast_nullable_to_non_nullable
-                  as String,
-        batchFlag: null == batchFlag
-            ? _value.batchFlag
-            : batchFlag // ignore: cast_nullable_to_non_nullable
-                  as String,
-        transferType: null == transferType
-            ? _value.transferType
-            : transferType // ignore: cast_nullable_to_non_nullable
-                  as String,
-        beatFlag: null == beatFlag
-            ? _value.beatFlag
-            : beatFlag // ignore: cast_nullable_to_non_nullable
-                  as String,
-        pageIndex: null == pageIndex
-            ? _value.pageIndex
-            : pageIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-        pageSize: null == pageSize
-            ? _value.pageSize
-            : pageSize // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+    return _then(_$OutboundTaskItemQueryImpl(
+      outTaskId: null == outTaskId
+          ? _value.outTaskId
+          : outTaskId // ignore: cast_nullable_to_non_nullable
+              as String,
+      workStation: null == workStation
+          ? _value.workStation
+          : workStation // ignore: cast_nullable_to_non_nullable
+              as String,
+      searchKey: null == searchKey
+          ? _value.searchKey
+          : searchKey // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int,
+      roleOrUserId: null == roleOrUserId
+          ? _value.roleOrUserId
+          : roleOrUserId // ignore: cast_nullable_to_non_nullable
+              as int,
+      roomTag: null == roomTag
+          ? _value.roomTag
+          : roomTag // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchFlag: null == batchFlag
+          ? _value.batchFlag
+          : batchFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      transferType: null == transferType
+          ? _value.transferType
+          : transferType // ignore: cast_nullable_to_non_nullable
+              as String,
+      beatFlag: null == beatFlag
+          ? _value.beatFlag
+          : beatFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      pageIndex: null == pageIndex
+          ? _value.pageIndex
+          : pageIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$OutboundTaskItemQueryImpl implements _OutboundTaskItemQuery {
-  const _$OutboundTaskItemQueryImpl({
-    @JsonKey(name: 'outtaskid') required this.outTaskId,
-    @JsonKey(name: 'workstation') required this.workStation,
-    @JsonKey(name: 'searchKey') this.searchKey = '',
-    @JsonKey(name: 'userId') required this.userId,
-    @JsonKey(name: 'roleoRuserId') required this.roleOrUserId,
-    @JsonKey(name: 'roomTag') this.roomTag = '0',
-    @JsonKey(name: 'batchflag') this.batchFlag = '0',
-    @JsonKey(name: 'transferType') this.transferType = '0',
-    @JsonKey(name: 'beatflag') this.beatFlag = 'N',
-    @JsonKey(name: 'PageIndex') this.pageIndex = 1,
-    @JsonKey(name: 'PageSize') this.pageSize = 100,
-  });
+  const _$OutboundTaskItemQueryImpl(
+      {@JsonKey(name: 'outtaskid') required this.outTaskId,
+      @JsonKey(name: 'workstation') required this.workStation,
+      @JsonKey(name: 'searchKey') this.searchKey = '',
+      @JsonKey(name: 'userId') required this.userId,
+      @JsonKey(name: 'roleoRuserId') required this.roleOrUserId,
+      @JsonKey(name: 'roomTag') this.roomTag = '0',
+      @JsonKey(name: 'batchflag') this.batchFlag = '0',
+      @JsonKey(name: 'transferType') this.transferType = '0',
+      @JsonKey(name: 'beatflag') this.beatFlag = 'N',
+      @JsonKey(name: 'PageIndex') this.pageIndex = 1,
+      @JsonKey(name: 'PageSize') this.pageSize = 100});
 
   factory _$OutboundTaskItemQueryImpl.fromJson(Map<String, dynamic> json) =>
       _$$OutboundTaskItemQueryImplFromJson(json);
@@ -871,125 +825,118 @@ class _$OutboundTaskItemQueryImpl implements _OutboundTaskItemQuery {
                 other.pageSize == pageSize));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    outTaskId,
-    workStation,
-    searchKey,
-    userId,
-    roleOrUserId,
-    roomTag,
-    batchFlag,
-    transferType,
-    beatFlag,
-    pageIndex,
-    pageSize,
-  );
+      runtimeType,
+      outTaskId,
+      workStation,
+      searchKey,
+      userId,
+      roleOrUserId,
+      roomTag,
+      batchFlag,
+      transferType,
+      beatFlag,
+      pageIndex,
+      pageSize);
 
-  /// Create a copy of OutboundTaskItemQuery
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$OutboundTaskItemQueryImplCopyWith<_$OutboundTaskItemQueryImpl>
-  get copyWith =>
-      __$$OutboundTaskItemQueryImplCopyWithImpl<_$OutboundTaskItemQueryImpl>(
-        this,
-        _$identity,
-      );
+      get copyWith => __$$OutboundTaskItemQueryImplCopyWithImpl<
+          _$OutboundTaskItemQueryImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OutboundTaskItemQueryImplToJson(this);
+    return _$$OutboundTaskItemQueryImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _OutboundTaskItemQuery implements OutboundTaskItemQuery {
-  const factory _OutboundTaskItemQuery({
-    @JsonKey(name: 'outtaskid') required final String outTaskId,
-    @JsonKey(name: 'workstation') required final String workStation,
-    @JsonKey(name: 'searchKey') final String searchKey,
-    @JsonKey(name: 'userId') required final int userId,
-    @JsonKey(name: 'roleoRuserId') required final int roleOrUserId,
-    @JsonKey(name: 'roomTag') final String roomTag,
-    @JsonKey(name: 'batchflag') final String batchFlag,
-    @JsonKey(name: 'transferType') final String transferType,
-    @JsonKey(name: 'beatflag') final String beatFlag,
-    @JsonKey(name: 'PageIndex') final int pageIndex,
-    @JsonKey(name: 'PageSize') final int pageSize,
-  }) = _$OutboundTaskItemQueryImpl;
+  const factory _OutboundTaskItemQuery(
+          {@JsonKey(name: 'outtaskid') required final String outTaskId,
+          @JsonKey(name: 'workstation') required final String workStation,
+          @JsonKey(name: 'searchKey') final String searchKey,
+          @JsonKey(name: 'userId') required final int userId,
+          @JsonKey(name: 'roleoRuserId') required final int roleOrUserId,
+          @JsonKey(name: 'roomTag') final String roomTag,
+          @JsonKey(name: 'batchflag') final String batchFlag,
+          @JsonKey(name: 'transferType') final String transferType,
+          @JsonKey(name: 'beatflag') final String beatFlag,
+          @JsonKey(name: 'PageIndex') final int pageIndex,
+          @JsonKey(name: 'PageSize') final int pageSize}) =
+      _$OutboundTaskItemQueryImpl;
 
   factory _OutboundTaskItemQuery.fromJson(Map<String, dynamic> json) =
       _$OutboundTaskItemQueryImpl.fromJson;
 
-  /// 出库任务ID（必填）
   @override
+
+  /// 出库任务ID（必填）
   @JsonKey(name: 'outtaskid')
   String get outTaskId;
+  @override
 
   /// 工作站（必填）
-  @override
   @JsonKey(name: 'workstation')
   String get workStation;
+  @override
 
   /// 搜索关键字（物料编码）
-  @override
   @JsonKey(name: 'searchKey')
   String get searchKey;
+  @override
 
   /// 用户ID
-  @override
   @JsonKey(name: 'userId')
   int get userId;
+  @override
 
   /// 角色或用户ID
-  @override
   @JsonKey(name: 'roleoRuserId')
   int get roleOrUserId;
+  @override
 
   /// 库房标签
-  @override
   @JsonKey(name: 'roomTag')
   String get roomTag;
+  @override
 
   /// 批次标志
-  @override
   @JsonKey(name: 'batchflag')
   String get batchFlag;
+  @override
 
   /// 转移类型
-  @override
   @JsonKey(name: 'transferType')
   String get transferType;
+  @override
 
   /// 节拍标志
-  @override
   @JsonKey(name: 'beatflag')
   String get beatFlag;
+  @override
 
   /// 页码
-  @override
   @JsonKey(name: 'PageIndex')
   int get pageIndex;
+  @override
 
   /// 页面大小
-  @override
   @JsonKey(name: 'PageSize')
   int get pageSize;
-
-  /// Create a copy of OutboundTaskItemQuery
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$OutboundTaskItemQueryImplCopyWith<_$OutboundTaskItemQueryImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 OutboundTaskItemListData _$OutboundTaskItemListDataFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _OutboundTaskItemListData.fromJson(json);
 }
 
@@ -1003,34 +950,26 @@ mixin _$OutboundTaskItemListData {
   @JsonKey(name: 'total')
   int get total => throw _privateConstructorUsedError;
 
-  /// Serializes this OutboundTaskItemListData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of OutboundTaskItemListData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $OutboundTaskItemListDataCopyWith<OutboundTaskItemListData> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $OutboundTaskItemListDataCopyWith<$Res> {
-  factory $OutboundTaskItemListDataCopyWith(
-    OutboundTaskItemListData value,
-    $Res Function(OutboundTaskItemListData) then,
-  ) = _$OutboundTaskItemListDataCopyWithImpl<$Res, OutboundTaskItemListData>;
+  factory $OutboundTaskItemListDataCopyWith(OutboundTaskItemListData value,
+          $Res Function(OutboundTaskItemListData) then) =
+      _$OutboundTaskItemListDataCopyWithImpl<$Res, OutboundTaskItemListData>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'rows') List<OutboundTaskItem> rows,
-    @JsonKey(name: 'total') int total,
-  });
+  $Res call(
+      {@JsonKey(name: 'rows') List<OutboundTaskItem> rows,
+      @JsonKey(name: 'total') int total});
 }
 
 /// @nodoc
-class _$OutboundTaskItemListDataCopyWithImpl<
-  $Res,
-  $Val extends OutboundTaskItemListData
->
+class _$OutboundTaskItemListDataCopyWithImpl<$Res,
+        $Val extends OutboundTaskItemListData>
     implements $OutboundTaskItemListDataCopyWith<$Res> {
   _$OutboundTaskItemListDataCopyWithImpl(this._value, this._then);
 
@@ -1039,24 +978,22 @@ class _$OutboundTaskItemListDataCopyWithImpl<
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of OutboundTaskItemListData
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? rows = null, Object? total = null}) {
-    return _then(
-      _value.copyWith(
-            rows: null == rows
-                ? _value.rows
-                : rows // ignore: cast_nullable_to_non_nullable
-                      as List<OutboundTaskItem>,
-            total: null == total
-                ? _value.total
-                : total // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? rows = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      rows: null == rows
+          ? _value.rows
+          : rows // ignore: cast_nullable_to_non_nullable
+              as List<OutboundTaskItem>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
   }
 }
 
@@ -1064,57 +1001,52 @@ class _$OutboundTaskItemListDataCopyWithImpl<
 abstract class _$$OutboundTaskItemListDataImplCopyWith<$Res>
     implements $OutboundTaskItemListDataCopyWith<$Res> {
   factory _$$OutboundTaskItemListDataImplCopyWith(
-    _$OutboundTaskItemListDataImpl value,
-    $Res Function(_$OutboundTaskItemListDataImpl) then,
-  ) = __$$OutboundTaskItemListDataImplCopyWithImpl<$Res>;
+          _$OutboundTaskItemListDataImpl value,
+          $Res Function(_$OutboundTaskItemListDataImpl) then) =
+      __$$OutboundTaskItemListDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'rows') List<OutboundTaskItem> rows,
-    @JsonKey(name: 'total') int total,
-  });
+  $Res call(
+      {@JsonKey(name: 'rows') List<OutboundTaskItem> rows,
+      @JsonKey(name: 'total') int total});
 }
 
 /// @nodoc
 class __$$OutboundTaskItemListDataImplCopyWithImpl<$Res>
-    extends
-        _$OutboundTaskItemListDataCopyWithImpl<
-          $Res,
-          _$OutboundTaskItemListDataImpl
-        >
+    extends _$OutboundTaskItemListDataCopyWithImpl<$Res,
+        _$OutboundTaskItemListDataImpl>
     implements _$$OutboundTaskItemListDataImplCopyWith<$Res> {
   __$$OutboundTaskItemListDataImplCopyWithImpl(
-    _$OutboundTaskItemListDataImpl _value,
-    $Res Function(_$OutboundTaskItemListDataImpl) _then,
-  ) : super(_value, _then);
+      _$OutboundTaskItemListDataImpl _value,
+      $Res Function(_$OutboundTaskItemListDataImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskItemListData
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? rows = null, Object? total = null}) {
-    return _then(
-      _$OutboundTaskItemListDataImpl(
-        rows: null == rows
-            ? _value._rows
-            : rows // ignore: cast_nullable_to_non_nullable
-                  as List<OutboundTaskItem>,
-        total: null == total
-            ? _value.total
-            : total // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+  $Res call({
+    Object? rows = null,
+    Object? total = null,
+  }) {
+    return _then(_$OutboundTaskItemListDataImpl(
+      rows: null == rows
+          ? _value._rows
+          : rows // ignore: cast_nullable_to_non_nullable
+              as List<OutboundTaskItem>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$OutboundTaskItemListDataImpl implements _OutboundTaskItemListData {
-  const _$OutboundTaskItemListDataImpl({
-    @JsonKey(name: 'rows') required final List<OutboundTaskItem> rows,
-    @JsonKey(name: 'total') required this.total,
-  }) : _rows = rows;
+  const _$OutboundTaskItemListDataImpl(
+      {@JsonKey(name: 'rows') required final List<OutboundTaskItem> rows,
+      @JsonKey(name: 'total') required this.total})
+      : _rows = rows;
 
   factory _$OutboundTaskItemListDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$OutboundTaskItemListDataImplFromJson(json);
@@ -1150,61 +1082,53 @@ class _$OutboundTaskItemListDataImpl implements _OutboundTaskItemListData {
             (identical(other.total, total) || other.total == total));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_rows),
-    total,
-  );
+      runtimeType, const DeepCollectionEquality().hash(_rows), total);
 
-  /// Create a copy of OutboundTaskItemListData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$OutboundTaskItemListDataImplCopyWith<_$OutboundTaskItemListDataImpl>
-  get copyWith =>
-      __$$OutboundTaskItemListDataImplCopyWithImpl<
-        _$OutboundTaskItemListDataImpl
-      >(this, _$identity);
+      get copyWith => __$$OutboundTaskItemListDataImplCopyWithImpl<
+          _$OutboundTaskItemListDataImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OutboundTaskItemListDataImplToJson(this);
+    return _$$OutboundTaskItemListDataImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _OutboundTaskItemListData implements OutboundTaskItemListData {
-  const factory _OutboundTaskItemListData({
-    @JsonKey(name: 'rows') required final List<OutboundTaskItem> rows,
-    @JsonKey(name: 'total') required final int total,
-  }) = _$OutboundTaskItemListDataImpl;
+  const factory _OutboundTaskItemListData(
+          {@JsonKey(name: 'rows') required final List<OutboundTaskItem> rows,
+          @JsonKey(name: 'total') required final int total}) =
+      _$OutboundTaskItemListDataImpl;
 
   factory _OutboundTaskItemListData.fromJson(Map<String, dynamic> json) =
       _$OutboundTaskItemListDataImpl.fromJson;
 
-  /// 明细列表
   @override
+
+  /// 明细列表
   @JsonKey(name: 'rows')
   List<OutboundTaskItem> get rows;
+  @override
 
   /// 总记录数
-  @override
   @JsonKey(name: 'total')
   int get total;
-
-  /// Create a copy of OutboundTaskItemListData
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$OutboundTaskItemListDataImplCopyWith<_$OutboundTaskItemListDataImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 OutboundTaskItemListResponse _$OutboundTaskItemListResponseFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _OutboundTaskItemListResponse.fromJson(json);
 }
 
@@ -1222,41 +1146,31 @@ mixin _$OutboundTaskItemListResponse {
   @JsonKey(name: 'data')
   OutboundTaskItemListData get data => throw _privateConstructorUsedError;
 
-  /// Serializes this OutboundTaskItemListResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $OutboundTaskItemListResponseCopyWith<OutboundTaskItemListResponse>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $OutboundTaskItemListResponseCopyWith<$Res> {
   factory $OutboundTaskItemListResponseCopyWith(
-    OutboundTaskItemListResponse value,
-    $Res Function(OutboundTaskItemListResponse) then,
-  ) =
-      _$OutboundTaskItemListResponseCopyWithImpl<
-        $Res,
-        OutboundTaskItemListResponse
-      >;
+          OutboundTaskItemListResponse value,
+          $Res Function(OutboundTaskItemListResponse) then) =
+      _$OutboundTaskItemListResponseCopyWithImpl<$Res,
+          OutboundTaskItemListResponse>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-    @JsonKey(name: 'data') OutboundTaskItemListData data,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message,
+      @JsonKey(name: 'data') OutboundTaskItemListData data});
 
   $OutboundTaskItemListDataCopyWith<$Res> get data;
 }
 
 /// @nodoc
-class _$OutboundTaskItemListResponseCopyWithImpl<
-  $Res,
-  $Val extends OutboundTaskItemListResponse
->
+class _$OutboundTaskItemListResponseCopyWithImpl<$Res,
+        $Val extends OutboundTaskItemListResponse>
     implements $OutboundTaskItemListResponseCopyWith<$Res> {
   _$OutboundTaskItemListResponseCopyWithImpl(this._value, this._then);
 
@@ -1265,8 +1179,6 @@ class _$OutboundTaskItemListResponseCopyWithImpl<
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1274,27 +1186,22 @@ class _$OutboundTaskItemListResponseCopyWithImpl<
     Object? message = null,
     Object? data = null,
   }) {
-    return _then(
-      _value.copyWith(
-            code: null == code
-                ? _value.code
-                : code // ignore: cast_nullable_to_non_nullable
-                      as String,
-            message: null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                      as String,
-            data: null == data
-                ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
-                      as OutboundTaskItemListData,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as OutboundTaskItemListData,
+    ) as $Val);
   }
 
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $OutboundTaskItemListDataCopyWith<$Res> get data {
@@ -1308,16 +1215,15 @@ class _$OutboundTaskItemListResponseCopyWithImpl<
 abstract class _$$OutboundTaskItemListResponseImplCopyWith<$Res>
     implements $OutboundTaskItemListResponseCopyWith<$Res> {
   factory _$$OutboundTaskItemListResponseImplCopyWith(
-    _$OutboundTaskItemListResponseImpl value,
-    $Res Function(_$OutboundTaskItemListResponseImpl) then,
-  ) = __$$OutboundTaskItemListResponseImplCopyWithImpl<$Res>;
+          _$OutboundTaskItemListResponseImpl value,
+          $Res Function(_$OutboundTaskItemListResponseImpl) then) =
+      __$$OutboundTaskItemListResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-    @JsonKey(name: 'data') OutboundTaskItemListData data,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message,
+      @JsonKey(name: 'data') OutboundTaskItemListData data});
 
   @override
   $OutboundTaskItemListDataCopyWith<$Res> get data;
@@ -1325,19 +1231,14 @@ abstract class _$$OutboundTaskItemListResponseImplCopyWith<$Res>
 
 /// @nodoc
 class __$$OutboundTaskItemListResponseImplCopyWithImpl<$Res>
-    extends
-        _$OutboundTaskItemListResponseCopyWithImpl<
-          $Res,
-          _$OutboundTaskItemListResponseImpl
-        >
+    extends _$OutboundTaskItemListResponseCopyWithImpl<$Res,
+        _$OutboundTaskItemListResponseImpl>
     implements _$$OutboundTaskItemListResponseImplCopyWith<$Res> {
   __$$OutboundTaskItemListResponseImplCopyWithImpl(
-    _$OutboundTaskItemListResponseImpl _value,
-    $Res Function(_$OutboundTaskItemListResponseImpl) _then,
-  ) : super(_value, _then);
+      _$OutboundTaskItemListResponseImpl _value,
+      $Res Function(_$OutboundTaskItemListResponseImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1345,22 +1246,20 @@ class __$$OutboundTaskItemListResponseImplCopyWithImpl<$Res>
     Object? message = null,
     Object? data = null,
   }) {
-    return _then(
-      _$OutboundTaskItemListResponseImpl(
-        code: null == code
-            ? _value.code
-            : code // ignore: cast_nullable_to_non_nullable
-                  as String,
-        message: null == message
-            ? _value.message
-            : message // ignore: cast_nullable_to_non_nullable
-                  as String,
-        data: null == data
-            ? _value.data
-            : data // ignore: cast_nullable_to_non_nullable
-                  as OutboundTaskItemListData,
-      ),
-    );
+    return _then(_$OutboundTaskItemListResponseImpl(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as OutboundTaskItemListData,
+    ));
   }
 }
 
@@ -1368,15 +1267,14 @@ class __$$OutboundTaskItemListResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$OutboundTaskItemListResponseImpl
     implements _OutboundTaskItemListResponse {
-  const _$OutboundTaskItemListResponseImpl({
-    @JsonKey(name: 'code') required this.code,
-    @JsonKey(name: 'msg') required this.message,
-    @JsonKey(name: 'data') required this.data,
-  });
+  const _$OutboundTaskItemListResponseImpl(
+      {@JsonKey(name: 'code') required this.code,
+      @JsonKey(name: 'msg') required this.message,
+      @JsonKey(name: 'data') required this.data});
 
   factory _$OutboundTaskItemListResponseImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$OutboundTaskItemListResponseImplFromJson(json);
+          Map<String, dynamic> json) =>
+      _$$OutboundTaskItemListResponseImplFromJson(json);
 
   /// 响应码
   @override
@@ -1408,63 +1306,58 @@ class _$OutboundTaskItemListResponseImpl
             (identical(other.data, data) || other.data == data));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, code, message, data);
 
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$OutboundTaskItemListResponseImplCopyWith<
-    _$OutboundTaskItemListResponseImpl
-  >
-  get copyWith =>
-      __$$OutboundTaskItemListResponseImplCopyWithImpl<
-        _$OutboundTaskItemListResponseImpl
-      >(this, _$identity);
+          _$OutboundTaskItemListResponseImpl>
+      get copyWith => __$$OutboundTaskItemListResponseImplCopyWithImpl<
+          _$OutboundTaskItemListResponseImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OutboundTaskItemListResponseImplToJson(this);
+    return _$$OutboundTaskItemListResponseImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _OutboundTaskItemListResponse
     implements OutboundTaskItemListResponse {
-  const factory _OutboundTaskItemListResponse({
-    @JsonKey(name: 'code') required final String code,
-    @JsonKey(name: 'msg') required final String message,
-    @JsonKey(name: 'data') required final OutboundTaskItemListData data,
-  }) = _$OutboundTaskItemListResponseImpl;
+  const factory _OutboundTaskItemListResponse(
+          {@JsonKey(name: 'code') required final String code,
+          @JsonKey(name: 'msg') required final String message,
+          @JsonKey(name: 'data')
+          required final OutboundTaskItemListData data}) =
+      _$OutboundTaskItemListResponseImpl;
 
   factory _OutboundTaskItemListResponse.fromJson(Map<String, dynamic> json) =
       _$OutboundTaskItemListResponseImpl.fromJson;
 
-  /// 响应码
   @override
+
+  /// 响应码
   @JsonKey(name: 'code')
   String get code;
+  @override
 
   /// 响应消息
-  @override
   @JsonKey(name: 'msg')
   String get message;
+  @override
 
   /// 响应数据
-  @override
   @JsonKey(name: 'data')
   OutboundTaskItemListData get data;
-
-  /// Create a copy of OutboundTaskItemListResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$OutboundTaskItemListResponseImplCopyWith<
-    _$OutboundTaskItemListResponseImpl
-  >
-  get copyWith => throw _privateConstructorUsedError;
+          _$OutboundTaskItemListResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 MaterialInfoResponse _$MaterialInfoResponseFromJson(Map<String, dynamic> json) {
@@ -1485,37 +1378,29 @@ mixin _$MaterialInfoResponse {
   @JsonKey(name: 'data')
   MaterialInfo get data => throw _privateConstructorUsedError;
 
-  /// Serializes this MaterialInfoResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $MaterialInfoResponseCopyWith<MaterialInfoResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $MaterialInfoResponseCopyWith<$Res> {
-  factory $MaterialInfoResponseCopyWith(
-    MaterialInfoResponse value,
-    $Res Function(MaterialInfoResponse) then,
-  ) = _$MaterialInfoResponseCopyWithImpl<$Res, MaterialInfoResponse>;
+  factory $MaterialInfoResponseCopyWith(MaterialInfoResponse value,
+          $Res Function(MaterialInfoResponse) then) =
+      _$MaterialInfoResponseCopyWithImpl<$Res, MaterialInfoResponse>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-    @JsonKey(name: 'data') MaterialInfo data,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message,
+      @JsonKey(name: 'data') MaterialInfo data});
 
   $MaterialInfoCopyWith<$Res> get data;
 }
 
 /// @nodoc
-class _$MaterialInfoResponseCopyWithImpl<
-  $Res,
-  $Val extends MaterialInfoResponse
->
+class _$MaterialInfoResponseCopyWithImpl<$Res,
+        $Val extends MaterialInfoResponse>
     implements $MaterialInfoResponseCopyWith<$Res> {
   _$MaterialInfoResponseCopyWithImpl(this._value, this._then);
 
@@ -1524,8 +1409,6 @@ class _$MaterialInfoResponseCopyWithImpl<
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1533,27 +1416,22 @@ class _$MaterialInfoResponseCopyWithImpl<
     Object? message = null,
     Object? data = null,
   }) {
-    return _then(
-      _value.copyWith(
-            code: null == code
-                ? _value.code
-                : code // ignore: cast_nullable_to_non_nullable
-                      as String,
-            message: null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                      as String,
-            data: null == data
-                ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
-                      as MaterialInfo,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as MaterialInfo,
+    ) as $Val);
   }
 
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $MaterialInfoCopyWith<$Res> get data {
@@ -1566,17 +1444,15 @@ class _$MaterialInfoResponseCopyWithImpl<
 /// @nodoc
 abstract class _$$MaterialInfoResponseImplCopyWith<$Res>
     implements $MaterialInfoResponseCopyWith<$Res> {
-  factory _$$MaterialInfoResponseImplCopyWith(
-    _$MaterialInfoResponseImpl value,
-    $Res Function(_$MaterialInfoResponseImpl) then,
-  ) = __$$MaterialInfoResponseImplCopyWithImpl<$Res>;
+  factory _$$MaterialInfoResponseImplCopyWith(_$MaterialInfoResponseImpl value,
+          $Res Function(_$MaterialInfoResponseImpl) then) =
+      __$$MaterialInfoResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-    @JsonKey(name: 'data') MaterialInfo data,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message,
+      @JsonKey(name: 'data') MaterialInfo data});
 
   @override
   $MaterialInfoCopyWith<$Res> get data;
@@ -1586,13 +1462,10 @@ abstract class _$$MaterialInfoResponseImplCopyWith<$Res>
 class __$$MaterialInfoResponseImplCopyWithImpl<$Res>
     extends _$MaterialInfoResponseCopyWithImpl<$Res, _$MaterialInfoResponseImpl>
     implements _$$MaterialInfoResponseImplCopyWith<$Res> {
-  __$$MaterialInfoResponseImplCopyWithImpl(
-    _$MaterialInfoResponseImpl _value,
-    $Res Function(_$MaterialInfoResponseImpl) _then,
-  ) : super(_value, _then);
+  __$$MaterialInfoResponseImplCopyWithImpl(_$MaterialInfoResponseImpl _value,
+      $Res Function(_$MaterialInfoResponseImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -1600,33 +1473,30 @@ class __$$MaterialInfoResponseImplCopyWithImpl<$Res>
     Object? message = null,
     Object? data = null,
   }) {
-    return _then(
-      _$MaterialInfoResponseImpl(
-        code: null == code
-            ? _value.code
-            : code // ignore: cast_nullable_to_non_nullable
-                  as String,
-        message: null == message
-            ? _value.message
-            : message // ignore: cast_nullable_to_non_nullable
-                  as String,
-        data: null == data
-            ? _value.data
-            : data // ignore: cast_nullable_to_non_nullable
-                  as MaterialInfo,
-      ),
-    );
+    return _then(_$MaterialInfoResponseImpl(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as MaterialInfo,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$MaterialInfoResponseImpl implements _MaterialInfoResponse {
-  const _$MaterialInfoResponseImpl({
-    @JsonKey(name: 'code') required this.code,
-    @JsonKey(name: 'msg') required this.message,
-    @JsonKey(name: 'data') required this.data,
-  });
+  const _$MaterialInfoResponseImpl(
+      {@JsonKey(name: 'code') required this.code,
+      @JsonKey(name: 'msg') required this.message,
+      @JsonKey(name: 'data') required this.data});
 
   factory _$MaterialInfoResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$MaterialInfoResponseImplFromJson(json);
@@ -1661,59 +1531,55 @@ class _$MaterialInfoResponseImpl implements _MaterialInfoResponse {
             (identical(other.data, data) || other.data == data));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, code, message, data);
 
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$MaterialInfoResponseImplCopyWith<_$MaterialInfoResponseImpl>
-  get copyWith =>
-      __$$MaterialInfoResponseImplCopyWithImpl<_$MaterialInfoResponseImpl>(
-        this,
-        _$identity,
-      );
+      get copyWith =>
+          __$$MaterialInfoResponseImplCopyWithImpl<_$MaterialInfoResponseImpl>(
+              this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MaterialInfoResponseImplToJson(this);
+    return _$$MaterialInfoResponseImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _MaterialInfoResponse implements MaterialInfoResponse {
-  const factory _MaterialInfoResponse({
-    @JsonKey(name: 'code') required final String code,
-    @JsonKey(name: 'msg') required final String message,
-    @JsonKey(name: 'data') required final MaterialInfo data,
-  }) = _$MaterialInfoResponseImpl;
+  const factory _MaterialInfoResponse(
+          {@JsonKey(name: 'code') required final String code,
+          @JsonKey(name: 'msg') required final String message,
+          @JsonKey(name: 'data') required final MaterialInfo data}) =
+      _$MaterialInfoResponseImpl;
 
   factory _MaterialInfoResponse.fromJson(Map<String, dynamic> json) =
       _$MaterialInfoResponseImpl.fromJson;
 
-  /// 响应码
   @override
+
+  /// 响应码
   @JsonKey(name: 'code')
   String get code;
+  @override
 
   /// 响应消息
-  @override
   @JsonKey(name: 'msg')
   String get message;
+  @override
 
   /// 物料信息
-  @override
   @JsonKey(name: 'data')
   MaterialInfo get data;
-
-  /// Create a copy of MaterialInfoResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$MaterialInfoResponseImplCopyWith<_$MaterialInfoResponseImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 MaterialInfo _$MaterialInfoFromJson(Map<String, dynamic> json) {
@@ -1726,12 +1592,8 @@ mixin _$MaterialInfo {
   @JsonKey(name: 'matcode')
   String get matCode => throw _privateConstructorUsedError;
 
-  /// Serializes this MaterialInfo to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of MaterialInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $MaterialInfoCopyWith<MaterialInfo> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1739,9 +1601,8 @@ mixin _$MaterialInfo {
 /// @nodoc
 abstract class $MaterialInfoCopyWith<$Res> {
   factory $MaterialInfoCopyWith(
-    MaterialInfo value,
-    $Res Function(MaterialInfo) then,
-  ) = _$MaterialInfoCopyWithImpl<$Res, MaterialInfo>;
+          MaterialInfo value, $Res Function(MaterialInfo) then) =
+      _$MaterialInfoCopyWithImpl<$Res, MaterialInfo>;
   @useResult
   $Res call({@JsonKey(name: 'matcode') String matCode});
 }
@@ -1756,20 +1617,17 @@ class _$MaterialInfoCopyWithImpl<$Res, $Val extends MaterialInfo>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of MaterialInfo
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? matCode = null}) {
-    return _then(
-      _value.copyWith(
-            matCode: null == matCode
-                ? _value.matCode
-                : matCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? matCode = null,
+  }) {
+    return _then(_value.copyWith(
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
@@ -1777,9 +1635,8 @@ class _$MaterialInfoCopyWithImpl<$Res, $Val extends MaterialInfo>
 abstract class _$$MaterialInfoImplCopyWith<$Res>
     implements $MaterialInfoCopyWith<$Res> {
   factory _$$MaterialInfoImplCopyWith(
-    _$MaterialInfoImpl value,
-    $Res Function(_$MaterialInfoImpl) then,
-  ) = __$$MaterialInfoImplCopyWithImpl<$Res>;
+          _$MaterialInfoImpl value, $Res Function(_$MaterialInfoImpl) then) =
+      __$$MaterialInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({@JsonKey(name: 'matcode') String matCode});
@@ -1790,23 +1647,20 @@ class __$$MaterialInfoImplCopyWithImpl<$Res>
     extends _$MaterialInfoCopyWithImpl<$Res, _$MaterialInfoImpl>
     implements _$$MaterialInfoImplCopyWith<$Res> {
   __$$MaterialInfoImplCopyWithImpl(
-    _$MaterialInfoImpl _value,
-    $Res Function(_$MaterialInfoImpl) _then,
-  ) : super(_value, _then);
+      _$MaterialInfoImpl _value, $Res Function(_$MaterialInfoImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of MaterialInfo
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? matCode = null}) {
-    return _then(
-      _$MaterialInfoImpl(
-        matCode: null == matCode
-            ? _value.matCode
-            : matCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? matCode = null,
+  }) {
+    return _then(_$MaterialInfoImpl(
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -1836,13 +1690,11 @@ class _$MaterialInfoImpl implements _MaterialInfo {
             (identical(other.matCode, matCode) || other.matCode == matCode));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, matCode);
 
-  /// Create a copy of MaterialInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$MaterialInfoImplCopyWith<_$MaterialInfoImpl> get copyWith =>
@@ -1850,27 +1702,27 @@ class _$MaterialInfoImpl implements _MaterialInfo {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MaterialInfoImplToJson(this);
+    return _$$MaterialInfoImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _MaterialInfo implements MaterialInfo {
-  const factory _MaterialInfo({
-    @JsonKey(name: 'matcode') required final String matCode,
-  }) = _$MaterialInfoImpl;
+  const factory _MaterialInfo(
+          {@JsonKey(name: 'matcode') required final String matCode}) =
+      _$MaterialInfoImpl;
 
   factory _MaterialInfo.fromJson(Map<String, dynamic> json) =
       _$MaterialInfoImpl.fromJson;
 
-  /// 物料编码
   @override
+
+  /// 物料编码
   @JsonKey(name: 'matcode')
   String get matCode;
-
-  /// Create a copy of MaterialInfo
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$MaterialInfoImplCopyWith<_$MaterialInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1889,12 +1741,8 @@ mixin _$CancelTaskResponse {
   @JsonKey(name: 'msg')
   String get message => throw _privateConstructorUsedError;
 
-  /// Serializes this CancelTaskResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of CancelTaskResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $CancelTaskResponseCopyWith<CancelTaskResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -1902,14 +1750,12 @@ mixin _$CancelTaskResponse {
 /// @nodoc
 abstract class $CancelTaskResponseCopyWith<$Res> {
   factory $CancelTaskResponseCopyWith(
-    CancelTaskResponse value,
-    $Res Function(CancelTaskResponse) then,
-  ) = _$CancelTaskResponseCopyWithImpl<$Res, CancelTaskResponse>;
+          CancelTaskResponse value, $Res Function(CancelTaskResponse) then) =
+      _$CancelTaskResponseCopyWithImpl<$Res, CancelTaskResponse>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message});
 }
 
 /// @nodoc
@@ -1922,78 +1768,71 @@ class _$CancelTaskResponseCopyWithImpl<$Res, $Val extends CancelTaskResponse>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of CancelTaskResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? code = null, Object? message = null}) {
-    return _then(
-      _value.copyWith(
-            code: null == code
-                ? _value.code
-                : code // ignore: cast_nullable_to_non_nullable
-                      as String,
-            message: null == message
-                ? _value.message
-                : message // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? code = null,
+    Object? message = null,
+  }) {
+    return _then(_value.copyWith(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$CancelTaskResponseImplCopyWith<$Res>
     implements $CancelTaskResponseCopyWith<$Res> {
-  factory _$$CancelTaskResponseImplCopyWith(
-    _$CancelTaskResponseImpl value,
-    $Res Function(_$CancelTaskResponseImpl) then,
-  ) = __$$CancelTaskResponseImplCopyWithImpl<$Res>;
+  factory _$$CancelTaskResponseImplCopyWith(_$CancelTaskResponseImpl value,
+          $Res Function(_$CancelTaskResponseImpl) then) =
+      __$$CancelTaskResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'code') String code,
-    @JsonKey(name: 'msg') String message,
-  });
+  $Res call(
+      {@JsonKey(name: 'code') String code,
+      @JsonKey(name: 'msg') String message});
 }
 
 /// @nodoc
 class __$$CancelTaskResponseImplCopyWithImpl<$Res>
     extends _$CancelTaskResponseCopyWithImpl<$Res, _$CancelTaskResponseImpl>
     implements _$$CancelTaskResponseImplCopyWith<$Res> {
-  __$$CancelTaskResponseImplCopyWithImpl(
-    _$CancelTaskResponseImpl _value,
-    $Res Function(_$CancelTaskResponseImpl) _then,
-  ) : super(_value, _then);
+  __$$CancelTaskResponseImplCopyWithImpl(_$CancelTaskResponseImpl _value,
+      $Res Function(_$CancelTaskResponseImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of CancelTaskResponse
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? code = null, Object? message = null}) {
-    return _then(
-      _$CancelTaskResponseImpl(
-        code: null == code
-            ? _value.code
-            : code // ignore: cast_nullable_to_non_nullable
-                  as String,
-        message: null == message
-            ? _value.message
-            : message // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? code = null,
+    Object? message = null,
+  }) {
+    return _then(_$CancelTaskResponseImpl(
+      code: null == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String,
+      message: null == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$CancelTaskResponseImpl implements _CancelTaskResponse {
-  const _$CancelTaskResponseImpl({
-    @JsonKey(name: 'code') required this.code,
-    @JsonKey(name: 'msg') required this.message,
-  });
+  const _$CancelTaskResponseImpl(
+      {@JsonKey(name: 'code') required this.code,
+      @JsonKey(name: 'msg') required this.message});
 
   factory _$CancelTaskResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$CancelTaskResponseImplFromJson(json);
@@ -2022,50 +1861,46 @@ class _$CancelTaskResponseImpl implements _CancelTaskResponse {
             (identical(other.message, message) || other.message == message));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, code, message);
 
-  /// Create a copy of CancelTaskResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$CancelTaskResponseImplCopyWith<_$CancelTaskResponseImpl> get copyWith =>
       __$$CancelTaskResponseImplCopyWithImpl<_$CancelTaskResponseImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CancelTaskResponseImplToJson(this);
+    return _$$CancelTaskResponseImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _CancelTaskResponse implements CancelTaskResponse {
-  const factory _CancelTaskResponse({
-    @JsonKey(name: 'code') required final String code,
-    @JsonKey(name: 'msg') required final String message,
-  }) = _$CancelTaskResponseImpl;
+  const factory _CancelTaskResponse(
+          {@JsonKey(name: 'code') required final String code,
+          @JsonKey(name: 'msg') required final String message}) =
+      _$CancelTaskResponseImpl;
 
   factory _CancelTaskResponse.fromJson(Map<String, dynamic> json) =
       _$CancelTaskResponseImpl.fromJson;
 
-  /// 响应码
   @override
+
+  /// 响应码
   @JsonKey(name: 'code')
   String get code;
+  @override
 
   /// 响应消息
-  @override
   @JsonKey(name: 'msg')
   String get message;
-
-  /// Create a copy of CancelTaskResponse
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$CancelTaskResponseImplCopyWith<_$CancelTaskResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

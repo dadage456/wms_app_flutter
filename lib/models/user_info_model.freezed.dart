@@ -12,8 +12,7 @@ part of 'user_info_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) {
   return _UserInfoModel.fromJson(json);
@@ -30,12 +29,8 @@ mixin _$UserInfoModel {
   String get status => throw _privateConstructorUsedError;
   String get delFlag => throw _privateConstructorUsedError;
 
-  /// Serializes this UserInfoModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserInfoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   $UserInfoModelCopyWith<UserInfoModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,20 +38,18 @@ mixin _$UserInfoModel {
 /// @nodoc
 abstract class $UserInfoModelCopyWith<$Res> {
   factory $UserInfoModelCopyWith(
-    UserInfoModel value,
-    $Res Function(UserInfoModel) then,
-  ) = _$UserInfoModelCopyWithImpl<$Res, UserInfoModel>;
+          UserInfoModel value, $Res Function(UserInfoModel) then) =
+      _$UserInfoModelCopyWithImpl<$Res, UserInfoModel>;
   @useResult
-  $Res call({
-    int userId,
-    int deptId,
-    String userName,
-    String nickName,
-    String sex,
-    String? avatar,
-    String status,
-    String delFlag,
-  });
+  $Res call(
+      {int userId,
+      int deptId,
+      String userName,
+      String nickName,
+      String sex,
+      String? avatar,
+      String status,
+      String delFlag});
 }
 
 /// @nodoc
@@ -69,8 +62,6 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UserInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -83,43 +74,40 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
     Object? status = null,
     Object? delFlag = null,
   }) {
-    return _then(
-      _value.copyWith(
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            deptId: null == deptId
-                ? _value.deptId
-                : deptId // ignore: cast_nullable_to_non_nullable
-                      as int,
-            userName: null == userName
-                ? _value.userName
-                : userName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            nickName: null == nickName
-                ? _value.nickName
-                : nickName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            sex: null == sex
-                ? _value.sex
-                : sex // ignore: cast_nullable_to_non_nullable
-                      as String,
-            avatar: freezed == avatar
-                ? _value.avatar
-                : avatar // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String,
-            delFlag: null == delFlag
-                ? _value.delFlag
-                : delFlag // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int,
+      deptId: null == deptId
+          ? _value.deptId
+          : deptId // ignore: cast_nullable_to_non_nullable
+              as int,
+      userName: null == userName
+          ? _value.userName
+          : userName // ignore: cast_nullable_to_non_nullable
+              as String,
+      nickName: null == nickName
+          ? _value.nickName
+          : nickName // ignore: cast_nullable_to_non_nullable
+              as String,
+      sex: null == sex
+          ? _value.sex
+          : sex // ignore: cast_nullable_to_non_nullable
+              as String,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      delFlag: null == delFlag
+          ? _value.delFlag
+          : delFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
@@ -127,21 +115,19 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
 abstract class _$$UserInfoModelImplCopyWith<$Res>
     implements $UserInfoModelCopyWith<$Res> {
   factory _$$UserInfoModelImplCopyWith(
-    _$UserInfoModelImpl value,
-    $Res Function(_$UserInfoModelImpl) then,
-  ) = __$$UserInfoModelImplCopyWithImpl<$Res>;
+          _$UserInfoModelImpl value, $Res Function(_$UserInfoModelImpl) then) =
+      __$$UserInfoModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    int userId,
-    int deptId,
-    String userName,
-    String nickName,
-    String sex,
-    String? avatar,
-    String status,
-    String delFlag,
-  });
+  $Res call(
+      {int userId,
+      int deptId,
+      String userName,
+      String nickName,
+      String sex,
+      String? avatar,
+      String status,
+      String delFlag});
 }
 
 /// @nodoc
@@ -149,12 +135,9 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
     extends _$UserInfoModelCopyWithImpl<$Res, _$UserInfoModelImpl>
     implements _$$UserInfoModelImplCopyWith<$Res> {
   __$$UserInfoModelImplCopyWithImpl(
-    _$UserInfoModelImpl _value,
-    $Res Function(_$UserInfoModelImpl) _then,
-  ) : super(_value, _then);
+      _$UserInfoModelImpl _value, $Res Function(_$UserInfoModelImpl) _then)
+      : super(_value, _then);
 
-  /// Create a copy of UserInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -167,58 +150,55 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
     Object? status = null,
     Object? delFlag = null,
   }) {
-    return _then(
-      _$UserInfoModelImpl(
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        deptId: null == deptId
-            ? _value.deptId
-            : deptId // ignore: cast_nullable_to_non_nullable
-                  as int,
-        userName: null == userName
-            ? _value.userName
-            : userName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        nickName: null == nickName
-            ? _value.nickName
-            : nickName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        sex: null == sex
-            ? _value.sex
-            : sex // ignore: cast_nullable_to_non_nullable
-                  as String,
-        avatar: freezed == avatar
-            ? _value.avatar
-            : avatar // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String,
-        delFlag: null == delFlag
-            ? _value.delFlag
-            : delFlag // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+    return _then(_$UserInfoModelImpl(
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int,
+      deptId: null == deptId
+          ? _value.deptId
+          : deptId // ignore: cast_nullable_to_non_nullable
+              as int,
+      userName: null == userName
+          ? _value.userName
+          : userName // ignore: cast_nullable_to_non_nullable
+              as String,
+      nickName: null == nickName
+          ? _value.nickName
+          : nickName // ignore: cast_nullable_to_non_nullable
+              as String,
+      sex: null == sex
+          ? _value.sex
+          : sex // ignore: cast_nullable_to_non_nullable
+              as String,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      delFlag: null == delFlag
+          ? _value.delFlag
+          : delFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$UserInfoModelImpl implements _UserInfoModel {
-  const _$UserInfoModelImpl({
-    required this.userId,
-    required this.deptId,
-    required this.userName,
-    required this.nickName,
-    required this.sex,
-    this.avatar,
-    required this.status,
-    required this.delFlag,
-  });
+  const _$UserInfoModelImpl(
+      {required this.userId,
+      required this.deptId,
+      required this.userName,
+      required this.nickName,
+      required this.sex,
+      this.avatar,
+      required this.status,
+      required this.delFlag});
 
   factory _$UserInfoModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserInfoModelImplFromJson(json);
@@ -262,23 +242,12 @@ class _$UserInfoModelImpl implements _UserInfoModel {
             (identical(other.delFlag, delFlag) || other.delFlag == delFlag));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    userId,
-    deptId,
-    userName,
-    nickName,
-    sex,
-    avatar,
-    status,
-    delFlag,
-  );
+  int get hashCode => Object.hash(runtimeType, userId, deptId, userName,
+      nickName, sex, avatar, status, delFlag);
 
-  /// Create a copy of UserInfoModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$UserInfoModelImplCopyWith<_$UserInfoModelImpl> get copyWith =>
@@ -286,21 +255,22 @@ class _$UserInfoModelImpl implements _UserInfoModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserInfoModelImplToJson(this);
+    return _$$UserInfoModelImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _UserInfoModel implements UserInfoModel {
-  const factory _UserInfoModel({
-    required final int userId,
-    required final int deptId,
-    required final String userName,
-    required final String nickName,
-    required final String sex,
-    final String? avatar,
-    required final String status,
-    required final String delFlag,
-  }) = _$UserInfoModelImpl;
+  const factory _UserInfoModel(
+      {required final int userId,
+      required final int deptId,
+      required final String userName,
+      required final String nickName,
+      required final String sex,
+      final String? avatar,
+      required final String status,
+      required final String delFlag}) = _$UserInfoModelImpl;
 
   factory _UserInfoModel.fromJson(Map<String, dynamic> json) =
       _$UserInfoModelImpl.fromJson;
@@ -321,11 +291,8 @@ abstract class _UserInfoModel implements UserInfoModel {
   String get status;
   @override
   String get delFlag;
-
-  /// Create a copy of UserInfoModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$UserInfoModelImplCopyWith<_$UserInfoModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
