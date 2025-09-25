@@ -9,7 +9,6 @@ import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.d
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
 import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
 import 'package:wms_app/services/user_manager.dart';
-import 'package:wms_app/utils/scanner_broadcast.dart';
 import 'bloc/collection_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 
@@ -32,18 +31,6 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     _tabController = TabController(length: 2, vsync: this);
     final userInfo = Modular.get<UserManager>().userInfo;
     BlocProvider.of<CollectionBloc>(context).add(InitializeTaskEvent(widget.task, userInfo!.userId));
-
-    // 注册监听
-    FlutterBroadcastReceiver.registerReceiver(
-      onReceive: (context, intent) {
-        if (intent.action == "com.scanner.broadcast") {
-          setState(() {
-            scannedData = intent.extras?["data"] ?? '';
-          });
-        }
-      },
-      actions: ["com.scanner.broadcast"],
-    );
     
   }
 
