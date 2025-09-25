@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wms_app/services/scanner_service.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_event.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.dart';
@@ -25,17 +27,38 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  StreamSubscription<String>? _scanSub;
+
+  late CollectionBloc _bloc; 
+
   @override
   void initState() {
     super.initState();
+
+    _bloc = BlocProvider.of<CollectionBloc>(context);
+
     _tabController = TabController(length: 2, vsync: this);
     final userInfo = Modular.get<UserManager>().userInfo;
-    BlocProvider.of<CollectionBloc>(context).add(InitializeTaskEvent(widget.task, userInfo!.userId));
-    
+    _bloc.add(InitializeTaskEvent(widget.task, userInfo!.userId));
+
+    // 订阅全局扫码服务（内部仅与原生建立一次连接）
+    _scanSub = ScannerService.instance.stream.listen(
+      (code) {
+        if (code.isEmpty) return;
+        // 仅在本页为当前可见路由时处理扫码，避免被新页面覆盖时误触发
+        final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
+        if (!mounted || !isCurrent) return;
+        _bloc.add(PerformBarcodeEvent(code));
+      },
+      onError: (e) {
+        _showErrorDialog(context, '扫码组件出错：$e');
+      },
+    );
   }
 
   @override
   void dispose() {
+    _scanSub?.cancel();
     _tabController.dispose();
     super.dispose();
   }
@@ -70,7 +93,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
         listener: (context, state) {
           if (state.error != null) {
             _showErrorDialog(context, state.error!);
-            Modular.get<CollectionBloc>().add(ClearErrorEvent());
+            _bloc.add(ClearErrorEvent());
           }
 
           debugPrint('------ state changed-----------');
@@ -104,7 +127,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
                     Tab(text: '正在采集'),
                   ],
                   onTap: (index) {
-                    Modular.get<CollectionBloc>().add(ChangeTabEvent(index));
+                    _bloc.add(ChangeTabEvent(index));
                   },
                 ),
               ),
@@ -224,7 +247,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
 
   // 将网格返回的索引集合映射到事件（与 checkedIds 做差异，同步到 Bloc）
   void _onGridSelectionChanged(List<int> indices, List<OutTaskItem> items) {
-    final bloc = Modular.get<CollectionBloc>();
+    final bloc = _bloc;
     final current = bloc.state.checkedIds.toSet();
     final next = indices
         .map((i) => items[i].outtaskitemid.toString())
@@ -248,7 +271,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
       decoration: const BoxDecoration(color: Colors.white),
       child: TextField(
         onSubmitted: (value) {
-          Modular.get<CollectionBloc>().add(PerformBarcodeEvent(value));
+          _bloc.add(PerformBarcodeEvent(value));
         },
         decoration: InputDecoration(
           hintText: '请扫描或输入库位/物料',
@@ -439,7 +462,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   }
 
   void _showCommitConfirmation(BuildContext context) {
-    final state = Modular.get<CollectionBloc>().state;
+    final state = _bloc.state;
 
     if (state.stocks.isEmpty) {
       _showErrorDialog(context, '本次无采集明细，请确认！');
@@ -473,7 +496,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Modular.get<CollectionBloc>().add(CommitCollectionEvent());
+              _bloc.add(CommitCollectionEvent());
             },
             child: const Text('确认'),
           ),
@@ -522,7 +545,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   }
 
   void _handleShortageAction(BuildContext context) {
-    final state = Modular.get<CollectionBloc>().state;
+    final state = _bloc.state;
 
     if (state.stocks.isNotEmpty) {
       _showErrorDialog(context, '采集数据未提交,不允许报缺！');
@@ -547,7 +570,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Modular.get<CollectionBloc>().add(ReportShortageEvent());
+              _bloc.add(ReportShortageEvent());
             },
             child: const Text('确认'),
           ),
@@ -557,7 +580,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   }
 
   void _handleBackPress(BuildContext context) {
-    final state = Modular.get<CollectionBloc>().state;
+    final state = _bloc.state;
 
     if (state.stocks.isNotEmpty) {
       showDialog(
