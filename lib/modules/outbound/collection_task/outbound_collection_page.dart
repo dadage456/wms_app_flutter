@@ -1,14 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_event.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
+import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
 import 'package:wms_app/services/user_manager.dart';
+import 'package:wms_app/utils/scanner_broadcast.dart';
 import 'bloc/collection_bloc.dart';
-import 'widgets/collection_input_widget.dart';
-import 'widgets/collection_info_widget.dart';
-import 'widgets/task_table_widget.dart';
+import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 
 class OutboundCollectionPage extends StatefulWidget {
   final OutboundTask task;
@@ -29,6 +32,19 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     _tabController = TabController(length: 2, vsync: this);
     final userInfo = Modular.get<UserManager>().userInfo;
     BlocProvider.of<CollectionBloc>(context).add(InitializeTaskEvent(widget.task, userInfo!.userId));
+
+    // 注册监听
+    FlutterBroadcastReceiver.registerReceiver(
+      onReceive: (context, intent) {
+        if (intent.action == "com.scanner.broadcast") {
+          setState(() {
+            scannedData = intent.extras?["data"] ?? '';
+          });
+        }
+      },
+      actions: ["com.scanner.broadcast"],
+    );
+    
   }
 
   @override
@@ -40,19 +56,26 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F6F6),
       appBar: AppBar(
-        title: const Text('平库下架采集'),
+        backgroundColor: const Color(0xFF1976D2),
+        centerTitle: true,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => _handleBackPress(context),
         ),
+        title: const Text(
+          '平库下架采集',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) => _handleMenuAction(context, value),
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'exception', child: Text('异常采集')),
-              const PopupMenuItem(value: 'shortage', child: Text('报缺')),
-            ],
+          TextButton(
+            onPressed: () => _showMoreOptions(context),
+            child: const Text('更多',
+              style: TextStyle(color: Colors.white, fontSize: 16)),
           ),
         ],
       ),
@@ -72,69 +95,65 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
 
           return Column(
             children: [
-              // 输入框
-              CollectionInputWidget(
-                placeholder: state.placeholder,
-                focus: state.focus,
-                onSubmitted: (value) {
-                  Modular.get<CollectionBloc>().add(PerformBarcodeEvent(value));
-                },
-              ),
-              // 信息卡片
-              CollectionInfoWidget(
-                storeSite: state.storeSite,
-                repQty: state.repQty,
-                barcodeContent: state.currentBarcode,
-                collectQty: state.collectQty,
-              ),
-              // 标签页
-              TabBar(
-                controller: _tabController,
-                labelColor: Colors.red,
-                unselectedLabelColor: Colors.grey,
-                tabs: const [
-                  Tab(text: '任务列表'),
-                  Tab(text: '正在采集'),
-                ],
-                onTap: (index) {
-                  Modular.get<CollectionBloc>().add(ChangeTabEvent(index));
-                },
+              // 输入框（示例风格）
+              _buildScanInput(),
+              // 信息卡片（示例风格）
+              _buildInfoCard(state),
+              // 标签页（示例风格）
+              Container(
+                decoration: const BoxDecoration(color: Colors.white),
+                height: 44,
+                child: TabBar(
+                  dividerHeight: 0,
+                  controller: _tabController,
+                  labelColor: const Color(0xFF1976D2),
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: const Color(0xFF1976D2),
+                  indicatorWeight: 3,
+                  labelStyle: const TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w600),
+                  tabs: const [
+                    Tab(text: '任务列表'),
+                    Tab(text: '正在采集'),
+                  ],
+                  onTap: (index) {
+                    Modular.get<CollectionBloc>().add(ChangeTabEvent(index));
+                  },
+                ),
               ),
               // 表格内容
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // 任务列表
-                    TaskTableWidget(
-                      items: state.detailList,
-                      checkedIds: state.checkedIds,
-                      onItemCheck: (id, selected) {
-                        Modular.get<CollectionBloc>().add(
-                          ToggleItemSelectionEvent(id, selected),
-                        );
-                      },
-                      onSelectAll: (selected) {
-                        Modular.get<CollectionBloc>().add(
-                          ToggleAllSelectionEvent(selected),
-                        );
+                    // 任务列表（使用通用表格）
+                    CommonDataGrid<OutTaskItem>(
+                      columns: _collectionColumns(),
+                      datas: state.detailList,
+                      allowPager: false,
+                      allowSelect: true,
+                      currentPage: 1,
+                      totalPages: 1,
+                      onLoadData: (_) async {},
+                      headerHeight: 44,
+                      rowHeight: 48,
+                      selectedRows: _selectedIndicesFor(state.detailList, state.checkedIds),
+                      onSelectionChanged: (indices) {
+                        _onGridSelectionChanged(indices, state.detailList);
                       },
                     ),
-                    // 正在采集
-                    TaskTableWidget(
-                      items: state.collectionList,
-                      checkedIds: state.checkedIds,
-                      onItemCheck: (id, selected) {
-                        Modular.get<CollectionBloc>().add(
-                          ToggleItemSelectionEvent(id, selected),
-                        );
-                      },
-                      onSelectAll: (selected) {
-                        Modular.get<CollectionBloc>().add(
-                          ToggleAllSelectionEvent(selected),
-                        );
-                      },
-                      showSelection: false,
+                    // 正在采集（使用通用表格，不显示选择列）
+                    CommonDataGrid<OutTaskItem>(
+                      columns: _collectionColumns(),
+                      datas: state.collectionList,
+                      allowPager: false,
+                      allowSelect: false,
+                      currentPage: 1,
+                      totalPages: 1,
+                      onLoadData: (_) async {},
+                      headerHeight: 44,
+                      rowHeight: 48,
+                      selectedRows: const [],
                     ),
                   ],
                 ),
@@ -143,21 +162,276 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           );
         },
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: _buildBottomButtons(context),
     );
   }
 
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BlocBuilder<CollectionBloc, CollectionState>(
-      builder: (context, state) {
-        return BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: '采集结果'),
-            BottomNavigationBarItem(icon: Icon(Icons.upload), label: '提交'),
-            BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: '更多'),
-          ],
-          onTap: (index) => _handleBottomNavTap(context, index),
+  // 表格列定义：与原 DataTable 列一致
+  List<GridColumnConfig<OutTaskItem>> _collectionColumns() {
+    return [
+      GridColumnConfig<OutTaskItem>(
+        name: 'matcode',
+        headerText: '物料编码',
+        valueGetter: (r) => r.matcode ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'storesiteno',
+        headerText: '库位',
+        valueGetter: (r) => r.storesiteno ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'hintqty',
+        headerText: '任务数量',
+        valueGetter: (r) => r.hintqty,
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'collectedqty',
+        headerText: '采集数量',
+        valueGetter: (r) => r.collectedqty,
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'repqty',
+        headerText: '结余库存',
+        valueGetter: (r) => r.repqty,
+        textStyle: const TextStyle(color: Colors.blue),
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'hintbatchno',
+        headerText: '批次',
+        valueGetter: (r) => r.hintbatchno ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'sn',
+        headerText: '序列',
+        valueGetter: (r) => r.sn ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'storeroomno',
+        headerText: '库房',
+        valueGetter: (r) => r.storeroomno ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'subinventoryCode',
+        headerText: '子库',
+        valueGetter: (r) => r.subinventoryCode ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'matname',
+        headerText: '物料名称',
+        valueGetter: (r) => r.matname ?? '',
+      ),
+    ];
+  }
+
+  // 由选中ID映射为当前列表中的行索引
+  List<int> _selectedIndicesFor(List<OutTaskItem> items, List<String> checkedIds) {
+    final idSet = checkedIds.toSet();
+    final indices = <int>[];
+    for (var i = 0; i < items.length; i++) {
+      if (idSet.contains(items[i].outtaskitemid.toString())) {
+        indices.add(i);
+      }
+    }
+    return indices;
+  }
+
+  // 将网格返回的索引集合映射到事件（与 checkedIds 做差异，同步到 Bloc）
+  void _onGridSelectionChanged(List<int> indices, List<OutTaskItem> items) {
+    final bloc = Modular.get<CollectionBloc>();
+    final current = bloc.state.checkedIds.toSet();
+    final next = indices
+        .map((i) => items[i].outtaskitemid.toString())
+        .toSet();
+
+    // 需要新增选中的
+    for (final id in next.difference(current)) {
+      bloc.add(ToggleItemSelectionEvent(id, true));
+    }
+    // 需要取消选中的
+    for (final id in current.difference(next)) {
+      bloc.add(ToggleItemSelectionEvent(id, false));
+    }
+  }
+
+  // 扫描输入（示例风格）
+  Widget _buildScanInput() {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      decoration: const BoxDecoration(color: Colors.white),
+      child: TextField(
+        onSubmitted: (value) {
+          Modular.get<CollectionBloc>().add(PerformBarcodeEvent(value));
+        },
+        decoration: InputDecoration(
+          hintText: '请扫描或输入库位/物料',
+          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
+      ),
+    );
+  }
+
+  // 信息卡片（示例风格）
+  Widget _buildInfoCard(CollectionState state) {
+    final matCode = state.matCode.isNotEmpty
+        ? state.matCode
+        : (state.currentBarcode?.matcode ?? '');
+    final batchNo = state.batchNo.isNotEmpty
+        ? state.batchNo
+        : (state.currentBarcode?.batchno ?? '');
+    final sn = state.sn.isNotEmpty
+        ? state.sn
+        : (state.currentBarcode?.sn ?? '');
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+      ),
+      child: Column(
+        children: [
+          _buildInfoRow('库位：', state.storeSite, '库存：', '${state.repQty}'),
+          _buildDottedDivider(),
+          _buildInfoRow('采集数量：', '${state.collectQty}', '物料：', matCode),
+          _buildDottedDivider(),
+          _buildInfoRow('批次：', batchNo, '序列：', sn),
+          _buildDottedDivider(),
+          _buildInfoRow('名称：', state.currentBarcode?.matname ?? '', '', ''),
+        ],
+      ),
+    );
+  }
+
+  // 底部按钮（示例风格）
+  Widget _buildBottomButtons(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: const BoxDecoration(color: Colors.white),
+      height: 40,
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () {
+                // 可跳转采集结果页，或弹出结果对话框
+              },
+              style: _buildOutlinedButtonStyle(),
+              child: const Text('采集结果'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _showCommitConfirmation(context),
+              style: _buildButtonStyle(),
+              child: const Text('提交'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ButtonStyle _buildOutlinedButtonStyle() {
+    return OutlinedButton.styleFrom(
+      foregroundColor: const Color(0xFF1976D2),
+      backgroundColor: Colors.transparent,
+      side: const BorderSide(color: Color(0xFF1976D2)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: EdgeInsets.zero,
+    );
+  }
+
+  ButtonStyle _buildButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF1976D2),
+      foregroundColor: Colors.white,
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
+  // 信息行 + 点状分割线
+  Widget _buildInfoRow(
+    String label1,
+    String value1,
+    String label2,
+    String value2,
+  ) {
+    const infoStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+    );
+    return SizedBox(
+      height: 32,
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 10,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(label1, style: infoStyle),
+                Text(value1, style: infoStyle),
+              ],
+            ),
+          ),
+          if (label2.isNotEmpty)
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 10,
+                    margin: const EdgeInsets.only(right: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Text(label2, style: infoStyle),
+                  Text(value2, style: infoStyle),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDottedDivider() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boxWidth = constraints.constrainWidth();
+        const dashWidth = 5.0;
+        const dashSpace = 3.0;
+        final dashCount = (boxWidth / (dashWidth + dashSpace)).floor();
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(dashCount, (_) {
+            return const SizedBox(
+              width: dashWidth,
+              height: 1,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: Color(0xFF0067FC)),
+              ),
+            );
+          }),
         );
       },
     );
@@ -325,6 +599,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   }
 
   void _showErrorDialog(BuildContext context, String message) {
+
+    LoadingDialogManager.instance.showErrorDialog(context, message);
+
+    return;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
