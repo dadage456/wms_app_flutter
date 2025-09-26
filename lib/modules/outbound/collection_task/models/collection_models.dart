@@ -35,17 +35,25 @@ class BarcodeContent extends HiveObject with _$BarcodeContent {
   BarcodeContent._();
 
   factory BarcodeContent({
-    @HiveField(0) required String matcode,
-    @HiveField(1) required String matname,
-    @HiveField(2) required String batchno,
-    @HiveField(3) required String sn,
-    @HiveField(4) required String seqctrl,
-    @HiveField(5) required String id_old,
-    @HiveField(6) required double qty,
+    @HiveField(0) String? matcode,
+    @HiveField(1) String? matname,
+    @HiveField(2) String? batchno,
+    @HiveField(3) String? sn,
+    @HiveField(4) String? seqctrl,
+    @HiveField(5) String? id_old,
+    @HiveField(6) double? qty,
   }) = _BarcodeContent;
 
   factory BarcodeContent.fromJson(Map<String, dynamic> json) =>
       _$BarcodeContentFromJson(json);
+
+  bool get isEmpty {
+    return (matcode == null || matcode!.isEmpty);
+  }
+
+  bool get isNotEmpty {
+    return !isEmpty;
+  }
 }
 
 @freezed
@@ -72,16 +80,16 @@ class CollectionStock extends HiveObject with _$CollectionStock {
       _$CollectionStockFromJson(json);
 }
 
-enum ScanStep{
-  site,   // 库位
-    qrcode, // 物料
-    
-    quantity,  // 数量
+enum ScanStep {
+  site, // 库位
+  qrcode, // 物料
+
+  quantity, // 数量
 }
 
-enum MtlCheckMode{
-  mtl,    // 检查物料
-    mtlBatch, // 物料+批号
-    mtlSite, // 物料+库位
-    mtlSiteBatch, // 物料+批号+库位
+enum MtlCheckMode {
+  mtl, // 检查物料
+  mtlBatch, // 物料+批号
+  mtlSite, // 物料+库位
+  mtlSiteBatch, // 物料+批号+库位
 }

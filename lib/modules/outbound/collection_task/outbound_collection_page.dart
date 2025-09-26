@@ -17,7 +17,8 @@ import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 class OutboundCollectionPage extends StatefulWidget {
   final OutboundTask task;
 
-  const OutboundCollectionPage({Key? key, required this.task}): super(key: key);
+  const OutboundCollectionPage({Key? key, required this.task})
+    : super(key: key);
 
   @override
   State<OutboundCollectionPage> createState() => _OutboundCollectionPageState();
@@ -26,10 +27,11 @@ class OutboundCollectionPage extends StatefulWidget {
 class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final TextEditingController _controller = TextEditingController();
 
   StreamSubscription<String>? _scanSub;
 
-  late CollectionBloc _bloc; 
+  late CollectionBloc _bloc;
 
   @override
   void initState() {
@@ -60,6 +62,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   void dispose() {
     _scanSub?.cancel();
     _tabController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -79,34 +82,55 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           '平库下架采集',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => _showMoreOptions(context),
-            child: const Text('更多',
-              style: TextStyle(color: Colors.white, fontSize: 16)),
+            child: const Text(
+              '更多',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
           ),
         ],
       ),
       body: BlocConsumer<CollectionBloc, CollectionState>(
         listener: (context, state) {
+          LoadingDialogManager.instance.hideLoadingDialog(context);
           if (state.error != null) {
             _showErrorDialog(context, state.error!);
             _bloc.add(ClearErrorEvent());
+          } else if (state.isLoading) {
+            LoadingDialogManager.instance.showLoadingDialog(context);
           }
 
+          if (state.currentTab != _tabController.index) {
+            _tabController.index = state.currentTab;
+          }
+          if (state.isLoading) {
+            LoadingDialogManager.instance.showLoadingDialog(context);
+          } else {
+            LoadingDialogManager.instance.hideLoadingDialog(context);
+          }
+
+          _controller.clear();
+
           debugPrint('------ state changed-----------');
+          debugPrint('------ state changed: ${state.currentBarcode}}');
         },
         builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          debugPrint('------ builder state changed: ${state.currentBarcode}}');
+          // if (state.isLoading) {
+          //   return const Center(child: CircularProgressIndicator());
+          // }
 
           return Column(
             children: [
               // 输入框（示例风格）
-              _buildScanInput(),
+              _buildScanInput(state.placeholder),
               // 信息卡片（示例风格）
               _buildInfoCard(state),
               // 标签页（示例风格）
@@ -121,7 +145,9 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
                   indicatorColor: const Color(0xFF1976D2),
                   indicatorWeight: 3,
                   labelStyle: const TextStyle(
-                    fontSize: 14, fontWeight: FontWeight.w600),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                   tabs: const [
                     Tab(text: '任务列表'),
                     Tab(text: '正在采集'),
@@ -145,9 +171,10 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
                       currentPage: 1,
                       totalPages: 1,
                       onLoadData: (_) async {},
-                      headerHeight: 44,
-                      rowHeight: 48,
-                      selectedRows: _selectedIndicesFor(state.detailList, state.checkedIds),
+                      selectedRows: _selectedIndicesFor(
+                        state.detailList,
+                        state.checkedIds,
+                      ),
                       onSelectionChanged: (indices) {
                         _onGridSelectionChanged(indices, state.detailList);
                       },
@@ -161,8 +188,6 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
                       currentPage: 1,
                       totalPages: 1,
                       onLoadData: (_) async {},
-                      headerHeight: 44,
-                      rowHeight: 48,
                       selectedRows: const [],
                     ),
                   ],
@@ -226,15 +251,43 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
         valueGetter: (r) => r.subinventoryCode ?? '',
       ),
       GridColumnConfig<OutTaskItem>(
+        name: 'orderno',
+        headerText: '出库单号',
+        valueGetter: (r) => r.orderno ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
         name: 'matname',
         headerText: '物料名称',
         valueGetter: (r) => r.matname ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'matinnercode',
+        headerText: '物料旧编码',
+        valueGetter: (r) => r.matinnercode ?? '',
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'outtaskitemid',
+        headerText: '任务id',
+        valueGetter: (r) => r.outtaskitemid.toString(),
+      ),
+      GridColumnConfig<OutTaskItem>(
+        name: 'taskindex',
+        headerText: '任务序号',
+        valueGetter: (r) {
+          final index = _bloc.state.detailList.indexWhere((item) {
+            return item.outtaskitemid == r.outtaskitemid;
+          });
+          return (index + 1);
+        },
       ),
     ];
   }
 
   // 由选中ID映射为当前列表中的行索引
-  List<int> _selectedIndicesFor(List<OutTaskItem> items, List<String> checkedIds) {
+  List<int> _selectedIndicesFor(
+    List<OutTaskItem> items,
+    List<String> checkedIds,
+  ) {
     final idSet = checkedIds.toSet();
     final indices = <int>[];
     for (var i = 0; i < items.length; i++) {
@@ -248,33 +301,34 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   // 将网格返回的索引集合映射到事件（与 checkedIds 做差异，同步到 Bloc）
   void _onGridSelectionChanged(List<int> indices, List<OutTaskItem> items) {
     final bloc = _bloc;
-    final current = bloc.state.checkedIds.toSet();
-    final next = indices
-        .map((i) => items[i].outtaskitemid.toString())
-        .toSet();
+    // final current = bloc.state.checkedIds.toSet();
+    final next = indices.map((i) => items[i].outtaskitemid.toString()).toSet();
+
+    bloc.add(ChangedSelectionEvent(next.toList()));
 
     // 需要新增选中的
-    for (final id in next.difference(current)) {
-      bloc.add(ToggleItemSelectionEvent(id, true));
-    }
-    // 需要取消选中的
-    for (final id in current.difference(next)) {
-      bloc.add(ToggleItemSelectionEvent(id, false));
-    }
+    // for (final id in next.difference(current)) {
+    //   bloc.add(ToggleItemSelectionEvent(id, true));
+    // }
+    // // 需要取消选中的
+    // for (final id in current.difference(next)) {
+    //   bloc.add(ToggleItemSelectionEvent(id, false));
+    // }
   }
 
   // 扫描输入（示例风格）
-  Widget _buildScanInput() {
+  Widget _buildScanInput(String placeholder) {
     return Container(
       height: 44,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       decoration: const BoxDecoration(color: Colors.white),
       child: TextField(
+        controller: _controller,
         onSubmitted: (value) {
           _bloc.add(PerformBarcodeEvent(value));
         },
         decoration: InputDecoration(
-          hintText: '请扫描或输入库位/物料',
+          hintText: placeholder,
           hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -290,15 +344,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
 
   // 信息卡片（示例风格）
   Widget _buildInfoCard(CollectionState state) {
-    final matCode = state.matCode.isNotEmpty
-        ? state.matCode
-        : (state.currentBarcode?.matcode ?? '');
-    final batchNo = state.batchNo.isNotEmpty
-        ? state.batchNo
-        : (state.currentBarcode?.batchno ?? '');
-    final sn = state.sn.isNotEmpty
-        ? state.sn
-        : (state.currentBarcode?.sn ?? '');
+    debugPrint('-------------- ${state.currentBarcode} ------------------');
+
+    final matCode = (state.currentBarcode?.matcode ?? '');
+    final batchNo = (state.currentBarcode?.batchno ?? '');
+    final sn = (state.currentBarcode?.sn ?? '');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -312,7 +362,8 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           _buildDottedDivider(),
           _buildInfoRow('采集数量：', '${state.collectQty}', '物料：', matCode),
           _buildDottedDivider(),
-          _buildInfoRow('批次：', batchNo, '序列：', sn),
+          if (sn.isNotEmpty) _buildInfoRow('序列：', sn, '', ''),
+          if (sn.isEmpty) _buildInfoRow('批次：', batchNo, '', ''),
           _buildDottedDivider(),
           _buildInfoRow('名称：', state.currentBarcode?.matname ?? '', '', ''),
         ],
@@ -376,10 +427,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     String label2,
     String value2,
   ) {
-    const infoStyle = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w400,
-    );
+    const infoStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
     return SizedBox(
       height: 32,
       child: Row(
@@ -609,23 +657,6 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
   }
 
   void _showErrorDialog(BuildContext context, String message) {
-
     LoadingDialogManager.instance.showErrorDialog(context, message);
-
-    return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('平库出库采集异常'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('确认'),
-          ),
-        ],
-      ),
-    );
   }
 }

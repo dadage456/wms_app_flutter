@@ -463,19 +463,19 @@ BarcodeContent _$BarcodeContentFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$BarcodeContent {
   @HiveField(0)
-  String get matcode => throw _privateConstructorUsedError;
+  String? get matcode => throw _privateConstructorUsedError;
   @HiveField(1)
-  String get matname => throw _privateConstructorUsedError;
+  String? get matname => throw _privateConstructorUsedError;
   @HiveField(2)
-  String get batchno => throw _privateConstructorUsedError;
+  String? get batchno => throw _privateConstructorUsedError;
   @HiveField(3)
-  String get sn => throw _privateConstructorUsedError;
+  String? get sn => throw _privateConstructorUsedError;
   @HiveField(4)
-  String get seqctrl => throw _privateConstructorUsedError;
+  String? get seqctrl => throw _privateConstructorUsedError;
   @HiveField(5)
-  String get id_old => throw _privateConstructorUsedError;
+  String? get id_old => throw _privateConstructorUsedError;
   @HiveField(6)
-  double get qty => throw _privateConstructorUsedError;
+  double? get qty => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -490,13 +490,13 @@ abstract class $BarcodeContentCopyWith<$Res> {
       _$BarcodeContentCopyWithImpl<$Res, BarcodeContent>;
   @useResult
   $Res call(
-      {@HiveField(0) String matcode,
-      @HiveField(1) String matname,
-      @HiveField(2) String batchno,
-      @HiveField(3) String sn,
-      @HiveField(4) String seqctrl,
-      @HiveField(5) String id_old,
-      @HiveField(6) double qty});
+      {@HiveField(0) String? matcode,
+      @HiveField(1) String? matname,
+      @HiveField(2) String? batchno,
+      @HiveField(3) String? sn,
+      @HiveField(4) String? seqctrl,
+      @HiveField(5) String? id_old,
+      @HiveField(6) double? qty});
 }
 
 /// @nodoc
@@ -512,43 +512,43 @@ class _$BarcodeContentCopyWithImpl<$Res, $Val extends BarcodeContent>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? matcode = null,
-    Object? matname = null,
-    Object? batchno = null,
-    Object? sn = null,
-    Object? seqctrl = null,
-    Object? id_old = null,
-    Object? qty = null,
+    Object? matcode = freezed,
+    Object? matname = freezed,
+    Object? batchno = freezed,
+    Object? sn = freezed,
+    Object? seqctrl = freezed,
+    Object? id_old = freezed,
+    Object? qty = freezed,
   }) {
     return _then(_value.copyWith(
-      matcode: null == matcode
+      matcode: freezed == matcode
           ? _value.matcode
           : matcode // ignore: cast_nullable_to_non_nullable
-              as String,
-      matname: null == matname
+              as String?,
+      matname: freezed == matname
           ? _value.matname
           : matname // ignore: cast_nullable_to_non_nullable
-              as String,
-      batchno: null == batchno
+              as String?,
+      batchno: freezed == batchno
           ? _value.batchno
           : batchno // ignore: cast_nullable_to_non_nullable
-              as String,
-      sn: null == sn
+              as String?,
+      sn: freezed == sn
           ? _value.sn
           : sn // ignore: cast_nullable_to_non_nullable
-              as String,
-      seqctrl: null == seqctrl
+              as String?,
+      seqctrl: freezed == seqctrl
           ? _value.seqctrl
           : seqctrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      id_old: null == id_old
+              as String?,
+      id_old: freezed == id_old
           ? _value.id_old
           : id_old // ignore: cast_nullable_to_non_nullable
-              as String,
-      qty: null == qty
+              as String?,
+      qty: freezed == qty
           ? _value.qty
           : qty // ignore: cast_nullable_to_non_nullable
-              as double,
+              as double?,
     ) as $Val);
   }
 }
@@ -562,13 +562,13 @@ abstract class _$$BarcodeContentImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String matcode,
-      @HiveField(1) String matname,
-      @HiveField(2) String batchno,
-      @HiveField(3) String sn,
-      @HiveField(4) String seqctrl,
-      @HiveField(5) String id_old,
-      @HiveField(6) double qty});
+      {@HiveField(0) String? matcode,
+      @HiveField(1) String? matname,
+      @HiveField(2) String? batchno,
+      @HiveField(3) String? sn,
+      @HiveField(4) String? seqctrl,
+      @HiveField(5) String? id_old,
+      @HiveField(6) double? qty});
 }
 
 /// @nodoc
@@ -582,43 +582,43 @@ class __$$BarcodeContentImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? matcode = null,
-    Object? matname = null,
-    Object? batchno = null,
-    Object? sn = null,
-    Object? seqctrl = null,
-    Object? id_old = null,
-    Object? qty = null,
+    Object? matcode = freezed,
+    Object? matname = freezed,
+    Object? batchno = freezed,
+    Object? sn = freezed,
+    Object? seqctrl = freezed,
+    Object? id_old = freezed,
+    Object? qty = freezed,
   }) {
     return _then(_$BarcodeContentImpl(
-      matcode: null == matcode
+      matcode: freezed == matcode
           ? _value.matcode
           : matcode // ignore: cast_nullable_to_non_nullable
-              as String,
-      matname: null == matname
+              as String?,
+      matname: freezed == matname
           ? _value.matname
           : matname // ignore: cast_nullable_to_non_nullable
-              as String,
-      batchno: null == batchno
+              as String?,
+      batchno: freezed == batchno
           ? _value.batchno
           : batchno // ignore: cast_nullable_to_non_nullable
-              as String,
-      sn: null == sn
+              as String?,
+      sn: freezed == sn
           ? _value.sn
           : sn // ignore: cast_nullable_to_non_nullable
-              as String,
-      seqctrl: null == seqctrl
+              as String?,
+      seqctrl: freezed == seqctrl
           ? _value.seqctrl
           : seqctrl // ignore: cast_nullable_to_non_nullable
-              as String,
-      id_old: null == id_old
+              as String?,
+      id_old: freezed == id_old
           ? _value.id_old
           : id_old // ignore: cast_nullable_to_non_nullable
-              as String,
-      qty: null == qty
+              as String?,
+      qty: freezed == qty
           ? _value.qty
           : qty // ignore: cast_nullable_to_non_nullable
-              as double,
+              as double?,
     ));
   }
 }
@@ -627,13 +627,13 @@ class __$$BarcodeContentImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BarcodeContentImpl extends _BarcodeContent {
   _$BarcodeContentImpl(
-      {@HiveField(0) required this.matcode,
-      @HiveField(1) required this.matname,
-      @HiveField(2) required this.batchno,
-      @HiveField(3) required this.sn,
-      @HiveField(4) required this.seqctrl,
-      @HiveField(5) required this.id_old,
-      @HiveField(6) required this.qty})
+      {@HiveField(0) this.matcode,
+      @HiveField(1) this.matname,
+      @HiveField(2) this.batchno,
+      @HiveField(3) this.sn,
+      @HiveField(4) this.seqctrl,
+      @HiveField(5) this.id_old,
+      @HiveField(6) this.qty})
       : super._();
 
   factory _$BarcodeContentImpl.fromJson(Map<String, dynamic> json) =>
@@ -641,25 +641,25 @@ class _$BarcodeContentImpl extends _BarcodeContent {
 
   @override
   @HiveField(0)
-  final String matcode;
+  final String? matcode;
   @override
   @HiveField(1)
-  final String matname;
+  final String? matname;
   @override
   @HiveField(2)
-  final String batchno;
+  final String? batchno;
   @override
   @HiveField(3)
-  final String sn;
+  final String? sn;
   @override
   @HiveField(4)
-  final String seqctrl;
+  final String? seqctrl;
   @override
   @HiveField(5)
-  final String id_old;
+  final String? id_old;
   @override
   @HiveField(6)
-  final double qty;
+  final double? qty;
 
   @override
   String toString() {
@@ -702,13 +702,13 @@ class _$BarcodeContentImpl extends _BarcodeContent {
 
 abstract class _BarcodeContent extends BarcodeContent {
   factory _BarcodeContent(
-      {@HiveField(0) required final String matcode,
-      @HiveField(1) required final String matname,
-      @HiveField(2) required final String batchno,
-      @HiveField(3) required final String sn,
-      @HiveField(4) required final String seqctrl,
-      @HiveField(5) required final String id_old,
-      @HiveField(6) required final double qty}) = _$BarcodeContentImpl;
+      {@HiveField(0) final String? matcode,
+      @HiveField(1) final String? matname,
+      @HiveField(2) final String? batchno,
+      @HiveField(3) final String? sn,
+      @HiveField(4) final String? seqctrl,
+      @HiveField(5) final String? id_old,
+      @HiveField(6) final double? qty}) = _$BarcodeContentImpl;
   _BarcodeContent._() : super._();
 
   factory _BarcodeContent.fromJson(Map<String, dynamic> json) =
@@ -716,25 +716,25 @@ abstract class _BarcodeContent extends BarcodeContent {
 
   @override
   @HiveField(0)
-  String get matcode;
+  String? get matcode;
   @override
   @HiveField(1)
-  String get matname;
+  String? get matname;
   @override
   @HiveField(2)
-  String get batchno;
+  String? get batchno;
   @override
   @HiveField(3)
-  String get sn;
+  String? get sn;
   @override
   @HiveField(4)
-  String get seqctrl;
+  String? get seqctrl;
   @override
   @HiveField(5)
-  String get id_old;
+  String? get id_old;
   @override
   @HiveField(6)
-  double get qty;
+  double? get qty;
   @override
   @JsonKey(ignore: true)
   _$$BarcodeContentImplCopyWith<_$BarcodeContentImpl> get copyWith =>

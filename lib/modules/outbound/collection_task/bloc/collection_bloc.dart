@@ -22,7 +22,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   String _batchFlag = 'Y';
   late int _userId;
 
-  CollectionBloc(this._service) : super(const CollectionState()) {
+  CollectionBloc(this._service) : super(CollectionState()) {
     on<InitializeTaskEvent>(_onInitializeTask);
     on<PerformBarcodeEvent>(_onPerformBarcode);
     on<ChangeTabEvent>(_onChangeTab);
@@ -32,6 +32,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<ReportShortageEvent>(_onReportShortage);
     on<ClearErrorEvent>(_onClearError);
     on<SetFocusEvent>(_onSetFocus);
+    on<ChangedSelectionEvent>(_onChangedSelection);
     _initHive();
   }
 
@@ -43,11 +44,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     InitializeTaskEvent event,
     Emitter<CollectionState> emit,
   ) async {
-    
     _userId = event.userId;
     _task = event.task;
 
-    
     _siteFlag = 'Y';
     _batchFlag = 'Y';
 
@@ -80,30 +79,31 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
       debugPrint('----------------- $detailList');
 
-      if(detailList.isEmpty) {
+      if (detailList.isEmpty) {
         emit(state.copyWith(isLoading: false, error: '当前任务列表没有待处理任务!'));
         return;
       }
 
       // 获取物料控制信息
       String roomMatControl = '0';
-      final controlResponse = await _service.getRoomMatControl(_task.outTaskId.toString());
-final roomMtlInfo = controlResponse.split('!');
-        if (roomMtlInfo.length > 4 && roomMtlInfo[4].isNotEmpty) {
-          roomMatControl = roomMtlInfo[4];
-        }
-
+      final controlResponse = await _service.getRoomMatControl(
+        _task.outTaskId.toString(),
+      );
+      final roomMtlInfo = controlResponse.split('!');
+      if (roomMtlInfo.length > 4 && roomMtlInfo[4].isNotEmpty) {
+        roomMatControl = roomMtlInfo[4];
+      }
 
       // 确定检查模式
       MtlCheckMode mtlCheckMode;
       if (_siteFlag == 'Y' && _batchFlag == 'Y') {
-        mtlCheckMode =  MtlCheckMode.mtlSiteBatch;
+        mtlCheckMode = MtlCheckMode.mtlSiteBatch;
       } else if (_siteFlag == 'Y' && _batchFlag != 'Y') {
-        mtlCheckMode =  MtlCheckMode.mtlSite;
+        mtlCheckMode = MtlCheckMode.mtlSite;
       } else if (_siteFlag != 'Y' && _batchFlag == 'Y') {
-        mtlCheckMode =  MtlCheckMode.mtlBatch;
+        mtlCheckMode = MtlCheckMode.mtlBatch;
       } else {
-        mtlCheckMode =  MtlCheckMode.mtl;
+        mtlCheckMode = MtlCheckMode.mtl;
       }
 
       emit(
@@ -121,9 +121,10 @@ final roomMtlInfo = controlResponse.split('!');
         detailList.map((e) => e.toJson()).toList(),
       );
       await _cacheBox.put('updateFlag', '0');
-
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: ErrorHandler.handleError(e)));
+      emit(
+        state.copyWith(isLoading: false, error: ErrorHandler.handleError(e)),
+      );
     }
   }
 
@@ -169,7 +170,6 @@ final roomMtlInfo = controlResponse.split('!');
           ),
         );
 
-        updateCollectionList(state.storeSite, emit);
         await _cacheBox.put('updateFlag', '0');
       }
     } catch (e) {
@@ -177,16 +177,17 @@ final roomMtlInfo = controlResponse.split('!');
     }
   }
 
-  void updateCollectionList(String storeSite, Emitter<CollectionState> emit) {
-    if (storeSite.isEmpty) return;
+  List<OutTaskItem> updateCollectionList(
+    String storeSite,
+    Emitter<CollectionState> emit,
+  ) {
+    if (storeSite.isEmpty) return [];
 
     final collectionList = state.detailList
         .where((item) => item.storesiteno == storeSite)
         .toList();
 
-    final newTab = collectionList.isEmpty ? 0 : 1;
-
-    emit(state.copyWith(collectionList: collectionList, currentTab: newTab));
+    return collectionList;
   }
 
   Future<void> _onChangeTab(
@@ -194,6 +195,14 @@ final roomMtlInfo = controlResponse.split('!');
     Emitter<CollectionState> emit,
   ) async {
     emit(state.copyWith(currentTab: event.index));
+  }
+
+  Future<void> _onChangedSelection(
+    ChangedSelectionEvent event,
+    Emitter<CollectionState> emit,
+  ) async {
+    debugPrint('------------- Selected indexes: ${event.ids}');
+    emit(state.copyWith(checkedIds: event.ids));
   }
 
   Future<void> _onToggleItemSelection(
@@ -217,7 +226,9 @@ final roomMtlInfo = controlResponse.split('!');
   ) async {
     final List<String> checkedIds;
     if (event.selected) {
-      checkedIds = state.detailList.map((item) => item.outtaskitemid.toString()).toList();
+      checkedIds = state.detailList
+          .map((item) => item.outtaskitemid.toString())
+          .toList();
     } else {
       checkedIds = [];
     }
@@ -245,23 +256,19 @@ final roomMtlInfo = controlResponse.split('!');
         await _handleSite(barcode, emit);
       } else if (_isNumeric(barcode)) {
         currentStep = ScanStep.quantity;
-         await _handleQuantity(double.parse(barcode), emit);
+        await _handleQuantity(double.parse(barcode), emit);
       } else {
         emit(state.copyWith(error: '采集内容不合法！'));
         return;
       }
-
 
       final placeholder = await _getPlaceMessage();
       if (placeholder.isEmpty) {
         // 所有扫码步骤完成，处理数量
         await _dealQuantity(state.collectQty, state.matControlFlag, emit);
       }
-
-      emit(state.copyWith(placeholder: placeholder));
     } catch (e) {
-      emit(state.copyWith(error: e.toString()));
-      _initializeCollect(emit);
+      emit(state.copyWith(error: e.toString(), isLoading: false));
     }
   }
 
@@ -269,105 +276,105 @@ final roomMtlInfo = controlResponse.split('!');
     String barcode,
     Emitter<CollectionState> emit,
   ) async {
+    emit(state.copyWith(isLoading: true));
+
     // 解析二维码
     final barcodeContent = await _service.getMaterialInfoByQR(barcode);
-    final newmarttask = barcodeContent.id_old;
-    final matControl = barcodeContent.seqctrl;
+    final newmarttask = barcodeContent.id_old ?? '';
+    final matControl = barcodeContent.seqctrl ?? '';
 
     // 获取物料控制信息
     String matSendControl = '0';
-    final mtlInfo = await _service.getMatControl(
-      barcodeContent.matcode,
-    );
-     if (mtlInfo.length > 4 && mtlInfo[4].isNotEmpty) {
-        matSendControl = mtlInfo[4];
-      }
+    final mtlInfo = await _service.getMatControl(barcodeContent.matcode!);
+    if (mtlInfo.length > 4 && mtlInfo[4].isNotEmpty) {
+      matSendControl = mtlInfo[4];
+    }
 
     // 验证序列号和批次
-    await _validateMaterialControl(
+    final erpRoom = await _validateMaterialControl(
       barcodeContent,
       newmarttask,
       matControl,
       matSendControl,
-      emit,
     );
 
-    emit(
-      state.copyWith(
-        currentBarcode: barcodeContent,
-        matCode: barcodeContent.matcode,
-        batchNo: barcodeContent.batchno,
-        sn: barcodeContent.sn,
-        matControlFlag: matControl,
-        matSendControl: matSendControl,
-        collectQty: matControl == '0' ? 1 : state.collectQty,
-      ),
+    var newstate = state.copyWith(
+      currentBarcode: barcodeContent,
+      matControlFlag: matControl,
+      matSendControl: matSendControl,
+      collectQty: matControl == '0' ? 1 : state.collectQty,
+      erpRoom: erpRoom,
+      isLoading: false,
     );
 
     // 检查库存
-    await _checkInventory(state.collectQty, state.storeSite, emit);
-    updateCollectionList(state.storeSite, emit);
+    newstate = await _checkInventory(
+      newstate,
+      newstate.collectQty,
+      newstate.storeSite,
+      emit,
+    );
+    final collectionList = updateCollectionList(newstate.storeSite, emit);
+
+    final newTab = collectionList.isEmpty ? 0 : 1;
+
+    emit(newstate.copyWith(collectionList: collectionList, currentTab: newTab));
   }
 
-  Future<void> _validateMaterialControl(
+  Future<String?> _validateMaterialControl(
     BarcodeContent barcodeContent,
     String newmarttask,
     String matControl,
     String matSendControl,
-    Emitter<CollectionState> emit,
   ) async {
-
-      if (matControl == '0') {
-        if (barcodeContent.sn.isEmpty) {
-          throw Exception('物料【${barcodeContent.matcode}】序列号不能为空');
-        }
-
-        final seqKey = '${barcodeContent.matcode}@${barcodeContent.sn}';
-        if (state.dicSeq.containsKey(seqKey)) {
-          throw Exception(
-            '物料【${barcodeContent.matcode}】序列号【${barcodeContent.sn}】不允许重复采集，请确认',
-          );
-        }
-
-        // 检查已采集的序列号
-        final existsInStocks = state.stocks.any(
-          (stock) => stock.sn == barcodeContent.sn,
-        );
-        if (existsInStocks) {
-          throw Exception(
-            '采集物料【${barcodeContent.matcode}】序列号【${barcodeContent.sn}】库位【${state.storeSite}】已经采集,不允许重复采集!',
-          );
-        }
-      } else if (matControl == '1' || matControl == '2') {
-
-        // 新格式与老格式的批次号
-        String batchNo = newmarttask == '0' ? barcodeContent.sn : barcodeContent.batchno;
-
-        if ((matSendControl == '0' && state.roomMatControl == '0') ||
-            state.roomMatControl == '1') {
-          await _checkMaterial(
-            barcodeContent.matcode,
-            batchNo,
-            state.storeSite,emit,
-          );
-        }
-        await _checkMaterialSite(
-          barcodeContent.matcode,
-          batchNo,
-          state.storeSite,
-          emit,
-        );
-      } else {
-        throw Exception('物料${barcodeContent.matcode}编码控制维护值维护不合法');
+    String erpRoom = '';
+    if (matControl == '0') {
+      if ((barcodeContent.sn ?? '').isEmpty) {
+        throw Exception('物料【${barcodeContent.matcode!}】序列号不能为空');
       }
-   
+
+      final seqKey = '${barcodeContent.matcode!}@${barcodeContent.sn}';
+      if (state.dicSeq.containsKey(seqKey)) {
+        throw Exception(
+          '物料【${barcodeContent.matcode!}】序列号【${barcodeContent.sn}】不允许重复采集，请确认',
+        );
+      }
+    } else if (matControl == '1' || matControl == '2') {
+      // 新格式与老格式的批次号
+      String? batchNo = newmarttask == '0'
+          ? barcodeContent.sn
+          : barcodeContent.batchno;
+
+      if ((matSendControl == '0' && state.roomMatControl == '0') ||
+          state.roomMatControl == '1') {
+        final erpRoom1 = await _checkMaterial(
+          barcodeContent.matcode!,
+          batchNo!,
+          state.storeSite,
+        );
+        if (erpRoom1.isNotEmpty) {
+          erpRoom = erpRoom1;
+        }
+      }
+      final erpRoom2 = await _checkMaterialSite(
+        barcodeContent.matcode!,
+        batchNo!,
+        state.storeSite,
+      );
+      if (erpRoom2.isNotEmpty) {
+        erpRoom = erpRoom2;
+      }
+      return erpRoom;
+    } else {
+      throw Exception('物料${barcodeContent.matcode!}编码控制维护值维护不合法');
+    }
+    return null;
   }
 
-  Future<void> _checkMaterial(
+  Future<String> _checkMaterial(
     String matcode,
     String batchno,
     String storeSite,
-    Emitter<CollectionState> emit,
   ) async {
     bool batchFound = false;
     String erpRoom = '';
@@ -396,17 +403,15 @@ final roomMtlInfo = controlResponse.split('!');
     if (!batchFound) {
       throw Exception('任务明细中物料【$matcode】不存在');
     }
-
-    emit(state.copyWith(erpRoom: erpRoom));
+    return erpRoom;
   }
 
-  Future<void> _checkMaterialSite(
+  Future<String> _checkMaterialSite(
     String matcode,
     String batchno,
     String storeSite,
-    Emitter<CollectionState> emit,
   ) async {
-    if (state.matControlFlag == '0') return;
+    if (state.matControlFlag == '0') return '';
 
     bool matFind = false;
     String erpRoom = '';
@@ -448,7 +453,7 @@ final roomMtlInfo = controlResponse.split('!');
       }
     }
 
-    emit(state.copyWith(erpRoom: erpRoom));
+    return erpRoom;
   }
 
   Future<void> _handleSite(
@@ -462,9 +467,11 @@ final roomMtlInfo = controlResponse.split('!');
 
     final siteCode = parts[2];
 
+    emit(state.copyWith(isLoading: true));
+
     // 验证库位
     final response = await _service.getStoreSite(_task.storeRoomNo, siteCode);
-    if (response['code'] != '200') {
+    if (response['code'] != 200) {
       throw Exception(response['msg'] ?? '库位验证失败');
     }
 
@@ -478,35 +485,64 @@ final roomMtlInfo = controlResponse.split('!');
     }
 
     // 检查物料和库位匹配
-    if ((state.matSendControl == '0' && state.roomMatControl == '0') ||
-        state.roomMatControl == '1') {
-      await _checkMaterialSite(state.matCode, state.batchNo, siteCode, emit);
+    if (state.currentBarcode != null && state.currentBarcode!.isNotEmpty) {
+      if ((state.matSendControl == '0' && state.roomMatControl == '0') ||
+          state.roomMatControl == '1') {
+        await _checkMaterialSite(
+          state.currentBarcode!.matcode ?? '',
+          state.currentBarcode!.batchno ?? '',
+          siteCode,
+        );
+      }
     }
 
-    emit(state.copyWith(storeSite: siteCode));
+    var newstate = state.copyWith(storeSite: siteCode);
 
     // 检查库存
-    await _checkInventory(0, siteCode, emit);
-    updateCollectionList(siteCode, emit);
+    newstate = await _checkInventory(
+      newstate,
+      newstate.collectQty,
+      newstate.storeSite,
+      emit,
+    );
+
+    final collectionList = updateCollectionList(newstate.storeSite, emit);
+
+    final newTab = collectionList.isEmpty ? 0 : 1;
+
+    emit(
+      newstate.copyWith(
+        collectionList: collectionList,
+        currentTab: newTab,
+        isLoading: false,
+      ),
+    );
   }
 
   Future<void> _handleQuantity(
     double quantity,
     Emitter<CollectionState> emit,
   ) async {
-    if (state.sn.isNotEmpty) {
+    if ((state.currentBarcode?.sn ?? '').isNotEmpty) {
       throw Exception('已采集序列号无需采集数量，请扫描二维码');
     }
 
     emit(state.copyWith(collectQty: quantity));
   }
 
-  Future<void> _checkInventory(
+  Future<CollectionState> _checkInventory(
+    CollectionState state,
     double collectQty,
     String storeSite,
     Emitter<CollectionState> emit,
   ) async {
-    if (state.matCode.isEmpty || storeSite.isEmpty) return;
+    if (state.currentBarcode?.matcode == null || storeSite.isEmpty) {
+      return state;
+    }
+
+    final batchno = state.currentBarcode!.batchno ?? '';
+
+    CollectionState newstate = state;
 
     List<dynamic> repertoryList = [];
     double repQty = 0;
@@ -515,10 +551,10 @@ final roomMtlInfo = controlResponse.split('!');
       // 批次管理的库存查询
       final response = await _service.getRepertoryByStoreSiteNo(
         storeSite,
-        state.matCode
+        state.currentBarcode!.matcode ?? '',
       );
 
-      if (response['code'] == '200') {
+      if (response['code'] == 200) {
         repertoryList = response['data'];
 
         // 计算总库存
@@ -533,14 +569,14 @@ final roomMtlInfo = controlResponse.split('!');
         if (state.erpRoom.isNotEmpty) {
           for (final item in repertoryList) {
             if (item['erpStoreroom'] == state.erpRoom &&
-                item['batchno'] == state.batchNo) {
+                item['batchno'] == batchno) {
               drcheck.add(item);
               repQty = double.parse(item['repqty']?.toString() ?? '0');
             }
           }
         } else {
           for (final item in repertoryList) {
-            if (item['batchno'] == state.batchNo) {
+            if (item['batchno'] == batchno) {
               drcheck.add(item);
               repQty += double.parse(item['repqty']?.toString() ?? '0');
             }
@@ -549,7 +585,7 @@ final roomMtlInfo = controlResponse.split('!');
 
         if (drcheck.isEmpty || repertoryList.isEmpty) {
           throw Exception(
-            '物料【${state.matCode}】批次【${state.batchNo}】在库位【$storeSite】不存在，请确认',
+            '物料【${state.currentBarcode!.matcode}】批次【$batchno】在库位【$storeSite】不存在，请确认',
           );
         }
 
@@ -561,7 +597,7 @@ final roomMtlInfo = controlResponse.split('!');
               '当前物料明细指定子库【${state.erpRoom}】与当前库位的物料批次子库【$erpStoreInv】存在不一致，请确认',
             );
           }
-          emit(state.copyWith(erpStoreInv: erpStoreInv));
+          newstate = newstate.copyWith(erpStoreInv: erpStoreInv);
         }
       }
     } else {
@@ -571,13 +607,13 @@ final roomMtlInfo = controlResponse.split('!');
 
       final responseSn = await _service.getRepertoryByStoreSiteNoSn(
         storeSite,
-        state.matCode,
+        state.currentBarcode!.matcode ?? '',
         null,
         null,
         null,
       );
 
-      if (responseSn['code'] == '200') {
+      if (responseSn['code'] == 200) {
         repertoryList = responseSn['data'];
         if (repertoryList.isNotEmpty) {
           repQty = double.parse(repertoryList[0]['repqty']?.toString() ?? '0');
@@ -585,7 +621,7 @@ final roomMtlInfo = controlResponse.split('!');
 
         if (repQty <= 0) {
           throw Exception(
-            '物料【${state.matCode}】批次【${state.batchNo}】序列【${state.sn}】 在库位【$storeSite】不存在，请确认',
+            '物料【${state.currentBarcode!.matcode}】批次【$batchno】序列【${state.currentBarcode!.sn}】 在库位【$storeSite】不存在，请确认',
           );
         }
 
@@ -593,12 +629,12 @@ final roomMtlInfo = controlResponse.split('!');
         if (state.erpRoom.isNotEmpty) {
           final responseErp = await _service.getRepertoryByStoreSiteNoSn(
             storeSite,
-            state.matCode,
+            state.currentBarcode!.matcode ?? '',
             state.erpRoom,
-            state.batchNo,
-            state.sn,
+            state.currentBarcode!.batchno ?? '',
+            state.currentBarcode!.sn ?? '',
           );
-          if (responseErp['code'] == '200') {
+          if (responseErp['code'] == 200) {
             final erpList = responseErp['data'] as List;
             if (erpList.isNotEmpty) {
               repqtySum31 = double.parse(
@@ -607,16 +643,15 @@ final roomMtlInfo = controlResponse.split('!');
             }
           }
           repQty = repqtySum31;
-
         } else {
           final responseBatch = await _service.getRepertoryByStoreSiteNoSn(
             storeSite,
-            state.matCode,
+            state.currentBarcode?.matcode ?? '',
             null,
-            state.batchNo,
-            state.sn,
+            state.currentBarcode?.batchno ?? '',
+            state.currentBarcode?.sn ?? '',
           );
-          if (responseBatch['code'] == '200') {
+          if (responseBatch['code'] == 200) {
             final batchList = responseBatch['data'] as List;
             if (batchList.isNotEmpty) {
               repqtySum41 = double.parse(
@@ -629,16 +664,16 @@ final roomMtlInfo = controlResponse.split('!');
 
         if (repQty <= 0) {
           throw Exception(
-            '物料【${state.matCode}】批次【${state.batchNo}】序列【${state.sn}】在库位【$storeSite】不存在，请确认',
+            '物料【${state.currentBarcode!.matcode}】批次【$batchno】序列【${state.currentBarcode!.sn}】在库位【$storeSite】不存在，请确认',
           );
         }
 
         // 获取ERP子库信息
         final erpResponse = await _service.getRepertoryByStoreSiteNoErp(
           storeSite,
-          state.matCode,
+          state.currentBarcode!.matcode ?? '',
         );
-        if (erpResponse['code'] == '200') {
+        if (erpResponse['code'] == 200) {
           final erpList = erpResponse['data'] as List;
           if (erpList.isNotEmpty) {
             final erpStoreInv = erpList[0]['erpStoreroom'];
@@ -647,20 +682,20 @@ final roomMtlInfo = controlResponse.split('!');
                 '当前物料明细指定子库【${state.erpRoom}】与当前库位的物料批次子库【$erpStoreInv】存在不一致，请确认',
               );
             }
-            emit(state.copyWith(erpStoreInv: erpStoreInv));
+            newstate = newstate.copyWith(erpStoreInv: erpStoreInv);
           }
         }
       }
     }
 
-    emit(state.copyWith(repQty: repQty));
+    return newstate.copyWith(repQty: repQty);
   }
 
   Future<String> _getPlaceMessage() async {
     if (state.storeSite.isEmpty) {
       return '请扫描库位';
     }
-    if (state.currentBarcode?.matcode.isEmpty ?? true) {
+    if (state.currentBarcode?.isEmpty ?? true) {
       return '请扫描二维码';
     }
     if (state.currentBarcode?.sn == null && state.collectQty == 0) {
@@ -690,11 +725,11 @@ final roomMtlInfo = controlResponse.split('!');
 
     // 检查库存是否足够
     final strKey =
-        '${state.storeSite}${state.matCode}${matFlagInt == 0 ? state.sn : state.batchNo}';
+        '${state.storeSite}${state.currentBarcode?.matcode!}${matFlagInt == 0 ? state.currentBarcode?.sn : state.currentBarcode?.batchno}';
     final decRepqty = state.dicInvMtlQty[strKey] ?? 0;
     if (state.repQty - decRepqty < qty) {
       throw Exception(
-        '库位【${state.storeSite}】物料【${state.matCode}】的库存【${state.repQty - decRepqty}】小于本次移出库存【$qty】，请确认',
+        '库位【${state.storeSite}】物料【${state.currentBarcode?.matcode}】的库存【${state.repQty - decRepqty}】小于本次移出库存【$qty】，请确认',
       );
     }
 
@@ -703,7 +738,7 @@ final roomMtlInfo = controlResponse.split('!');
     double totalTmpQty = 0;
 
     for (final item in state.detailList) {
-      if (item.matcode != state.matCode) continue;
+      if (item.matcode != state.currentBarcode?.matcode) continue;
 
       bool shouldInclude = true;
       if ((matFlagInt == 1 || matFlagInt == 2) &&
@@ -711,11 +746,11 @@ final roomMtlInfo = controlResponse.split('!');
               state.roomMatControl == '1')) {
         switch (state.mtlCheckMode) {
           case MtlCheckMode.mtlBatch:
-            shouldInclude = item.hintbatchno == state.batchNo;
+            shouldInclude = item.hintbatchno == state.currentBarcode?.batchno;
             break;
           case MtlCheckMode.mtlSiteBatch:
             shouldInclude =
-                item.hintbatchno == state.batchNo &&
+                item.hintbatchno == state.currentBarcode?.batchno &&
                 item.storesiteno == state.storeSite;
             break;
           case MtlCheckMode.mtlSite:
@@ -743,7 +778,7 @@ final roomMtlInfo = controlResponse.split('!');
     double currentRepQty = state.repQty;
 
     for (final item in state.detailList) {
-      if (item.matcode == state.matCode &&
+      if (item.matcode == state.currentBarcode?.matcode &&
           item.storesiteno == state.storeSite &&
           item.repqty > 0) {
         tmpRepQty = item.repqty;
@@ -811,7 +846,10 @@ final roomMtlInfo = controlResponse.split('!');
       existFlag = true;
 
       // 更新dicMtlQty
-      newDicMtlQty[item.outtaskitemid.toString()] = [tmpQty, tmpQty + allocatedQty];
+      newDicMtlQty[item.outtaskitemid.toString()] = [
+        tmpQty,
+        tmpQty + allocatedQty,
+      ];
     }
 
     // 验证是否成功分配
@@ -825,7 +863,8 @@ final roomMtlInfo = controlResponse.split('!');
     // 更新序列号记录
     final newDicSeq = Map<String, String>.from(state.dicSeq);
     if (sn.isNotEmpty) {
-      newDicSeq['${state.matCode}@$sn'] = '${state.matCode}@$sn';
+      newDicSeq['${state.currentBarcode?.matcode}@$sn'] =
+          '${state.currentBarcode?.matcode}@$sn';
     }
 
     // 更新库存消耗记录
@@ -833,21 +872,10 @@ final roomMtlInfo = controlResponse.split('!');
     final currentInvQty = newDicInvMtlQty[strKey] ?? 0;
     newDicInvMtlQty[strKey] = currentInvQty + qty;
 
-    emit(
-      state.copyWith(
-        detailList: updatedDetailList,
-        dicSeq: newDicSeq,
-        dicMtlQty: newDicMtlQty,
-        dicInvMtlQty: newDicInvMtlQty,
-      ),
-    );
-
-    updateCollectionList(state.storeSite, emit);
-
     // 添加采集记录
     await _addCollectData(
-      state.matCode,
-      state.batchNo,
+      state.currentBarcode?.matcode ?? '',
+      state.currentBarcode?.batchno ?? '',
       sn,
       qty,
       _task.storeRoomNo,
@@ -858,16 +886,29 @@ final roomMtlInfo = controlResponse.split('!');
       emit,
     );
     await _localSave();
-    _initializeCollect(emit);
+
+    final collectionList = updatedDetailList
+        .where((item) => item.storesiteno == state.storeSite)
+        .toList();
+
+    emit(
+      _initializeCollect().copyWith(
+        detailList: updatedDetailList,
+        collectionList: collectionList,
+        dicSeq: newDicSeq,
+        dicMtlQty: newDicMtlQty,
+        dicInvMtlQty: newDicInvMtlQty,
+      ),
+    );
   }
 
   bool _shouldProcessItemForAllocation(OutTaskItem item, int matFlag) {
     // 物料不匹配
-    if (item.matcode != state.matCode) return false;
+    if (item.matcode != state.currentBarcode?.matcode) return false;
 
     // 对于序列号控制的物料，需要同时匹配物料和库位
     if (matFlag == 0) {
-      return item.matcode == state.matCode &&
+      return item.matcode == state.currentBarcode?.matcode &&
           item.storesiteno == state.storeSite;
     }
 
@@ -876,7 +917,7 @@ final roomMtlInfo = controlResponse.split('!');
         ((state.matSendControl == '0' && state.roomMatControl == '0') ||
             state.roomMatControl == '1')) {
       // 必须匹配物料和库位
-      if (item.matcode != state.matCode ||
+      if (item.matcode != state.currentBarcode?.matcode ||
           item.storesiteno != state.storeSite) {
         return false;
       }
@@ -884,9 +925,9 @@ final roomMtlInfo = controlResponse.split('!');
       // 根据检查模式进一步验证
       switch (state.mtlCheckMode) {
         case MtlCheckMode.mtlBatch:
-          return item.hintbatchno == state.batchNo;
+          return item.hintbatchno == state.currentBarcode?.batchno;
         case MtlCheckMode.mtlSiteBatch:
-          return item.hintbatchno == state.batchNo &&
+          return item.hintbatchno == state.currentBarcode?.batchno &&
               item.storesiteno == state.storeSite;
         case MtlCheckMode.mtlSite:
           return item.storesiteno == state.storeSite;
@@ -945,20 +986,18 @@ final roomMtlInfo = controlResponse.split('!');
     await _cacheBox.put('updateFlag', '1');
   }
 
-  void _initializeCollect(Emitter<CollectionState> emit) {
-    emit(
-      state.copyWith(
-        collectQty: 0,
-        currentBarcode: null,
-        focus: false,
-        matCode: '',
-        batchNo: '',
-        sn: '',
-        matControlFlag: '',
-        erpRoom: '',
-        erpStoreInv: '',
-        placeholder: '请扫描库位',
-      ),
+  CollectionState _initializeCollect() {
+    return state.copyWith(
+      error: null,
+      isLoading: false,
+      collectQty: 0,
+      repQty: 0,
+      currentBarcode: BarcodeContent.fromJson({}),
+      focus: false,
+      matControlFlag: '',
+      erpRoom: '',
+      erpStoreInv: '',
+      placeholder: '请扫描库位',
     );
   }
 
@@ -1078,7 +1117,7 @@ final roomMtlInfo = controlResponse.split('!');
         lsItems,
       );
 
-      if (response['code'] == '200') {
+      if (response['code'] == 200) {
         // 清理缓存
         await _clearCache();
         emit(
@@ -1119,17 +1158,10 @@ final roomMtlInfo = controlResponse.split('!');
         emit(state.copyWith(error: '请至少选择一行记录！'));
         return;
       }
+      final id = state.checkedIds.first;
+      final response = await _service.commitFinishOutTaskItem(id);
 
-      // 这里应该显示确认对话框
-      final selectedItem = state.detailList.firstWhere(
-        (item) => item.outtaskitemid == state.checkedIds.first,
-      );
-
-      final response = await _service.commitFinishOutTaskItem(
-        selectedItem.outtaskitemid.toString(),
-      );
-
-      if (response['code'] == '200') {
+      if (response['code'] == 200) {
         // 重新加载任务列表
         await loadTaskList(emit);
       } else {

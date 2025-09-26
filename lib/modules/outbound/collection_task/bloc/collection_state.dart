@@ -16,9 +16,6 @@ class CollectionState {
   final Map<String, List<double>> dicMtlQty;
   final Map<String, String> dicSeq;
   final Map<String, double> dicInvMtlQty;
-  final String matCode;
-  final String batchNo;
-  final String sn;
   final String matControlFlag;
   final String erpRoom;
   final String erpStoreInv;
@@ -43,9 +40,6 @@ class CollectionState {
     this.dicMtlQty = const {},
     this.dicSeq = const {},
     this.dicInvMtlQty = const {},
-    this.matCode = '',
-    this.batchNo = '',
-    this.sn = '',
     this.matControlFlag = '',
     this.erpRoom = '',
     this.erpStoreInv = '',
@@ -71,9 +65,6 @@ class CollectionState {
     Map<String, List<double>>? dicMtlQty,
     Map<String, String>? dicSeq,
     Map<String, double>? dicInvMtlQty,
-    String? matCode,
-    String? batchNo,
-    String? sn,
     String? matControlFlag,
     String? erpRoom,
     String? erpStoreInv,
@@ -98,9 +89,6 @@ class CollectionState {
       dicMtlQty: dicMtlQty ?? this.dicMtlQty,
       dicSeq: dicSeq ?? this.dicSeq,
       dicInvMtlQty: dicInvMtlQty ?? this.dicInvMtlQty,
-      matCode: matCode ?? this.matCode,
-      batchNo: batchNo ?? this.batchNo,
-      sn: sn ?? this.sn,
       matControlFlag: matControlFlag ?? this.matControlFlag,
       erpRoom: erpRoom ?? this.erpRoom,
       erpStoreInv: erpStoreInv ?? this.erpStoreInv,

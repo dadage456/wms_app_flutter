@@ -73,7 +73,7 @@ class LoadingDialogManager {
   /// [context] - 上下文
   /// [message] - 加载提示文字，默认为"正在加载..."
   /// [barrierDismissible] - 是否可以通过点击背景关闭，默认为false
-  void showLoadingDialog(
+  void showLoadingDialogScreen(
     BuildContext context, {
     String message = '正在加载...',
     bool barrierDismissible = false,
@@ -113,6 +113,53 @@ class LoadingDialogManager {
         );
       },
     );
+  }
+
+  void showLoadingDialog(
+    BuildContext context, {
+    String message = '正在加载...',
+    bool barrierDismissible = false,
+  }) {
+    if (_isDialogShowing) return;
+    _isDialogShowing = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      barrierColor: Colors.transparent, // 遮罩颜色（与原背景一致）
+      builder: (_) => Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 120,
+            height: 120,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.black54, // 卡片背景
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    decoration: TextDecoration.none,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ).then((_) => _isDialogShowing = false);
   }
 
   /// 隐藏加载对话框

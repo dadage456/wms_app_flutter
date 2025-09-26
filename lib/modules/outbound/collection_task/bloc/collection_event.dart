@@ -37,6 +37,15 @@ class ChangeTabEvent extends CollectionEvent {
   List<Object> get props => [index];
 }
 
+class ChangedSelectionEvent extends CollectionEvent {
+  final List<String> ids;
+
+  const ChangedSelectionEvent(this.ids);
+
+  @override
+  List<Object> get props => [ids];
+}
+
 class ToggleItemSelectionEvent extends CollectionEvent {
   final String itemId;
   final bool selected;

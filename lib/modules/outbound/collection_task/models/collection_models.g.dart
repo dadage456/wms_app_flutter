@@ -87,13 +87,13 @@ class BarcodeContentAdapter extends TypeAdapter<BarcodeContent> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return BarcodeContent(
-      matcode: fields[0] as String,
-      matname: fields[1] as String,
-      batchno: fields[2] as String,
-      sn: fields[3] as String,
-      seqctrl: fields[4] as String,
-      id_old: fields[5] as String,
-      qty: fields[6] as double,
+      matcode: fields[0] as String?,
+      matname: fields[1] as String?,
+      batchno: fields[2] as String?,
+      sn: fields[3] as String?,
+      seqctrl: fields[4] as String?,
+      id_old: fields[5] as String?,
+      qty: fields[6] as double?,
     );
   }
 
@@ -235,13 +235,13 @@ Map<String, dynamic> _$$OutTaskItemImplToJson(_$OutTaskItemImpl instance) =>
 
 _$BarcodeContentImpl _$$BarcodeContentImplFromJson(Map<String, dynamic> json) =>
     _$BarcodeContentImpl(
-      matcode: json['matcode'] as String,
-      matname: json['matname'] as String,
-      batchno: json['batchno'] as String,
-      sn: json['sn'] as String,
-      seqctrl: json['seqctrl'] as String,
-      id_old: json['id_old'] as String,
-      qty: (json['qty'] as num).toDouble(),
+      matcode: json['matcode'] as String?,
+      matname: json['matname'] as String?,
+      batchno: json['batchno'] as String?,
+      sn: json['sn'] as String?,
+      seqctrl: json['seqctrl'] as String?,
+      id_old: json['id_old'] as String?,
+      qty: (json['qty'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$BarcodeContentImplToJson(
