@@ -33,6 +33,8 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<ClearErrorEvent>(_onClearError);
     on<SetFocusEvent>(_onSetFocus);
     on<ChangedSelectionEvent>(_onChangedSelection);
+    on<DeleteCollectedStocksEvent>(_onDeleteCollectedStocks);
+    on<UpdateFromResultEvent>(_onUpdateFromResult);
     _initHive();
   }
 
@@ -262,11 +264,17 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         return;
       }
 
-      final placeholder = await _getPlaceMessage();
+      var placeholder = await _getPlaceMessage();
       if (placeholder.isEmpty) {
         // 所有扫码步骤完成，处理数量
         await _dealQuantity(state.collectQty, state.matControlFlag, emit);
       }
+
+      placeholder = placeholder.isEmpty
+          ? (state.storeSite.isEmpty ? '请扫描库位' : '请扫描二维码')
+          : placeholder;
+
+      emit(state.copyWith(placeholder: placeholder));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), isLoading: false));
     }
@@ -1185,6 +1193,181 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     Emitter<CollectionState> emit,
   ) async {
     emit(state.copyWith(error: null));
+  }
+
+  Future<void> _onUpdateFromResult(
+    UpdateFromResultEvent event,
+    Emitter<CollectionState> emit,
+  ) async {
+    try {
+      if (event.deletedStocks.isEmpty) return;
+
+      // 类型安全：集合内应为 CollectionStock
+      final deleted = event.deletedStocks;
+      if (deleted.isEmpty) return;
+
+      final updatedStocks = List<CollectionStock>.from(state.stocks);
+      final updatedDetailList = List<OutTaskItem>.from(state.detailList);
+      final newDicSeq = Map<String, String>.from(state.dicSeq);
+      final newDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
+      final newDicInvMtlQty = Map<String, double>.from(state.dicInvMtlQty);
+
+      for (final s in deleted) {
+        final idx = updatedStocks.indexWhere((x) => x.stockid == s.stockid);
+        if (idx < 0) continue;
+
+        // 1) 明细 collectedqty 扣减
+        final dIdx = updatedDetailList.indexWhere(
+          (d) => d.outtaskitemid.toString() == s.outtaskitemid,
+        );
+        if (dIdx >= 0) {
+          final d = updatedDetailList[dIdx];
+          final newCollected = d.collectedqty - s.collectQty;
+          updatedDetailList[dIdx] = d.copyWith(
+            collectedqty: newCollected < 0 ? 0 : newCollected,
+          );
+        }
+
+        // 2) dicSeq 删除 matcode@sn
+        if (s.sn.isNotEmpty) {
+          final seqKey = '${s.matcode}@${s.sn}';
+          newDicSeq.remove(seqKey);
+        }
+
+        // 3) dicMtlQty 扣减第二位（累计采集量）
+        final mtlKey = s.outtaskitemid;
+        final ls2 = List<double>.from(newDicMtlQty[mtlKey] ?? <double>[0, 0]);
+        final newSecond = (ls2.length > 1 ? ls2[1] : 0) - s.collectQty;
+        if (ls2.length > 1) {
+          ls2[1] = newSecond < 0 ? 0 : newSecond;
+        } else {
+          ls2.add(newSecond < 0 ? 0 : newSecond);
+        }
+        newDicMtlQty[mtlKey] = ls2;
+
+        // 4) dicInvMtlQty 扣减库存消耗
+        final invKey = s.sn.isNotEmpty
+            ? '${s.storeSite}${s.matcode}${s.sn}'
+            : '${s.storeSite}${s.matcode}${s.batchno}';
+        final invVal = (newDicInvMtlQty[invKey] ?? 0) - s.collectQty;
+        newDicInvMtlQty[invKey] = invVal < 0 ? 0 : invVal;
+
+        // 5) 从 stocks 移除
+        updatedStocks.removeAt(idx);
+      }
+
+      final updateCollectionList = updatedDetailList
+          .where((item) => item.storesiteno == state.storeSite)
+          .toList();
+
+      emit(
+        state.copyWith(
+          stocks: updatedStocks,
+          detailList: updatedDetailList,
+          collectionList: updateCollectionList,
+          dicSeq: newDicSeq,
+          dicMtlQty: newDicMtlQty,
+          dicInvMtlQty: newDicInvMtlQty,
+        ),
+      );
+      await _localSave();
+    } catch (e) {
+      emit(state.copyWith(error: '从结果页更新采集数据失败：${e.toString()}'));
+    }
+  }
+
+  Future<void> _onDeleteCollectedStocks(
+    DeleteCollectedStocksEvent event,
+    Emitter<CollectionState> emit,
+  ) async {
+    try {
+      if (event.stockIds.isEmpty) {
+        emit(state.copyWith(error: '请至少选择一行记录'));
+        return;
+      }
+
+      // 可变副本
+      final updatedStocks = List<CollectionStock>.from(state.stocks);
+      final updatedDetailList = List<OutTaskItem>.from(state.detailList);
+      final newDicSeq = Map<String, String>.from(state.dicSeq);
+      final newDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
+      final newDicInvMtlQty = Map<String, double>.from(state.dicInvMtlQty);
+
+      // 逐条删除并扣减关联数据
+      for (final stockId in event.stockIds) {
+        final idx = updatedStocks.indexWhere((s) => s.stockid == stockId);
+        if (idx < 0) continue;
+
+        final s = updatedStocks[idx];
+
+        // 1) 明细 collectedqty 扣减
+        final dIdx = updatedDetailList.indexWhere(
+          (d) => d.outtaskitemid.toString() == s.outtaskitemid,
+        );
+        if (dIdx >= 0) {
+          final d = updatedDetailList[dIdx];
+          final newCollected = (d.collectedqty - s.collectQty);
+          updatedDetailList[dIdx] = d.copyWith(
+            collectedqty: newCollected < 0 ? 0 : newCollected,
+          );
+        }
+
+        // 2) dicSeq 删除 matcode@sn
+        if (s.sn.isNotEmpty) {
+          final seqKey = '${s.matcode}@${s.sn}';
+          if (newDicSeq.containsKey(seqKey)) {
+            newDicSeq.remove(seqKey);
+          }
+        }
+
+        // 3) dicMtlQty 扣减第二位（累计采集量）
+        final mtlKey = s.outtaskitemid;
+        if (newDicMtlQty.containsKey(mtlKey)) {
+          final ls2 = List<double>.from(newDicMtlQty[mtlKey]!);
+          // ls2 结构： [原tmpQty, 累计采集 qty]
+          final newSecond = (ls2.length > 1 ? ls2[1] : 0) - s.collectQty;
+          if (ls2.length > 1) {
+            ls2[1] = newSecond < 0 ? 0 : newSecond;
+          } else {
+            ls2.add(newSecond < 0 ? 0 : newSecond);
+          }
+          newDicMtlQty[mtlKey] = ls2;
+        }
+
+        // 4) dicInvMtlQty 扣减库存消耗
+        String invKey = '';
+        if (s.sn.isNotEmpty) {
+          invKey = '${s.storeSite}${s.matcode}${s.sn}';
+        } else {
+          invKey = '${s.storeSite}${s.matcode}${s.batchno}';
+        }
+        if (newDicInvMtlQty.containsKey(invKey)) {
+          final val = (newDicInvMtlQty[invKey] ?? 0) - s.collectQty;
+          newDicInvMtlQty[invKey] = val < 0 ? 0 : val;
+        }
+
+        // 5) 从 stocks 移除
+        updatedStocks.removeAt(idx);
+      }
+      final updateCollectionList = updatedDetailList
+          .where((item) => item.storesiteno == state.storeSite)
+          .toList();
+
+      // 写入并持久化
+      emit(
+        state.copyWith(
+          stocks: updatedStocks,
+          detailList: updatedDetailList,
+          collectionList: updateCollectionList,
+          dicSeq: newDicSeq,
+          dicMtlQty: newDicMtlQty,
+          dicInvMtlQty: newDicInvMtlQty,
+        ),
+      );
+      await _localSave();
+    } catch (e) {
+      emit(state.copyWith(error: '删除采集记录失败：${e.toString()}'));
+    }
   }
 
   Future<void> _onSetFocus(

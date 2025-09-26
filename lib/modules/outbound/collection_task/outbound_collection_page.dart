@@ -13,6 +13,8 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 import 'package:wms_app/services/user_manager.dart';
 import 'bloc/collection_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
+import 'package:wms_app/modules/outbound/collection_task/outbound_collection_result_page.dart';
+import 'package:wms_app/modules/outbound/collection_task/models/deleted_payload.dart';
 
 class OutboundCollectionPage extends StatefulWidget {
   final OutboundTask task;
@@ -99,6 +101,8 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
       ),
       body: BlocConsumer<CollectionBloc, CollectionState>(
         listener: (context, state) {
+          debugPrint('------ listener state changed-----------');
+          debugPrint('------ isLoading: ${state.isLoading}');
           LoadingDialogManager.instance.hideLoadingDialog(context);
           if (state.error != null) {
             _showErrorDialog(context, state.error!);
@@ -117,16 +121,8 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
           }
 
           _controller.clear();
-
-          debugPrint('------ state changed-----------');
-          debugPrint('------ state changed: ${state.currentBarcode}}');
         },
         builder: (context, state) {
-          debugPrint('------ builder state changed: ${state.currentBarcode}}');
-          // if (state.isLoading) {
-          //   return const Center(child: CircularProgressIndicator());
-          // }
-
           return Column(
             children: [
               // 输入框（示例风格）
@@ -381,8 +377,27 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () {
-                // 可跳转采集结果页，或弹出结果对话框
+              onPressed: () async {
+                // 传入当前 stocks 的只读快照，结果页独立管理与删除
+                final initStocks = List<CollectionStock>.from(
+                  _bloc.state.stocks,
+                );
+                final res = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) =>
+                        OutboundCollectionResultPage(initialStocks: initStocks),
+                  ),
+                );
+                if (!mounted) return;
+                if (res is DeletedStocksPayload &&
+                    res.deletedStocks.isNotEmpty) {
+                  _bloc.add(UpdateFromResultEvent(res.deletedStocks));
+                  LoadingDialogManager.instance.showSnackSuccessMsg(
+                    context,
+                    '删除成功',
+                    duration: const Duration(milliseconds: 800),
+                  );
+                }
               },
               style: _buildOutlinedButtonStyle(),
               child: const Text('采集结果'),

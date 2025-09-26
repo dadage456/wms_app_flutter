@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
 
 abstract class CollectionEvent extends Equatable {
@@ -84,4 +85,23 @@ class SetFocusEvent extends CollectionEvent {
 
   @override
   List<Object> get props => [focus];
+}
+
+class DeleteCollectedStocksEvent extends CollectionEvent {
+  final List<String> stockIds;
+
+  const DeleteCollectedStocksEvent(this.stockIds);
+
+  @override
+  List<Object> get props => [stockIds];
+}
+
+class UpdateFromResultEvent extends CollectionEvent {
+  final List<CollectionStock>
+  deletedStocks; // accept dynamic to avoid import loop; cast in Bloc
+
+  const UpdateFromResultEvent(this.deletedStocks);
+
+  @override
+  List<Object> get props => [deletedStocks];
 }
