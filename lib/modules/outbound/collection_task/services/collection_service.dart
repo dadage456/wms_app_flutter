@@ -92,7 +92,7 @@ class CollectionService {
     String? sn,
   ) async {
     final response = await _dio.get(
-      '/system/terminal/getRepertoryByStoresiteNosn',
+      '/system/terminal/getRepertoryByStoresiteNoSn',
       queryParameters: {
         'storesiteno': storesiteno,
         'matcode': matcode,
