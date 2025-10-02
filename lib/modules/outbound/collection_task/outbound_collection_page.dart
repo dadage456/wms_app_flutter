@@ -30,6 +30,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   StreamSubscription<String>? _scanSub;
 
@@ -65,6 +66,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     _scanSub?.cancel();
     _tabController.dispose();
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -118,6 +120,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
             LoadingDialogManager.instance.showLoadingDialog(context);
           } else {
             LoadingDialogManager.instance.hideLoadingDialog(context);
+          }
+
+          if (state.focus) {
+            _focusNode.requestFocus();
+            _bloc.add(SetFocusEvent(false));
           }
 
           _controller.clear();
@@ -320,6 +327,8 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
       decoration: const BoxDecoration(color: Colors.white),
       child: TextField(
         controller: _controller,
+        focusNode: _focusNode,
+        keyboardType: TextInputType.number,
         onSubmitted: (value) {
           _bloc.add(PerformBarcodeEvent(value));
         },

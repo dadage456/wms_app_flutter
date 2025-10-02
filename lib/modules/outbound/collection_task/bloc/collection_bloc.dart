@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.dart';
-import 'package:wms_app/modules/outbound/task_details/models/outbound_task_item.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
-import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/utils/error_handler.dart';
 import '../models/collection_models.dart';
 import '../services/collection_service.dart';
@@ -26,8 +24,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<InitializeTaskEvent>(_onInitializeTask);
     on<PerformBarcodeEvent>(_onPerformBarcode);
     on<ChangeTabEvent>(_onChangeTab);
-    on<ToggleItemSelectionEvent>(_onToggleItemSelection);
-    on<ToggleAllSelectionEvent>(_onToggleAllSelection);
     on<CommitCollectionEvent>(_onCommitCollection);
     on<ReportShortageEvent>(_onReportShortage);
     on<ClearErrorEvent>(_onClearError);
@@ -35,11 +31,10 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<ChangedSelectionEvent>(_onChangedSelection);
     on<DeleteCollectedStocksEvent>(_onDeleteCollectedStocks);
     on<UpdateFromResultEvent>(_onUpdateFromResult);
-    _initHive();
   }
 
   Future<void> _initHive() async {
-    _cacheBox = await Hive.openBox('collection_cache');
+    _cacheBox = await Hive.openBox('collection_cache_${_task.outTaskId}');
   }
 
   Future<void> _onInitializeTask(
@@ -52,6 +47,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     _siteFlag = 'Y';
     _batchFlag = 'Y';
 
+    await _initHive();
     await loadTaskList(emit);
     await _restoreFromCache(emit);
   }
@@ -78,8 +74,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           collecter: _userId,
         ),
       );
-
-      debugPrint('----------------- $detailList');
 
       if (detailList.isEmpty) {
         emit(state.copyWith(isLoading: false, error: '当前任务列表没有待处理任务!'));
@@ -116,13 +110,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           mtlCheckMode: mtlCheckMode,
         ),
       );
-
-      // 缓存数据
-      await _cacheBox.put(
-        'detailList',
-        detailList.map((e) => e.toJson()).toList(),
-      );
-      await _cacheBox.put('updateFlag', '0');
     } catch (e) {
       emit(
         state.copyWith(isLoading: false, error: ErrorHandler.handleError(e)),
@@ -164,7 +151,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
         emit(
           state.copyWith(
-            detailList: detailList,
+            // detailList: detailList,
             stocks: stocks,
             dicSeq: cachedDicSeq,
             dicMtlQty: cachedDicMtlQty,
@@ -172,7 +159,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           ),
         );
 
-        await _cacheBox.put('updateFlag', '0');
+        // await _cacheBox.put('updateFlag', '0');
       }
     } catch (e) {
       emit(state.copyWith(error: '恢复缓存数据失败：${e.toString()}'));
@@ -205,36 +192,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   ) async {
     debugPrint('------------- Selected indexes: ${event.ids}');
     emit(state.copyWith(checkedIds: event.ids));
-  }
-
-  Future<void> _onToggleItemSelection(
-    ToggleItemSelectionEvent event,
-    Emitter<CollectionState> emit,
-  ) async {
-    final checkedIds = List<String>.from(state.checkedIds);
-    if (event.selected) {
-      if (!checkedIds.contains(event.itemId)) {
-        checkedIds.add(event.itemId);
-      }
-    } else {
-      checkedIds.remove(event.itemId);
-    }
-    emit(state.copyWith(checkedIds: checkedIds));
-  }
-
-  Future<void> _onToggleAllSelection(
-    ToggleAllSelectionEvent event,
-    Emitter<CollectionState> emit,
-  ) async {
-    final List<String> checkedIds;
-    if (event.selected) {
-      checkedIds = state.detailList
-          .map((item) => item.outtaskitemid.toString())
-          .toList();
-    } else {
-      checkedIds = [];
-    }
-    emit(state.copyWith(checkedIds: checkedIds));
   }
 
   Future<void> _onPerformBarcode(
@@ -274,7 +231,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           ? (state.storeSite.isEmpty ? '请扫描库位' : '请扫描二维码')
           : placeholder;
 
-      emit(state.copyWith(placeholder: placeholder));
+      final focus = placeholder == '请输入数量';
+
+      emit(state.copyWith(placeholder: placeholder, focus: focus));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), isLoading: false));
     }
@@ -893,7 +852,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       '',
       emit,
     );
-    await _localSave();
 
     final collectionList = updatedDetailList
         .where((item) => item.storesiteno == state.storeSite)
@@ -908,6 +866,8 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         dicInvMtlQty: newDicInvMtlQty,
       ),
     );
+
+    await _localSave();
   }
 
   bool _shouldProcessItemForAllocation(OutTaskItem item, int matFlag) {
@@ -987,6 +947,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       'detailList',
       state.detailList.map((e) => e.toJson()).toList(),
     );
+
     await _cacheBox.put('stocks', state.stocks.map((e) => e.toJson()).toList());
     await _cacheBox.put('dicSeq', state.dicSeq);
     await _cacheBox.put('dicMtlQty', state.dicMtlQty);
@@ -1132,7 +1093,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           state.copyWith(
             isLoading: false,
             stocks: [],
-            detailList: [],
             dicSeq: {},
             dicMtlQty: {},
             dicInvMtlQty: {},
@@ -1186,6 +1146,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     await _cacheBox.put('detailList', <Map>[]);
     await _cacheBox.put('dicMtlQty', <String, List<double>>{});
     await _cacheBox.put('dicInvMtlQty', <String, double>{});
+    _cacheBox.clear();
   }
 
   Future<void> _onClearError(
