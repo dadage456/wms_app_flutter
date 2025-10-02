@@ -786,22 +786,11 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
           : remainingQty;
 
       // 更新采集数量
-      updatedDetailList[i] = OutTaskItem(
-        outtaskitemid: item.outtaskitemid,
-        matcode: item.matcode,
-        matname: item.matname,
-        storesiteno: item.storesiteno,
-        hintqty: item.hintqty,
+      updatedDetailList[i] = item.copyWith(
         collectedqty: tmpQty + allocatedQty,
         repqty: availableQty == allocatedQty
             ? currentRepQty - allocatedQty
             : currentRepQty - (taskQty - tmpQty),
-        hintbatchno: item.hintbatchno,
-        sn: item.sn,
-        storeroomno: item.storeroomno,
-        subinventoryCode: item.subinventoryCode,
-        orderno: item.orderno,
-        matinnercode: item.matinnercode,
       );
 
       // 更新库存
