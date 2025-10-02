@@ -840,8 +840,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         dicMtlOperation[item.outtaskitemid.toString()] = [taskCount, tempCount];
 
         // 更新dicMtlQty (已采集的数量，累计采集的数量)
+        final begin = newDicMtlQty[item.outtaskitemid.toString()]![0];
         newDicMtlQty[item.outtaskitemid.toString()] = [
-          collectedCount,
+          begin,
           collectedCount + tempCount,
         ];
       }
@@ -876,43 +877,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     );
 
     await _localSave();
-  }
-
-  bool _shouldProcessItemForAllocation(OutTaskItem item, int matFlag) {
-    // 物料不匹配
-    if (item.matcode != state.currentBarcode?.matcode) return false;
-
-    // 对于序列号控制的物料，需要同时匹配物料和库位
-    if (matFlag == 0) {
-      return item.matcode == state.currentBarcode?.matcode &&
-          item.storesiteno == state.storeSite;
-    }
-
-    // 对于批次控制的物料
-    if ((matFlag == 1 || matFlag == 2) &&
-        ((state.matSendControl == '0' && state.roomMatControl == '0') ||
-            state.roomMatControl == '1')) {
-      // 必须匹配物料和库位
-      if (item.matcode != state.currentBarcode?.matcode ||
-          item.storesiteno != state.storeSite) {
-        return false;
-      }
-
-      // 根据检查模式进一步验证
-      switch (state.mtlCheckMode) {
-        case MtlCheckMode.mtlBatch:
-          return item.hintbatchno == state.currentBarcode?.batchno;
-        case MtlCheckMode.mtlSiteBatch:
-          return item.hintbatchno == state.currentBarcode?.batchno &&
-              item.storesiteno == state.storeSite;
-        case MtlCheckMode.mtlSite:
-          return item.storesiteno == state.storeSite;
-        case MtlCheckMode.mtl:
-          return true;
-      }
-    }
-
-    return true;
   }
 
   Future<void> _addCollectData(
@@ -1057,7 +1021,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       final lsItems = <Map<String, dynamic>>[];
       for (final entry in state.dicMtlQty.entries) {
         final itemListInfo = <String, dynamic>{};
-        final mtlQty = entry.value.map((e) => e.toString()).toList();
+        final mtlQty = entry.value
+            .map((e) => isInteger(e) ? e.toInt().toString() : e.toString())
+            .toList();
         itemListInfo['mtlQty'] = mtlQty;
         itemListInfo['outTaskItemid'] = entry.key;
 
@@ -1122,6 +1088,8 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       emit(state.copyWith(isLoading: false, error: '平库出库采集异常：${e.toString()}'));
     }
   }
+
+  bool isInteger(double x) => x.isFinite && x % 1 == 0;
 
   Future<void> _onReportShortage(
     ReportShortageEvent event,
