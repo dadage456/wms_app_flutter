@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
@@ -48,6 +50,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     _batchFlag = 'Y';
 
     await _initHive();
+    _clearCache();
     await loadTaskList(emit);
     await _restoreFromCache(emit);
   }
@@ -671,8 +674,29 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     return '';
   }
 
+  bool _shouldInclude(OutTaskItem item) {
+    bool include = true;
+    switch (state.mtlCheckMode) {
+      case MtlCheckMode.mtlBatch:
+        include = item.hintbatchno == state.currentBarcode?.batchno;
+        break;
+      case MtlCheckMode.mtlSiteBatch:
+        include =
+            item.hintbatchno == state.currentBarcode?.batchno &&
+            item.storesiteno == state.storeSite;
+        break;
+      case MtlCheckMode.mtlSite:
+        include = item.storesiteno == state.storeSite;
+        break;
+      case MtlCheckMode.mtl:
+        include = true;
+        break;
+    }
+    return include;
+  }
+
   Future<void> _dealQuantity(
-    double qty,
+    double count,
     String matFlag,
     Emitter<CollectionState> emit,
   ) async {
@@ -686,7 +710,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       sn = state.currentBarcode?.sn ?? '';
     }
 
-    if (qty <= 0) {
+    if (count <= 0) {
       throw Exception('采集数量必须大于0');
     }
 
@@ -694,153 +718,148 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     final strKey =
         '${state.storeSite}${state.currentBarcode?.matcode!}${matFlagInt == 0 ? state.currentBarcode?.sn : state.currentBarcode?.batchno}';
     final decRepqty = state.dicInvMtlQty[strKey] ?? 0;
-    if (state.repQty - decRepqty < qty) {
+    if (state.repQty - decRepqty < count) {
       throw Exception(
-        '库位【${state.storeSite}】物料【${state.currentBarcode?.matcode}】的库存【${state.repQty - decRepqty}】小于本次移出库存【$qty】，请确认',
+        '库位【${state.storeSite}】物料【${state.currentBarcode?.matcode}】的库存【${state.repQty - decRepqty}】小于本次移出库存【$count】，请确认',
       );
-    }
-
-    // 统计当前物料总计划数和总扫描数 - 第一次遍历
-    double totalTaskQty = 0;
-    double totalTmpQty = 0;
-
-    for (final item in state.detailList) {
-      if (item.matcode != state.currentBarcode?.matcode) continue;
-
-      bool shouldInclude = true;
-      if ((matFlagInt == 1 || matFlagInt == 2) &&
-          ((state.matSendControl == '0' && state.roomMatControl == '0') ||
-              state.roomMatControl == '1')) {
-        switch (state.mtlCheckMode) {
-          case MtlCheckMode.mtlBatch:
-            shouldInclude = item.hintbatchno == state.currentBarcode?.batchno;
-            break;
-          case MtlCheckMode.mtlSiteBatch:
-            shouldInclude =
-                item.hintbatchno == state.currentBarcode?.batchno &&
-                item.storesiteno == state.storeSite;
-            break;
-          case MtlCheckMode.mtlSite:
-            shouldInclude = item.storesiteno == state.storeSite;
-            break;
-          case MtlCheckMode.mtl:
-            shouldInclude = true;
-            break;
-        }
-      }
-
-      if (shouldInclude) {
-        totalTaskQty += item.hintqty;
-        totalTmpQty += item.collectedqty;
-      }
-    }
-
-    // 校验数量是否足够
-    if (totalTmpQty + qty > totalTaskQty) {
-      throw Exception('本次采集数量【$qty】大于剩余可采集数量【${totalTaskQty - totalTmpQty}】');
-    }
-
-    // 计算单个物料剩余库存 - 第二次遍历
-    double tmpRepQty = 0;
-    double currentRepQty = state.repQty;
-
-    for (final item in state.detailList) {
-      if (item.matcode == state.currentBarcode?.matcode &&
-          item.storesiteno == state.storeSite &&
-          item.repqty > 0) {
-        tmpRepQty = item.repqty;
-        break;
-      }
-    }
-
-    if (currentRepQty > 0 && tmpRepQty > 0 && currentRepQty > tmpRepQty) {
-      currentRepQty = tmpRepQty;
-    }
-
-    // 分配数量到具体任务项 - 第三次遍历（主要分配逻辑）
-    double remainingQty = qty;
-    final dicMtlOperation = <String, List<double>>{};
-    final updatedDetailList = List<OutTaskItem>.from(state.detailList);
-    final newDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
-    bool existFlag = false;
-
-    for (int i = 0; i < updatedDetailList.length && remainingQty > 0; i++) {
-      final item = updatedDetailList[i];
-
-      // 检查是否应该处理这个项目
-      if (!_shouldProcessItemForAllocation(item, matFlagInt)) continue;
-
-      final taskQty = item.hintqty;
-      final tmpQty = item.collectedqty;
-
-      if (taskQty == tmpQty) continue; // 已经完成的跳过
-
-      // 初始化 dicMtlQty
-      if (!newDicMtlQty.containsKey(item.outtaskitemid.toString())) {
-        newDicMtlQty[item.outtaskitemid.toString()] = [tmpQty, 0];
-      }
-
-      final availableQty = taskQty - tmpQty;
-      final allocatedQty = remainingQty >= availableQty
-          ? availableQty
-          : remainingQty;
-
-      // 更新采集数量
-      updatedDetailList[i] = item.copyWith(
-        collectedqty: tmpQty + allocatedQty,
-        repqty: availableQty == allocatedQty
-            ? currentRepQty - allocatedQty
-            : currentRepQty - (taskQty - tmpQty),
-      );
-
-      // 更新库存
-      currentRepQty = updatedDetailList[i].repqty;
-
-      // 记录分配操作
-      dicMtlOperation[item.outtaskitemid.toString()] = [taskQty, allocatedQty];
-      remainingQty -= allocatedQty;
-      existFlag = true;
-
-      // 更新dicMtlQty
-      newDicMtlQty[item.outtaskitemid.toString()] = [
-        tmpQty,
-        tmpQty + allocatedQty,
-      ];
-    }
-
-    // 验证是否成功分配
-    if ((state.matSendControl == '0' && state.roomMatControl == '0') ||
-        state.roomMatControl == '1') {
-      if (!existFlag) {
-        throw Exception('采集物料批号序列号信息匹配任务明细失败');
-      }
     }
 
     // 更新序列号记录
     final newDicSeq = Map<String, String>.from(state.dicSeq);
-    if (sn.isNotEmpty) {
-      newDicSeq['${state.currentBarcode?.matcode}@$sn'] =
-          '${state.currentBarcode?.matcode}@$sn';
-    }
 
     // 更新库存消耗记录
     final newDicInvMtlQty = Map<String, double>.from(state.dicInvMtlQty);
     final currentInvQty = newDicInvMtlQty[strKey] ?? 0;
-    newDicInvMtlQty[strKey] = currentInvQty + qty;
+    newDicInvMtlQty[strKey] = currentInvQty + count;
 
-    // 添加采集记录
-    await _addCollectData(
-      state.currentBarcode?.matcode ?? '',
-      state.currentBarcode?.batchno ?? '',
-      sn,
-      qty,
-      _task.storeRoomNo,
-      state.storeSite,
-      dicMtlOperation,
-      state.erpStoreInv,
-      '',
-      emit,
-    );
+    final updatedDetailList = List<OutTaskItem>.from(state.detailList);
+    final dicMtlOperation = <String, List<double>>{};
+    final newDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
+
+    // 统计当前物料总计划数和总扫描数 - 第一次遍历
+    double totalTaskQty = 0;
+    double totalTmpQty = 0;
+    double totalInventory = state.repQty;
+
+    // 当前操作物料的所有任务项的index
+    final indexes = updatedDetailList
+        .asMap()
+        .entries
+        .where(
+          (e) =>
+              e.value.matcode == state.currentBarcode?.matcode &&
+              _shouldInclude(e.value),
+        )
+        .map((e) => e.key)
+        .toList();
+
+    if (matFlagInt != 0 && indexes.isEmpty) {
+      // 验证是否成功分配
+      throw Exception('采集物料批号序列号信息匹配任务明细失败');
+    }
+
+    for (var index in indexes) {
+      final item = updatedDetailList[index];
+      totalTaskQty += item.hintqty;
+      totalTmpQty += item.collectedqty;
+    }
+
+    totalInventory -= totalTmpQty + count; // 剩余总库存
+
+    // 校验数量是否足够
+    if (totalTmpQty + count > totalTaskQty) {
+      throw Exception('本次采集数量【$count】大于剩余可采集数量【${totalTaskQty - totalTmpQty}】');
+    }
+
+    if (matFlagInt == 0) {
+      // 处理序列号
+      var idx = indexes
+          .where((index) => updatedDetailList[index].sn == sn)
+          .firstOrNull;
+      if (idx != null) {
+        var item = updatedDetailList[idx];
+        item = item.copyWith(collectedqty: 1);
+        updatedDetailList[idx] = item;
+
+        // 记录分配操作（任务的总采集数，本次采集的数量）
+        dicMtlOperation[item.outtaskitemid.toString()] = [1, 1];
+
+        // 更新dicMtlQty (已采集的数量，累计采集的数量)
+        newDicMtlQty[item.outtaskitemid.toString()] = [0, 1];
+
+        if (sn.isNotEmpty) {
+          newDicSeq['${state.currentBarcode?.matcode}@$sn'] =
+              '${state.currentBarcode?.matcode}@$sn';
+        }
+
+        // 添加采集记录
+        await _addCollectData(
+          state.currentBarcode?.matcode ?? '',
+          state.currentBarcode?.batchno ?? '',
+          sn,
+          count,
+          _task.storeRoomNo,
+          state.storeSite,
+          dicMtlOperation,
+          state.erpStoreInv,
+          '',
+          emit,
+        );
+      }
+    } else {
+      // 分配数量到具体任务项
+      double currentCount = count;
+      for (var index in indexes) {
+        var item = updatedDetailList[index];
+        final taskCount = item.hintqty;
+        final collectedCount = item.collectedqty;
+
+        item = item.copyWith(repqty: totalInventory);
+        updatedDetailList[index] = item;
+
+        // 已经完成的跳过
+        if (taskCount == collectedCount || currentCount == 0) continue;
+
+        // 采集数量
+        final tempCount = (taskCount - collectedCount) > currentCount
+            ? currentCount
+            : (taskCount - collectedCount);
+
+        // 剩余采集数量
+        currentCount -= tempCount;
+
+        item = item.copyWith(collectedqty: collectedCount + tempCount);
+        updatedDetailList[index] = item;
+
+        // 初始化 dicMtlQty
+        if (!newDicMtlQty.containsKey(item.outtaskitemid.toString())) {
+          newDicMtlQty[item.outtaskitemid.toString()] = [collectedCount, 0];
+        }
+
+        // 记录分配操作（任务的总采集数，本次采集的数量）
+        dicMtlOperation[item.outtaskitemid.toString()] = [taskCount, tempCount];
+
+        // 更新dicMtlQty (已采集的数量，累计采集的数量)
+        newDicMtlQty[item.outtaskitemid.toString()] = [
+          collectedCount,
+          collectedCount + tempCount,
+        ];
+      }
+
+      // 添加采集记录
+      await _addCollectData(
+        state.currentBarcode?.matcode ?? '',
+        state.currentBarcode?.batchno ?? '',
+        sn,
+        count,
+        _task.storeRoomNo,
+        state.storeSite,
+        dicMtlOperation,
+        state.erpStoreInv,
+        '',
+        emit,
+      );
+    }
 
     final collectionList = updatedDetailList
         .where((item) => item.storesiteno == state.storeSite)
@@ -1038,7 +1057,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       final lsItems = <Map<String, dynamic>>[];
       for (final entry in state.dicMtlQty.entries) {
         final itemListInfo = <String, dynamic>{};
-        final mtlQty = entry.value;
+        final mtlQty = entry.value.map((e) => e.toString()).toList();
         itemListInfo['mtlQty'] = mtlQty;
         itemListInfo['outTaskItemid'] = entry.key;
 
@@ -1069,6 +1088,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       if (lsItems.isEmpty) {
         throw Exception('本次无采集明细，请确认！');
       }
+
+      log('下架信息：$downShelvesInfosList');
+      log('任务项信息：$lsItems');
 
       final response = await _service.commitDownShelves(
         downShelvesInfosList,

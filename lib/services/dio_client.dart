@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wms_app/services/api_response_handler.dart';
@@ -59,6 +61,8 @@ class DioClient {
         if (_token?.isNotEmpty == true) {
           options.headers["Authorization"] = "Bearer $_token";
         }
+
+        log('----------- bearer token: $_token -----------');
 
         return handler.next(options);
       },
