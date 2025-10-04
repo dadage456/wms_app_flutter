@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
+import 'package:wms_app/utils/custom_extension.dart';
 import 'package:wms_app/utils/error_handler.dart';
 import '../models/collection_models.dart';
 import '../services/collection_service.dart';
@@ -1021,9 +1022,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       final lsItems = <Map<String, dynamic>>[];
       for (final entry in state.dicMtlQty.entries) {
         final itemListInfo = <String, dynamic>{};
-        final mtlQty = entry.value
-            .map((e) => isInteger(e) ? e.toInt().toString() : e.toString())
-            .toList();
+        final mtlQty = entry.value.map((e) => e.toFormatString()).toList();
         itemListInfo['mtlQty'] = mtlQty;
         itemListInfo['outTaskItemid'] = entry.key;
 
@@ -1088,8 +1087,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       emit(state.copyWith(isLoading: false, error: '平库出库采集异常：${e.toString()}'));
     }
   }
-
-  bool isInteger(double x) => x.isFinite && x % 1 == 0;
 
   Future<void> _onReportShortage(
     ReportShortageEvent event,

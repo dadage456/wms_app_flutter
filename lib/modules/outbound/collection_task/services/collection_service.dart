@@ -138,4 +138,56 @@ class CollectionService {
     );
     return response.data;
   }
+
+  Future<String?> getPalletStoreSite(String trayNo) async {
+    final response = await _dio.get(
+      '/system/terminal/getPalletSiteNo',
+      queryParameters: {'taskNo': trayNo},
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      throw Exception('响应格式错误');
+    }
+
+    final code = data['code'] as int?;
+    if (code != 200) {
+      throw Exception(data['msg']?.toString() ?? '获取托盘库位失败');
+    }
+
+    final sites = data['data'];
+    if (sites is List && sites.isNotEmpty) {
+      final first = sites.first;
+      if (first is Map<String, dynamic>) {
+        final site = first['storesiteno'] ?? first['storeSiteNo'];
+        if (site != null) {
+          return site.toString();
+        }
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> commitExceptionShelves(
+    List<Map<String, dynamic>> exceptionInfos,
+  ) async {
+    final response = await _dio.post(
+      '/system/terminal/commitExceptShelves',
+      data: {'exceptShelvesInfos': exceptionInfos},
+      options: Options(
+        headers: {'content-type': 'application/json;charset=UTF-8'},
+      ),
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      throw Exception('响应格式错误');
+    }
+
+    final code = data['code'] as int?;
+    if (code != 200) {
+      throw Exception(data['msg']?.toString() ?? '异常采集提交失败');
+    }
+  }
 }

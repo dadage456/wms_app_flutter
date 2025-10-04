@@ -7,6 +7,7 @@ import 'package:wms_app/utils/error_handler.dart';
 typedef DataGridLoader<T> =
     Future<DataGridResponseData<T>> Function(int pageIndex);
 typedef DataGridDeleter = Future<void> Function(List<int> items);
+typedef DataGridCommiter = Future<void> Function(List<int> items);
 
 class DataGridResponseData<T> {
   final int totalPages;
@@ -19,11 +20,16 @@ class CommonDataGridBloc<T>
     extends Bloc<CommonDataGridEvent<T>, CommonDataGridState<T>> {
   final DataGridLoader<T> dataLoader;
   final DataGridDeleter? dataDeleter;
+  final DataGridCommiter? dataCommiter;
 
-  CommonDataGridBloc({required this.dataLoader, this.dataDeleter})
-    : super(CommonDataGridState<T>()) {
+  CommonDataGridBloc({
+    required this.dataLoader,
+    this.dataDeleter,
+    this.dataCommiter,
+  }) : super(CommonDataGridState<T>()) {
     on<LoadDataEvent<T>>(_onLoadData);
     on<DeleteSelectedRowsEvent<T>>(_onDeleteSelectedRows);
+    on<CommitSelectedRowsEvent<T>>(_onCommitSelectedRows);
 
     on<ChangeSelectedRowsEvent<T>>(_onChangeSelectedRows);
     on<UpdateTableDataEvent<T>>(_onUpdateData);
@@ -71,6 +77,32 @@ class CommonDataGridBloc<T>
       if (event.completer != null && !event.completer!.isCompleted) {
         event.completer!.completeError(e);
       }
+    }
+  }
+
+  /// 处理提交事件
+  Future<void> _onCommitSelectedRows(
+    CommitSelectedRowsEvent<T> event,
+    Emitter<CommonDataGridState<T>> emit,
+  ) async {
+    if (dataCommiter == null) {
+      emit(state.copyWith(status: GridStatus.error, errorMessage: '提交功能未配置'));
+      return;
+    }
+
+    try {
+      // 发出提交中状态
+      emit(state.copyWith(status: GridStatus.loading));
+      // 执行提交操作
+      await dataCommiter!(event.selectedRows);
+      emit(state.copyWith(status: GridStatus.success));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: GridStatus.error,
+          errorMessage: '提交失败: ${e.toString()}',
+        ),
+      );
     }
   }
 

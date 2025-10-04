@@ -58,7 +58,9 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
         },
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Modular.to.pushNamed('/outbound/receive');
+            },
             icon: const Icon(Icons.add, color: Colors.white, size: 28),
           ),
         ],
@@ -230,9 +232,7 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
     // 导航到出库采集页面
     Modular.to.pushNamed(
       '/outbound/collect/${task.outTaskNo}',
-      arguments: {
-        'task': task,
-      },
+      arguments: {'task': task},
     );
   }
 
@@ -248,7 +248,6 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
       ).showSnackBar(const SnackBar(content: Text('用户信息获取失败，请重新登录')));
       return;
     }
-    
 
     // 导航到出库任务明细页面
     Modular.to.pushNamed(

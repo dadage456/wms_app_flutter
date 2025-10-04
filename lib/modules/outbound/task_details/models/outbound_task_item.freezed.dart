@@ -492,11 +492,11 @@ mixin _$OutboundTaskItemQuery {
 
   /// 用户ID
   @JsonKey(name: 'userId')
-  int get userId => throw _privateConstructorUsedError;
+  String get userId => throw _privateConstructorUsedError;
 
   /// 角色或用户ID
   @JsonKey(name: 'roleoRuserId')
-  int get roleOrUserId => throw _privateConstructorUsedError;
+  String get roleOrUserId => throw _privateConstructorUsedError;
 
   /// 库房标签
   @JsonKey(name: 'roomTag')
@@ -538,8 +538,8 @@ abstract class $OutboundTaskItemQueryCopyWith<$Res> {
       {@JsonKey(name: 'outtaskid') String outTaskId,
       @JsonKey(name: 'workstation') String workStation,
       @JsonKey(name: 'searchKey') String searchKey,
-      @JsonKey(name: 'userId') int userId,
-      @JsonKey(name: 'roleoRuserId') int roleOrUserId,
+      @JsonKey(name: 'userId') String userId,
+      @JsonKey(name: 'roleoRuserId') String roleOrUserId,
       @JsonKey(name: 'roomTag') String roomTag,
       @JsonKey(name: 'batchflag') String batchFlag,
       @JsonKey(name: 'transferType') String transferType,
@@ -590,11 +590,11 @@ class _$OutboundTaskItemQueryCopyWithImpl<$Res,
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       roleOrUserId: null == roleOrUserId
           ? _value.roleOrUserId
           : roleOrUserId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       roomTag: null == roomTag
           ? _value.roomTag
           : roomTag // ignore: cast_nullable_to_non_nullable
@@ -636,8 +636,8 @@ abstract class _$$OutboundTaskItemQueryImplCopyWith<$Res>
       {@JsonKey(name: 'outtaskid') String outTaskId,
       @JsonKey(name: 'workstation') String workStation,
       @JsonKey(name: 'searchKey') String searchKey,
-      @JsonKey(name: 'userId') int userId,
-      @JsonKey(name: 'roleoRuserId') int roleOrUserId,
+      @JsonKey(name: 'userId') String userId,
+      @JsonKey(name: 'roleoRuserId') String roleOrUserId,
       @JsonKey(name: 'roomTag') String roomTag,
       @JsonKey(name: 'batchflag') String batchFlag,
       @JsonKey(name: 'transferType') String transferType,
@@ -686,11 +686,11 @@ class __$$OutboundTaskItemQueryImplCopyWithImpl<$Res>
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       roleOrUserId: null == roleOrUserId
           ? _value.roleOrUserId
           : roleOrUserId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       roomTag: null == roomTag
           ? _value.roomTag
           : roomTag // ignore: cast_nullable_to_non_nullable
@@ -756,12 +756,12 @@ class _$OutboundTaskItemQueryImpl implements _OutboundTaskItemQuery {
   /// 用户ID
   @override
   @JsonKey(name: 'userId')
-  final int userId;
+  final String userId;
 
   /// 角色或用户ID
   @override
   @JsonKey(name: 'roleoRuserId')
-  final int roleOrUserId;
+  final String roleOrUserId;
 
   /// 库房标签
   @override
@@ -861,8 +861,8 @@ abstract class _OutboundTaskItemQuery implements OutboundTaskItemQuery {
           {@JsonKey(name: 'outtaskid') required final String outTaskId,
           @JsonKey(name: 'workstation') required final String workStation,
           @JsonKey(name: 'searchKey') final String searchKey,
-          @JsonKey(name: 'userId') required final int userId,
-          @JsonKey(name: 'roleoRuserId') required final int roleOrUserId,
+          @JsonKey(name: 'userId') required final String userId,
+          @JsonKey(name: 'roleoRuserId') required final String roleOrUserId,
           @JsonKey(name: 'roomTag') final String roomTag,
           @JsonKey(name: 'batchflag') final String batchFlag,
           @JsonKey(name: 'transferType') final String transferType,
@@ -893,12 +893,12 @@ abstract class _OutboundTaskItemQuery implements OutboundTaskItemQuery {
 
   /// 用户ID
   @JsonKey(name: 'userId')
-  int get userId;
+  String get userId;
   @override
 
   /// 角色或用户ID
   @JsonKey(name: 'roleoRuserId')
-  int get roleOrUserId;
+  String get roleOrUserId;
   @override
 
   /// 库房标签

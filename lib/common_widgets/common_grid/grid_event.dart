@@ -41,6 +41,16 @@ class DeleteSelectedRowsEvent<T> extends CommonDataGridEvent<T> {
   List<Object?> get props => [selectedRows];
 }
 
+/// 删除选中行事件
+class CommitSelectedRowsEvent<T> extends CommonDataGridEvent<T> {
+  final List<int> selectedRows;
+
+  const CommitSelectedRowsEvent(this.selectedRows);
+
+  @override
+  List<Object?> get props => [selectedRows];
+}
+
 class ChangeSelectedRowsEvent<T> extends CommonDataGridEvent<T> {
   final List<int> selectedRows;
 

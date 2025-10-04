@@ -3,6 +3,7 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 import 'package:wms_app/services/api_response_handler.dart';
 import '../task_list/models/outbound_task.dart';
 import '../task_details/models/outbound_task_item.dart';
+
 /// 出库任务服务
 class OutboundTaskService {
   final Dio _dio;
@@ -75,12 +76,25 @@ class OutboundTaskService {
     String operationType = '0',
     String confirm = 'true',
   }) async {
-    final response = await _dio.post<Map<String, dynamic>>(
+    await commitOutboundTaskItems(
+      taskItemIds: taskItemIds,
+      roomTag: operationType,
+      isCancel: confirm.toLowerCase() == 'true',
+    );
+  }
+
+  /// 提交/接收出库任务明细
+  Future<void> commitOutboundTaskItems({
+    required List<String> taskItemIds,
+    String roomTag = '0',
+    bool isCancel = false,
+  }) async {
+    await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitRCOutTaskItem',
       data: {
         'outtaskitemids': taskItemIds,
-        'roomTag': operationType,
-        'isCanel': confirm,
+        'roomTag': roomTag,
+        'isCanel': isCancel.toString(),
       },
     );
   }
@@ -111,5 +125,4 @@ class OutboundTaskService {
     // 直接返回内容作为物料编码
     return content;
   }
-
 }

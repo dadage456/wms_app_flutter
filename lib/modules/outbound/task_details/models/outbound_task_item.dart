@@ -59,10 +59,10 @@ class OutboundTaskItemQuery with _$OutboundTaskItemQuery {
     @JsonKey(name: 'searchKey') @Default('') String searchKey,
 
     /// 用户ID
-    @JsonKey(name: 'userId') required int userId,
+    @JsonKey(name: 'userId') required String userId,
 
     /// 角色或用户ID
-    @JsonKey(name: 'roleoRuserId') required int roleOrUserId,
+    @JsonKey(name: 'roleoRuserId') required String roleOrUserId,
 
     /// 库房标签
     @JsonKey(name: 'roomTag') @Default('0') String roomTag,

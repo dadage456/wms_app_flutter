@@ -73,8 +73,8 @@ class OutboundTaskDetailBloc
       currentQuery = OutboundTaskItemQuery(
         outTaskId: outTaskId,
         workStation: workStation,
-        userId: userInfo.userId,
-        roleOrUserId: userInfo.userId,
+        userId: userInfo.userId.toString(),
+        roleOrUserId: userInfo.userId.toString(),
         pageIndex: 1,
         pageSize: 100,
       );
