@@ -1,11 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:wms_app/services/scanner_service.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_event.dart';
 import 'package:wms_app/modules/outbound/collection_task/bloc/collection_state.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
@@ -21,8 +19,7 @@ import 'package:wms_app/modules/outbound/exception_collection/models/exception_c
 class OutboundCollectionPage extends StatefulWidget {
   final OutboundTask task;
 
-  const OutboundCollectionPage({Key? key, required this.task})
-    : super(key: key);
+  const OutboundCollectionPage({super.key, required this.task});
 
   @override
   State<OutboundCollectionPage> createState() => _OutboundCollectionPageState();
@@ -31,12 +28,8 @@ class OutboundCollectionPage extends StatefulWidget {
 class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
-  StreamSubscription<String>? _scanSub;
-
   late CollectionBloc _bloc;
+  final ScannerController _scannerController = ScannerController();
 
   @override
   void initState() {
@@ -47,28 +40,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     _tabController = TabController(length: 2, vsync: this);
     final userInfo = Modular.get<UserManager>().userInfo;
     _bloc.add(InitializeTaskEvent(widget.task, userInfo!.userId));
-
-    // 订阅全局扫码服务（内部仅与原生建立一次连接）
-    _scanSub = ScannerService.instance.stream.listen(
-      (code) {
-        if (code.isEmpty) return;
-        // 仅在本页为当前可见路由时处理扫码，避免被新页面覆盖时误触发
-        final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
-        if (!mounted || !isCurrent) return;
-        _bloc.add(PerformBarcodeEvent(code));
-      },
-      onError: (e) {
-        _showErrorDialog(context, '扫码组件出错：$e');
-      },
-    );
   }
 
   @override
   void dispose() {
-    _scanSub?.cancel();
     _tabController.dispose();
-    _controller.dispose();
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -137,11 +113,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
             }
 
             if (state.focus) {
-              _focusNode.requestFocus();
+              _scannerController.requestFocus();
               _bloc.add(SetFocusEvent(false));
             }
 
-            _controller.clear();
+            _scannerController.clear();
           },
           builder: (context, state) {
             return Column(
@@ -334,31 +310,19 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
     // }
   }
 
-  // 扫描输入（示例风格）
+  // 扫描输入（使用通用扫描组件）
   Widget _buildScanInput(String placeholder) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      decoration: const BoxDecoration(color: Colors.white),
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        keyboardType: TextInputType.number,
-        onSubmitted: (value) {
-          _bloc.add(PerformBarcodeEvent(value));
-        },
-        decoration: InputDecoration(
-          hintText: placeholder,
-          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.grey[200],
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-      ),
+    final config = ScannerConfig().copyWith(placeholder: placeholder);
+
+    return ScannerWidget(
+      config: config,
+      controller: _scannerController,
+      onScanResult: (code) {
+        _bloc.add(PerformBarcodeEvent(code));
+      },
+      onError: (message) {
+        _showErrorDialog(context, message);
+      },
     );
   }
 
@@ -542,20 +506,6 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
         );
       },
     );
-  }
-
-  void _handleBottomNavTap(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        // 采集结果 - 可以导航到采集结果页面
-        break;
-      case 1:
-        _showCommitConfirmation(context);
-        break;
-      case 2:
-        _showMoreOptions(context);
-        break;
-    }
   }
 
   void _showCommitConfirmation(BuildContext context) {

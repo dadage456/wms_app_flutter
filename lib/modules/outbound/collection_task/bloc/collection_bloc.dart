@@ -382,7 +382,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     String batchno,
     String storeSite,
   ) async {
-    if (state.matControlFlag == '0') return '';
+    if (isSnTask) return '';
 
     bool matFind = false;
     String erpRoom = '';
@@ -490,11 +490,14 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     );
   }
 
+  /// 是否是序列号任务
+  bool get isSnTask => state.matControlFlag == '0';
+
   Future<void> _handleQuantity(
     double quantity,
     Emitter<CollectionState> emit,
   ) async {
-    if ((state.currentBarcode?.sn ?? '').isNotEmpty) {
+    if (isSnTask) {
       throw Exception('已采集序列号无需采集数量，请扫描二维码');
     }
 
@@ -669,7 +672,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     if (state.currentBarcode?.isEmpty ?? true) {
       return '请扫描二维码';
     }
-    if (state.currentBarcode?.sn == null && state.collectQty == 0) {
+    if (!isSnTask && state.collectQty == 0) {
       return '请输入数量';
     }
     return '';
@@ -788,10 +791,8 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         // 更新dicMtlQty (已采集的数量，累计采集的数量)
         newDicMtlQty[item.outtaskitemid.toString()] = [0, 1];
 
-        if (sn.isNotEmpty) {
-          newDicSeq['${state.currentBarcode?.matcode}@$sn'] =
-              '${state.currentBarcode?.matcode}@$sn';
-        }
+        newDicSeq['${state.currentBarcode?.matcode}@$sn'] =
+            '${state.currentBarcode?.matcode}@$sn';
 
         // 添加采集记录
         await _addCollectData(

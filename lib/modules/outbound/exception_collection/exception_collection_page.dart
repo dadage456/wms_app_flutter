@@ -5,12 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
 import 'package:wms_app/modules/outbound/exception_collection/bloc/exception_collection_bloc.dart';
 import 'package:wms_app/modules/outbound/exception_collection/bloc/exception_collection_event.dart';
 import 'package:wms_app/modules/outbound/exception_collection/bloc/exception_collection_state.dart';
 import 'package:wms_app/modules/outbound/exception_collection/models/exception_collection_args.dart';
 import 'package:wms_app/modules/outbound/exception_collection/models/exception_collection_models.dart';
-import 'package:wms_app/services/scanner_service.dart';
 
 class ExceptionCollectionPage extends StatefulWidget {
   final ExceptionCollectionArgs args;
@@ -23,10 +24,8 @@ class ExceptionCollectionPage extends StatefulWidget {
 }
 
 class _ExceptionCollectionPageState extends State<ExceptionCollectionPage> {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
   late ExceptionCollectionBloc _bloc;
-  StreamSubscription<String>? _scanSubscription;
+  final ScannerController _scannerController = ScannerController();
 
   static const List<ExceptionTypeOption> _exceptionOptions = [
     ExceptionTypeOption(value: '010', label: '小包装发料'),
@@ -47,26 +46,10 @@ class _ExceptionCollectionPageState extends State<ExceptionCollectionPage> {
         initialStoreSite: widget.args.storeSite ?? '',
       ),
     );
-
-    _scanSubscription = ScannerService.instance.stream.listen(
-      (code) {
-        if (code.isEmpty || !mounted) return;
-        final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
-        if (!isCurrent) return;
-        _bloc.add(ExceptionPerformScanEvent(code));
-      },
-      onError: (error) {
-        if (!mounted) return;
-        _showErrorDialog('扫码组件出错：$error');
-      },
-    );
   }
 
   @override
   void dispose() {
-    _scanSubscription?.cancel();
-    _controller.dispose();
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -135,10 +118,10 @@ class _ExceptionCollectionPageState extends State<ExceptionCollectionPage> {
             }
 
             if (state.focus) {
-              _focusNode.requestFocus();
+              _scannerController.requestFocus();
             }
 
-            _controller.clear();
+            _scannerController.clear();
           },
           builder: (context, state) {
             return Column(
@@ -161,30 +144,17 @@ class _ExceptionCollectionPageState extends State<ExceptionCollectionPage> {
   }
 
   Widget _buildScanInput(String placeholder) {
-    return Container(
-      height: 44,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      decoration: const BoxDecoration(color: Colors.white),
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        textInputAction: TextInputAction.done,
-        keyboardType: TextInputType.number,
-        onSubmitted: (value) {
-          _bloc.add(ExceptionPerformScanEvent(value));
-        },
-        decoration: InputDecoration(
-          hintText: placeholder,
-          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.grey[200],
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-      ),
+    final config = ScannerConfig().copyWith(placeholder: placeholder);
+
+    return ScannerWidget(
+      config: config,
+      controller: _scannerController,
+      onScanResult: (code) {
+        _bloc.add(ExceptionPerformScanEvent(code));
+      },
+      onError: (message) {
+        _showErrorDialog(message);
+      },
     );
   }
 
