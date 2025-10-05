@@ -74,8 +74,8 @@ class ReportShortageEvent extends CollectionEvent {
   const ReportShortageEvent();
 }
 
-class ClearErrorEvent extends CollectionEvent {
-  const ClearErrorEvent();
+class ResetStatusEvent extends CollectionEvent {
+  const ResetStatusEvent();
 }
 
 class SetFocusEvent extends CollectionEvent {

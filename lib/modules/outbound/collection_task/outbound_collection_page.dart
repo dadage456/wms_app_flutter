@@ -94,22 +94,25 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
         body: BlocConsumer<CollectionBloc, CollectionState>(
           listener: (context, state) {
             debugPrint('------ listener state changed-----------');
-            debugPrint('------ isLoading: ${state.isLoading}');
+            debugPrint('------ isLoading: ${state.status.isLoading}');
             LoadingDialogManager.instance.hideLoadingDialog(context);
-            if (state.error != null) {
-              _showErrorDialog(context, state.error!);
-              _bloc.add(ClearErrorEvent());
-            } else if (state.isLoading) {
+
+            if (state.status.isError) {
+              _showErrorDialog(context, state.status.message ?? '报错');
+              _bloc.add(ResetStatusEvent());
+            } else if (state.status.isLoading) {
               LoadingDialogManager.instance.showLoadingDialog(context);
+            } else if (state.status.isSuccess && state.status.message != null) {
+              LoadingDialogManager.instance.showSnackSuccessMsg(
+                context,
+                state.status.message ?? '成功',
+                duration: const Duration(milliseconds: 800),
+              );
+              _bloc.add(ResetStatusEvent());
             }
 
             if (state.currentTab != _tabController.index) {
               _tabController.index = state.currentTab;
-            }
-            if (state.isLoading) {
-              LoadingDialogManager.instance.showLoadingDialog(context);
-            } else {
-              LoadingDialogManager.instance.hideLoadingDialog(context);
             }
 
             if (state.focus) {

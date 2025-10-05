@@ -1,6 +1,49 @@
 import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
 
+enum CollectionStatusType {
+  normal,
+  // 加载中
+  loading,
+  // 错误
+  error,
+  // 成功
+  success,
+}
+
+class CollectionStatus {
+  final CollectionStatusType type;
+  final String? message;
+
+  const CollectionStatus(this.type, [this.message]);
+
+  factory CollectionStatus.normal() {
+    return const CollectionStatus(CollectionStatusType.normal);
+  }
+
+  factory CollectionStatus.loading() {
+    return const CollectionStatus(CollectionStatusType.loading);
+  }
+
+  factory CollectionStatus.error([String? message]) {
+    return CollectionStatus(CollectionStatusType.error, message);
+  }
+
+  factory CollectionStatus.success([String? message]) {
+    return CollectionStatus(CollectionStatusType.success, message);
+  }
+
+  CollectionStatus copyWith({CollectionStatusType? type, String? message}) {
+    return CollectionStatus(type ?? this.type, message ?? this.message);
+  }
+
+  bool get isNormal => type == CollectionStatusType.normal;
+  bool get isLoading => type == CollectionStatusType.loading;
+  bool get isError => type == CollectionStatusType.error;
+  bool get isSuccess => type == CollectionStatusType.success;
+}
+
 class CollectionState {
+  final CollectionStatus status;
   final List<OutTaskItem> detailList;
   final List<OutTaskItem> collectionList;
   final List<CollectionStock> stocks;
@@ -9,8 +52,6 @@ class CollectionState {
   final double repQty;
   final double collectQty;
   final String placeholder;
-  final bool isLoading;
-  final String? error;
   final int currentTab;
   final List<String> checkedIds;
   final Map<String, List<double>> dicMtlQty;
@@ -25,6 +66,7 @@ class CollectionState {
   final bool focus;
 
   const CollectionState({
+    this.status = const CollectionStatus(CollectionStatusType.normal),
     this.detailList = const [],
     this.collectionList = const [],
     this.stocks = const [],
@@ -33,8 +75,6 @@ class CollectionState {
     this.repQty = 0,
     this.collectQty = 0,
     this.placeholder = '请扫描库位',
-    this.isLoading = false,
-    this.error,
     this.currentTab = 0,
     this.checkedIds = const [],
     this.dicMtlQty = const {},
@@ -50,6 +90,7 @@ class CollectionState {
   });
 
   CollectionState copyWith({
+    CollectionStatus? status,
     List<OutTaskItem>? detailList,
     List<OutTaskItem>? collectionList,
     List<CollectionStock>? stocks,
@@ -58,8 +99,6 @@ class CollectionState {
     double? repQty,
     double? collectQty,
     String? placeholder,
-    bool? isLoading,
-    String? error,
     int? currentTab,
     List<String>? checkedIds,
     Map<String, List<double>>? dicMtlQty,
@@ -74,6 +113,7 @@ class CollectionState {
     bool? focus,
   }) {
     return CollectionState(
+      status: status ?? this.status,
       detailList: detailList ?? this.detailList,
       collectionList: collectionList ?? this.collectionList,
       stocks: stocks ?? this.stocks,
@@ -82,8 +122,6 @@ class CollectionState {
       repQty: repQty ?? this.repQty,
       collectQty: collectQty ?? this.collectQty,
       placeholder: placeholder ?? this.placeholder,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
       currentTab: currentTab ?? this.currentTab,
       checkedIds: checkedIds ?? this.checkedIds,
       dicMtlQty: dicMtlQty ?? this.dicMtlQty,

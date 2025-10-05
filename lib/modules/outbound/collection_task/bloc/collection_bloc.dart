@@ -29,11 +29,15 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<ChangeTabEvent>(_onChangeTab);
     on<CommitCollectionEvent>(_onCommitCollection);
     on<ReportShortageEvent>(_onReportShortage);
-    on<ClearErrorEvent>(_onClearError);
     on<SetFocusEvent>(_onSetFocus);
     on<ChangedSelectionEvent>(_onChangedSelection);
     on<DeleteCollectedStocksEvent>(_onDeleteCollectedStocks);
     on<UpdateFromResultEvent>(_onUpdateFromResult);
+    on<ResetStatusEvent>(_onResetStatus);
+  }
+
+  void _onResetStatus(ResetStatusEvent event, Emitter<CollectionState> emit) {
+    emit(state.copyWith(status: CollectionStatus.normal()));
   }
 
   Future<void> _initHive() async {
@@ -58,7 +62,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
   Future<void> loadTaskList(Emitter<CollectionState> emit) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(status: CollectionStatus.loading()));
 
       final detailList = await _service.getOutTaskCollitemList(
         CollectionTaskItemQuery(
@@ -80,7 +84,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       );
 
       if (detailList.isEmpty) {
-        emit(state.copyWith(isLoading: false, error: '当前任务列表没有待处理任务!'));
+        emit(state.copyWith(status: CollectionStatus.error('当前任务列表没有待处理任务')));
         return;
       }
 
@@ -109,14 +113,16 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       emit(
         state.copyWith(
           detailList: detailList,
-          isLoading: false,
+          status: CollectionStatus.success(),
           roomMatControl: roomMatControl,
           mtlCheckMode: mtlCheckMode,
         ),
       );
     } catch (e) {
       emit(
-        state.copyWith(isLoading: false, error: ErrorHandler.handleError(e)),
+        state.copyWith(
+          status: CollectionStatus.error(ErrorHandler.handleError(e)),
+        ),
       );
     }
   }
@@ -166,7 +172,11 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         // await _cacheBox.put('updateFlag', '0');
       }
     } catch (e) {
-      emit(state.copyWith(error: '恢复缓存数据失败：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('恢复缓存数据失败：${e.toString()}'),
+        ),
+      );
     }
   }
 
@@ -204,7 +214,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   ) async {
     final barcode = event.barcode;
     if (barcode.isEmpty) {
-      emit(state.copyWith(error: '采集内容为空,请重新采集'));
+      emit(state.copyWith(status: CollectionStatus.error('采集内容为空,请重新采集')));
       return;
     }
 
@@ -221,7 +231,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         currentStep = ScanStep.quantity;
         await _handleQuantity(double.parse(barcode), emit);
       } else {
-        emit(state.copyWith(error: '采集内容不合法！'));
+        emit(state.copyWith(status: CollectionStatus.error('采集内容不合法！')));
         return;
       }
 
@@ -239,7 +249,11 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
       emit(state.copyWith(placeholder: placeholder, focus: focus));
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), isLoading: false));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(ErrorHandler.handleError(e)),
+        ),
+      );
     }
   }
 
@@ -247,7 +261,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     String barcode,
     Emitter<CollectionState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(status: CollectionStatus.loading()));
 
     // 解析二维码
     final barcodeContent = await _service.getMaterialInfoByQR(barcode);
@@ -275,7 +289,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       matSendControl: matSendControl,
       collectQty: matControl == '0' ? 1 : state.collectQty,
       erpRoom: erpRoom,
-      isLoading: false,
+      status: CollectionStatus.success(),
     );
 
     // 检查库存
@@ -438,7 +452,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
     final siteCode = parts[2];
 
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(status: CollectionStatus.loading()));
 
     // 验证库位
     final response = await _service.getStoreSite(_task.storeRoomNo, siteCode);
@@ -485,7 +499,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       newstate.copyWith(
         collectionList: collectionList,
         currentTab: newTab,
-        isLoading: false,
+        status: CollectionStatus.success(),
       ),
     );
   }
@@ -875,6 +889,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         dicSeq: newDicSeq,
         dicMtlQty: newDicMtlQty,
         dicInvMtlQty: newDicInvMtlQty,
+        status: CollectionStatus.success('采集成功'),
       ),
     );
 
@@ -931,8 +946,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
   CollectionState _initializeCollect() {
     return state.copyWith(
-      error: null,
-      isLoading: false,
+      status: CollectionStatus.normal(),
       collectQty: 0,
       repQty: 0,
       currentBarcode: BarcodeContent.fromJson({}),
@@ -954,7 +968,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   ) async {
     try {
       if (state.stocks.isEmpty) {
-        emit(state.copyWith(error: '本次无采集明细，请确认！'));
+        emit(state.copyWith(status: CollectionStatus.error('本次无采集明细，请确认！')));
         return;
       }
 
@@ -986,13 +1000,19 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       // 这里应该显示确认对话框，为简化直接处理
       await _performCommit(emit);
     } catch (e) {
-      emit(state.copyWith(error: '平库出库采集异常：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '平库出库采集异常：${ErrorHandler.handleError(e)}',
+          ),
+        ),
+      );
     }
   }
 
   Future<void> _performCommit(Emitter<CollectionState> emit) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(status: CollectionStatus.loading()));
 
       // 再次校验采集数据
       final collectStocks = state.stocks;
@@ -1068,7 +1088,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         await _clearCache();
         emit(
           state.copyWith(
-            isLoading: false,
+            status: CollectionStatus.success(response['msg'] ?? '提交成功'),
             stocks: [],
             dicSeq: {},
             dicMtlQty: {},
@@ -1081,11 +1101,19 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         // Navigator.of(context).pop();
       } else {
         emit(
-          state.copyWith(isLoading: false, error: response['msg'] ?? '提交失败'),
+          state.copyWith(
+            status: CollectionStatus.error(response['msg'] ?? '提交失败'),
+          ),
         );
       }
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: '平库出库采集异常：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '平库出库采集异常：${ErrorHandler.handleError(e)}',
+          ),
+        ),
+      );
     }
   }
 
@@ -1095,12 +1123,12 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   ) async {
     try {
       if (state.stocks.isNotEmpty) {
-        emit(state.copyWith(error: '采集数据未提交,不允许报缺！'));
+        emit(state.copyWith(status: CollectionStatus.error('采集数据未提交,不允许报缺！')));
         return;
       }
 
       if (state.checkedIds.isEmpty) {
-        emit(state.copyWith(error: '请至少选择一行记录！'));
+        emit(state.copyWith(status: CollectionStatus.error('请至少选择一行记录！')));
         return;
       }
       final id = state.checkedIds.first;
@@ -1110,10 +1138,18 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
         // 重新加载任务列表
         await loadTaskList(emit);
       } else {
-        emit(state.copyWith(error: response['msg'] ?? '报缺失败'));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error(response['msg'] ?? '报缺失败'),
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(error: '报缺异常：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('报缺异常：${ErrorHandler.handleError(e)}'),
+        ),
+      );
     }
   }
 
@@ -1124,13 +1160,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     await _cacheBox.put('dicMtlQty', <String, List<double>>{});
     await _cacheBox.put('dicInvMtlQty', <String, double>{});
     _cacheBox.clear();
-  }
-
-  Future<void> _onClearError(
-    ClearErrorEvent event,
-    Emitter<CollectionState> emit,
-  ) async {
-    emit(state.copyWith(error: null));
   }
 
   Future<void> _onUpdateFromResult(
@@ -1210,7 +1239,13 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       );
       await _localSave();
     } catch (e) {
-      emit(state.copyWith(error: '从结果页更新采集数据失败：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '从结果页更新采集数据失败：${ErrorHandler.handleError(e)}',
+          ),
+        ),
+      );
     }
   }
 
@@ -1220,7 +1255,7 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
   ) async {
     try {
       if (event.stockIds.isEmpty) {
-        emit(state.copyWith(error: '请至少选择一行记录'));
+        emit(state.copyWith(status: CollectionStatus.error('请至少选择一行记录')));
         return;
       }
 
@@ -1304,7 +1339,13 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
       );
       await _localSave();
     } catch (e) {
-      emit(state.copyWith(error: '删除采集记录失败：${e.toString()}'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '删除采集记录失败：${ErrorHandler.handleError(e)}',
+          ),
+        ),
+      );
     }
   }
 
