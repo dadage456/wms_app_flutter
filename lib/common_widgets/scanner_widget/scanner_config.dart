@@ -55,8 +55,8 @@ class ScannerConfig {
     this.autoFocus = false,
     this.backgroundColor = Colors.white,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
-    this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 0),
-    this.height = 44,
+    this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 8),
+    this.height = 54,
     this.textStyle = const TextStyle(fontSize: 14),
     this.hintStyle = const TextStyle(color: Colors.grey, fontSize: 14),
     this.border,
@@ -83,6 +83,7 @@ class ScannerConfig {
     bool Function(String)? validator,
     bool? enableVibration,
     bool? enableSoundFeedback,
+    bool? clearOnSubmit,
   }) {
     return ScannerConfig(
       placeholder: placeholder ?? this.placeholder,
@@ -99,6 +100,7 @@ class ScannerConfig {
       validator: validator ?? this.validator,
       enableVibration: enableVibration ?? this.enableVibration,
       enableSoundFeedback: enableSoundFeedback ?? this.enableSoundFeedback,
+      clearOnSubmit: clearOnSubmit ?? this.clearOnSubmit,
     );
   }
 }

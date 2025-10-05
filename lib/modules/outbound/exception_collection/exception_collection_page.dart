@@ -144,7 +144,11 @@ class _ExceptionCollectionPageState extends State<ExceptionCollectionPage> {
   }
 
   Widget _buildScanInput(String placeholder) {
-    final config = ScannerConfig().copyWith(placeholder: placeholder);
+    final config = ScannerConfig().copyWith(
+      placeholder: placeholder,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      height: 48,
+    );
 
     return ScannerWidget(
       config: config,

@@ -7,6 +7,9 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 import 'modules/home/login/login_page.dart';
 import 'app_module.dart';
 
+final RouteObserver<PageRoute<dynamic>> routeObserver =
+    RouteObserver<PageRoute<dynamic>>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();

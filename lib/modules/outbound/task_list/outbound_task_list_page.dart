@@ -8,6 +8,8 @@ import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 import 'package:wms_app/common_widgets/custom_app_bar.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
 import 'package:wms_app/modules/outbound/task_list/bloc/outbound_task_bloc.dart';
 import 'package:wms_app/modules/outbound/task_list/bloc/outbound_task_event.dart';
 import 'package:wms_app/modules/outbound/task_list/config/outbound_task_grid_config.dart';
@@ -26,15 +28,13 @@ class OutboundTaskListPage extends StatefulWidget {
 
 class _OutboundTaskListPageState extends State<OutboundTaskListPage>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final TextEditingController _scanController = TextEditingController();
   late final CommonDataGridBloc<OutboundTask> _gridBloc;
   late final OutboundTaskBloc _bloc;
+  final ScannerController _scannerController = ScannerController();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _bloc = BlocProvider.of<OutboundTaskBloc>(context);
 
     _gridBloc = _bloc.gridBloc;
@@ -42,8 +42,6 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _scanController.dispose();
     super.dispose();
   }
 
@@ -76,70 +74,33 @@ class _OutboundTaskListPageState extends State<OutboundTaskListPage>
   }
 
   Widget _buildScanInput() {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(8.0)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _scanController,
-              onSubmitted: (value) {
-                _bloc.add(SearchOutboundTasksEvent(value));
-              },
-              decoration: InputDecoration(
-                hintText: '请扫描单号',
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // 输入框 8 圆角
-                  borderSide: BorderSide.none, // 去掉默认边框
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: _scanController,
-                  builder: (_, value, __) => value.text.isEmpty
-                      ? const SizedBox.shrink() // 无文字时不显示
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _scanController.clear();
-                            _bloc.add(SearchOutboundTasksEvent(''));
-                          },
-                        ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 0),
-          IconButton(
-            icon: SvgPicture.asset(
-              'assets/images/icon_filter.svg', // SVG 文件路径
-              // width: 32, // 设置图标的宽度
-              // height: 32, // 设置图标的高度
-              // colorFilter: const ColorFilter.mode(
-              //   Colors.blue, // 给 SVG 图像上色
-              //   BlendMode.srcIn,
-              // ),
-            ),
-            onPressed: () {
-              // TODO: 在这里添加筛选逻辑
-              print('Filter button pressed');
-              OutboundTaskFilterDialog.show(
-                context: context,
-                currentFilter: _bloc.currentQuery?.finishFlag ?? '0',
-                onFilterChanged: (v) {
-                  _bloc.add(FilterOutboundTasksEvent(v));
-                },
-              );
+    final config = ScannerConfig().copyWith(
+      placeholder: '请扫描单号',
+      clearOnSubmit: true,
+    );
+
+    return ScannerWidget(
+      config: config,
+      controller: _scannerController,
+      onScanResult: (value) {
+        _bloc.add(SearchOutboundTasksEvent(value));
+      },
+      onError: (message) {
+        LoadingDialogManager.instance.showErrorDialog(context, message);
+      },
+      suffix: IconButton(
+        icon: SvgPicture.asset(
+          'assets/images/icon_filter.svg', // SVG 文件路径
+        ),
+        onPressed: () {
+          OutboundTaskFilterDialog.show(
+            context: context,
+            currentFilter: _bloc.currentQuery.finishFlag,
+            onFilterChanged: (v) {
+              _bloc.add(FilterOutboundTasksEvent(v));
             },
-          ),
-        ],
+          );
+        },
       ),
     );
   }

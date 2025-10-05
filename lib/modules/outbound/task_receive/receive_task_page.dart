@@ -8,6 +8,8 @@ import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 import 'package:wms_app/common_widgets/custom_app_bar.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
 
 import 'bloc/receive_task_bloc.dart';
@@ -24,7 +26,7 @@ class ReceiveTaskPage extends StatefulWidget {
 class _ReceiveTaskPageState extends State<ReceiveTaskPage> {
   late final ReceiveTaskBloc _bloc;
   late final CommonDataGridBloc<OutboundTask> _gridBloc;
-  final TextEditingController _controller = TextEditingController();
+  final ScannerController _scannerController = ScannerController();
 
   @override
   void initState() {
@@ -36,7 +38,6 @@ class _ReceiveTaskPageState extends State<ReceiveTaskPage> {
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -58,48 +59,20 @@ class _ReceiveTaskPageState extends State<ReceiveTaskPage> {
   }
 
   Widget _buildScanInput() {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        // borderRadius: BorderRadius.vertical(bottom: Radius.circular(8.0)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              onSubmitted: (value) {
-                _bloc.add(SearchReceiveTasksEvent(value));
-              },
-              decoration: InputDecoration(
-                hintText: '请扫描单号',
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // 输入框 8 圆角
-                  borderSide: BorderSide.none, // 去掉默认边框
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: _controller,
-                  builder: (_, value, __) => value.text.isEmpty
-                      ? const SizedBox.shrink() // 无文字时不显示
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _controller.clear();
-                            _bloc.add(const SearchReceiveTasksEvent(''));
-                          },
-                        ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    final config = ScannerConfig().copyWith(
+      placeholder: '请扫描凭证号',
+      clearOnSubmit: true,
+    );
+
+    return ScannerWidget(
+      config: config,
+      controller: _scannerController,
+      onScanResult: (value) {
+        _bloc.add(SearchReceiveTasksEvent(value));
+      },
+      onError: (message) {
+        LoadingDialogManager.instance.showErrorDialog(context, message);
+      },
     );
   }
 

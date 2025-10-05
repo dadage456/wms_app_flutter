@@ -19,12 +19,15 @@ class ScannerWidget extends StatefulWidget {
   /// 外部控制器（可选）
   final ScannerController? controller;
 
+  final Widget? suffix;
+
   const ScannerWidget({
     super.key,
     required this.config,
     required this.onScanResult,
     this.onError,
     this.controller,
+    this.suffix,
   });
 
   @override
@@ -35,7 +38,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   StreamSubscription<String>? _scanSubscription;
-  bool _isProcessing = false;
+
+  get isCurrent => ModalRoute.of(context)?.isCurrent ?? false;
 
   @override
   void initState() {
@@ -52,7 +56,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     _scanSubscription = ScannerService.instance.stream.listen(
       _handleScanResult,
       onError: (e) {
-        if (mounted) {
+        if (mounted && isCurrent) {
           widget.onError?.call('扫码组件出错：$e');
         }
       },
@@ -61,7 +65,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     // 自动聚焦
     if (widget.config.autoFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
+        if (mounted && isCurrent) {
           _focusNode.requestFocus();
         }
       });
@@ -81,11 +85,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   /// 处理扫描结果
   void _handleScanResult(String code) {
-    if (code.isEmpty || !mounted || _isProcessing) return;
-
     // 仅在本页为当前可见路由时处理扫码
-    final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
-    if (!isCurrent) return;
+    if (code.isEmpty || !isCurrent) return;
 
     _processScanResult(code);
   }
@@ -104,6 +105,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         clear();
         return;
       }
+
+      _controller.text = code;
 
       // 回调结果
       widget.onScanResult(code);
@@ -143,54 +146,62 @@ class _ScannerWidgetState extends State<ScannerWidget> {
       height: widget.config.height,
       padding: widget.config.padding,
       decoration: BoxDecoration(color: widget.config.backgroundColor),
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        keyboardType: widget.config.keyboardType,
-        enabled: !_isProcessing,
-        style: widget.config.textStyle,
-        decoration: InputDecoration(
-          hintText: widget.config.placeholder,
-          hintStyle: widget.config.hintStyle,
-          border: OutlineInputBorder(
-            borderRadius: widget.config.borderRadius,
-            borderSide: widget.config.border != null
-                ? widget.config.border!.top
-                : BorderSide.none,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: _focusNode,
+              keyboardType: widget.config.keyboardType,
+              style: widget.config.textStyle,
+              decoration: InputDecoration(
+                hintText: widget.config.placeholder,
+                hintStyle: widget.config.hintStyle,
+                border: OutlineInputBorder(
+                  borderRadius: widget.config.borderRadius,
+                  borderSide: widget.config.border != null
+                      ? widget.config.border!.top
+                      : BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: widget.config.borderRadius,
+                  borderSide: widget.config.border != null
+                      ? widget.config.border!.top
+                      : BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: widget.config.borderRadius,
+                  borderSide: widget.config.border != null
+                      ? widget.config.border!.top
+                      : BorderSide.none,
+                ),
+                filled: true,
+                fillColor: widget.config.fillColor ?? Colors.grey[200],
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _controller,
+                  builder: (_, value, __) => value.text.isEmpty
+                      ? const SizedBox.shrink() // 无文字时不显示
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _controller.clear();
+                            if (widget.config.clearOnSubmit) {
+                              _handleManualInput('');
+                              _focusNode.unfocus();
+                            }
+                          },
+                        ),
+                ),
+              ),
+              onSubmitted: _handleManualInput,
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+              ],
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: widget.config.borderRadius,
-            borderSide: widget.config.border != null
-                ? widget.config.border!.top
-                : BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: widget.config.borderRadius,
-            borderSide: widget.config.border != null
-                ? widget.config.border!.top
-                : BorderSide.none,
-          ),
-          filled: true,
-          fillColor: widget.config.fillColor ?? Colors.grey[200],
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-          suffixIcon: ValueListenableBuilder<TextEditingValue>(
-            valueListenable: _controller,
-            builder: (_, value, __) => value.text.isEmpty
-                ? const SizedBox.shrink() // 无文字时不显示
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _controller.clear();
-                      if (widget.config.clearOnSubmit) {
-                        _handleManualInput('');
-                        _focusNode.unfocus();
-                      }
-                    },
-                  ),
-          ),
-        ),
-        onSubmitted: _handleManualInput,
-        inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+          widget.suffix ?? const SizedBox.shrink(),
+        ],
       ),
     );
   }

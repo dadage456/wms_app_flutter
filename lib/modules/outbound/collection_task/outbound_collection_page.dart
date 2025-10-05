@@ -312,7 +312,11 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
 
   // 扫描输入（使用通用扫描组件）
   Widget _buildScanInput(String placeholder) {
-    final config = ScannerConfig().copyWith(placeholder: placeholder);
+    final config = ScannerConfig().copyWith(
+      placeholder: placeholder,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      height: 48,
+    );
 
     return ScannerWidget(
       config: config,

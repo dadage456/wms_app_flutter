@@ -8,6 +8,8 @@ import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
 import 'package:wms_app/common_widgets/custom_app_bar.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
+import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
 
 import 'bloc/outbound_task_detail_bloc.dart';
 import 'bloc/outbound_task_detail_event.dart';
@@ -37,7 +39,7 @@ class OutboundTaskDetailPage extends StatefulWidget {
 class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
   late OutboundTaskDetailBloc _bloc;
   late final CommonDataGridBloc<OutboundTaskItem> _gridBloc;
-  final TextEditingController _scanController = TextEditingController();
+  final ScannerController _scannerController = ScannerController();
 
   @override
   void initState() {
@@ -49,7 +51,6 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
 
   @override
   void dispose() {
-    _scanController.dispose();
     super.dispose();
   }
 
@@ -114,45 +115,21 @@ class _OutboundTaskDetailPageState extends State<OutboundTaskDetailPage> {
     );
   }
 
-  /// 构建扫码输入区域
   Widget _buildScanInput() {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      decoration: const BoxDecoration(color: Colors.white),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _scanController,
-              onSubmitted: _handleSearch,
-              decoration: InputDecoration(
-                hintText: '请扫描或输入物料编码',
-                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: _scanController,
-                  builder: (_, value, __) => value.text.isEmpty
-                      ? const SizedBox.shrink()
-                      : IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _scanController.clear();
-                            _handleSearch('');
-                          },
-                        ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    final config = ScannerConfig().copyWith(
+      placeholder: '请扫描或输入物料编码',
+      clearOnSubmit: true,
+    );
+
+    return ScannerWidget(
+      config: config,
+      controller: _scannerController,
+      onScanResult: (value) {
+        _handleSearch(value);
+      },
+      onError: (message) {
+        LoadingDialogManager.instance.showErrorDialog(context, message);
+      },
     );
   }
 
