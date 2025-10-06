@@ -1,0 +1,106 @@
+<template>
+	<fui-nav-bar isFixed title="组盘上架提交结果" @leftClick="page_back">
+		<fui-icon name="arrowleft"></fui-icon>
+	</fui-nav-bar>
+	<view style="padding-top: 125rpx">
+		<fui-table-weex
+			ref="table"
+			fixed
+			align="left"
+			height="750"
+			stripe
+			selection
+			full
+			ellipsis
+			is-drag
+			:itemList="stocks"
+			:header="column1"
+			@rowClick="rowClick"
+			@select="handleCheckItem"
+			@selectAll="handleCheckAll"
+		></fui-table-weex>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { toast, showConfirm, tansParams } from '@/utils/common';
+import { getPalletItemByTaskID } from '@/api/system/aswhUp';
+
+export default {
+	data() {
+		return {
+			detailListView: [],
+			column1: [
+				{
+					prop: 'trayNo',
+					label: '托盘号',
+					sortable: true
+				},
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					sortable: true
+				},
+				{
+					prop: 'taskQty',
+					label: '任务数量'
+				},
+				{
+					prop: 'collectQty',
+					label: '采集数量'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 250,
+					sortable: true
+					
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 350,
+					sortable: true
+				},
+				{
+					prop: 'erpStore',
+					label: '子库'
+				},
+				{
+					name: 'storeRoom',
+					label: '库房'
+				},
+				{
+					name: 'taskNo',
+					label: '任务号',
+					width: 250
+				},
+				{
+					name: 'inTaskItemid',
+					label: '任务明细ID'
+				}
+			]
+		};
+	},
+	onLoad(options) {
+		this.trayNo = options.trayNo;
+		this.getList();
+	},
+	methods: {
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		},
+		getList() {
+			getPalletItemByTaskID(this.trayNo).then((response) => {
+				this.detailListView = response.data;
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

@@ -1,0 +1,216 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="接收到货任务" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view class="fui-block"></view>
+		<fui-input borderTop topLeft topRight borderBottom placeholder="请扫描单号" type="text" clearable @confirm="search2()" v-model="arrivalsBill.searchKey"></fui-input>
+		<fui-table-weex ref="table" align="left" fixed height="1100" stripe ellipsis is-drag full :itemList="arriveSignList" :header="column1" @click="rowOperate"></fui-table-weex>
+		<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { getArriveUnSignList, receArriveSign } from '@/api/system/arriveSign';
+import { getOutaskList } from '@/api/system/goodsDown';
+import storage from '@/utils/storage';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			column1: [
+				{
+					label: '操作',
+					fixed: 'right',
+					type: 3,
+					width: 310,
+					click: '',
+					buttons: [
+						{
+							text: '接收',
+							color: '#465CFF',
+							// size: 30,
+							fontWeight: 600,
+							type: 'primary'
+						},
+						{
+							text: '明细',
+							color: '#465CFF',
+							// size: 30,
+							fontWeight: 600,
+							type: 'success'
+						}
+					]
+				},
+				{
+					prop: 'orderno',
+					label: '装箱单号',
+					width: 270,
+					sortable: true
+				},
+				{
+					prop: 'poNumber',
+					label: '采购单号',
+					width: 250,
+					sortable: true
+				},
+				{
+					prop: 'createdate',
+					label: '到货日期',
+					width: 180,
+					sortable: true
+				},
+				{
+					prop: 'arrivalsBillno',
+					label: '到货单号',
+					width: 235,
+					sortable: true
+				},
+				{
+					prop: 'werks',
+					label: '工厂',
+					sortable: true
+				},
+				{
+					prop: 'parname',
+					label: '供应商',
+					width: 550,
+					sortable: true
+				},
+				{
+					prop: 'arrivalsBillid',
+					label: '到货单id'
+				}
+			],
+
+			total: '',
+			current: 1,
+			//查询条件
+			arrivalsBill: {
+				sortType: 'desc',
+				sortColumn: 'createdate',
+				searchKey: '',
+				PageIndex: '1',
+				PageSize: '100'
+			},
+			//查询结果
+			arriveSignList: []
+		};
+	},
+	onBackPress() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+		uni.reLaunch({
+			url: '/pages/arrive_sign/index' // 你可以根据需要调整跳转的页面
+		});
+		return true;
+	},
+	onLoad() {
+		var _this = this;
+		_this.getList();
+
+		uni.$on('scancodedate', function (content) {
+			_this.arrivalsBill.searchKey = content;
+			_this.getList();
+		});
+	},
+	methods: {
+		page_back() {
+			uni.$off('scancodedate');
+			uni.reLaunch({
+				url: '/pages/arrive_sign/index' // 你可以根据需要调整跳转的页面
+			});
+		},
+		rowOperate(rowItem) {
+			if (rowItem.buttonIndex === 0) {
+				this.receive(rowItem.item);
+			}
+			if (rowItem.buttonIndex === 1) {
+				this.detaill(rowItem.item);
+			}
+		},
+		detaill(ite) {
+			this.actionsClick('receive_detail', ite.arrivalsBillid);
+		},
+
+		receive(ite) {
+			this.receArriveOrder(ite.arrivalsBillid);
+		},
+
+		//进入采集界面
+		actionsClick(url, arrivalsBillid) {
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.reLaunch({
+					url: url + '?arrivalsBillid=' + arrivalsBillid
+				});
+			}, 100);
+		},
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+			console.log('数据加载中...');
+			this.arrivalsBill.PageIndex = this.current;
+			getArriveUnSignList(this.arrivalsBill).then((response) => {
+				this.arriveSignList = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+
+				if (this.arriveSignList.length <= 0) {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '当前任务列表没有待处理任务！'
+					});
+				}
+			});
+		},
+		//接收单据
+		receArriveOrder(arrivalsBillid) {
+			receArriveSign(arrivalsBillid).then((response) => {
+				if (response.code == '200') {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '单据接收成功！'
+					});
+
+					uni.$off('scancodedate');
+					uni.reLaunch({
+						url: '/pages/arrive_sign/index' // 你可以根据需要调整跳转的页面
+					});
+				}
+			});
+		},
+		//搜索
+		search() {
+			this.getList();
+		},
+		search2() {
+			this.getList();
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+.fui-block {
+	width: 100%;
+	height: 100rpx;
+	background-color: #fff;
+}
+</style>

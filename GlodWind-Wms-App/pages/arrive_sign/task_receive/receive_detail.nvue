@@ -1,0 +1,206 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="到货任务接收明细" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 120rpx">
+			<fui-table-weex
+				ref="table"
+				fixed
+				align="left"
+				height="1200"
+				stripe
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListView"
+				:header="column1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+			></fui-table-weex>
+		</view>
+		<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { getArriveSignDetailList, getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import storage from '@/utils/storage';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			column1: [
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					sortable: true
+				},
+				{
+					prop: 'qty',
+					label: '任务数量'
+				},
+				{
+					prop: 'goodqty',
+					label: '采集数量'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 260,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 350,
+					sortable: true
+				},
+				{
+					prop: 'subinventoryCode',
+					label: '子库'
+				},
+				{
+					prop: 'posnr',
+					label: 'SAP行号',
+					sortable: true
+				},
+				{
+					prop: 'matname',
+					label: '物料名称',
+					width: 600
+				},
+
+				{
+					prop: 'parname',
+					label: '供应商',
+					width: 550,
+					sortable: true
+				},
+				{
+					prop: 'matcodecontrol',
+					label: '控制属性'
+				},
+				{
+					prop: 'orderno',
+					label: '装箱单号',
+					width: 270
+				},
+				{
+					prop: 'arrivalsBillno',
+					label: '到货单号',
+					width: 235
+				}
+			],
+			total: '',
+			current: 1,
+			//查询结果
+			detailListView: [],
+			//查询条件
+			arrivalsDetailBill: {
+				arrivalsBillid: '',
+				sortType: '',
+				sortColumn: '',
+				searchKey: '',
+				PageIndex: '1',
+				PageSize: '80'
+			}
+		};
+	},
+	onBackPress() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+		uni.reLaunch({
+			url: '/pages/arrive_sign/task_receive/index' // 你可以根据需要调整跳转的页面
+		});
+		return true;
+	},
+	onLoad(options) {
+		var _this = this;
+		_this.arrivalsDetailBill.arrivalsBillid = options.arrivalsBillid;
+		_this.getList();
+		uni.$on('scancodedate', function (content) {
+			console.log('你想要的code:' + content);
+			if (content == undefined || content == null || content.length == 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集内容为空,请重新采集'
+				});
+				_this.arrivalsDetailBill.searchKey = null;
+				return;
+			}
+			if (content.includes('MC') > 0) {
+				getPmMaterialInfoByQR(content).then((response) => {
+					if (response.msg && response.code != '200') {
+						uni.showModal({
+							title: '采集异常',
+							showCancel: false,
+							content: response.msg
+						});
+						_this.arrivalsDetailBill.searchKey = null;
+						return;
+					}
+					if (response.code == '200') {
+						_this.arrivalsDetailBill.searchKey = response.data.matcode;
+						_this.getList();
+					}
+				});
+			} else {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集内容不合法'
+				});
+				_this.arrivalsDetailBill.searchKey = null;
+				return;
+			}
+		});
+	},
+
+	methods: {
+		page_back() {
+			// 移除监听事件
+			uni.$off('scancodedate');
+			uni.reLaunch({
+				url: '/pages/arrive_sign/task_receive/index' // 你可以根据需要调整跳转的页面
+			});
+		},
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+			console.log('数据加载中...');
+			this.arrivalsDetailBill.PageIndex = this.current;
+			getArriveSignDetailList(this.arrivalsDetailBill).then((response) => {
+				this.detailListView = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+				if (this.detailListView.length <= 0) {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '当前任务列表没有待处理任务！'
+					});
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

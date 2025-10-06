@@ -1,0 +1,479 @@
+<template>
+	<view style="padding-top: 35rpx">
+		<fui-swiper-dot :styles="styles" :items="items" :current="current2">
+			<swiper
+				previous-margin="60rpx"
+				next-margin="60rpx"
+				class="fui-banner__box"
+				@change="change2"
+				circular
+				:indicator-dots="false"
+				autoplay
+				:interval="5000"
+				:duration="150"
+			>
+				<swiper-item v-for="(item, index) in items" :key="index">
+					<image :src="item.image" class="fui-banner__item"></image>
+				</swiper-item>
+			</swiper>
+		</fui-swiper-dot>
+
+		<fui-notice-bar speed="30" :content="content" scrollable @click="getMore">
+			<template v-slot:right>
+				<view class="fui-more__wrap">
+					<text class="fui-more__text">查看更多</text>
+					<fui-icon name="arrowright" :size="36" color="#7F7F7F"></fui-icon>
+				</view>
+			</template>
+		</fui-notice-bar>
+
+		<!-- <fui-notice-bar speed="30" :content="content" height="88" size="30" single background="#fff" color="#333">
+			<view class="fui-icon__box">
+				<fui-icon name="notice-fill" :size="40" color="#465CFF"></fui-icon>
+			</view>
+			<template v-slot:right>
+				<view class="fui-more__wrap">
+					<text class="fui-more__text">查看更多</text>
+					<fui-icon name="arrowright" :size="36" color="#7F7F7F"></fui-icon>
+				</view>
+			</template>
+		</fui-notice-bar> -->
+
+		<view class="gui-margin-top">
+			<gui-box-banner
+				:color="['#08AAFF', 'rgba(69, 90, 100, 0.5)', 'rgba(69, 90, 100, 0.5)']"
+				borderColor="#F8F8F8"
+				background="#F8F8F8"
+				:items="items2"
+				@taped="taped"
+			></gui-box-banner>
+		</view>
+
+		<view class="orane-usermenus">
+			<view class="micon" @tap="navTo('/pages/arrive_sign/index')">
+				<text class="new"></text>
+				<fui-icon name="signin" color="#FF3D00"></fui-icon>
+				<text class="txt">到货接收</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/goodsup/goodsUp')">
+				<fui-icon name="pullup-fill" color="#FFEB3B"></fui-icon>
+				<text class="txt">平库入库</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/aswhup/aswhUp')">
+				<fui-icon name="plussign-fill" color="#FFCCBC"></fui-icon>
+				<text class="txt">立库组盘</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/goodsdown/goodsDown')">
+				<fui-icon name="pulldown-fill" color="#EF5350"></fui-icon>
+				<text class="txt">平库出库</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/aswhdown/aswhDown')">
+				<fui-icon name="minussign-fill" color="#795558"></fui-icon>
+				<text class="txt">在线拣选</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/mtlsenter/mtlSenterTaskItem')">
+				<fui-icon name="cart-fill" color="#E040FB"></fui-icon>
+				<text class="txt">拉式发料</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/transfer/transfer')">
+				<fui-icon name="find-fill" color="#0097A7"></fui-icon>
+				<text class="txt">平库移库</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/aswhInventorytask/aswhInventoryTask')">
+				<fui-icon name="home-fill" color="#455A64"></fui-icon>
+				<text class="txt">立库盘点</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/Inventorytask/InventoryTask')">
+				<fui-icon name="order-fill" color="#1E88E5"></fui-icon>
+				<text class="txt">平库盘点</text>
+			</view>
+			<view class="micon" @tap="navTo('/pages/queryrepertory/queryRepertory')">
+				<fui-icon name="search" color="#00796B"></fui-icon>
+				<text class="txt">库存查询</text>
+			</view>
+		</view>
+		<fui-footer :text="version"></fui-footer>
+		<!-- <scanCode></scanCode> -->
+	</view>
+</template>
+
+<script>
+import { toast, showConfirm, tansParams } from '@/utils/common';
+/* import scanCode from '@/components/scan-code/scan-code.vue'; */
+import { selectSysMessageCount, getLatestNotice, selectPdaCollExceptList, selectSapInteExceptList, pushcld, selectTaskMessageList } from '@/api/system/goodsUp';
+export default {
+	/* components: {
+		scanCode
+	}, */
+	data() {
+		return {
+			version: 'Copyright © 2025 版本号wms生产:1.1.14',
+			items2: [
+				[0, '条', '采集异常'],
+				[0, '条', '接口异常'],
+				[0, '条', '我的消息']
+			],
+			styles: {
+				width: 12,
+				height: 12,
+				activeWidth: 24
+			},
+			content: '暂无',
+
+			current2: 0,
+			items: [
+				{
+					image: '/static/images/banner/banner01.jpg'
+				},
+				{
+					image: '/static/images/banner/banner02.jpg'
+				},
+				{
+					image: '/static/images/banner/banner03.jpg'
+				},
+				{
+					image: '/static/images/banner/banner04.jpg'
+				}
+			]
+		};
+	},
+	onBackPress(options) {
+		// 如果是返回按钮，才做执行
+		if (options.from === 'backbutton') {
+			showConfirm('确定退出当前程序?').then((res) => {
+				if (res.confirm) {
+					plus.runtime.quit();
+				}
+			});
+			return true;
+		}
+	},
+	onLoad() {
+		var _this = this;
+		_this.getNotice();
+		_this.getpdaCollExceptNum();
+		_this.getSapInteExceptNum();
+		/* _this.getTaskMessageNum(); */
+		_this.clearCache();
+		/* this.initScanCodeListener(); */
+	},
+
+	onUnload() {
+		// 移除监听事件
+		/* uni.$off('scancodedate', this.scanCodeListener); */
+	},
+
+	onShow() {
+		var _this = this;
+		_this.getNotice();
+		_this.getpdaCollExceptNum();
+		_this.getSapInteExceptNum();
+		/* _this.getTaskMessageNum(); */
+
+		/* uni.$off('scancodedate', this.scanCodeListener); // 避免重复绑定
+		if (this.scanCodeListener) {
+			this.initScanCodeListener();
+		} */
+	},
+
+	methods: {
+		/* initScanCodeListener() {
+			const _this = this;
+			this.scanCodeListener = (content) => {};
+			uni.$off('scancodedate', this.scanCodeListener); // 避免重复绑定
+			uni.$on('scancodedate', this.scanCodeListener);
+			console.log('scancodedate绑定');
+		}, */
+		// 获取缓存
+		formatSize() {
+			plus.android.importClass('android.app.ActivityManager');
+			var Context = plus.android.importClass('android.content.Context');
+			var am = plus.android.runtimeMainActivity().getSystemService(Context.ACTIVITY_SERVICE);
+			am.clearApplicationUserData();
+		},
+		// 清除缓存
+		handleClearCache() {
+			let that = this;
+			uni.showModal({
+				title: '清除缓存',
+				content: '您确定要清除缓存吗？',
+				success: function (res) {
+					if (res.confirm) {
+						console.log('用户点击确定');
+						that.clearCache();
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+				}
+			});
+		},
+		// 清理缓存
+		clearCache() {
+			let that = this;
+			let os = plus.os.name;
+			if (os == 'Android') {
+				let main = plus.android.runtimeMainActivity();
+				let sdRoot = main.getCacheDir();
+				let files = plus.android.invoke(sdRoot, 'listFiles');
+				let len = files.length;
+				for (let i = 0; i < len; i++) {
+					let filePath = '' + files[i]; // 没有找到合适的方法获取路径，这样写可以转成文件路径
+					plus.io.resolveLocalFileSystemURL(
+						filePath,
+						function (entry) {
+							console.log('entry:' + entry);
+							if (entry.isDirectory) {
+								entry.removeRecursively(
+									function (entry) {
+										//递归删除其下的所有文件及子目录
+										uni.showToast({
+											title: '缓存清理完成',
+											duration: 2000
+										});
+										//that.formatSize(); // 重新计算缓存
+									},
+									function (e) {
+										console.log(e.message);
+									}
+								);
+							} else {
+								entry.remove();
+							}
+						},
+						function (e) {
+							console.log('文件路径读取失败');
+						}
+					);
+				}
+			} else {
+				// ios
+				plus.cache.clear(function () {
+					uni.showToast({
+						title: '缓存清理完成',
+						duration: 2000
+					});
+					that.formatSize();
+				});
+			}
+		},
+		clearAppData() {
+			let main = plus.android.runtimeMainActivity();
+			let sdRoot1 = main.getFilesDir();
+			let filesOne = plus.android.invoke(sdRoot1, 'listFiles');
+			let lenOne = filesOne.length;
+			for (let i = 0; i < lenOne; i++) {
+				let filePath = '' + filesOne[i]; // 没有找到合适的方法获取路径，这样写可以转成文件路径
+				plus.io.resolveLocalFileSystemURL(
+					filePath,
+					function (entry) {
+						if (entry.isDirectory) {
+							entry.removeRecursively(
+								function (entry) {
+									//递归删除其下的所有文件及子目录
+									console.log('清理文件数据完成');
+								},
+								function (e) {
+									console.log(e.message);
+								}
+							);
+						} else {
+							entry.remove(
+								function (entry) {
+									//递归删除其下的所有文件及子目录
+									console.log('清理文件数据完成');
+								},
+								function (e) {
+									console.log(e.message);
+								}
+							);
+						}
+					},
+					function (e) {
+						console.log('清理文件数据失败');
+					}
+				);
+			}
+		},
+		getpdaCollExceptNum() {
+			selectPdaCollExceptList().then((response) => {
+				this.items2[0][0] = response.data.total;
+			});
+		},
+		//已接收未完成单据加载
+		getSapInteExceptNum() {
+			selectSapInteExceptList().then((response) => {
+				this.items2[1][0] = response.data.total;
+			});
+		},
+		//已接收未完成单据加载
+		getTaskMessageNum() {
+			selectSysMessageCount().then((response) => {
+				this.items2[2][0] = response.data;
+			});
+		},
+		navTo(url) {
+			/* uni.$off('scancodedate', this.scanCodeListener); */ // 避免重复绑定
+			/* uni.navigateTo({
+				url: url
+			}); */
+
+			uni.reLaunch({
+				url: url
+			});
+		},
+		change2(e) {
+			this.current2 = e.detail.current;
+		},
+
+		taped(idx) {
+			uni.showModal({
+				title: '采集异常',
+				showCancel: false,
+				content: idx
+			});
+			/* uni.$off('scancodedate', this.scanCodeListener); */ // 避免重复绑定
+			if (idx == 0) {
+				uni.navigateTo({
+					url: '/pages/exceptColl/pdacollExcept'
+				});
+			}
+			if (idx == 1) {
+				uni.navigateTo({
+					url: '/pages/exceptColl/sapInteExcept'
+				});
+			}
+			if (idx == 2) {
+				uni.navigateTo({
+					url: '/pages/exceptColl/taskMessage'
+				});
+			}
+		},
+		getMore() {
+			/* uni.$off('scancodedate', this.scanCodeListener); */ // 避免重复绑定
+			uni.navigateTo({
+				url: '/pages/msg/msg'
+			});
+		},
+		getNotice() {
+			getLatestNotice().then((response) => {
+				let noteList = response.data;
+				if (noteList.length > 0) {
+					this.content = noteList[0].noticeTitle;
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style>
+.fui-banner__wrap {
+	height: 360rpx;
+}
+.fui-banner__item {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	height: 360rpx;
+	color: #ffffff;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+.fui-banner__cell {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	height: 280rpx;
+	color: #ffffff;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	font-size: 34rpx;
+	font-weight: 600;
+	border-radius: 24rpx;
+	transition: transform 0.1s linear;
+	/* #ifdef APP-NVUE */
+	transform: scale(0.9);
+	/* #endif */
+}
+.demo-icon {
+	width: 60rpx;
+	line-height: 90rpx;
+	font-size: 32rpx;
+}
+
+.orane-usermenus {
+	padding: 30rpx 0;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	display: flex;
+}
+
+.orane-usermenus .micon {
+	width: 180rpx;
+	justify-content: center;
+	align-items: center;
+	margin: 36rpx 0;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+.orane-usermenus .micon .new {
+	position: absolute;
+	width: 16rpx;
+	height: 16rpx;
+	border-radius: 16rpx;
+	background-color: #f30;
+	right: 60rpx;
+	top: 0;
+}
+
+.orane-usermenus .micon .mimg {
+	width: 50rpx;
+	height: 50rpx;
+	margin-bottom: 16rpx;
+}
+
+.orane-usermenus .micon .txt {
+	font-size: 28rpx;
+}
+
+.fui-icon__box {
+	padding-left: 24rpx;
+	padding-right: 12rpx;
+}
+
+.fui-more__wrap {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	flex-direction: row;
+	align-items: center;
+	padding: 0 24rpx;
+}
+
+.fui-more__text {
+	font-size: 26rpx;
+	color: #7f7f7f;
+}
+
+.fui-notice__fixed {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	z-index: 10;
+	/* #endif */
+	position: fixed;
+	left: 0;
+	top: 0;
+}
+
+.fui-notice__pt {
+	padding-top: 124rpx;
+}
+</style>

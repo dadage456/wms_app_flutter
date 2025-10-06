@@ -1,0 +1,126 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">输入验证码</text>
+			<view class="fui-mobile__box">
+				<text class="fui-def__size">已发送验证码至</text>
+				<text class="fui-mobile__text fui-def__size">+86 18888888888</text>
+			</view>
+		</view>
+		<view class="fui-form__box">
+			<fui-single-input padding="0" type="number" isFocus @complete="complete"></fui-single-input>
+			<view class="fui-btn__box">
+				<fui-button text="确定" radius="96rpx" bold @click="onClick"></fui-button>
+			</view>
+			<view class="fui-countdown__box">
+				<text class="fui-countdown__val">57秒</text>
+				<text class="fui-countdown__text">重新发送</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				code: '',
+				type: 1
+			}
+		},
+		onLoad(e) {
+			this.type = e.type || 1
+		},
+		methods: {
+			complete(e) {
+				this.code = e.detail.value
+				// this.fui.toast(`您输入的验证码为${this.code}`)
+				uni.showToast({
+					title: `您输入的验证码为${this.code}`,
+					icon: 'none'
+				})
+			},
+			onClick() {
+				if (this.type == 2) {
+					// this.fui.href('/pages/set/setPwd/setPwd')
+
+					uni.navigateTo({
+						url: '/pages/set/setPwd/setPwd'
+					});
+				} else {
+					// this.fui.toast('登录中...')
+
+					uni.showToast({
+						title: '登录中...',
+						icon: 'none'
+					})
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+	.fui-form__box {
+		padding-top: 60rpx;
+	}
+
+	.fui-btn__box {
+		padding: 96rpx 0 48rpx;
+		position: relative;
+	}
+
+	.fui-mobile__box {
+		padding-top: 16rpx;
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.fui-mobile__text {
+		padding-left: 12rpx;
+		/* #ifdef APP-NVUE */
+		color: #999999;
+		/* #endif */
+
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-label, #999999);
+		/* #endif */
+	}
+
+	.fui-countdown__box {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		/* #endif */
+		flex: 1;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.fui-countdown__val {
+		font-size: 28rpx;
+		font-weight: 500;
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-warning, #FFC85B);
+		/* #endif */
+		/* #ifdef APP-NVUE */
+		color: #FFC85B;
+		/* #endif */
+	}
+
+	.fui-countdown__text {
+		font-weight: 500;
+		font-size: 28rpx;
+		/* #ifdef APP-NVUE */
+		color: #999999;
+		/* #endif */
+
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-label, #999999);
+		/* #endif */
+	}
+</style>

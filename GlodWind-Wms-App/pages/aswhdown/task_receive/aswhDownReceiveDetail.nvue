@@ -1,0 +1,254 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="在线拣选接收明细" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 120rpx">
+			<fui-table-weex
+				ref="table"
+				fixed
+				align="left"
+				height="1100"
+				stripe
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListView"
+				:header="column1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+				@click="rowOperate"
+			></fui-table-weex>
+		</view>
+		<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+	<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { getOutTaskitemList, CommitRCOutTaskItem } from '@/api/system/goodsDown';
+import scanCode from '@/components/scan-code/scan-code.vue';
+import storage from '@/utils/storage';
+export default {
+	components: {
+		scanCode
+	},
+	onLoad(options) {
+		var _this = this;
+		_this.outtaskitem.outtaskid = options.outtaskid;
+		_this.outtaskitem.workstation = options.workstation;
+		_this.getList();
+		
+        uni.$off('scancodedate'); 
+		uni.$on('scancodedate', function (content) {
+			if (content == undefined || content == null || content.length == 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集内容为空,请重新采集'
+				});
+				_this.outtaskitem.searchKey = null;
+				return;
+			}
+			if (content.includes('MC') > 0) {
+				getPmMaterialInfoByQR(content).then((response) => {
+					if (response.msg && response.code != '200') {
+						uni.showModal({
+							title: '采集异常',
+							showCancel: false,
+							content: response.msg
+						});
+						_this.outtaskitem.searchKey = null;
+						return;
+					}
+					if (response.code == '200') {
+						_this.outtaskitem.searchKey = response.data.matcode;
+						_this.getList();
+					}
+				});
+			} else if (content.includes('$KW$')) {
+				var str1 = content.toString();
+				let sArry = str1.split('$');
+				_this.outtaskitem.searchKey = sArry[2];
+				_this.getList();
+			} else {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集内容不合法'
+				});
+				_this.outtaskitem.searchKey = null;
+				return;
+			}
+		});
+	},
+	onBackPress() {
+		console.log('onBackPress');
+		// 移除监听事件
+		uni.$off('scancodedate');
+		uni.reLaunch({
+			url: '/pages/aswhdown/task_receive/aswhDownReceive'
+		});
+		return true;
+	},
+	data() {
+		return {
+			options: [
+				{
+					text: '全选/取消全选'
+				},
+				{
+					text: '接收'
+				}
+			],
+			height: 100,
+			show: false,
+
+			column1: [
+				{ prop: 'matcode', label: '物料编码',sortable: true  },
+				{ prop: 'palletno', label: '托盘号' ,sortable: true},
+				{ prop: 'hintqty', label: '任务数量' },
+				{ prop: 'storeroomno', label: '库房' },
+				{ prop: 'storesiteno', label: '库位' },
+				{ prop: 'subinventoryCode', label: '子库' },
+				{ prop: 'orderno', label: '出库单号', width: 550 },
+				{ prop: 'matname', label: '物料名称', width: 600 },
+				{ prop: 'matinnercode', label: '物料旧编码', width: 250 },
+				{ prop: 'outtaskitemid', label: '任务id' }
+			],
+			total: '',
+			current: 1,
+
+			inArray,
+			checkedIds: [],
+			list: [],
+			//查询结果
+			detailListView: [],
+			//查询条件
+			outtaskitem: {
+				sortType: '',
+				sortColumn: '',
+				searchKey: '',
+
+				userId: 'ALL',
+				roleoRuserId: this.$store.state.userid,
+				roomTag: '1',
+				batchflag: '0',
+				transferType: '0',
+				beatflag: 'N',
+				PageIndex: '1',
+				PageSize: '80'
+			}
+		};
+	},
+	methods: {
+		page_back() {
+			uni.$off('scancodedate');
+			uni.reLaunch({
+				url: '/pages/aswhdown/task_receive/aswhDownReceive'
+			});
+		},
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.$refs.table && this.$refs.table.toggleAllSelection();
+			}
+			if (e.index === 1) {
+				this.receiveTask();
+			}
+		},
+
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		handleCheckAll(selectItem) {
+			const { checkedIds, detailListView } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.detailListView.map((item) => item.outtaskitemid);
+			} else {
+				this.checkedIds = [];
+			}
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.outtaskitemid);
+			if (selectItem.is_selected) {
+				if (index < 0) {
+					this.checkedIds.push(selectItem.item.outtaskitemid);
+				}
+			} else {
+				if (index >= 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+		},
+
+		receiveTask() {
+			if (this.checkedIds.length <= 0) {
+				uni.showToast({
+					icon: 'none',
+					duration: 3000,
+					title: '请至少选择一行记录'
+				});
+				return;
+			}
+
+			CommitRCOutTaskItem(this.checkedIds, '0', 'false').then((response) => {
+				if (response.code != '200') {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: response.msg
+					});
+					return;
+				}
+				if (response.code == '200') {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '单据接收成功！'
+					});
+				}
+				this.getList();
+			});
+		},
+
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			this.outtaskitem.PageIndex = this.current;
+			getOutTaskitemList(this.outtaskitem).then((response) => {
+				this.detailListView = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+				if (this.detailListView.length <= 0) {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '当前任务列表没有待处理任务！'
+					});
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

@@ -1,0 +1,113 @@
+/* #ifndef APP-NVUE */
+page {
+	background-color: #FFFFFF;
+	font-size: 32rpx;
+	color: #181818;
+	font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+}
+
+/* #endif */
+
+.fui-wrap {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: column;
+    
+	/* #ifdef APP-NVUE */
+	background-color: #FFFFFF;
+	color: #181818;
+	/* #endif */
+	font-size: 50rpx;
+	
+}
+
+.fui-form__box {
+	/* #ifndef APP-NVUE */
+	padding-top: 116rpx;
+	/* #endif */
+
+	/* #ifdef APP-NVUE */
+	padding-top: 106rpx;
+	/* #endif */
+}
+
+.fui-btn__box {
+	padding: 96rpx 0;
+	position: relative;
+}
+
+.fui-def__size {
+	font-size: 32rpx;
+}
+
+.fui-page__spacing {
+	padding-left: 32rpx;
+	padding-right: 32rpx;
+	/* #ifndef APP-NVUE */
+	box-sizing: border-box;
+	/* #endif */
+}
+
+.fui-padding {
+	padding-left: 64rpx;
+	padding-right: 64rpx;
+	/* #ifndef APP-NVUE */
+	box-sizing: border-box;
+	/* #endif */
+}
+
+.fui-title__box {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	flex: 1;
+	/* #endif */
+	padding-top: 64rpx;
+	flex-direction: column;
+}
+
+.fui-title__size {
+	font-size: 56rpx;
+	font-weight: 600;
+}
+
+.fui-color__primary {
+	/* #ifndef APP-NVUE */
+	color: var(--fui-color-primary, #465CFF);
+	/* #endif */
+
+	/* #ifdef APP-NVUE */
+	color: #465CFF;
+	/* #endif */
+}
+
+.fui-color__link {
+	/* #ifndef APP-NVUE */
+	color: var(--fui-color-link, #465CFF);
+	/* #endif */
+
+	/* #ifdef APP-NVUE */
+	color: #465CFF;
+	/* #endif */
+
+	/* #ifdef H5 */
+	cursor: pointer;
+	/* #endif */
+}
+
+.fui-highlight {
+	/* #ifdef H5 */
+	cursor: pointer;
+	/* #endif */
+}
+
+.fui-highlight:active,
+.fui-color__link:active {
+	opacity: 0.6;
+}

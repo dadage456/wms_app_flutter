@@ -1,0 +1,453 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="平库下架" @rightClick="task_receive" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+			<template v-slot:right>
+				<fui-icon name="plus"></fui-icon>
+			</template>
+		</fui-nav-bar>
+		<view class="fui-block"></view>
+		<fui-input borderTop topLeft topRight borderBottom placeholder="请扫描单号" type="text" clearable @confirm="search2()" v-model="outtask.searchKey"></fui-input>
+		<fui-table-weex ref="table" fixed align="left" height="1100" stripe ellipsis is-drag full :itemList="outtaskList" :header="column1" @click="rowOperate"></fui-table-weex>
+		<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+
+		<fui-bottom-popup :show="show_popup" :maskClosable="false">
+			<view class="fui-popup__container">
+				<text class="fui-title">全部单据选择</text>
+				<view class="fui-btn__box">
+					<fui-radio-group name="radio" v-model="val" @change="checkboxChange">
+						<view class="fui-list__item">
+							<fui-label>
+								<view class="fui-align__center">
+									<fui-radio value="1"></fui-radio>
+									<text class="fui-text">所有单据</text>
+								</view>
+							</fui-label>
+							<fui-label :margin="['0', '0', '0', '40rpx']">
+								<view class="fui-align__center">
+									<fui-radio value="0" checked></fui-radio>
+									<text class="fui-text">采集中单据</text>
+								</view>
+							</fui-label>
+						</view>
+					</fui-radio-group>
+				</view>
+				<view class="fui-btn__box">
+					<fui-button width="240rpx" height="80rpx" text="确认" :margin="['0', '16rpx']" @click="search2()"></fui-button>
+				</view>
+
+				<view class="fui-icon__close" @tap="closePopup()">
+					<fui-icon name="close" :size="48"></fui-icon>
+				</view>
+			</view>
+		</fui-bottom-popup>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { getOutaskList } from '@/api/system/goodsDown';
+import scanCode from '@/components/scan-code/scan-code.vue';
+import storage from '@/utils/storage';
+import store from '@/store';
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			options: [
+				{
+					text: '所有任务'
+				}
+			],
+			height: 100,
+			show: false,
+
+			show_popup: false,
+			linkage: false,
+
+			column1: [
+				{
+					label: '操作',
+					fixed: 'right',
+					type: 3,
+					width: 300,
+					click: '',
+					buttons: [
+						{
+							text: '采集',
+							color: '#465CFF',
+							fontWeight: 600,
+							type: 'primary'
+						},
+						{
+							text: '明细',
+							color: '#465CFF',
+							fontWeight: 600,
+							type: 'success'
+						}
+					]
+				},
+				{
+					prop: 'storeroomno',
+					label: '库房号',
+					sortable: true
+				},
+				{
+					prop: 'orderno',
+					label: '出库单号',
+					width: 550,
+					sortable: true
+				},
+				{
+					prop: 'po_number',
+					label: '来源单号',
+					width: 550,
+					sortable: true
+				},
+				{
+					prop: 'workstation',
+					label: '工位',
+					sortable: true
+				},
+				{
+					prop: 'outtaskno',
+					label: '任务号',
+					width: 270,
+					sortable: true
+				},
+				{
+					prop: 'wip_supplement_flag',
+					label: '紧急补单'
+				},
+				{
+					prop: 'schedule_group_name',
+					label: '班组',
+					width: 350,
+					sortable: true
+				},
+				{
+					prop: 'taskcomment',
+					label: '凭证号',
+					width: 420,
+					sortable: true
+				}
+			],
+			total: '',
+			current: 1,
+
+			//查询条件
+			outtask: {
+				sortType: '',
+				sortColumn: '',
+				searchKey: '',
+				userId: this.$store.state.userid,
+				roleoRuserId: this.$store.state.userid,
+				roomTag: '0',
+				batchflag: '0',
+				transferType: '0',
+				beatflag: 'N',
+				PageIndex: '1',
+				PageSize: '100',
+				finshFlg: '0'
+			},
+			//查询结果
+			outtaskList: []
+		};
+	},
+	globalData: {
+		store: store
+	},
+	onBackPress() {
+		console.log('onBackPress');
+		// 移除监听事件
+		uni.$off('scancodedate');
+		uni.reLaunch({
+			url: '/pages/index' // 你可以根据需要调整跳转的页面
+		});
+		return true;
+	},
+
+	onLoad() {
+		var _this = this;
+		_this.getList();
+
+		uni.$on('scancodedate', function (content) {
+			console.log('扫描二维码:', content);
+			_this.outtask.searchKey = content;
+			_this.getList();
+		});
+	},
+	/* onShow() {
+		var _this = this;
+		_this.getList();
+
+		uni.$off('scancodedate'); // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			_this.outtask.searchKey = content;
+			_this.getList();
+		});
+	}, */
+
+	methods: {
+		moveToBack() {
+			// 隐藏“再按一次退出应用”的提示，将应用隐藏至后台
+			let main = plus.android.runtimeMainActivity();
+			plus.runtime.quit = function () {
+				main.moveTaskToBack(false);
+			};
+			//重写提示：如果提示为 ‘再按一次退出应用’ 就隐藏应用，其他提示正常显示
+			plus.nativeUI.toast = function (str) {
+				if (str == '再按一次退出应用') {
+					main.moveTaskToBack(false);
+					return false;
+				} else {
+					uni.showToast({
+						title: str,
+						icon: 'none'
+					});
+				}
+			};
+		},
+
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.showPopup();
+			}
+		},
+		page_back() {
+			/* uni.navigateBack({
+				delta: 1
+			}); */
+			uni.$off('scancodedate');
+			uni.reLaunch({
+				url: '/pages/index'
+			});
+		},
+		rowOperate(rowItem) {
+			console.log(rowItem.buttonIndex);
+			if (rowItem.buttonIndex === 0) {
+				this.actionsClick('task_collect/goodDownNvue', rowItem.item);
+			}
+			if (rowItem.buttonIndex === 1) {
+				this.detailClick('goodsDownDetail', rowItem.item.outtaskid, rowItem.item.workstation);
+			}
+		},
+		/* 		collect(ite, index) {
+			this.actionsClick('task_collect/goodDownNvue', ite);
+		},
+		detaill(ite, index) {
+			this.detailClick('goodsDownDetail', ite.outtaskid, ite.workstation);
+		}, */
+
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+			console.log('数据加载中...');
+			//this.Outtask.PageIndex = this.current;
+			console.log(this.outtask);
+			getOutaskList(this.outtask).then((response) => {
+				console.log('请求返回数据：', response);
+				this.outtaskList = response.data.rows;
+				this.total = response.data.total;
+				console.log('返回的json数据:', this.outtaskList);
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 10);
+				if (this.outtaskList.length <= 0) {
+					uni.showToast({
+						icon: 'none',
+						duration: 300,
+						title: '当前任务列表没有待处理任务1！'
+					});
+				}
+			});
+		},
+
+		//搜索
+		search() {
+			this.getList();
+		},
+		//进入采集界面
+		actionsClick(url, item) {
+			item.finshFlg = this.outtask.finshFlg;
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.reLaunch({
+					url: url + '?item=' + encodeURIComponent(JSON.stringify(item))
+				});
+			}, 100);
+		},
+		//进入明细界面
+		detailClick(url, outtaskid, workstation) {
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.reLaunch({
+					url: url + '?outtaskid=' + outtaskid + '&workstation=' + workstation
+				});
+			}, 100);
+		},
+		//打开接收单据窗口
+		task_receive() {
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.reLaunch({
+					url: 'task_receive/goodsDownReceive'
+				});
+			}, 100);
+		},
+		showPopup() {
+			this.show_popup = true;
+		},
+		closePopup() {
+			this.show_popup = false;
+		},
+		checkboxChange(e) {
+			console.log('finshFlg:', e);
+			this.outtask.finshFlg = e.detail.value;
+		},
+		search2() {
+			this.closePopup();
+			this.getList();
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+.fui-block {
+	width: 100%;
+	height: 100rpx;
+	background-color: #fff;
+}
+
+.fui-page__bd {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.fui-custom__wrap {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 520rpx;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 案例一 start*/
+.fui-popup__container {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	position: relative;
+	justify-content: center;
+	flex-direction: column;
+	padding: 24rpx 32rpx;
+}
+
+.fui-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	text-align: center;
+}
+
+.fui-sub__title {
+	/* #ifndef APP-NVUE */
+	display: block;
+	/* #endif */
+	text-align: center;
+	font-size: 24rpx;
+	color: #7f7f7f;
+	transform: scale(0.9);
+}
+
+.fui-descr {
+	font-weight: bold;
+	padding-top: 64rpx;
+}
+
+.fui-sub__descr {
+	font-size: 26rpx;
+	color: #b2b2b2;
+	padding: 32rpx 0;
+}
+
+.fui-btn__box {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: row;
+	justify-content: center;
+	padding: 32rpx 0;
+	height: 144rpx;
+}
+
+.fui-icon__close {
+	position: absolute;
+	top: 24rpx;
+	left: 24rpx;
+}
+
+/* 案例一 end*/
+.fui-scroll__wrap {
+	padding-top: 30rpx;
+	position: relative;
+}
+
+.fui-scroll__view {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 600rpx;
+}
+
+.fui-title__pb {
+	padding-bottom: 24rpx;
+}
+.fui-list__item {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: row;
+	align-items: center;
+	background-color: #ffffff;
+	padding: 28rpx 32rpx;
+}
+.fui-align__center {
+	/* #ifndef APP-NVUE */
+	display: flex !important;
+	/* #endif */
+	align-items: center;
+	flex-direction: row !important;
+}
+</style>

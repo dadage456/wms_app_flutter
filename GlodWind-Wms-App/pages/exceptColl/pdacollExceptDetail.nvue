@@ -1,0 +1,342 @@
+<template>
+	<view class="fui-wrap">
+		<view style="height: 500px; padding-top: 10px">
+			<zb-table :show-header="true" :stripe="true" :fit="true" :columns="column1" :highlight="true" :border="true" :data="intaskList"></zb-table>
+		</view>
+		<uni-pagination class="pageitem" pageSize="20" :total="total" :current="current" @change="loadData"></uni-pagination>
+		<css-float-ball v-model="floatBallPosition">
+			<uni-fab ref="fab" :pattern="pattern" :content="content" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger" />
+		</css-float-ball>
+	</view>
+</template>
+
+<script>
+import { selectPdaCollExceptList, reprocessDconnect } from '@/api/system/goodsUp';
+import storage from '@/utils/storage';
+export default {
+	data() {
+		return {
+			column1: [
+				/* {
+					name: 'operation',
+					type: 'operation',
+					label: '操作',
+					renders: [
+						{
+							name: '重新处理',
+							class: 'reprocess',
+							type: 'primary',
+							func: 'reprocess' // func 代表子元素点击的事件 父元素接收的事件 父元素 @edit
+						},
+						{
+							name: '明细',
+							class: 'detaill',
+							type: 'info',
+							func: 'detaill' // func 代表子元素点击的事件 父元素接收的事件 父元素 @edit
+						}
+					]
+				}, */
+				/*   { type:'selection', fixed:true,width:60 },*/
+				/* { type:'index'}, */
+
+				{
+					name: 'contime',
+					label: '处理时间',
+					summary: true
+				},
+				{
+					name: 'cname',
+					label: '采集人员',
+					summary: true
+				},
+				{
+					name: 'constateName',
+					label: '处理状态',
+					sorter: true
+				},
+				{
+					name: 'proofno',
+					label: '凭证号',
+					sorter: true,
+					emptyString: ''
+				},
+				{
+					name: 'taskno',
+					label: '采集任务号',
+					sorter: true
+				},
+
+				{
+					name: 'collectortype',
+					label: '任务类型',
+					sorter: true
+				},
+				{
+					name: 'businesskind',
+					label: '采集类型',
+					sorter: true
+				},
+
+				{
+					name: 'data5',
+					label: '错误信息',
+					sorter: true
+				},
+				{
+					name: 'dcConnectid',
+					label: '通讯批次ID',
+					sorter: true
+				},
+				{
+					name: 'dcConnectno',
+					label: '通讯批次',
+					sorter: true
+				},
+				{
+					name: 'palletno',
+					label: '托盘号',
+					sorter: true
+				}
+			],
+			total: '',
+			current: 1,
+
+			isLoading: false,
+			//查询条件
+			Intask: {
+				sortType: '',
+				sortColumn: '',
+				searchKey: '',
+				userId: this.$store.state.user.userid,
+				roleoRuserId: this.$store.state.user.userid,
+				roomTag: '0',
+				transferType: '0',
+				PageIndex: '1',
+				PageSize: '100',
+				dcConnectid:'',
+			},
+			//查询结果
+			intaskList: []
+		};
+	},
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+	},
+	onLoad() {
+		var _this = this;
+		_this.Intask.dcConnectid = options.dcConnectid;
+		_this.getList();
+	},
+	methods: {
+
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			this.Intask.PageIndex = this.current;
+			selectPdaCollExceptDetailList(this.Intask).then((response) => {
+				this.intaskList = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 2000);
+				if (this.intaskList.length <= 0) {
+					this.$u.toast('当前任务列表没有待处理任务！');
+				}
+			});
+		},
+
+		//搜索
+		search() {
+			this.getList();
+		},
+		//进入采集界面
+		actionsClick(url, item) {
+			/* uni.navigateTo({
+					url: url + '?intaskid=' + intaskid
+				}); */
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?item=' + encodeURIComponent(JSON.stringify(item))
+				});
+			}, 500);
+		},
+		//进入明细界面
+		detailClick(url, intaskid, workstation) {
+			/* uni.navigateTo({
+					url: url + '?intaskid=' + intaskid
+				}); */
+			uni.$off('scancodedate');
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?intaskid=' + intaskid + '&workstation=' + workstation
+				});
+			}, 500);
+		},
+		//打开接收单据窗口
+		task_receive() {
+			uni.$off('scancodedate');
+			uni.navigateTo({
+				url: 'task_receive/goodsUpReceive'
+			});
+		},
+
+		// 悬浮按钮功能实现
+		trigger(e) {
+			console.log('悬浮按钮:' + e.item.text);
+			if (e.item.text == '排序') {
+				this.showSort('showRight');
+			}
+		},
+		//悬浮按钮排序功能打开
+		showSort(e) {
+			this.$refs[e].open();
+		},
+		closeSort(e) {
+			this.$refs[e].close();
+		},
+		confirmSort(e) {
+			this.getList();
+			this.$refs[e].close();
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+page {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	background-color: #fff;
+	min-height: 100%;
+	height: auto;
+}
+
+view {
+	font-size: 14px;
+	line-height: inherit;
+}
+
+.defaultFlex {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.top {
+	display: flex;
+	position: fixed;
+	width: 100%;
+	z-index: 99;
+	height: 40px;
+	/* background-color: white; */
+	background-color: #fff;
+}
+
+.body {
+	margin-top: 45px;
+}
+
+.card-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	height: 45px;
+	border-top: 1px #eee solid;
+}
+
+.card-actions-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.card-actions-item-text {
+	font-size: 16px;
+	color: #666;
+	margin-left: 5px;
+}
+
+.content {
+	padding: 15px;
+}
+
+.text {
+	font-size: 20px;
+	color: #666;
+	line-height: 20px;
+}
+
+.button {
+	// margin-top: 10px;
+	margin: 10px;
+	margin-bottom: 0;
+}
+
+.scroll-view {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	height: 100%;
+	/* #endif */
+	flex: 1;
+}
+
+// 处理抽屉内容滚动
+.scroll-view-box {
+	flex: 1;
+	position: absolute;
+	top: 40px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.info {
+	padding: 15px;
+	color: #666;
+}
+
+.info-text {
+	font-size: 20px;
+	color: #666;
+}
+
+.info-content {
+	padding: 5px 15px;
+}
+
+.close {
+	padding: 10px;
+}
+
+.show-item {
+	margin-right: 28px;
+}
+
+.header-fiex-input {
+	background-color: #fff;
+}
+
+.show-item {
+	margin-right: 28px;
+}
+
+.header-fiex-input {
+	background-color: #fff;
+}
+
+.pageitem {
+	padding: 20px;
+}
+</style>

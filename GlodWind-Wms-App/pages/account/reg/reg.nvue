@@ -1,0 +1,146 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">你好，</text>
+			<text class="fui-title__size">欢迎注册First UI</text>
+		</view>
+		<view class="fui-form__box">
+			<fui-input type="number" :padding="['28rpx','0']" placeholder="手机号码" bottomLeft="0" maxlength="11">
+				<template v-slot:left>
+					<view class="fui-areacode__box fui-highlight" @tap.stop="area">
+						<text class="fui-area__code fui-color__primary">{{areaCode}}</text>
+						<fui-icon name="arrowdown" size="44" color="#465CFF"></fui-icon>
+					</view>
+				</template>
+			</fui-input>
+			<fui-input :padding="['64rpx','0','28rpx']" placeholder="验证码" bottomLeft="0" maxlength="6">
+				<text class="fui-btn__captcha fui-highlight">获取验证码</text>
+			</fui-input>
+			<fui-input :padding="['64rpx','0','28rpx']" placeholder="用户名，用于账号登录" bottomLeft="0" maxlength="20">
+			</fui-input>
+			<fui-input :password="password" :padding="['64rpx','0','28rpx']" placeholder="密码" bottomLeft="0"
+				maxlength="30">
+				<fui-icon @click="change" :name="password?'invisible':'visible'" size="44" color="#CCCCCC"></fui-icon>
+			</fui-input>
+			<view class="fui-btn__box">
+				<view class="fui-user__agmt">
+					<text class="fui-agmt__size">注册即视为同意</text>
+					<text class="fui-agmt__size fui-color__link">《FirstUI用户协议》</text>
+				</view>
+
+				<fui-button text="注册" radius="96rpx" bold></fui-button>
+			</view>
+			<view class="fui-menu__box">
+				<text class="fui-menu__item">已有账号？</text>
+				<text class="fui-menu__item fui-color__link" @tap="loginPwd">去登录</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		mapState
+	} from 'vuex';
+	export default {
+		data() {
+			return {
+				password: true
+			}
+		},
+		computed: mapState(['areaCode']),
+		methods: {
+			change() {
+				this.password = !this.password
+			},
+			loginPwd() {
+				uni.navigateBack()
+			},
+			area() {
+				// this.fui.href('/pages/common/area/area')
+				uni.navigateTo({
+					url: '/pages/common/area/area'
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+	.fui-wrap {
+		padding-bottom: 128rpx;
+	}
+	.fui-areacode__box {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		flex-shrink: 0;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		margin-right: 64rpx;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+	}
+
+	.fui-area__code {
+		/* #ifndef APP-NVUE */
+		display: block;
+		white-space: nowrap;
+		/* #endif */
+		font-weight: 500;
+		padding-right: 12rpx;
+		font-size: 32rpx;
+	}
+
+	.fui-btn__captcha {
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-warning, #FFC85B);
+		/* #endif */
+		/* #ifdef APP-NVUE */
+		color: #FFC85B;
+		font-size: 32rpx;
+		/* #endif */
+	}
+
+	.fui-menu__box {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		/* #endif */
+		flex: 1;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.fui-menu__item {
+		font-size: 28rpx;
+		line-height: 28rpx;
+		font-weight: 500;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+	}
+
+	.fui-user__agmt {
+		/* #ifdef APP-NVUE */
+		color: #999999;
+		/* #endif */
+
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-label, #999999);
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		position: absolute;
+		top: 24rpx;
+		left: 0;
+	}
+
+	.fui-agmt__size {
+		font-size: 24rpx;
+		line-height: 24rpx;
+	}
+</style>

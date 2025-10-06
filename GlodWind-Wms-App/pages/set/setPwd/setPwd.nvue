@@ -1,0 +1,35 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">重置密码</text>
+		</view>
+		<view class="fui-form__box">
+			<fui-input password :padding="['28rpx','0']" placeholder="设置新密码" bottomLeft="0" maxlength="20"></fui-input>
+			<fui-input :password="password" :padding="['64rpx','0','28rpx']" placeholder="确认密码" bottomLeft="0"
+				maxlength="30">
+				<fui-icon @click="change" :name="password?'invisible':'visible'" size="44" color="#CCCCCC"></fui-icon>
+			</fui-input>
+			<view class="fui-btn__box">
+				<fui-button text="确认" radius="96rpx" bold></fui-button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				password: true
+			}
+		},
+		methods: {
+			change() {
+				this.password = !this.password
+			}
+		}
+	}
+</script>
+
+<style>
+</style>

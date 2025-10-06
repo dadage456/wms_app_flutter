@@ -1,0 +1,174 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">你好，</text>
+			<text class="fui-title__size">欢迎登录金风科技WMS</text>
+		</view>
+		<view class="fui-form__box">
+			<view>
+				<text class=".gui-h1 gui-color-gray">账号</text>
+			</view>
+			<view class="gui-border-b">
+				<input type="text" v-model="loginForm.username" class="gui-form-input" name="username" placeholder="请输入账号" />
+			</view>
+			<view class="gui-margin-top">
+				<text class=".gui-h1 gui-color-gray">密码</text>
+			</view>
+			<view class="gui-border-b">
+				<input type="password"  ref="passwordInput" v-model="loginForm.password" class="gui-form-input" name="password" placeholder="请输入密码" />
+			</view>
+			<view class="fui-btn__box">
+				<text class="fui-forget__pwd fui-highlight" @tap.stop="forget">忘记密码？</text>
+				<fui-button @click="handleLogin" text="登录" radius="96rpx" bold></fui-button>
+			</view>
+			<!-- <view class="fui-menu__box">
+				<text class="fui-menu__item fui-menu__first" @tap="login">验证码登录</text>
+				<text class="fui-menu__item fui-color__link" @tap="reg">去注册</text>
+			</view> -->
+		</view>
+	</view>
+</template>
+
+<script>
+export default {
+	data() {
+		return {
+			password: false,
+			codeUrl: '',
+			captchaEnabled: false,
+			/* globalConfig: getApp().globalData.config, */
+			loginForm: {
+				username: '',
+				password: '',
+				code: '',
+				uuid: '',
+				clientid: ''
+			}
+		};
+	},
+	mounted() {
+				let that = this;
+				//页面加载完成，获取本地存储的用户名及密码
+				const userName = uni.getStorageSync('userName');
+				const userPsw = uni.getStorageSync('userPsw');
+				if(userName && userPsw){
+					that.loginForm.username = userName;
+					that.loginForm.password = userPsw;
+				}
+				
+			},
+	methods: {
+		change() {
+			this.password = !this.password;
+		},
+		forget() {
+			// this.fui.href('/pages/set/resetPwd/resetPwd')
+
+			uni.navigateTo({
+				url: '/pages/set/resetPwd/resetPwd'
+			});
+		},
+		// 登录方法
+		async handleLogin() {
+			if (this.loginForm.username === '') {
+				uni.showToast({
+					title: '请输入您的账号',
+					icon: 'none'
+				});
+			} else if (this.loginForm.password === '') {
+				uni.showToast({
+					title: '请输入您的密码',
+					icon: 'none'
+				});
+			} else if (this.loginForm.code === '' && this.captchaEnabled) {
+				uni.showToast({
+					title: '请输入验证码',
+					icon: 'none'
+				});
+			} else {
+				this.loginForm.clientid = plus.push.getClientInfo().clientid;
+
+				uni.showToast({
+					title: '登录中，请耐心等待...',
+					icon: 'none'
+				});
+				this.pwdLogin();
+			}
+		},
+		// 密码登录
+		async pwdLogin() {
+			this.$store
+				.dispatch('Login', this.loginForm)
+				.then(() => {
+					/* this.$modal.closeLoading(); */
+					this.loginSuccess();
+					uni.setStorageSync('userName', this.loginForm.username);
+					uni.setStorageSync('userPsw',  this.loginForm.password);
+				})
+				.catch(() => {
+					if (this.captchaEnabled) {
+						this.getCode();
+					}
+				});
+		},
+		// 登录成功后，处理函数
+		loginSuccess(result) {
+			// 设置用户信息
+			this.$store.dispatch('GetInfo').then((res) => {
+				uni.navigateTo({
+					url: '/pages/index'
+				});
+			});
+		}
+	}
+};
+</script>
+
+<style>
+.fui-menu__box {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	flex: 1;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.fui-menu__item {
+	font-size: 28rpx;
+	line-height: 28rpx;
+	font-weight: 500;
+	/* #ifdef H5 */
+	cursor: pointer;
+	/* #endif */
+	padding: 0 24rpx;
+}
+
+.fui-menu__item:active {
+	opacity: 0.6;
+}
+
+.fui-menu__first {
+	/* #ifdef APP-NVUE */
+	border-right: 1rpx solid #d8d8d8;
+	/* #endif */
+
+	/* #ifndef APP-NVUE */
+	border-right: 1rpx solid var(--fui-color-border, #d8d8d8);
+	/* #endif */
+}
+
+.fui-forget__pwd {
+	font-size: 28rpx;
+	line-height: 28rpx;
+	font-weight: 500;
+	/* #ifdef H5 */
+	cursor: pointer;
+	/* #endif */
+	position: absolute;
+	top: 16rpx;
+	right: 0;
+}
+</style>

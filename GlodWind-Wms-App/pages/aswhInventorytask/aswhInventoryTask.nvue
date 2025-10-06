@@ -1,0 +1,208 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="立库盘点" @rightClick="task_receive" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+			<template v-slot:right>
+				<fui-icon name="plus"></fui-icon>
+			</template>
+		</fui-nav-bar>
+		<view class="fui-block"></view>
+		<fui-input borderTop topLeft topRight borderBottom placeholder="请扫描单号" type="text" clearable></fui-input>
+		<fui-table-weex ref="table" fixed align="left" height="1100" stripe ellipsis is-drag full :itemList="checktaskList" :header="column1" @click="rowOperate"></fui-table-weex>
+		<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+	<scanCode></scanCode>
+	</view>
+</template>
+<script>
+import { getInventoryTask, commitInventoryTask } from '@/api/system/goodsDown';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+import storage from '@/utils/storage';
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			column1: [
+				{
+					label: '操作',
+					fixed: 'right',
+					type: 3,
+					width: 300,
+					click: '',
+					buttons: [
+						{
+							text: '采集',
+							color: '#465CFF',
+							// size: 30,
+							fontWeight: 600,
+							type: 'primary'
+						},
+						{
+							text: '撤销',
+							color: '#465CFF',
+							// size: 30,
+							fontWeight: 600,
+							type: 'warning'
+						}
+					]
+				},
+				{
+					prop: 'taskcomment',
+					label: '盘库单号',
+					width: 280,
+					sortable: true
+				},
+				{
+					prop: 'storeroomno',
+					label: '库房号',
+					sortable: true
+				},
+				{
+					prop: 'storeroomname',
+					label: '库房名称',
+					width: 350
+				},
+				{
+					prop: 'checktaskno',
+					label: '任务号',
+					width: 280,
+					sortable: true
+				}
+			],
+			total: '',
+			current: 1,
+
+			//查询条件
+			checktask: {
+				sortType: 'desc',
+				sortColumn: 'createdate',
+				searchKey: '',
+				userId: this.$store.state.userid,
+				roleoRuserId: this.$store.state.userid,
+				roomTag: '1',
+				PageIndex: '1',
+				PageSize: '100'
+			},
+			//查询结果
+			checktaskList: []
+		};
+	},
+	onLoad() {
+		this.getList();
+	},
+	onShow() {
+		this.getList();
+	},
+onBackPress() {
+		console.log('onBackPress');
+		// 移除监听事件
+		uni.$off('scancodedate');
+		uni.reLaunch({
+			url: '/pages/index' // 你可以根据需要调整跳转的页面
+		});
+		return true;
+	},
+	methods: {
+		page_back() {
+			/* uni.navigateBack({
+				delta: 1
+			}); */
+			uni.$off('scancodedate');
+			uni.reLaunch({
+				url: '/pages/index'
+			});
+		},
+		rowOperate(rowItem) {
+			console.log(rowItem.buttonIndex);
+			if (rowItem.buttonIndex === 0) {
+				this.actionsClick('task_collect/aswhInventorytaskaskItem', rowItem.item);
+			}
+			if (rowItem.buttonIndex === 1) {
+				this.receiveTask(rowItem.item.checktaskno);
+			}
+		},
+
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			this.checktask.PageIndex = this.current;
+			getInventoryTask(this.checktask).then((response) => {
+				this.checktaskList = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+				if (this.checktaskList.length <= 0) {
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '当前任务列表没有待处理任务！'
+					});
+				}
+			});
+		},
+
+		//搜索
+		search() {
+			this.getList();
+		},
+		//进入采集界面
+		actionsClick(url, item) {
+			setTimeout(() => {
+				uni.reLaunch({
+					url: url + '?item=' + encodeURIComponent(JSON.stringify(item))
+				});
+			}, 100);
+		},
+		//打开接收单据窗口
+		task_receive() {
+			uni.reLaunch({
+				url: 'task_receive/aswhInventorytaskReceive'
+			});
+		},
+		//单据撤销
+		receiveTask(taskcomment) {
+			uni.showModal({
+				title: '撤销确认',
+				content: '是否执行撤销操作?',
+				success: (res) => {
+					if (res.confirm) {
+						console.log(taskcomment);
+						commitInventoryTask(taskcomment, this.$store.state.userid, 'true').then((response) => {
+							if (response.code == '200') {
+								uni.showToast({
+									icon: 'none',
+									duration: 3000,
+									title: '单据撤销成功！'
+								});
+								this.getList();
+							}
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+.fui-block {
+	width: 100%;
+	height: 100rpx;
+	background-color: #fff;
+}
+</style>

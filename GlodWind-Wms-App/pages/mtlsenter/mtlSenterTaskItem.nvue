@@ -1,0 +1,589 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="拉式发料"  @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-input
+				borderTop
+				topLeft
+				topRight
+				borderBottom
+				v-model="scanningContent.text"
+				:placeholder="placeholder"
+				:focus="focus"
+				type="digit"
+				clearable
+				@confirm="search"
+				@change="qtychange"
+			></fui-input>
+		</view>
+		<fui-row marginBottom="5rpx">
+			<fui-col :span="12">
+				<fui-card title="库位:" :tag="storeSite"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="库存:" :tag="repqty"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="物料:" :tag="BarcodeContent.matcode"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="采集数量:" :tag="collectQty"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="24">
+				<fui-card title="物料名称:" :tag="BarcodeContent.matname"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="最小包装数:" :tag="lbMinQty"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="配送量:" :tag="lbDefaultQty"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-table-weex
+			ref="table"
+			fixed
+			height="595"
+			stripe
+			selection
+			ellipsis
+			is-drag
+			full
+			:itemList="detailListView"
+			:header="column1"
+			@select="handleCheckItem"
+			@selectAll="handleCheckAll"
+		></fui-table-weex>
+		<fui-bottom-navbar background="#F7F8FA" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { toast, showConfirm, tansParams } from '@/utils/common';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime, uuid } from '@/common/util.js';
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { getIntaskitemList, getStoreSiteByRoom, getLSMtlRepertoryByStoresiteNo, CommitUpShelves, CommitMtlSender, getMtlQtyByMtlCode } from '@/api/system/goodsUp';
+import storage from '@/utils/storage';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+//采集结果记录
+var matCode = '';
+var batchNo = '';
+var sn = '';
+var pdate = '';
+var vdays = '';
+var strMsg = '';
+
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			options: [
+				{
+					text: '删除',
+					color: '#F37B1D'
+				},
+				{
+					text: '提交',
+					color: '#F37B1D'
+				}
+			],
+			height: 100,
+			show: false,
+
+			column1: [
+				{ prop: 'storesiteno', label: '库位', width: 183, sortable: true },
+				{ prop: 'matcode', label: '物料编码', width: 180, sortable: true },
+				{ prop: 'qty', label: '任务数量', width: 130, color: '#465CFF' }
+			],
+			Step: {
+				_2DBarcode: '_2DBarcode',
+				Site: 'Site',
+				Quantity: 'Quantity'
+			},
+			placeholder: '请扫描货架号',
+			//扫描内容
+			scanningContent: { text: '' },
+
+			repqty: 0,
+			storeSite: '', //采集的库位
+			collectQty: 0,
+			lbMinQty: '',
+			lbDefaultQty: '',
+
+			//采集结果
+			BarcodeContent: {
+				matcode: '', //物料编码
+				qty: '', //采集数量
+				matname: '', //物料名称
+				batchno: '', //批次
+				sn: '', //序列
+				seqctrl: '', //控制方式
+				id_old: '' //编码方式 新格式，就格式
+			},
+			//查询结果
+			detailListView: [],
+			dicMtlQty: new Map(), //key: intaskitemid value: 0:开始采集数  1：本次数量
+			stocks: [],
+			focus: false,
+			inArray,
+			checkedIds: [],
+			dicMtlInfo: new Map()
+		};
+	},
+	onLoad(options) {
+		var _this = this;
+		uni.$off('scancodedate');
+		uni.$on('scancodedate', function (content) {
+			_this.PerformingBarcode(content);
+		});
+	},
+	onBackPress(options) {
+		// 如果是返回按钮，才做执行
+		if (options.from === 'backbutton') {
+			if (this.detailListView.length > 0) {
+				uni.showModal({
+					title: '提示',
+					content: '当前采集记录尚未提交 确定退出采集吗？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.$off('scancodedate');
+							uni.reLaunch({
+								url: '/pages/index' // 你可以根据需要调整跳转的页面
+							});
+						}
+					}
+				});
+				// 禁止默认返回
+				return true;
+			} else {
+				uni.$off('scancodedate');
+				uni.reLaunch({
+					url: '/pages/index' // 你可以根据需要调整跳转的页面
+				});
+				return true;
+			}
+		}
+	},
+	methods: {
+		page_back() {
+			if (this.detailListView.length > 0) {
+				uni.showModal({
+					title: '提示',
+					content: '当前采集记录尚未提交 确定退出采集吗？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.$off('scancodedate');
+							uni.reLaunch({
+								url: '/pages/index' // 你可以根据需要调整跳转的页面
+							});
+						}
+					}
+				});
+			} else {
+				uni.$off('scancodedate');
+				uni.reLaunch({
+					url: '/pages/index' // 你可以根据需要调整跳转的页面
+				});
+			}
+		},
+		//导航栏点击事件
+		onClick(e) {
+			if (e.index === 0) {
+				this.deleteColl();
+			}
+			if (e.index === 1) {
+				this.commitButton_Click();
+			} else {
+			}
+		},
+		handleCheckAll(selectItem) {
+			if (selectItem.is_selected) {
+				this.checkedIds = this.detailListView.map((item) => item.itemid);
+			} else {
+				this.checkedIds = [];
+			}
+		},
+
+		handleCheckItem(selectItem) {
+			let index = this.checkedIds.findIndex((id) => id === selectItem.item.itemid);
+			if (selectItem.is_selected) {
+				if (index < 0) {
+					this.checkedIds.push(selectItem.item.itemid);
+				}
+			} else {
+				if (index >= 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+		},
+
+		search(event) {
+			this.PerformingBarcode(event.detail.value);
+		},
+
+		deleteColl() {
+			if (this.detailListView.length <= 0) {
+				uni.showToast({
+					icon: 'none',
+					duration: 3000,
+					title: '当前没有采数据采集！'
+				});
+				return;
+			}
+			var checkedList = [];
+			checkedList = this.detailListView.filter((item) => inArray(item.itemid, this.checkedIds));
+			if (checkedList.length <= 0) {
+				uni.showToast({
+					icon: 'none',
+					duration: 3000,
+					title: '请至少选择一行记录'
+				});
+
+				return;
+			}
+			showConfirm('是否要执行删除操作?').then((res) => {
+				if (res.confirm) {
+					for (var cc = 0; cc < checkedList.length; cc++) {
+						let checkedRow = checkedList[cc];
+						let id = checkedRow.itemid;
+						for (var c1 = 0; c1 < this.detailListView.length; c1++) {
+							let detailRow = this.detailListView[c1];
+							let tepId = detailRow.itemid;
+							if (id == tepId) {
+								let strLocation1 = this.detailListView[c1].storesiteno; //货架号
+								let strMatCode1 = this.detailListView[c1].matcode; //物料号
+								let decMatQty1 = this.detailListView[c1].qty; //数量
+								let strKey1 = strMatCode1 + strLocation1;
+
+								if (this.dicMtlInfo.has(strKey1)) {
+									this.dicMtlInfo.delete(strKey1);
+								}
+								if (this.dicMtlQty.has(strMatCode1)) {
+									let tmpQty = this.dicMtlQty.get(strMatCode1);
+									tmpQty -= decMatQty1;
+
+									if (tmpQty <= 0) {
+										this.dicMtlQty.delete(strMatCode1);
+									} else {
+										this.dicMtlQty.set(strMatCode1, tmpQty);
+									}
+								}
+								this.detailListView.splice(c1, 1);
+								break;
+							}
+						}
+					}
+					uni.showToast({
+						icon: 'none',
+						duration: 3000,
+						title: '删除成功！'
+					});
+				}
+				if (res.cancel) {
+					return;
+				}
+			});
+		},
+
+		//采集内容处理
+		async PerformingBarcode(barcode) {
+			try {
+				if (barcode == undefined || barcode == null || barcode.length == 0) {
+					throw new Error('采集内容为空,请重新采集!');
+				}
+				let currStep = '';
+				//采集内容判断
+				//物料编码
+				if (barcode.includes('MC') > 0) {
+					currStep = this.Step._2DBarcode;
+					//库位判断
+				} else if (barcode.includes('$KW$')) {
+					currStep = this.Step.Site;
+				}
+				//数量
+				else if (this.checkIntAndFloat(barcode)) {
+					currStep = this.Step.Quantity;
+				} else {
+					throw new Error('采集内容不合法!');
+				}
+
+				switch (currStep) {
+					case this.Step._2DBarcode:
+						var BarcodeContent2 = null;
+						//物料条码分析
+						let response = await this.getPmMaterialInfoByQR(barcode);
+
+						if (response.code == '200') {
+							BarcodeContent2 = response.data;
+						}
+
+						if (BarcodeContent2 == undefined || BarcodeContent2 == null || BarcodeContent2.length == 0) {
+							throw new Error('物料条码识别出现问题!');
+						}
+
+						//物料控制模式 序列还是批次
+						var matControl = BarcodeContent2.seqctrl.toString();
+
+						this.BarcodeContent = BarcodeContent2;
+						let responseRep = await this.getMtlRepertoryByStoresiteNo(null, this.BarcodeContent.matcode);
+						if (responseRep.code == '200') {
+							let RepertoryList = responseRep.data;
+
+							if (RepertoryList != null && RepertoryList.length > 0) {
+								this.repqty = RepertoryList[0].repqty;
+							} else {
+								this.repqty = 0;
+							}
+						}
+						this.$set(this.scanningContent, 'text', '');
+						break;
+
+					case this.Step.Site:
+						var str1 = barcode.toString();
+						let sArry = str1.split('$');
+						this.storeSite = sArry[2];
+						this.$set(this.scanningContent, 'text', '');
+						break;
+					case this.Step.Quantity:
+						this.collectQty = parseFloat(barcode);
+						break;
+
+					default:
+						break;
+				}
+
+				strMsg = this.getPlaceMsg();
+				//表示条码都扫描完毕
+				if (strMsg == '') {
+					let strLocation = this.storeSite;
+					let strMatCode = this.BarcodeContent.matcode.toString();
+					let strKey = strMatCode + strLocation;
+					let decQty = this.repqty;
+					let oldQty = 0;
+					let qty = this.collectQty;
+
+					if (this.dicMtlQty.has(strMatCode)) {
+						oldQty = this.dicMtlQty.get(strMatCode);
+					}
+					if (decQty - oldQty < qty) {
+						if (oldQty > 0) {
+							throw new Error('已经扫描数【' + decQty + '】加上本次扫描数量【' + oldQty + '】大于库存数【' + qty + '】，请确认!');
+						} else {
+							throw new Error('库存数【' + decQty + '】小于本次作业数量【' + qty + '】，请确认!');
+						}
+					}
+					if (!this.dicMtlInfo.has(strKey)) {
+						this.dicMtlInfo.set(strKey, qty);
+						let item = {};
+						item.itemid = uuid();
+						item.storesiteno = strLocation;
+						item.matcode = strMatCode;
+						item.qty = qty;
+						this.detailListView.push(item);
+					} else {
+						let tmpqty = this.dicMtlInfo.get(strKey);
+						tmpqty = tmpqty + qty;
+						this.dicMtlInfo.set(strKey, tmpqty);
+
+						let tmpLocation = '';
+						let tmpMatCode = '';
+
+						for (let i = 0; i < this.detailListView.length; i++) {
+							tmpLocation = this.detailListView[i].storesiteno; //货架号
+							tmpMatCode = this.detailListView[i].matcode; //物料号
+							if (tmpLocation == strLocation && tmpMatCode == strMatCode) {
+								/* this.detailListView[i].qty = tmpqty; */
+								var cc2 = this.detailListView[i];
+								cc2.qty = tmpqty;
+								this.$set(this.detailListView, i, cc2);
+								break;
+							}
+						}
+					}
+					if (!this.dicMtlQty.has(strMatCode)) {
+						this.dicMtlQty.set(strMatCode, qty);
+					} else {
+						let tempqty2 = this.dicMtlQty.get(strMatCode);
+						tempqty2 = tempqty2 + qty;
+						this.dicMtlQty.set(strMatCode, tempqty2);
+					}
+
+					this.InitializeCollect();
+				} else {
+					if (
+						this.storeSite != '' &&
+						this.storeSite != null &&
+						this.storeSite != undefined &&
+						this.BarcodeContent.matcode != '' &&
+						this.BarcodeContent.matcode != null &&
+						this.BarcodeContent.matcode != undefined
+					) {
+						let responseMtl = await this.GetMtlQtyByMtlCode(this.BarcodeContent.matcode, this.storeSite);
+						if (responseMtl.code == '200') {
+							let dtMtlInfo = responseMtl.data;
+							if (dtMtlInfo != null && dtMtlInfo.length > 0) {
+								this.lbMinQty = dtMtlInfo[0].minQty;
+								this.lbDefaultQty = dtMtlInfo[0].deliveryQty;
+							} else {
+								this.lbMinQty = 0;
+								this.lbDefaultQty = 0;
+							}
+						}
+					}
+				}
+				this.$set(this.scanningContent, 'text', '');
+				this.placeholder = this.getPlaceMsg();
+			} catch (error) {
+				this.InitializeCollect();
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: error.message
+				});
+			}
+		},
+
+		async GetMtlQtyByMtlCode(mtlCode, siteNo) {
+			return new Promise(function (resolve, reject) {
+				getMtlQtyByMtlCode(mtlCode, siteNo).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async getMtlRepertoryByStoresiteNo(storeSite, matCode) {
+			return new Promise(function (resolve, reject) {
+				getLSMtlRepertoryByStoresiteNo(storeSite, matCode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async getPmMaterialInfoByQR(barcode) {
+			return new Promise(function (resolve, reject) {
+				getPmMaterialInfoByQR(barcode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		/// 设定提示信息
+		/// </summary>
+		/// <param name="msg"></param>
+		getPlaceMsg() {
+			if (this.storeSite == '' || this.storeSite == null || this.storeSite == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描货架号';
+			}
+			if (this.BarcodeContent.matcode == '' || this.BarcodeContent.matcode == null || this.BarcodeContent.matcode == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描二维码';
+			} else if (this.collectQty == 0) {
+				this.focus = true;
+				return '请输入数量';
+			} else {
+				this.focus = false;
+				return '';
+			}
+		},
+		/// <summary>
+		/// 重新初始采集
+		/// </summary>
+		InitializeCollect() {
+			matCode = null;
+			batchNo = null;
+			sn = null;
+			pdate = null;
+			vdays = null;
+			this.collectQty = 0;
+			this.BarcodeContent = [];
+			this.focus = false;
+			this.repqty = 0;
+			this.lbMinQty = '';
+			this.lbDefaultQty = '';
+		},
+		async showConfirm(content) {
+			return new Promise(function (resolve, reject) {
+				// 一段耗时的异步操作
+				uni.showModal({
+					title: '操作确认',
+					content: content,
+					cancelText: '取消',
+					confirmText: '确认',
+					success: (res) => {
+						if (res.confirm) {
+							resolve(true); // 数据处理完成
+						} else if (res.cancel) {
+							resolve(false);
+						}
+					}
+				});
+			});
+		},
+
+		commitButton_Click() {
+			if (this.detailListView.length == 0) {
+				uni.showModal({
+					title: '提交异常',
+					showCancel: false,
+					content: '本次无采集明细，请确认！'
+				});
+				return;
+			}
+
+			uni.showModal({
+				title: '提交确认',
+				content: '请确认是否提交？',
+				success: (res) => {
+					if (res.confirm) {
+						let collectStocks = this.detailListView;
+
+						let mtlSenderInfos = [];
+						for (let io = 0; io < collectStocks.length; io++) {
+							let mtlSenderInfo = {};
+							let upStock = collectStocks[io];
+
+							mtlSenderInfo.locationNo = upStock.storesiteno;
+							mtlSenderInfo.matCode = upStock.matcode; //物料号
+							mtlSenderInfo.qty = upStock.qty; //批号
+							mtlSenderInfos.push(mtlSenderInfo);
+						}
+						CommitMtlSender(mtlSenderInfos).then((response) => {
+							this.detailListView = [];
+							uni.showModal({
+								title: '信息提示',
+								showCancel: false,
+								content: '提交成功'
+							});
+							
+							uni.$off('scancodedate');
+							uni.reLaunch({
+								url: '/pages/index' // 你可以根据需要调整跳转的页面
+							});
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		},
+		checkIntAndFloat(source) {
+			var regex = /^[0-9]+(\.[0-9]+)?$/g;
+			return regex.test(source);
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

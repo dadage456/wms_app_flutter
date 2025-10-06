@@ -1,0 +1,221 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">你好，</text>
+			<text class="fui-title__size">欢迎登录First UI</text>
+		</view>
+		<view class="fui-form__box">
+			<fui-input type="number" :padding="['28rpx','0']" placeholder="请输入手机号码" bottomLeft="0" maxlength="11">
+				<template v-slot:left>
+					<view class="fui-areacode__box fui-highlight" @tap.stop="area">
+						<text class="fui-area__code fui-color__primary">{{areaCode}}</text>
+						<fui-icon name="arrowdown" size="44" color="#465CFF"></fui-icon>
+					</view>
+				</template>
+			</fui-input>
+			<view class="fui-btn__box">
+				<fui-button text="获取验证码" radius="96rpx" bold @click="captcha"></fui-button>
+			</view>
+			<view class="fui-menu__box">
+				<text class="fui-menu__item  fui-menu__first" @tap="account">账号登录</text>
+				<text class="fui-menu__item  fui-color__link" @tap="reg">去注册</text>
+			</view>
+		</view>
+		<view class="fui-third__party" v-if="!show">
+			<text class="fui-menu__item" @tap="thirdShow">其他登录方式</text>
+		</view>
+		<view class="fui-third__wrap fui-padding" :class="{'fui-third__show':show}">
+			<view class="fui-third__item fui-highlight" v-for="(item,index) in thirdData" :key="index">
+				<image class="fui-third__ic" :src="`/static/images/login/icon_${item.icon}_3x.png`"></image>
+				<text class="fui-third__text">{{item.name}}</text>
+			</view>
+		</view> 
+	</view>
+</template>
+
+<script>
+	import {
+		mapState
+	} from 'vuex';
+	export default {
+		data() {
+			return {
+				thirdData: [{
+					name: 'QQ',
+					icon: 'qq'
+				}, {
+					name: '微信',
+					icon: 'weixin'
+				}, {
+					name: '微博',
+					icon: 'weibo'
+				}],
+				show: false
+			}
+		},
+		computed: mapState(['areaCode']),
+		methods: {
+			thirdShow() {
+				this.show = true
+			},
+			account() {
+				// this.fui.href('../loginPwd/loginPwd')
+
+				uni.navigateTo({
+					url: '../loginPwd/loginPwd'
+				});
+			},
+			reg() {
+				// this.fui.href('../reg/reg')
+
+				uni.navigateTo({
+					url: '../reg/reg'
+				});
+			},
+			area() {
+				// this.fui.href('/pages/common/area/area')
+
+				uni.navigateTo({
+					url: '/pages/common/area/area'
+				});
+			},
+			captcha() {
+				// this.fui.href('/pages/common/captcha/captcha')
+
+				uni.navigateTo({
+					url: '/pages/common/captcha/captcha'
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+	.fui-areacode__box {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		flex-shrink: 0;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		margin-right: 64rpx;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+	}
+
+	.fui-area__code {
+		/* #ifndef APP-NVUE */
+		display: block;
+		white-space: nowrap;
+		/* #endif */
+		font-weight: 500;
+		padding-right: 12rpx;
+		/* #ifdef APP-NVUE */
+		font-size: 32rpx;
+		/* #endif */
+	}
+
+	.fui-menu__box {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		/* #endif */
+		flex: 1;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.fui-menu__item {
+		font-size: 28rpx;
+		line-height: 28rpx;
+		font-weight: 500;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+		padding: 0 24rpx;
+	}
+
+	.fui-menu__item:active {
+		opacity: 0.6;
+	}
+
+	.fui-menu__first {
+		/* #ifdef APP-NVUE */
+		border-right: 1rpx solid #D8D8D8;
+		/* #endif */
+
+		/* #ifndef APP-NVUE */
+		border-right: 1rpx solid var(--fui-color-border, #D8D8D8);
+		/* #endif */
+	}
+
+	.fui-third__party {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		/* #endif */
+		flex: 1;
+		flex-direction: row;
+		justify-content: center;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 128rpx;
+	}
+
+	.fui-third__wrap {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		display: flex;
+		opacity: 0;
+		/* #endif */
+		flex: 1;
+		flex-direction: row;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		transform: translateY(136rpx);
+		transition: transform 0.3s;
+	}
+	
+	.fui-third__show {
+		/* #ifndef APP-NVUE */
+		transform: translateY(-128rpx);
+		opacity: 1;
+		/* #endif */
+		
+		/* #ifdef APP-NVUE */
+		transform: translateY(-64px);
+		/* #endif */
+	}
+
+	.fui-third__item {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex: 1;
+		height: 132rpx;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.fui-third__ic {
+		width: 80rpx;
+		height: 80rpx;
+	}
+
+	.fui-third__text {
+		font-size: 28rpx;
+		/* #ifdef APP-NVUE */
+		color: #999999;
+		/* #endif */
+
+		/* #ifndef APP-NVUE */
+		color: var(--fui-color-label, #999999);
+		/* #endif */
+	}
+</style>

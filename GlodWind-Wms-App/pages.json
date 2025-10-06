@@ -1,0 +1,1041 @@
+{
+	"pages": [{
+			"path": "pages/account/loginPwd/loginPwd",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		}, {
+			"path": "pages/account/login/login",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		}, {
+			"path": "pages/account/reg/reg",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		}, {
+			"path": "pages/common/captcha/captcha",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		}, {
+			"path": "pages/common/area/area",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "选择国家或地区",
+				"enablePullDownRefresh": false,
+				"mp-weixin": {
+					"disableScroll": true
+				},
+				"mp-baidu": {
+					"disableScroll": true
+				},
+				"app-plus": {
+					"bounce": "none"
+				},
+				"mp-alipay": {
+					"allowsBounceVertical": "NO"
+				}
+			}
+
+		}, {
+			"path": "pages/set/resetPwd/resetPwd",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		}, {
+			"path": "pages/set/setPwd/setPwd",
+			"style": {
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				}
+			}
+
+		},
+
+		{
+			"path": "pages/index",
+			"style": {
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsdown/goodsDown",
+			"style": {
+				"navigationBarTitleText": "平库出库",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/goodsdown/goodsDownDetail",
+			"style": {
+				"navigationBarTitleText": "任务明细",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsdown/task_receive/goodsDownReceive",
+			"style": {
+				"navigationBarTitleText": "平库出库任务接收",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsdown/task_receive/goodsDownReceiveDetail",
+			"style": {
+				"navigationBarTitleText": "平库出库任务接收明细",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsdown/task_collect/goodDownNvue",
+			"style": {
+				"navigationBarTitleText": "平库出库采集",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/goodsdown/task_collect/goodsDownCollectDetail",
+			"style": {
+				"navigationBarTitleText": "采集明细",
+				"renderer": "native", // 确保使用原生渲染
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+
+
+
+
+
+
+
+		{
+			"path": "pages/aswhdown/aswhDown",
+			"style": {
+				"navigationBarTitleText": "在线拣选",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/aswhdown/aswhDownDetail",
+			"style": {
+				"navigationBarTitleText": "在线拣选任务明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhdown/task_receive/aswhDownReceive",
+			"style": {
+				"navigationBarTitleText": "在线拣选任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhdown/task_receive/aswhDownReceiveDetail",
+			"style": {
+				"navigationBarTitleText": "在线拣选任务接收明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhdown/task_collect/aswhDownTaskItem",
+			"style": {
+				"navigationBarTitleText": "在线拣选采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/aswhdown/task_collect/aswhDownCollectDetail",
+			"style": {
+				"navigationBarTitleText": "采集明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/aswhdown/task_collect/aswhDownWmsToWcs",
+			"style": {
+				"navigationBarTitleText": "任务指令查询",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+
+
+
+		{
+			"path": "pages/goodsup/goodsUp",
+			"style": {
+				"navigationBarTitleText": "平库上架",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/goodsup/goodsUpDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架任务明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_receive/goodsUpReceive",
+			"style": {
+				"navigationBarTitleText": "平库上架任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_receive/goodsUpReceiveDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架任务接收明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_collect/goodsUpTaskItem",
+			"style": {
+				"navigationBarTitleText": "平库上架采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/goodsup/task_collect/goodsUpCollectDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架采集明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/goodsUp",
+			"style": {
+				"navigationBarTitleText": "平库上架",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/goodsup/goodsUpDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架任务明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_receive/goodsUpReceive",
+			"style": {
+				"navigationBarTitleText": "平库上架任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_receive/goodsUpReceiveDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架任务接收明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/goodsup/task_collect/goodsUpTaskItem",
+			"style": {
+				"navigationBarTitleText": "平库上架采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/goodsup/task_collect/goodsUpCollectDetail",
+			"style": {
+				"navigationBarTitleText": "平库上架采集明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+
+
+
+
+
+		{
+			"path": "pages/arrive_sign/index",
+			"style": {
+				"navigationBarTitleText": "到货签收",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": true,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/arrive_sign/detail",
+			"style": {
+				"navigationBarTitleText": "到货签收任务明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/arrive_sign/task_receive/index",
+			"style": {
+				"navigationBarTitleText": "到货签收任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/arrive_sign/task_receive/receive_detail",
+			"style": {
+				"navigationBarTitleText": "到货签收任务接收明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/arrive_sign/task_collect/index",
+			"style": {
+				"navigationBarTitleText": "到货签收采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/arrive_sign/task_collect/collect_detail",
+			"style": {
+				"navigationBarTitleText": "到货签收采集明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhup/aswhUp",
+			"style": {
+				"navigationBarTitleText": "立库组盘",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/aswhup/aswhUpDetail",
+			"style": {
+				"navigationBarTitleText": "立库组盘任务明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhup/task_receive/aswhUpReceive",
+			"style": {
+				"navigationBarTitleText": "立库组盘任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhup/task_receive/aswhUpReceiveDetail",
+			"style": {
+				"navigationBarTitleText": "立库组盘任务接收明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aswhup/task_collect/aswhUpTaskItem",
+			"style": {
+				"navigationBarTitleText": "立库组盘采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		}, {
+			"path": "pages/aswhup/task_collect/aswhUpCollectDetail",
+			"style": {
+				"navigationBarTitleText": "立库组盘采集明细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/aswhup/task_collect/aswhUpWmsToWcs",
+			"style": {
+				"navigationBarTitleText": "立库组盘任务指令查询",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/aswhup/task_collect/aswhUpPalletItem",
+			"style": {
+				"navigationBarTitleText": "立库组盘采集提交查询",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+
+
+
+		{
+			"path": "pages/queryrepertory/queryRepertory",
+			"style": {
+				"navigationBarTitleText": "库存查询",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/mtlsenter/mtlSenterTaskItem",
+			"style": {
+				"navigationBarTitleText": "拉式发料",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/transfer/transfer",
+			"style": {
+				"navigationBarTitleText": "平库移库",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+		{
+			"path": "pages/aswhInventorytask/aswhInventoryTask",
+			"style": {
+				"navigationBarTitleText": "立库盘点",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/aswhInventorytask/task_receive/aswhInventorytaskReceive",
+			"style": {
+				"navigationBarTitleText": "盘点任务接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+
+			}
+		},
+		{
+			"path": "pages/aswhInventorytask/task_collect/aswhInventorytaskaskItem",
+			"style": {
+				"navigationBarTitleText": "盘点任务采集",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}
+
+
+
+		, {
+			"path": "pages/aswhInventorytask/task_collect/aswhInventorytaskCollectDetail",
+			"style": {
+				"navigationBarTitleText": "盘点任务结果",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/aswhInventorytask/task_collect/aswhInventoryCheckorder",
+			"style": {
+				"navigationBarTitleText": "托盘指令查询",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+		{
+			"path": "pages/Inventorytask/InventoryTask",
+			"style": {
+				"navigationBarTitleText": "平库盘点",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Inventorytask/task_receive/InventorytaskReceive",
+			"style": {
+				"navigationBarTitleText": "平库盘点接收",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "custom"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Inventorytask/task_collect/InventorytaskaskItem",
+			"style": {
+				"navigationBarTitleText": "平库盘点采集",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Inventorytask/task_collect/InventorytaskCollectDetail",
+			"style": {
+				"navigationBarTitleText": "盘点采集结果",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/exceptTask/exceptTask",
+			"style": {
+				"navigationBarTitleText": "异常采集",
+
+				// #ifdef H5
+				"titleNView": true,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		},
+
+
+
+		{
+			"path": "pages/exceptColl/sapInteExcept",
+			"style": {
+				"navigationBarTitleText": "接口异常",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/exceptColl/pdacollExcept",
+			"style": {
+				"navigationBarTitleText": "采集异常",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/exceptColl/taskMessage",
+			"style": {
+				"navigationBarTitleText": "消息列表",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/msg/msg",
+			"style": {
+				"navigationBarTitleText": "通知列表",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/msg/msgdetail",
+			"style": {
+				"navigationBarTitleText": "消息详细",
+
+				// #ifdef H5
+				"titleNView": false,
+				// #endif
+				"enablePullDownRefresh": false,
+				"mp-alipay": {
+					"allowsBounceVertical": "YES"
+				},
+				"navigationStyle": "custom"
+			}
+		}
+
+
+
+
+
+
+
+
+
+	],
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"fui-(.*)": "@/components/firstui/fui-$1/fui-$1.vue",
+			"gui-(.*)": "@/GraceUI5/components/gui-$1.vue"
+		}
+	},
+
+	"globalStyle": {
+		"backgroundTextStyle": "dark",
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "First UI",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFE",
+		"backgroundColorTop": "#FFFFFF",
+		"backgroundColorBottom": "#FFFFFF"
+	}
+}

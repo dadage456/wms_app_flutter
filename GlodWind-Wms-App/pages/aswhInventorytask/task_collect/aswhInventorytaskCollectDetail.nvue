@@ -1,0 +1,207 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="立库盘点采集结果" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="595"
+				stripe
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="stocks"
+				:header="column1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+			></fui-table-weex>
+		</view>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { toast, showConfirm, tansParams } from '@/utils/common';
+export default {
+	onLoad() {
+		try {
+			let value = uni.getStorageSync('up_stocks');
+			if (value != '' && value != undefined && value.length > 0) {
+				console.log(value);
+				this.stocks = value;
+			}
+			let valuede = uni.getStorageSync('up_inTaskItemList');
+			if (valuede != '' && valuede != undefined && valuede.length > 0) {
+				console.log(valuede);
+				this.detailListView = valuede;
+			}
+		} catch (e) {
+			//错误
+		}
+	},
+	data() {
+		return {
+			//数据格式二
+			options: [
+				{
+					text: '删除'
+				}
+			],
+			height: 100,
+			show: false,
+
+			column1: [
+				{
+					prop: 'TrayNo',
+					label: '托盘号',
+					width: 230,
+					sortable: true
+				},
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					width: 210,
+					sortable: true
+				},
+				{
+					prop: 'InventoryQty',
+					label: '采集数量'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 350,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 450,
+					sortable: true
+				},
+				{
+					prop: 'storeRoom',
+					label: '库房'
+				},
+				{
+					prop: 'InvTaskItemid',
+					label: '任务明细ID'
+				},
+				{
+					prop: 'stockid',
+					label: '采集数据id',
+					width: 400
+				}
+			],
+			inArray,
+			checkedIds: [],
+			stocks: [],
+			//查询结果
+			detailListView: [],
+			checkedList: []
+		};
+	},
+	methods: {
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.deleteColl();
+			}
+		},
+		handleCheckAll(selectItem) {
+			const { checkedIds, stocks } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.stocks.map((item) => item.stockid);
+			} else {
+				this.checkedIds = [];
+			}
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.stockid);
+			if (selectItem.is_selected) {
+				if (index < 0) {
+					this.checkedIds.push(selectItem.item.stockid);
+				}
+			} else {
+				if (index >= 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+		},
+		deleteColl() {
+			if (this.checkedIds.length <= 0) {
+				uni.showToast({
+					icon: 'none',
+					duration: 3000,
+					title: '请至少选择一行记录'
+				});
+				return;
+			}
+
+			showConfirm('是否要执行删除操作?').then((res) => {
+				if (res.confirm) {
+					for (var cc = 0; cc < this.checkedIds.length; cc++) {
+						for (var c1 = 0; c1 < this.stocks.length; c1++) {
+							if (this.checkedIds[cc] == this.stocks[c1].stockid) {
+								for (var c2 = 0; c2 < this.detailListView.length; c2++) {
+									let co_checkitemid = this.detailListView[c2].co_checkitemid;
+									if (this.stocks[c1].InvTaskItemid == co_checkitemid) {
+										let collectQty = parseFloat(this.detailListView[c2].collectdataqty);
+										let collectQty_col = parseFloat(this.stocks[c1].InventoryQty);
+										collectQty = collectQty - collectQty_col;
+										if (collectQty < 0) {
+											collectQty = 0;
+										}
+										this.detailListView[c2].collectdataqty = collectQty;
+										break;
+									}
+								}
+								this.stocks.splice(c1, 1);
+								break;
+							}
+						}
+					}
+					uni.setStorage({
+						key: 'up_updateflag',
+						data: '1', //有修改
+						success: function () {
+							console.log('采集状态调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_stocks',
+						data: this.stocks, //未修改
+						success: function () {
+							console.log('采集结果调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_inTaskItemList',
+						data: this.detailListView, //未修改
+						success: function () {
+							console.log('采集任务调整成功');
+						}
+					});
+				}
+				if (res.cancel) {
+					return;
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

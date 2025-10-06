@@ -1,0 +1,216 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="到货签收采集结果" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-table-weex
+				ref="table"
+				fixed
+				align="left"
+				height="750"
+				stripe
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="stocks"
+				:header="column1"
+				@rowClick="rowClick1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+			></fui-table-weex>
+		</view>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { toast, showConfirm, tansParams } from '@/utils/common';
+
+export default {
+	onLoad() {
+		try {
+			let value = uni.getStorageSync('stocks');
+			if (value != '' && value != undefined && value.length > 0) {
+				console.log(value);
+				this.stocks = value;
+			}
+			let valuede = uni.getStorageSync('SignDetailList');
+			if (valuede != '' && valuede != undefined && valuede.length > 0) {
+				console.log(valuede);
+				this.detailListView = valuede;
+			}
+		} catch (e) {
+			//错误
+		}
+	},
+	data() {
+		return {
+			options: [
+				{
+					text: '删除'
+				}
+			],
+			height: 100,
+			show: false,
+
+			inArray,
+			checkedIds: [],
+			list: [],
+			stocks: [],
+			//查询结果
+			detailListView: [],
+			column1: [
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					width: 200,
+					sortable: true
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 260,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 350,
+					sortable: true
+				},
+				{
+					prop: 'collectQty',
+					label: '采集数量'
+				},
+				{
+					prop: 'taskQty',
+					label: '任务数量'
+				},
+				{
+					prop: 'pdate',
+					label: '生产日期',
+					width: 250
+				},
+
+				{
+					prop: 'vdays',
+					label: '有效天数',
+					width: 250
+				},
+				{
+					prop: 'collectFlg',
+					label: '匹配情况'
+				}
+			]
+		};
+	},
+	methods: {
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		},
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.deleteColl();
+			}
+		},
+		handleCheckAll(selectItem) {
+			const { checkedIds, stocks } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.stocks.map((item) => item.stockid);
+			} else {
+				this.checkedIds = [];
+			}
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.stockid);
+			if (selectItem.is_selected) {
+				if (index <= 0) {
+					this.checkedIds.push(selectItem.item.stockid);
+				}
+			} else {
+				if (index > 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+		},
+
+		deleteColl() {
+			var checkedList = [];
+			checkedList = this.stocks.filter((item) => inArray(item.stockid, this.checkedIds));
+			if (checkedList.length <= 0) {
+				uni.showModal({
+					title: '删除提示',
+					showCancel: false,
+					content: '请至少选择一行记录'
+				});
+				return;
+			}
+			showConfirm('是否要执行删除操作?').then((res) => {
+				if (res.confirm) {
+					for (var cc = 0; cc < checkedList.length; cc++) {
+						for (var c1 = 0; c1 < this.stocks.length; c1++) {
+							if (checkedList[cc].stockid == this.stocks[c1].stockid) {
+								for (var c2 = 0; c2 < this.detailListView.length; c2++) {
+									let arrivalsDetailid = this.detailListView[c2].arrivalsDetailid;
+									if (this.stocks[c1].arrivalsDetailid == arrivalsDetailid) {
+										let collectQty = parseFloat(this.detailListView[c2].goodqty);
+										let collectQty_col = parseFloat(this.stocks[c1].collectQty);
+										collectQty = collectQty - collectQty_col;
+										if (collectQty < 0) {
+											collectQty = 0;
+										}
+										this.detailListView[c2].goodqty = collectQty;
+										break;
+									}
+								}
+								this.stocks.splice(c1, 1);
+								break;
+							}
+						}
+					}
+					uni.setStorage({
+						key: 'updateflag',
+						data: '1', //有修改
+						success: function () {
+							console.log('采集状态调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'stocks',
+						data: this.stocks, //未修改
+						success: function () {
+							console.log('采集结果调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'SignDetailList',
+						data: this.detailListView, //未修改
+						success: function () {
+							console.log('采集任务调整成功');
+						}
+					});
+				}
+				if (res.cancel) {
+					return;
+				}
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

@@ -1,0 +1,90 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="在线拣选出入库指令" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-table-weex ref="table" fixed align="left" height="1100" stripe selection full :itemList="detailListView" :header="column1"></fui-table-weex>
+		</view>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { toast, showConfirm, tansParams } from '@/utils/common';
+
+import { getWmsToWcsByTaskID } from '@/api/system/aswhUp';
+
+export default {
+	onLoad(options) {
+		this.taskComment = options.taskComment;
+		this.taskId = options.taskId;
+		this.taskType = options.taskType;
+
+		this.getList();
+	},
+	data() {
+		return {
+			options: [
+				{
+					text: '撤销回指令'
+				},
+				{
+					text: '撤销出库指令'
+				},
+				{
+					text: '刷新'
+				}
+			],
+			height: 100,
+			show: false,
+			column1: [
+				{ prop: 'palno', label: '托盘号' },
+				{ prop: 'saddr', label: '起始地址' },
+				{ prop: 'daddr', label: '目标地址' },
+				{ prop: 'dvno', label: '堆垛机号' },
+				{ prop: 'sendtime2', label: '发送时间', width: 250 },
+				{ prop: 'state2', label: '状态' },
+				{ prop: 'weightGrade2', label: '重量等级' },
+				{ prop: 'highGrade2', label: '高度等级' },
+				{ prop: 'taskNo', label: '任务号', width: 250 },
+				{ prop: 'proofno', label: '凭证号', width: 350 },
+				{ prop: 'tasktype2', label: '任务类型', width: 300 },
+				{ prop: 'changetype2', label: '更改类型' },
+				{ prop: 'typ2', label: '出入库' },
+				{ prop: 'wcsErrMessage2', label: 'WCS错误', width: 250 },
+				{ prop: 'taskId', label: '任务ID', width: 250 },
+				{ prop: 'proofid', label: '凭证ID', width: 350 },
+				{ prop: 'interfaceWmsToWcsId', label: '指令ID' }
+			],
+			detailListView: []
+		};
+	},
+	methods: {
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		},
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+			getWmsToWcsByTaskID(this.taskComment, this.taskId, '03').then((response) => {
+				this.detailListView = response.data;
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

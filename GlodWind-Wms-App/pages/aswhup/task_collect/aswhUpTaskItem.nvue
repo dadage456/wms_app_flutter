@@ -1,0 +1,1855 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="组盘上架采集">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 105rpx">
+			<fui-input
+				borderTop
+				topLeft
+				topRight
+				borderBottom
+				v-model="scanningContent.text"
+				:placeholder="placeholder"
+				:focus="focus"
+				type="digit"
+				clearable
+				@confirm="search"
+			></fui-input>
+		</view>
+		<fui-row marginBottom="5rpx">
+			<fui-col :span="12">
+				<fui-card title="托盘号:" :tag="trayNo"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="剩余容量:" :tag="trayCapacity"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="物料:" :tag="BarcodeContent.matcode"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="采集数量:" :tag="collectQty"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="名称:" :tag="BarcodeContent.matname"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="批次:" :tag="BarcodeContent.batchno"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="24">
+				<fui-card title="序列:" :tag="BarcodeContent.sn"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<view class="fui-page__bd">
+			<fui-tabs :tabs="tabs" center :current="curTab" selectedColor="#FA2209" @change="onChangeTab"></fui-tabs>
+		</view>
+
+		<view :class="{ table_hide: curTab == 1 }">
+			<!--如果需要初始化时触发 @selectionChange 事件，将属性 initEmitChange 设为true-->
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="665"
+				stripe
+				align="left"
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListView"
+				:header="column1"
+				@rowClick="rowClick1"
+				@select="handleCheckItem"
+			></fui-table-weex>
+		</view>
+		<view :class="{ table_hide: curTab == 0 }">
+			<!--如果需要初始化时触发 @selectionChange 事件，将属性 initEmitChange 设为true-->
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="665"
+				stripe
+				align="left"
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListViewColl"
+				:header="column2"
+				@select="handleCheckItem2"
+			></fui-table-weex>
+		</view>
+
+		<fui-bottom-navbar background="#F7F8FA" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+		<!--气泡框组件使用请查看具体文档-->
+		<fui-bubble-box
+			width="200"
+			:size="28"
+			direction="top"
+			:show="show"
+			:triangle="{ left: 100 }"
+			:bottom="height"
+			:right="10"
+			:items="subItems"
+			@click="subClick"
+			@close="onClose"
+		></fui-bubble-box>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { toast, showConfirm, tansParams } from '@/utils/common';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime, uuid } from '@/common/util.js';
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import {
+	getIntaskitemList,
+	getStoreSiteByRoom,
+	getMtlRepertoryByStoresiteNo,
+	CommitUpShelves,
+	CheckBindingTray,
+	CheckBindingTrayByTaskId,
+	GetMatControl,
+	CommitUpWmsToWcs
+} from '@/api/system/aswhUp';
+import { login } from '@/api/login';
+import storage from '@/utils/storage';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+var collectFlg = '';
+var matFoundFlg = '';
+const tabs = [
+	{
+		name: `任务列表`,
+		value: 'taskall'
+	},
+	{
+		name: `正在采集`,
+		value: 'extreing'
+	}
+];
+
+var booCheck = true; //是否校验批次
+var erpStoreSite = '';
+var batchFountFlg = '0';
+var booCheck = true; //校验批次
+var booCheckAagentCode = true; //校验供应商
+//采集结果记录
+var matCode = '';
+var batchNo = '';
+var sn = '';
+var pdate = '';
+var vdays = '';
+var matControlFlag = '';
+var strMsg = '';
+
+var protype = '';
+var storeRoom = ''; //库房编码
+var taskNo = '';
+var taskId = '';
+var siteFlag = '';
+var batchFlag = '';
+var finishFlag = '';
+var taskComment = '';
+var workStation = '';
+
+var booCheck = true; //是否校验批次
+var currentWeight = 0; //当前总承重
+var currentCapacity = 0; //当前总容积
+var boCheckMtl = true; //是否检查物料
+var mtlCapacity = 0; //物料容量
+var mtlWeight = 0; //物料承重
+
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			show_popup: false,
+			linkage: false,
+			show_p: false,
+			checkedList: [],
+
+			//数据格式二
+			options: [
+				{
+					text: '采集结果',
+					color: '#E55D52'
+				},
+				{
+					text: '组盘提交',
+					color: '#F37B1D'
+				},
+				{
+					text: '更多',
+					name: 'menu',
+					size: 24,
+					width: 1
+				}
+			],
+			//二级菜单
+			subItems: [
+				{
+					text: '异常处理'
+				},
+				{
+					text: '查询提交'
+				},
+				{
+					text: '查询指令'
+				},
+				{
+					text: '托盘上架'
+				}
+			],
+			height: 100,
+			show: false,
+
+			column1: [
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					width: 180,
+					sortable: true
+				},
+				{
+					prop: 'qty',
+					label: '任务数量',
+					width: 130
+				},
+				{
+					prop: 'collectedqty',
+					label: '采集数量',
+					width: 130,
+					color: '#465CFF'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 300,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 300,
+					sortable: true
+				},
+				{
+					prop: 'subinventoryCode',
+					label: '子库'
+				},
+				{
+					prop: 'storeroomno',
+					label: '库房'
+				},
+				{
+					prop: 'matname',
+					label: '物料名称',
+					width: 200
+				},
+				{
+					prop: 'orderno',
+					label: '入库单号',
+					width: 250
+				},
+				{
+					prop: 'matinnercode',
+					label: '物料旧编码',
+					width: 250
+				},
+				{
+					prop: 'taskcomment',
+					label: '凭证号',
+					width: 330
+				},
+				{
+					prop: 'intaskno',
+					label: '任务号',
+					width: 250
+				},
+				{
+					prop: 'intaskitemid',
+					label: '任务id'
+				}
+			],
+			column2: [
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					width: 180,
+					sortable: true
+				},
+				{
+					prop: 'qty',
+					label: '任务数量',
+					width: 130
+				},
+				{
+					prop: 'collectedqty',
+					label: '采集数量',
+					width: 130,
+					color: '#465CFF'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 300,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 300,
+					sortable: true
+				},
+				{
+					prop: 'subinventoryCode',
+					label: '子库'
+				},
+				{
+					prop: 'storeroomno',
+					label: '库房'
+				},
+				{
+					prop: 'matname',
+					label: '物料名称',
+					width: 250
+				},
+				{
+					prop: 'orderno',
+					label: '入库单号',
+					width: 250
+				},
+				{
+					prop: 'matinnercode',
+					label: '物料旧编码',
+					width: 250
+				},
+				{
+					prop: 'taskcomment',
+					label: '凭证号',
+					width: 330
+				},
+				{
+					prop: 'intaskno',
+					label: '任务号',
+					width: 250
+				},
+				{
+					prop: 'intaskitemid',
+					label: '任务id'
+				}
+			],
+			inArray,
+			checkedIds: [],
+			curTab: 0,
+			tabs,
+			show1: false,
+
+			Step: {
+				_2DBarcode: '_2DBarcode',
+				Site: 'Site',
+				Quantity: 'Quantity',
+				TrayNo: 'TrayNo'
+			},
+			placeholder: '请扫描托盘号',
+			//扫描内容
+			scanningContent: { text: '' },
+
+			repqty: 0,
+			storeSite: '', //采集的库位
+			trayNo: '', //采集的托盘
+			collectQty: 0,
+			trayCapacity: 0,
+
+			//查询条件
+			inTaskItem: {
+				intaskno: '',
+				intaskid: '',
+				storeroomno: '',
+				forcesite: '',
+				forcebatch: '',
+				taskcomment: '',
+				taskFinishFlag: '0',
+				roomtag: '1',
+				workstation: '',
+				sortType: '',
+				sortColumn: '',
+				searchKey: '',
+				userId: this.$store.state.userid
+			},
+			//采集结果
+			BarcodeContent: {
+				matcode: '', //物料编码
+				qty: '', //采集数量
+				matname: '', //物料名称
+				batchno: '', //批次
+				sn: '', //序列
+				pdate: '', //生产日期
+				vdays: '', //保质期
+				seqctrl: '', //控制方式
+				id_old: '' //编码方式 新格式，就格式
+			},
+			//查询结果
+			detailListView: [],
+			detailListViewColl: [],
+
+			dicMtlQty: new Map(), //key: intaskitemid value: 0:开始采集数  1：本次数量
+			dicSeq: new Map(), //key: intaskitemid value: 0:开始采集数  1：本次数量
+			dicMtlWeight: new Map(),
+			dicTryNoMtl: new Map(),
+			collectList: [],
+			stocks: [],
+			focus: false
+		};
+	},
+	onLoad(options) {
+		var _this = this;
+		let inTask = JSON.parse(decodeURIComponent(options.item));
+		/* _this.arrivalsDetailBill.arrivalsBillid = JSON.parse(decodeURIComponent(options.info)); */
+		_this.inTaskItem.intaskno = inTask.intaskno;
+		_this.inTaskItem.taskcomment = inTask.taskcomment;
+		_this.inTaskItem.forcesite = inTask.forcesite;
+		_this.inTaskItem.forcebatch = inTask.forcebatch;
+		_this.inTaskItem.workstation = inTask.workstation;
+
+		taskNo = inTask.intaskno;
+		taskId = inTask.intaskid;
+		siteFlag = inTask.forcesite;
+		batchFlag = inTask.batchflag;
+		finishFlag = '0';
+		taskComment = inTask.taskcomment;
+		workStation = inTask.workstation;
+		storeRoom = inTask.storeroomno;
+
+		_this.getList();
+		/* uni.$off('scancodedate') */ // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			_this.PerformingBarcode(content);
+		});
+	},
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+	},
+	onShow() {
+		setTimeout(() => {
+			try {
+				console.log('进入onshow');
+				let updateflag = uni.getStorageSync('up_updateflag');
+				if (updateflag == '1') {
+					console.log('进入onshow');
+					let value22 = uni.getStorageSync('up_inTaskItemList');
+					if (value22) {
+						this.detailListView = value22;
+						this.stocks = uni.getStorageSync('up_stocks');
+						let valueSeq = uni.getStorageSync('up_dicSeq');
+						this.dicSeq = new Map(JSON.parse(valueSeq));
+
+						this.taskcollAdd(matCode, '');
+						uni.setStorage({
+							key: 'up_updateflag',
+							data: '0', //未修改
+							success: function () {
+								console.log('采集状态修改标志恢复');
+							}
+						});
+					}
+				}
+			} catch (e) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: e
+				});
+			}
+		}, 100);
+	},
+onBackPress(options) {
+		// 如果是返回按钮，才做执行
+		if (options.from === 'backbutton') {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '提示',
+					content: '当前采集记录尚未提交 确定退出采集吗？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.$off('scancodedate');
+							uni.reLaunch({
+								url: '/pages/aswhup/aswhUp' // 你可以根据需要调整跳转的页面
+							});
+						}
+					}
+				});
+				// 禁止默认返回
+				return true;
+			} else {
+				uni.$off('scancodedate');
+				uni.reLaunch({
+					url: '/pages/aswhup/aswhUp' // 你可以根据需要调整跳转的页面
+				});
+				return true;
+			}
+		}
+	},
+	methods: {
+		initCurTab(options) {
+			const app = this;
+			if (options.dataType) {
+				const indextab = app.tabs.findIndex((item) => item.value == options.dataType);
+				app.curTab = indextab > -1 ? indextab : 0;
+			}
+		},
+		onChangeTab(tab) {
+			const app = this;
+			app.curTab = tab.index;
+
+			console.log(this.curTab);
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.intaskitemid);
+			if (selectItem.is_selected) {
+				if (index <= 0) {
+					this.checkedIds.push(selectItem.item.intaskitemid);
+				}
+			} else {
+				if (index > 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+			this.checkedList = this.detailListView.filter((item) => inArray(item.intaskitemid, this.checkedIds));
+		},
+
+		//进入采集结果界面
+		//进入采集结果界面
+		taskcollAdd(matcode, matsn) {
+			this.detailListViewColl = [];
+			let coli = 0;
+			let tmpMatcode = '';
+			let tmpSn = '';
+			if (matcode != undefined && matcode != null && matcode.length != 0 && matsn != undefined && matsn != null && matsn.length != 0) {
+				for (coli = 0; coli < this.detailListView.length; coli++) {
+					tmpMatcode = this.detailListView[coli].matcode;
+					tmpSn = this.detailListView[coli].sn;
+					if (tmpMatcode == matcode && tmpSn == matsn) {
+						this.detailListViewColl.push(this.detailListView[coli]);
+						break;
+					}
+				}
+			}
+			if (matcode != undefined && matcode != null && matcode.length != 0) {
+				for (coli = 0; coli < this.detailListView.length; coli++) {
+					tmpMatcode = this.detailListView[coli].matcode;
+					tmpSn = this.detailListView[coli].sn;
+					if (tmpMatcode == matcode) {
+						if (matsn != undefined && matsn != null && matsn.length != 0) {
+							if (tmpSn != matsn) {
+								this.detailListViewColl.push(this.detailListView[coli]);
+							}
+						} else {
+							this.detailListViewColl.push(this.detailListView[coli]);
+						}
+					}
+				}
+			}
+			if (this.detailListViewColl.length <= 0) {
+				this.curTab = 0;
+			} else {
+				this.curTab = 1;
+			}
+		},
+
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			getIntaskitemList(this.inTaskItem).then((response) => {
+				if (response.msg && response.code != '200') {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: response.msg
+					});
+					return;
+				}
+				if (response.code == '200') {
+					this.detailListView = response.data.rows;
+					if (this.detailListView.length > 0) {
+						protype = this.detailListView[0].protype;
+						if (protype == '10' || protype == '12' || protype == '15' || protype == '16' || protype == '17' || protype == '18') {
+							//校验批次
+							booCheck = true;
+						} else {
+							booCheck = false;
+						}
+						if (protype == '9' || protype == '10') {
+							//校验供应商
+							booCheckAagentCode = true;
+						} else {
+							booCheckAagentCode = false;
+						}
+						uni.setStorage({
+							key: 'up_stocks',
+							data: null, //未修改
+							success: function () {
+								console.log('采集结果初始化');
+							}
+						});
+						uni.setStorage({
+							key: 'up_updateflag',
+							data: '0',
+							success: function () {
+								console.log('采集状态修改标志初始化');
+							}
+						});
+						uni.setStorage({
+							key: 'up_inTaskItemList',
+							data: response.data,
+							success: function () {
+								console.log('采集任务初始化');
+							}
+						});
+
+						setTimeout(function () {
+							uni.hideLoading();
+						}, 100);
+					} else {
+						setTimeout(function () {
+							uni.hideLoading();
+						}, 100);
+						uni.showModal({
+							title: '采集异常',
+							showCancel: false,
+							content: '当前任务列表没有待处理任务！'
+						});
+					}
+				}
+			});
+		},
+		search(event) {
+			this.PerformingBarcode(event.detail.value);
+		},
+
+		//采集内容处理
+		async PerformingBarcode(barcode) {
+			try {
+				this.$set(this.scanningContent, 'text', '');
+
+				if (barcode == undefined || barcode == null || barcode.length == 0) {
+					throw new Error('采集内容为空,请重新采集！');
+				}
+				let currStep = '';
+				//采集内容判断
+				//物料编码
+				if (barcode.includes('MC') > 0) {
+					currStep = this.Step._2DBarcode;
+					//库位判断
+				} else if (barcode.includes('$TP$')) {
+					if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+						currStep = this.Step.TrayNo;
+					} else {
+						let res = await this.showConfirm('更换托盘之前扫描的数据将清空，是否继续？');
+						if (res) {
+							if (barcode.substr(4, 8) == this.trayNo) {
+								this.$set(this.scanningContent, 'text', '');
+								throw new Error('扫描的托盘号与当前装载的一样，请确认！');
+							}
+							this.initialTaryInfo();
+							currStep = this.Step.TrayNo;
+						} else {
+							this.$set(this.scanningContent, 'text', '');
+							return;
+						}
+					}
+				}
+				//数量
+				else if (this.checkIntAndFloat(barcode)) {
+					currStep = this.Step.Quantity;
+				} else {
+					throw new Error('采集内容不合法！');
+				}
+
+				switch (currStep) {
+					case this.Step._2DBarcode:
+						var BarcodeContent2 = null;
+						//物料条码分析
+						let response = await this.getPmMaterialInfoByQR(barcode);
+						if (response.code == '200') {
+							BarcodeContent2 = response.data;
+						}
+
+						if (BarcodeContent2 == undefined || BarcodeContent2 == null || BarcodeContent2.length == 0) {
+							throw new Error('物料条码识别出现问题!');
+						}
+						//二维码新旧格式
+						var newmarttask = BarcodeContent2.id_old.toString();
+						//物料控制模式 序列还是批次
+						var matControl = BarcodeContent2.seqctrl.toString();
+						var decMtlCapacity = 0;
+						var decMtlWeight = 0;
+
+						let tmpbarcode = BarcodeContent2.matcode;
+						let sn = BarcodeContent2.sn;
+
+						if (newmarttask == '0') {
+							//旧条码格式 做物料检查，不合格将返回
+							/* this.CheckMat(BarcodeContent2.matcode, matControl, BarcodeContent2.sn); */
+							/* CheckMat(barcode, matControl, sn) */
+							{
+								batchFountFlg = '0';
+								for (let i = 0; i < this.detailListView.length; i++) {
+									let tmpMat3 = this.detailListView[i].matcode;
+									if (matControl == '0') {
+										if (booCheck) {
+											let tmpSn3 = this.detailListView[i].sn.toString(); //序列
+											let tmpBatch3 = this.detailListView[i].batchno.toString();
+											if (tmpMat3 == tmpbarcode) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										} else {
+											if (tmpMat3 == tmpbarcode) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										}
+									} else if (matControl == '1' || matControl == '2') {
+										if (booCheck) {
+											let tmpBatch4 = this.detailListView[i].batchno.toString();
+											if (tmpMat3 == barcode && tmpBatch4 == sn) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										} else {
+											if (tmpMat3 == tmpbarcode) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										}
+									}
+								}
+								if (batchFountFlg == '0') {
+									if (matControl == '0') {
+										//0单件(序列)控制，1批次控制，2无控制
+										throw new Error('任务明细中物料【' + tmpbarcode + '】的不存在!');
+									} else {
+										throw new Error('任务明细中物料【' + tmpbarcode + '】批号【' + sn + '】的物料不存在!');
+									}
+								}
+							}
+							if (matControl == '0') {
+								if (BarcodeContent2.sn == undefined || BarcodeContent2.sn == null) {
+									throw new Error('物料' + BarcodeContent2.matcode + '序列号不能为空!');
+								}
+
+								if (this.dicSeq.has(BarcodeContent2.matcode + '@' + BarcodeContent2.sn)) {
+									matCode = '';
+									throw new Error('序列号【' + BarcodeContent2.sn + '】不允许重复采集，请确认!');
+								}
+
+								this.BarcodeContent = BarcodeContent2;
+								this.BarcodeContent.batchNo = BarcodeContent2.sn;
+								this.BarcodeContent.qty = 1;
+
+								batchNo = '';
+								sn = '';
+								batchNo = BarcodeContent2.sn;
+								sn = BarcodeContent2.sn;
+								this.collectQty = 1;
+							}
+							if (matControl == '1' || matControl == '2') {
+								if (BarcodeContent2.sn == undefined || BarcodeContent2.sn == null) {
+									throw new Error('物料' + BarcodeContent2.matcode + '批次号不能为空!');
+								}
+								sn = '';
+								batchNo = '';
+								this.BarcodeContent = BarcodeContent2;
+								batchNo = BarcodeContent2.sn;
+							} else {
+								throw new Error('物料' + BarcodeContent2.matcode + '编码控制维护值维护不合法!');
+							}
+						} else {
+							let response3 = await this.GetMatControl(BarcodeContent2.matcode);
+							if (response3.code == '200') {
+								let mtlInfo = response3.msg.split('!');
+								mtlCapacity = 0;
+								mtlWeight = 0;
+
+								if (mtlInfo[1] != null && mtlInfo[1] != undefined && mtlInfo[1] != '') {
+									mtlWeight = mtlInfo[1];
+								}
+								if (mtlInfo[2] != null && mtlInfo[2] != undefined && mtlInfo[2] != '') {
+									mtlCapacity = mtlInfo[2];
+								}
+							}
+
+							//旧条码格式 做物料检查，不合格将返回
+							/* await this.CheckMat2(BarcodeContent2.matcode, matControl,
+								BarcodeContent2
+								.batchno, BarcodeContent2.sn); */
+							/* async CheckMat2(barcode, matControl, BatchNo, sn) */
+							let BatchNo = BarcodeContent2.batchno;
+							{
+								batchFountFlg = '0';
+								for (let i = 0; i < this.detailListView.length; i++) {
+									let tmpMat3 = this.detailListView[i].matcode;
+									if (matControl == '0') {
+										if (booCheck) {
+											let tmpSn3 = this.detailListView[i].sn.toString(); //序列
+											let tmpBatch3 = this.detailListView[i].batchno.toString();
+											if (tmpMat3 == tmpbarcode && tmpSn3 == sn && tmpBatch3 == BatchNo) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										} else {
+											if (tmpMat3 == tmpbarcode) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										}
+									} else if (matControl == '1' || matControl == '2') {
+										if (booCheck) {
+											let tmpBatch4 = this.detailListView[i].batchno.toString();
+											if (tmpMat3 == tmpbarcode && tmpBatch4 == BatchNo) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										} else {
+											if (tmpMat3 == tmpbarcode) {
+												erpStoreSite = this.detailListView[i].subinventoryCode.toString();
+												batchFountFlg = '1';
+												break;
+											}
+										}
+									}
+								}
+							}
+
+							if (batchFountFlg == '0') {
+								if (matControl == '0') {
+									//0单件(序列)控制，1批次控制，2无控制
+
+									this.BarcodeContent = null;
+									throw new Error(
+										'任务明细中物料【' + BarcodeContent2.matcode + '】批号【' + BarcodeContent2.batchno + '】序列【' + BarcodeContent2.sn + '】的物料不存在'
+									);
+								} else {
+									this.BarcodeContent = null;
+									throw new Error('任务明细中物料【' + BarcodeContent2.matcode + '】批号【' + BarcodeContent2.batchno + '】的物料不存在');
+								}
+							}
+
+							if (matControl == '0') {
+								sn = '';
+								batchNo = '';
+
+								this.BarcodeContent = BarcodeContent2;
+								this.BarcodeContent.qty = 1;
+
+								batchNo = BarcodeContent2.batchno;
+								sn = BarcodeContent2.sn;
+								this.collectQty = 1;
+
+								if (sn == undefined || sn == null || sn == '') {
+									this.BarcodeContent = null;
+									throw new Error('物料' + BarcodeContent2.matcode + '序列号不能为空');
+								}
+
+								if (batchNo == undefined || batchNo == null || batchNo == '') {
+									this.BarcodeContent = null;
+									throw new Error('物料' + BarcodeContent2.matcode + '批次号不能为空');
+								}
+
+								if (this.dicSeq.has(BarcodeContent2.matcode + '@' + BarcodeContent2.sn)) {
+									matCode = '';
+									this.BarcodeContent = null;
+									throw new Error('序列号【' + BarcodeContent2.sn + '】不允许重复采集，请确认');
+								}
+							} else {
+								batchNo = BarcodeContent2.batchno == undefined || BarcodeContent2.batchno == '' || BarcodeContent2.batchno == null ? '' : BarcodeContent2.batchno;
+
+								if (batchNo == undefined || batchNo == null || batchNo == '') {
+									this.BarcodeContent = {};
+									throw new Error('物料' + BarcodeContent2.matcode + '批次号不能为空');
+								}
+							}
+							matCode = BarcodeContent2.matcode;
+							matControlFlag = matControl;
+
+							pdate = BarcodeContent2.pdate; //生产日期
+							vdays = BarcodeContent2.vdays; //有效期天数
+
+							if (this.BarcodeContent.qty > 0) {
+								BarcodeContent2.qty = this.BarcodeContent.qty;
+							}
+							this.BarcodeContent = BarcodeContent2;
+						}
+						this.taskcollAdd(matCode, '');
+						this.$set(this.scanningContent, 'text', '');
+						break;
+					case this.Step.TrayNo:
+						console.log('barcode:' + barcode);
+						let ret = await this.CheckBindingTray(barcode.substring(4, 12));
+						if (ret.code != '200') {
+							this.$set(this.scanningContent, 'text', '');
+							throw new Error(ret.msg);
+						} else {
+							this.trayCapacity = ret.data;
+						}
+						currentCapacity = 0;
+						currentWeight = 0;
+
+						let str1 = barcode.toString();
+						let sArry = str1.split('$');
+						this.trayNo = sArry[2];
+						this.$set(this.scanningContent, 'text', '');
+						let ret2 = await this.CheckBindingTrayByTaskId(taskId, this.trayNo, '00');
+						if (ret2.code != '200') {
+							throw new Error(ret2.msg);
+						}
+						break;
+					case this.Step.Quantity:
+						if (sn != undefined && sn != '' && sn != null && sn != undefined) {
+							throw new Error('已采集序列号无需采集数量，请扫描二维码');
+						}
+						this.collectQty = parseFloat(barcode);
+						break;
+
+					default:
+						break;
+				}
+
+				strMsg = this.getPlaceMsg();
+				//表示条码都扫描完毕
+				if (strMsg == '') {
+					/* await this.DealQuantity(this.collectQty, matControlFlag); */
+					/* async DealQuantity(qty, matFlag) */
+					{
+						let qty = this.collectQty;
+						let matFlag = matControlFlag;
+
+						var matCode = this.BarcodeContent.matcode.toString();
+						var batchNo = this.BarcodeContent.batchno.toString();
+						var sn = null;
+
+						matFlag = Number(matFlag);
+						if (matFlag == undefined || matFlag == null || matFlag.length == 0) {
+							throw new Error('获取物料编码属性失败');
+						}
+						if (qty <= 0) {
+							throw new Error('采集数量必须大于0');
+						}
+						if (!this.dicMtlWeight.has(matCode)) {
+							let ls1 = [];
+							ls1.push(mtlWeight.toString());
+							ls1.push(mtlCapacity.toString());
+							this.dicMtlWeight.set(matCode, ls1);
+						}
+
+						if (mtlCapacity * qty > this.trayCapacity) {
+							throw new Error('物料【' + mtlCapacity * qty + '】容量大于托盘剩余容量');
+						}
+
+						if (matFlag == 0) {
+							sn = this.BarcodeContent.sn.toString();
+						}
+						var exsitFlag = false;
+						var taskQty = 0;
+						var tmpQty = 0;
+						var strInfo = '';
+
+						if (boCheckMtl) {
+							//表示校验物料
+							strInfo = matCode;
+						}
+
+						if (matFlag == '1' || matFlag == '2') {
+							//批次管控
+							strInfo = strInfo + batchNo; //组盘按物料+批次区分
+						}
+						strInfo = strInfo.trim();
+
+						if (this.dicTryNoMtl.has(this.trayNo)) {
+							if (!(this.dicTryNoMtl.get(this.trayNo) == strInfo) && this.dicTryNoMtl.get(this.trayNo).indexOf(matCode, 1) > 0) {
+								if (boCheckMtl) {
+									//表示校验物料
+									if (matFlag == '0') {
+										//序列管控
+										throw new Error('扫描物料【' + matCode + '】与托盘【' + this.trayNo + '】物料不一致');
+									} else {
+										throw new Error('扫描物料【' + matCode + '】批号【' + batchNo + '】与托盘【' + this.trayNo + '】物料批号不一致');
+									}
+								} else {
+									throw new Error('扫描批号【' + batchNo + '】与托盘【' + this.trayNo + '】扫描物料批号不一致');
+								}
+							}
+						}
+
+						var tatalTaskQty = 0; //当前物料总计划数
+						var tatalTmpQty = 0; //当前物料总扫描数
+						var tmpNotmatQty = 0;
+						var qiangzhicajiFlag = 0;
+						var tatalNotmatQty = 0; //当前物料总扫描数
+						var inTaskItemid = '';
+
+						//统计当前物料总扫描数和总计划数
+						for (let i2 = 0; i2 < this.detailListView.length; i2++) {
+							let tmpMat = this.detailListView[i2].matcode.toString(); //物料
+							if (tmpMat != matCode) {
+								continue; //如果物料不是当前输入的物料 继续
+							}
+							if ((matFlag == 1 || matFlag == 2) && booCheck) {
+								//批次管控
+								let tmpBatch = this.detailListView[i2].batchno.toString();
+								console.log('tmpBatch1:' + tmpBatch);
+								if (tmpBatch != batchNo) {
+									continue; //如果物料批次跟当前输入不一致 继续
+								}
+							}
+
+							taskQty = parseFloat(this.detailListView[i2].qty);
+							tmpQty = parseFloat(this.detailListView[i2].collectedqty);
+							tatalTaskQty += taskQty;
+							tatalTmpQty += tmpQty;
+						}
+
+						//校验数量是否足够
+						if (tatalTmpQty + qty > tatalTaskQty) {
+							throw new Error('本次采集数量【' + qty + '】大于剩余可采集数量【' + (tatalTaskQty - tatalTmpQty) + '】');
+						}
+						let decQty = qty;
+						var ls = new Map();
+						var dicMtlOperatin = new Map();
+
+						for (let i1 = 0; i1 < this.detailListView.length; i1++) {
+							if (decQty <= 0) {
+								break;
+							}
+
+							let tmpMat1 = this.detailListView[i1].matcode.toString(); //物料
+
+							if (tmpMat1 != matCode) {
+								continue; //如果物料、货位不是当前输入的物料、货位 继续
+							}
+							taskQty = parseFloat(this.detailListView[i1].qty);
+							tmpQty = parseFloat(this.detailListView[i1].collectedqty);
+
+							inTaskItemid = this.detailListView[i1].intaskitemid.toString();
+
+							if (taskQty == tmpQty) {
+								continue;
+							}
+
+							if (matFlag == '1' || matFlag == '2') {
+								//booCheck true表示完工入库 不校验批次
+								if (booCheck) {
+									let tmpBatch = this.detailListView[i1].batchno.toString();
+									if (tmpBatch != batchNo) {
+										continue;
+									}
+								}
+							}
+
+							if (matFlag == '0') {
+								//booCheck true表示完工入库 不校验批次
+								if (booCheck) {
+									let tmpBatch = this.detailListView[i1].batchno.toString();
+									let tmpSn = this.detailListView[i1].sn.toString();
+									if (!(tmpBatch == batchNo && tmpSn == sn)) {
+										continue;
+									}
+								}
+							}
+
+							if (!this.dicMtlQty.has(inTaskItemid)) {
+								let ls = [];
+								ls[0] = tmpQty;
+								ls[1] = '0';
+								ls[2] = tmpMat1;
+								this.dicMtlQty.set(inTaskItemid, ls);
+							}
+
+							if (taskQty - tmpQty >= decQty) {
+								//表示足够扣
+								/* this.detailListView[i1].collectedqty = tmpQty + decQty; */
+								var cc2 = this.detailListView[i1];
+								cc2.collectedqty = tmpQty + decQty;
+								this.$set(this.detailListView, i1, cc2);
+
+								let ls2 = this.dicMtlQty.get(inTaskItemid);
+								ls2[1] = tmpQty + decQty;
+								this.dicMtlQty.set(inTaskItemid, ls2);
+
+								let set = [];
+								set[0] = taskQty;
+								set[1] = decQty;
+								dicMtlOperatin.set(inTaskItemid, set); //第一笔存物料计划数
+
+								decQty = 0;
+								exsitFlag = true;
+							} else {
+								decQty = decQty - (taskQty - tmpQty); //本次扫描数量- 计划剩余数量
+								/* this.detailListView[i1].collectedqty = taskQty; */
+
+								var cc1 = this.detailListView[i1];
+								cc1.collectedqty = taskQty;
+								this.$set(this.detailListView, i1, cc1);
+
+								let ls2 = this.dicMtlQty.get(inTaskItemid);
+								ls2[1] = taskQty;
+								this.dicMtlQty.set(inTaskItemid, ls2);
+
+								let set = [];
+								set[0] = taskQty;
+								set[1] = taskQty - tmpQty;
+								dicMtlOperatin.set(inTaskItemid, set); //第一笔存物料计划数
+							}
+						}
+						if (!exsitFlag) {
+							throw new Error('采集物料批号序列号信息匹配任务明细失败');
+						}
+
+						this.trayCapacity -= mtlCapacity * qty;
+						currentCapacity += mtlCapacity * qty; //当前容积增加
+						currentWeight += mtlWeight * qty; //当前体积增加
+
+						if (sn != null && sn != '' && sn != undefined && !this.dicSeq.has(matCode + '@' + sn)) {
+							this.dicSeq.set(matCode + '@' + sn, matCode + '@' + sn);
+						}
+
+						if (!this.dicTryNoMtl.has(this.trayNo)) {
+							this.dicTryNoMtl.set(this.trayNo, strInfo);
+						}
+						//添加采集记录;对于采集记录的修改操作统一在采集明细中操作
+						this.AddCollectData(matCode, batchNo, sn, taskQty, qty, storeRoom, this.storeSite, this.trayNo, dicMtlOperatin);
+					}
+					this.taskcollAdd(matCode, sn);
+					this.InitializeCollect();
+					this.localSave();
+				}
+				this.$set(this.scanningContent, 'text', '');
+				this.placeholder = this.getPlaceMsg();
+			} catch (error) {
+				uni.showModal({
+					title: '组盘上架异常',
+					showCancel: false,
+					content: error.message
+				});
+				this.$set(this.scanningContent, 'text', '');
+				this.InitializeCollect();
+			}
+		},
+		/// <summary>
+		/// 校验托盘号
+		/// </summary>
+		/// <param name="trayNo"></param>
+		async CheckTray(trayNo) {
+			if (trayNo == null || trayNo == '' || trayNo == undefined) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '托盘号不能为空'
+				});
+				return;
+			}
+			let ret = await this.CheckBindingTray(trayNo);
+			return ret;
+		},
+
+		/// <summary>
+		/// 校验库位
+		/// </summary>
+		/// <param name="siteCode"></param>
+		async CheckSite(siteCode) {
+			let response = await this.getStoreSiteByRoom(storeRoom, siteCode);
+			console.log(response);
+			if (response.msg && response.code != '200') {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: response.msg
+				});
+				return;
+			}
+			if (response.code == '200') {
+				let siteList = response.data;
+				if (siteList.Length <= 0) {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: '库房【' + storeRoom + '】下无库位号【' + siteCode + '】'
+					});
+					return;
+				}
+
+				if (siteList[0].isfrozen != '0') {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: '库位【' + siteCode + '】被锁定或者冻结'
+					});
+					return;
+				}
+			}
+		},
+
+		async GetMatControl(matcode) {
+			return new Promise(function (resolve, reject) {
+				GetMatControl(matcode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async CheckBindingTray(trayNo) {
+			return new Promise(function (resolve, reject) {
+				CheckBindingTray(trayNo).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async CheckBindingTrayByTaskId(taskId, trayNo, taskType) {
+			return new Promise(function (resolve, reject) {
+				CheckBindingTrayByTaskId(taskId, trayNo, taskType).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+
+		async getStoreSiteByRoom(storeRoomNo, storeSiteNo) {
+			return new Promise(function (resolve, reject) {
+				getStoreSiteByRoom(storeRoomNo, storeSiteNo).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		/// <summary>
+		/// 检验库存
+		/// </summary>
+		/// <param name="collectQty">当前数量</param>
+		/// <returns></returns>
+		async checkInv(collectQty, storeSite) {
+			console.log('matCode:' + matCode);
+			console.log('storeSite:' + storeSite);
+			if (matCode == null || matCode == '' || matCode == undefined || storeSite == null || storeSite == '' || storeSite == undefined) {
+				return;
+			}
+
+			let response = await this.getMtlRepertoryByStoresiteNo(storeSite, matCode);
+			console.log(response);
+			if (response.msg && response.code != '200') {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: response.msg
+				});
+
+				return;
+			}
+			if (response.code == '200') {
+				let RepertoryList = response.data;
+
+				if (RepertoryList != null && RepertoryList.length > 0) {
+					if (collectQty == 0) {
+						this.repqty = RepertoryList[0].repqty;
+					}
+
+					//入库类型为9、10时，若库房编码为“XN-BL”则不校验子库  2016 3 30 从洋提出
+					if (booCheckAagentCode && storeRoom == 'XN-BL') {
+						//预留
+					} else {
+						if (RepertoryList[0].erpStoreroom != erpStoreSite) {
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '此物料在当前货位存在其他物权属性的库存，请选择其他上架库位'
+							});
+							return;
+						}
+					}
+
+					if (storeRoom == 'XN-BL') {
+						//booCheckAagentCode为true时 校验供应商  2016.3.31 刘益峰提出
+						if (booCheckAagentCode && RepertoryList[0].parno != supplier) {
+							//卡供应商
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '物料对应的拥有方【' + supplier + '】与库位物料拥有方【' + RepertoryList[0].parno + '】不一致，请确认'
+							});
+							return;
+						}
+					}
+				} else {
+					if (collectQty == 0) {
+						this.repqty = 0;
+					}
+				}
+			}
+		},
+		async getMtlRepertoryByStoresiteNo(storeSite, matCode) {
+			return new Promise(function (resolve, reject) {
+				getMtlRepertoryByStoresiteNo(storeSite, matCode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async getPmMaterialInfoByQR(barcode) {
+			return new Promise(function (resolve, reject) {
+				getPmMaterialInfoByQR(barcode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		/// 设定提示信息
+		/// </summary>
+		/// <param name="msg"></param>
+		getPlaceMsg() {
+			if (this.trayNo == '' || this.trayNo == null || this.trayNo == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描托盘';
+			}
+			if (this.BarcodeContent.matcode == '' || this.BarcodeContent.matcode == null || this.BarcodeContent.matcode == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描二维码';
+				/* } else if ((this.BarcodeContent.sn == '' || this.BarcodeContent.sn == null || this
+							.BarcodeContent.sn == undefined) && (this.collectQty == '' || this.collectQty == null || this.collectQty ==
+							undefined || this.collectQty == 0)) */ //肯定是批次  如数量为空
+			} else if ((this.BarcodeContent.sn == null || this.BarcodeContent.sn == '' || this.BarcodeContent.sn == undefined) && this.collectQty == 0) {
+				this.focus = true;
+				return '请输入数量';
+			} else {
+				this.focus = false;
+				return '';
+			}
+		},
+		initialTaryInfo() {
+			let itemId = '';
+			for (let i = 0; i < this.detailListView.length; i++) {
+				itemId = this.detailListView[i].intaskitemid.toString();
+				if (this.dicMtlQty.has(itemId)) {
+					this.detailListView[i].collectedqty = this.dicMtlQty.get(itemId)[0];
+				}
+			}
+			this.stocks = [];
+			this.dicMtlQty = new Map();
+			this.dicTryNoMtl = new Map();
+			matCode = '';
+			batchNo = '';
+			sn = '';
+			this.placeholder = this.getPlaceMsg();
+		},
+		/// <summary>
+		/// 重新初始采集
+		/// </summary>
+		InitializeCollect() {
+			matCode = null;
+			batchNo = null;
+			sn = null;
+			pdate = null;
+			vdays = null;
+			this.collectQty = 0;
+			this.BarcodeContent = [];
+			collectFlg = '';
+			matFoundFlg = '';
+			booCheck = true; //是否校验批次
+			storeRoom = ''; //子库
+			batchFountFlg = '0';
+			matControlFlag = '';
+			this.focus = false;
+		},
+		localSave() {
+			uni.setStorage({
+				key: 'up_inTaskItemList',
+				data: this.detailListView,
+				success: function () {
+					console.log('采集成功后 任务列表保存成功');
+				}
+			});
+			uni.setStorage({
+				key: 'up_stocks',
+				data: this.stocks,
+				success: function () {
+					console.log('采集成功后 采集列表保存成功');
+				}
+			});
+			uni.setStorage({
+				key: 'up_dicSeq',
+				data: JSON.stringify(Array.from(this.dicSeq)),
+				success: function () {
+					console.log('采集成功后 采集列表保存成功');
+				}
+			});
+		},
+		async showConfirm(content) {
+			return new Promise(function (resolve, reject) {
+				// 一段耗时的异步操作
+				uni.showModal({
+					title: '操作确认',
+					content: content,
+					cancelText: '取消',
+					confirmText: '确认',
+					success: (res) => {
+						if (res.confirm) {
+							resolve(true); // 数据处理完成
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+							resolve(false);
+						}
+					}
+				});
+			});
+		},
+
+		AddCollectData(matCode, batchNo, sn, taskQty, collectQty, storeRoom, storeSite, trayNo, dicMtlOperatin) {
+			for (let [key, value] of dicMtlOperatin) {
+				console.log(key + ' = ' + value);
+				let stock = {};
+				stock.stockid = uuid();
+				stock.matcode = matCode;
+				stock.batchno = batchNo;
+				stock.sn = sn;
+				stock.taskQty = value[0]; //计划数
+				stock.collectQty = value[1]; //本次采集数量
+				stock.inTaskItemid = key;
+				stock.storeRoom = storeRoom;
+				stock.storeSite = storeSite;
+				stock.taskNo = taskNo;
+				stock.trayNo = trayNo;
+
+				this.stocks.push(stock);
+			}
+		},
+		commitButton_Click() {
+			if (this.stocks.length == 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '本次无采集明细，请确认！'
+				});
+				return;
+			}
+			if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '托盘号为空，请确认'
+				});
+				return;
+			}
+
+			if (taskNo == null || taskNo == '' || taskNo == undefined) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '托盘号为空，请确认'
+				});
+				return;
+			}
+			var startAddr = '';
+			var endAddr = '';
+			var filter = '';
+
+			let tmpMat = '';
+			let taskQty1 = 0;
+			let tmpQty1 = 0;
+			let msg = '';
+			let tmpStore = '';
+
+			msg = '请确认是否提交？';
+
+			uni.showModal({
+				title: '提交确认',
+				content: msg,
+				success: (res) => {
+					if (res.confirm) {
+						let filter = '';
+						let dicSeqs = this.dicSeq;
+						for (let [key, value] of dicSeqs) {
+							filter += ",'" + value + "'";
+						}
+						if (filter != '' && filter != null && filter != undefined) {
+							filter = filter.substring(1, filter.length);
+						}
+
+						let collectStocks = this.stocks;
+
+						let upShelvesInfosList = [];
+						for (let io = 0; io < collectStocks.length; io++) {
+							let upShelvesInfo = {};
+							let upStock = collectStocks[io];
+
+							upShelvesInfo.matCode = upStock.matcode; //物料号
+							upShelvesInfo.batchNo = upStock.batchno; //批号
+							upShelvesInfo.sn = upStock.sn; //序列号
+							upShelvesInfo.taskQty = upStock.taskQty; //任务数量
+							upShelvesInfo.collectQty = upStock.collectQty; //已采集数量
+							upShelvesInfo.storeRoomNo = upStock.storeRoom;
+							upShelvesInfo.storeSiteNo = upStock.storeSite;
+							upShelvesInfo.taskid = upStock.taskid;
+							upShelvesInfo.inTaskItemid = upStock.inTaskItemid;
+
+							upShelvesInfosList.push(upShelvesInfo);
+						}
+
+						let lsItems = [];
+						let dicMtlQtys = this.dicMtlQty;
+						for (let [key, value] of dicMtlQtys) {
+							let itemListInfo = {};
+							let mtlQty = [];
+							mtlQty[0] = value[0];
+							mtlQty[1] = value[1];
+							itemListInfo.mtlQty = mtlQty;
+
+							itemListInfo.inTaskItemid = key;
+							itemListInfo.mtlCode = value[2];
+
+							lsItems.push(itemListInfo);
+						}
+						/* let upShelvesInfos = JSON.stringify(upShelvesInfosList); */
+
+						CommitUpShelves(upShelvesInfosList, lsItems, taskNo, this.trayNo, filter, currentWeight, currentCapacity).then((response) => {
+							this.dicMtlQty = new Map();
+							this.stocks = [];
+							this.getList();
+
+							uni.showModal({
+								title: '信息提示',
+								showCancel: false,
+								content: '组盘数据提交成功！'
+							});
+							CommitUpWmsToWcs(taskId, taskNo, this.trayNo, startAddr, endAddr).then((response) => {
+								uni.showModal({
+									title: '信息提示',
+									showCancel: false,
+									content: '托盘上架提交成功！'
+								});
+							});
+
+							uni.setStorage({
+								key: 'up_stocks',
+								data: [], //未修改
+								success: function () {
+									console.log('采集结果初始化');
+								}
+							});
+
+							uni.setStorage({
+								key: 'up_updateflag',
+								data: '0',
+								success: function () {
+									console.log('采集状态修改标志初始化');
+								}
+							});
+							uni.setStorage({
+								key: 'up_inTaskItemList',
+								data: [],
+								success: function () {
+									console.log('采集任务初始化');
+								}
+							});
+						});
+					}
+				}
+			});
+		},
+
+		commitButton_Click2() {
+			var startAddr = '';
+			var endAddr = '';
+
+			uni.showModal({
+				title: '托盘上架',
+				content: '请确认组盘完成，准备托盘上架？',
+				success: (res) => {
+					if (res.confirm) {
+						if (this.stocks.length > 0) {
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '采集数据未提交,不允许托盘上架！'
+							});
+							return;
+						}
+						if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '托盘号为空，请确认'
+							});
+							return;
+						}
+
+						if (taskNo == null || taskNo == '' || taskNo == undefined) {
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '凭证号为空，请确认'
+							});
+							return;
+						}
+
+						CommitUpWmsToWcs(taskId, taskNo, this.trayNo, startAddr, endAddr).then((response) => {
+							if (response.msg && response.code != '200') {
+								uni.showModal({
+									title: '采集异常',
+									showCancel: false,
+									content: response.msg
+								});
+								return;
+							}
+							if (response.code == '200') {
+								this.$u.toast('托盘上架提交成功');
+							}
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		},
+
+		//进入采集结果界面
+		collectItemButton_Click(url) {
+			/* if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+					this.$u.toast('托盘号为空，请确认');
+					return;
+				}
+
+				if (taskNo == null || taskNo == '' || taskNo == undefined) {
+					this.$u.toast('凭证号为空，请确认');
+					return;
+				} */
+
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url
+				});
+			}, 100);
+		},
+
+		//查询提交
+		QueryPalletNoItemBN_Click(url) {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集数据未提交,不允许托盘上架！'
+				});
+				return;
+			}
+			if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '托盘号为空，请确认'
+				});
+				return;
+			}
+
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?trayNo=' + this.trayNo
+				});
+			}, 100);
+		},
+
+		//查询指令
+		GetPalletItemByTaskID(url) {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集数据未提交,不允许查看指令！'
+				});
+				return;
+			}
+
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?taskComment=' + taskComment + '&taskId=' + taskId + '&taskType=00'
+				});
+			}, 100);
+		},
+		checkIntAndFloat(source) {
+			var regex = /^[0-9]+(\.[0-9]+)?$/g;
+			return regex.test(source);
+		},
+
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.collectItemButton_Click('aswhUpCollectDetail');
+			}
+			if (e.index === 1) {
+				this.commitButton_Click();
+			}
+			if (e.index === 2) {
+				this.show = true;
+			}
+		},
+		//二级菜单点击事件
+		subClick(e) {
+			console.log(e);
+			if (e.index === 1) {
+				this.QueryPalletNoItemBN_Click('aswhUpPalletItem');
+			} else if (e.index === 2) {
+				this.GetPalletItemByTaskID('aswhUpWmsToWcs');
+			} else if (e.index === 3) {
+				this.commitButton_Click2();
+			}
+			this.onClose();
+		},
+		//关闭二级菜单
+		onClose() {
+			this.show = false;
+		},
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+/* #ifndef APP-NVUE */
+page {
+	font-weight: normal;
+}
+/* #endif */
+
+.fui-page__bd {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.fui-custom__wrap {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 520rpx;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 案例一 start*/
+.fui-popup__container {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	position: relative;
+	justify-content: center;
+	flex-direction: column;
+	padding: 24rpx 32rpx;
+}
+
+.fui-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	text-align: center;
+}
+
+.fui-sub__title {
+	/* #ifndef APP-NVUE */
+	display: block;
+	/* #endif */
+	text-align: center;
+	font-size: 24rpx;
+	color: #7f7f7f;
+	transform: scale(0.9);
+}
+
+.fui-descr {
+	font-weight: bold;
+	padding-top: 64rpx;
+}
+
+.fui-sub__descr {
+	font-size: 26rpx;
+	color: #b2b2b2;
+	padding: 32rpx 0;
+}
+
+.fui-btn__box {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: row;
+	justify-content: center;
+	padding: 32rpx 0;
+	height: 144rpx;
+}
+
+.fui-icon__close {
+	position: absolute;
+	top: 24rpx;
+	left: 24rpx;
+}
+
+/* 案例一 end*/
+.fui-scroll__wrap {
+	padding-top: 30rpx;
+	position: relative;
+}
+
+.fui-scroll__view {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 600rpx;
+}
+
+.fui-title__pb {
+	padding-bottom: 24rpx;
+}
+.table_hide {
+	width: 100%;
+	height: 0rpx;
+}
+</style>

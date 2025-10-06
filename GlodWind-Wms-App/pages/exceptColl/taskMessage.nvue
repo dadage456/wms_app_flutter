@@ -1,0 +1,164 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="我的消息" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-table-weex ref="table" fixed height="1200" stripe full :itemList="intaskList" :header="column1" @click="rowOperate"></fui-table-weex>
+			<fui-pagination :total="total" pageSize="100" :pageType="2" :current="current" @change="loadData"></fui-pagination>
+		</view>
+	</view>
+</template>
+
+<script>
+import { selectTaskMessageList, messageConfim } from '@/api/system/goodsUp';
+import storage from '@/utils/storage';
+export default {
+	data() {
+		return {
+			column1: [
+				{
+					label: '操作',
+					fixed: 'right',
+					type: 3,
+					width: 200,
+					click: '',
+					buttons: [
+						{
+							text: '确认',
+							color: '#465CFF',
+							// size: 30,
+							fontWeight: 600,
+							type: 'success'
+						}
+					]
+				},
+				{
+					prop: 'messageType',
+					label: '消息类型',
+					width: 260
+				},{
+					prop: 'messageStatus',
+					label: '消息状态',
+					width: 140
+				},
+				{
+					prop: 'messageTitle',
+					label: '消息标题',
+					width: 380
+				},
+				{
+					prop: 'messageConcent',
+					label: '消息内容',
+					width: 960
+				},
+				
+				{
+					prop: 'createTime',
+					label: '下达时间',
+					width: 380
+				},
+
+				{
+					prop: 'receiveTime',
+					label: '处理时间',
+					width: 380
+				}
+			],
+			total: '',
+			current: 1,
+
+			isLoading: false,
+			//查询条件
+			Intask: {
+				userId: this.$store.state.userid,
+				roleoRuserId: this.$store.state.userid,
+				PageIndex: '1',
+				PageSize: '100'
+			},
+			//查询结果
+			intaskList: []
+		};
+	},
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+	},
+	onLoad() {
+		var _this = this;
+		_this.getList();
+
+		/* uni.$off('scancodedate') */ // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			console.log('你想要的code:' + content);
+			_this.Intask.searchKey = content;
+			_this.getList();
+		});
+	},
+	onShow() {
+		var _this = this;
+		_this.getList();
+		console.log('重新加载画面');
+
+		uni.$off('scancodedate'); // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			console.log('你想要的code:' + content);
+			_this.Intask.searchKey = content;
+			_this.getList();
+		});
+	},
+	methods: {
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		},
+		rowOperate(rowItem) {
+			if (rowItem.buttonIndex === 0) {
+				this.reprocess(rowItem.item);
+			}
+		},
+
+		reprocess(ite) {
+			console.log(ite);
+			this.reprocessDconnect(ite.messageId);
+		},
+
+		//重新执行
+		reprocessDconnect(messageId) {
+			messageConfim(messageId).then((response) => {
+				this.getList();
+			});
+		},
+
+		loadData(params) {
+			this.current = params.current;
+			this.getList(); // 点击的时候去请求查询列表
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			this.Intask.PageIndex = this.current;
+			selectTaskMessageList(this.Intask).then((response) => {
+				this.intaskList = response.data.rows;
+				this.total = response.data.total;
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+.fui-block {
+	width: 100%;
+	height: 50rpx;
+	background-color: #fff;
+}
+</style>

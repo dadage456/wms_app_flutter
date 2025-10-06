@@ -1,0 +1,114 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="通知列表" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view class="fui-block"></view>
+
+		<view class="fui-news__list">
+			<view class="fui-news__item" v-for="(item, index) in noteList" :key="index" @click="navTo('/pages/msg/msgdetail',item.noticeId)">
+				<fui-overflow-hidden :text="item.noticeTitle" :size="36" :rows="1"></fui-overflow-hidden>
+				<view class="fui-news__info">
+					<fui-text :padding="['0', '20rpx', '0', '0']" :text="item.createBy" :size="25" color="#7F7F7F"></fui-text>
+					<fui-text :text="`${item.createDate}`" :size="25" color="#7F7F7F"></fui-text>
+				</view>
+			</view>
+		</view>
+		
+	</view>
+</template>
+
+<script>
+import { getMorNotice } from '@/api/system/goodsUp';
+export default {
+	data() {
+		return {
+			noteList: [],
+			keywords: ''
+		};
+	},
+	onLoad() {
+		let _this=this;
+		_this.getNotice();
+	},
+	methods: {
+		getNotice() {
+			getMorNotice().then((response) => {
+				this.noteList = response.data;
+			});
+		},
+		navTo(url,noticeId) {
+			uni.navigateTo({
+				url: url + '?noticeId=' + noticeId
+			});
+		},
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		}
+	}
+};
+</script>
+
+<style>
+/* #ifndef APP-NVUE */
+page {
+	font-weight: normal;
+}
+
+/* #endif */
+
+.fui-align__center {
+	flex-direction: row;
+}
+
+.fui-section__title {
+	margin-left: 32rpx;
+	/* #ifdef APP-NVUE */
+	margin-top: 64rpx;
+	/* #endif */
+}
+
+/*
+	  新闻列表 css
+	*/
+
+.fui-news__item {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	box-sizing: border-box;
+	/* #endif */
+	padding: 20rpx 32rpx;
+	background-color: #fff;
+}
+
+.fui-news__item:active {
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.fui-image__list {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-top: 20rpx;
+	padding-bottom: 16rpx;
+}
+
+.fui-news__info {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	flex-direction: row;
+	transform: scale(0.8);
+	transform-origin: 0 100%;
+}
+.fui-block {
+	width: 100%;
+	height: 130rpx;
+	background-color: #fff;
+}
+</style>

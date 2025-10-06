@@ -1,0 +1,294 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="平库下架采集结果" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 125rpx">
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="750"
+				align="left"
+				stripe
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="stocks"
+				:header="column1"
+				@rowClick="rowClick1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+			></fui-table-weex>
+		</view>
+		<fui-bottom-navbar background="#465CFF" color="#d1d1d1" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+	</view>
+</template>
+
+<script>
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime } from '@/common/util.js';
+import { toast, showConfirm, tansParams } from '@/utils/common';
+export default {
+	onLoad() {
+		try {
+			let value = uni.getStorageSync('up_stocks');
+			if (value != '' && value != undefined && value.length > 0) {
+				/* console.log(value); */
+				this.stocks = value;
+			}
+			let valuede = uni.getStorageSync('up_inTaskItemList');
+			if (valuede != '' && valuede != undefined && valuede.length > 0) {
+				/* console.log(valuede); */
+				this.detailListView = valuede;
+			}
+
+			let valueSeq = uni.getStorageSync('up_dicSeq');
+			this.dicSeq = new Map(JSON.parse(valueSeq));
+
+			let valueQty = uni.getStorageSync('up_dicMtlQty');
+			this.dicMtlQty = new Map(JSON.parse(valueQty));
+
+			let valueInvQty = uni.getStorageSync('up_dicInvMtlQty');
+			this.dicInvMtlQty = new Map(JSON.parse(valueInvQty));
+		} catch (e) {
+			//错误
+		}
+	},
+	data() {
+		return {
+			checkedIds: [],
+			//数据格式二
+			options: [
+				{
+					text: '删除'
+				}
+			],
+			height: 100,
+			show: false,
+			list: [],
+			stocks: [],
+			checkedList: [],
+			detailListView: [],
+			dicSeq: new Map(),
+			dicMtlQty: new Map(),
+			dicInvMtlQty: new Map(),
+			column1: [
+				{
+					prop: 'storeSite',
+					label: '库位',
+					width: 260,
+					sortable: true
+				},
+				{
+					prop: 'matcode',
+					label: '物料编码',
+					width: 210,
+					sortable: true
+				},
+				{
+					prop: 'taskQty',
+					label: '任务数量'
+				},
+				{
+					prop: 'collectQty',
+					label: '采集数量'
+				},
+				{
+					prop: 'batchno',
+					label: '批次',
+					width: 360,
+					sortable: true
+				},
+				{
+					prop: 'sn',
+					label: '序列',
+					width: 450,
+					sortable: true
+				},
+				{
+					prop: 'erpStore',
+					label: '子库',
+					sortable: true
+				},
+				{
+					prop: 'storeRoom',
+					label: '库房'
+				},
+				{
+					prop: 'taskid',
+					label: '任务id'
+				},
+				{
+					prop: 'outtaskitemid',
+					label: '出库任务明细id'
+				},
+				{
+					prop: 'stockid',
+					label: '采集数据id',
+					width: 450
+				}
+			]
+		};
+	},
+	methods: {
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.deleteColl();
+			}
+		},
+		handleCheckAll(selectItem) {
+			const { checkedIds, stocks } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.stocks.map((item) => item.stockid);
+			} else {
+				this.checkedIds = [];
+			}
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.stockid);
+			if (selectItem.is_selected) {
+				if (index < 0) {
+					this.checkedIds.push(selectItem.item.stockid);
+				}
+			} else {
+				if (index >= 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+		},
+
+		deleteColl() {
+			if (this.checkedIds.length <= 0) {
+				uni.showToast({
+					icon: 'none',
+					duration: 3000,
+					title: '请至少选择一行记录'
+				});
+				return;
+			}
+			showConfirm('是否要执行删除操作?').then((res) => {
+				if (res.confirm) {
+					for (var cc = 0; cc < this.checkedIds.length; cc++) {
+						for (var c1 = 0; c1 < this.stocks.length; c1++) {
+							if (this.checkedIds[cc] == this.stocks[c1].stockid) {
+								for (var c2 = 0; c2 < this.detailListView.length; c2++) {
+									let outtaskitemid = this.detailListView[c2].outtaskitemid;
+									if (this.stocks[c1].outtaskitemid == outtaskitemid) {
+										let collectQty = parseFloat(this.detailListView[c2].collectedqty);
+										let collectQty_col = parseFloat(this.stocks[c1].collectQty);
+										collectQty = collectQty - collectQty_col;
+										if (collectQty < 0) {
+											collectQty = 0;
+										}
+										this.detailListView[c2].collectedqty = collectQty;
+										break;
+									}
+								}
+								if (this.dicSeq.has(this.stocks[c1].matcode + '@' + this.stocks[c1].sn)) {
+									this.dicSeq.delete(this.stocks[c1].matcode + '@' + this.stocks[c1].sn);
+								}
+
+								if (this.dicMtlQty.has(this.stocks[c1].outtaskitemid)) {
+									let ls2 = this.dicMtlQty.get(this.stocks[c1].outtaskitemid);
+									let taskQty = ls2[1];
+									taskQty = parseFloat(taskQty) - parseFloat(this.stocks[c1].collectQty);
+									if (taskQty <= 0) {
+										taskQty = 0;
+									}
+									ls2[1] = taskQty;
+									this.dicMtlQty.set(this.stocks[c1].outtaskitemid, ls2);
+								}
+
+								let strkey = '';
+								if (this.stocks[c1].sn != '' && this.stocks[c1].sn != undefined && this.stocks[c1].sn != null) {
+									strkey = this.stocks[c1].storeSite + this.stocks[c1].matcode + this.stocks[c1].sn;
+								} else {
+									strkey = this.stocks[c1].storeSite + this.stocks[c1].matcode + this.stocks[c1].batchno;
+								}
+								if (this.dicInvMtlQty.has(strkey)) {
+									let ls21 = this.dicInvMtlQty.get(strkey);
+									let taskQty = ls21;
+									taskQty = parseFloat(taskQty) - parseFloat(this.stocks[c1].collectQty);
+									if (taskQty <= 0) {
+										taskQty = 0;
+									}
+									ls21 = taskQty;
+									this.dicInvMtlQty.set(strkey, ls21);
+								}
+
+								this.stocks.splice(c1, 1);
+								break;
+							}
+						}
+					}
+					uni.setStorage({
+						key: 'up_updateflag',
+						data: '1', //有修改
+						success: function () {
+							console.log('采集状态调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_stocks',
+						data: this.stocks, //未修改
+						success: function () {
+							console.log('采集结果调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_inTaskItemList',
+						data: this.detailListView, //未修改
+						success: function () {
+							console.log('采集任务调整成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_dicMtlQty',
+						data: JSON.stringify(Array.from(this.dicMtlQty)),
+						success: function () {
+							console.log('采集成功后 采集列表保存成功');
+						}
+					});
+
+					uni.setStorage({
+						key: 'up_dicInvMtlQty',
+						data: JSON.stringify(Array.from(this.dicInvMtlQty)),
+						success: function () {
+							console.log('采集成功后 采集列表保存成功');
+						}
+					});
+					uni.setStorage({
+						key: 'up_dicSeq',
+						data: JSON.stringify(Array.from(this.dicSeq)),
+						success: function () {
+							console.log('采集成功后 采集列表保存成功');
+						}
+					});
+				}
+				if (res.cancel) {
+					return;
+				}
+			});
+		},
+		rowClick(row, index) {
+			console.log('单击某行', row, index);
+		},
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss"></style>

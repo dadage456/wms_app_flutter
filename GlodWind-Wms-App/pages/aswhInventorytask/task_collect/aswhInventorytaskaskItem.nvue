@@ -1,0 +1,1619 @@
+<template>
+	<view class="fui-wrap">
+		<fui-nav-bar isFixed title="立库盘点采集" >
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view style="padding-top: 105rpx">
+			<fui-input
+				borderTop
+				topLeft
+				topRight
+				borderBottom
+				v-model="scanningContent.text"
+				:placeholder="placeholder"
+				:focus="focus"
+				type="digit"
+				clearable
+				@confirm="search"
+			></fui-input>
+		</view>
+		<fui-row marginBottom="5rpx">
+			<fui-col :span="12">
+				<fui-card title="托盘号:" :tag="trayNo"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="库位编码:" :tag="storeSite"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<fui-row marginBottom="5rpx">
+			<fui-col :span="12">
+				<fui-card title="库存:" :tag="repqty"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="拣选位置:" :tag="endAddr"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="物料:" :tag="BarcodeContent.matcode"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="采集数量:" :tag="collectQty"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="12">
+				<fui-card title="名称:" :tag="BarcodeContent.matname"></fui-card>
+			</fui-col>
+			<fui-col :span="12">
+				<fui-card title="批次:" :tag="BarcodeContent.batchno"></fui-card>
+			</fui-col>
+		</fui-row>
+		<fui-row marginBottom="1rpx">
+			<fui-col :span="24">
+				<fui-card title="序列:" :tag="BarcodeContent.sn"></fui-card>
+			</fui-col>
+		</fui-row>
+
+		<view class="fui-page__bd">
+			<fui-tabs :tabs="tabs" center :current="curTab" selectedColor="#FA2209" @change="onChangeTab"></fui-tabs>
+		</view>
+
+		<view :class="{ table_hide: curTab == 1 }">
+			<!--如果需要初始化时触发 @selectionChange 事件，将属性 initEmitChange 设为true-->
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="585"
+				stripe
+				align="left"
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListView"
+				:header="column1"
+				@rowClick="rowClick1"
+				@select="handleCheckItem"
+				@selectAll="handleCheckAll"
+			></fui-table-weex>
+		</view>
+		<view :class="{ table_hide: curTab == 0 }">
+			<!--如果需要初始化时触发 @selectionChange 事件，将属性 initEmitChange 设为true-->
+			<fui-table-weex
+				ref="table"
+				fixed
+				height="585"
+				stripe
+				align="left"
+				selection
+				ellipsis
+				is-drag
+				full
+				:itemList="detailListViewColl"
+				:header="column2"
+				@select="handleCheckItem2"
+				@selectAll="handleCheckAll2"
+			></fui-table-weex>
+		</view>
+
+		<fui-picker :layer="layer" :options="InOutdt" :linkage="linkage" :show="show_p" @change="change_p" @cancel="cancel_p"></fui-picker>
+		<fui-bottom-popup :show="show_popup" :maskClosable="false">
+			<view class="fui-popup__container">
+				<text class="fui-title">托盘数量确认</text>
+				<view class="fui-list__item">
+					<fui-label>
+						<view class="fui-align__center">
+							<fui-input-number custom backgroundColor="#FFF" :size="30" :width="60" margin="0" v-model="palletnum.calling_num">
+								<fui-icon name="minussign" :size="48" color="#FFB703"></fui-icon>
+								<template v-slot:plus>
+									<fui-icon name="plussign-fill" :size="48" color="#FFB703"></fui-icon>
+								</template>
+							</fui-input-number>
+						</view>
+					</fui-label>
+				</view>
+				<view class="fui-btn__box">
+					<fui-button type="gray" width="240rpx" height="80rpx" text="取消" :margin="['0', '16rpx']" @click="closePopup()"></fui-button>
+					<fui-button width="240rpx" height="80rpx" text="确认" :margin="['0', '16rpx']" @click="WCSbutton()"></fui-button>
+				</view>
+
+				<view class="fui-icon__close" @tap="closePopup()">
+					<fui-icon name="close" :size="48"></fui-icon>
+				</view>
+			</view>
+		</fui-bottom-popup>
+		<fui-bottom-navbar background="#F7F8FA" lineColor="#333" :items="options" left="8" @init="init" @click="onClick"></fui-bottom-navbar>
+		<!--气泡框组件使用请查看具体文档-->
+		<fui-bubble-box
+			width="200"
+			:size="28"
+			direction="top"
+			:show="show"
+			:triangle="{ left: 100 }"
+			:bottom="height"
+			:right="10"
+			:items="subItems"
+			@click="subClick"
+			@close="onClose"
+		></fui-bubble-box>
+		<scanCode></scanCode>
+	</view>
+</template>
+
+<script>
+import { toast, showConfirm, tansParams } from '@/utils/common';
+import { GetDate, GetTaState, inArray, arrayIntersect, debounce, DatasTime, uuid } from '@/common/util.js';
+import { getPmMaterialInfoByQR } from '@/api/system/arriveSign';
+import {
+	CommitASWHDownShelves,
+	GetInOutLocation,
+	CommitDownWmsToWcs,
+	CommitEmptyTrayWmsToWcs,
+	getOutTaskCollitemList,
+	GetRoomMatControl,
+	GetMatControl,
+	getMtlRepertoryByStoresiteNo,
+	commitDownShelves,
+	getInventoryTaskItem,
+	getStoreSiteByRoom,
+	commitInventoryInfos,
+	commitInvDownWmsToWcs,
+	CommitInvResetWmsToWcs
+} from '@/api/system/goodsDown';
+import storage from '@/utils/storage';
+import scanCode from '@/components/scan-code/scan-code.vue';
+
+const tabs = [
+	{
+		name: `任务列表`,
+		value: 'taskall'
+	},
+	{
+		name: `正在采集`,
+		value: 'extreing'
+	}
+];
+
+var collectFlg = '';
+var matFoundFlg = '';
+
+/* var storeSite = ''; */
+var erpStoreSite = '';
+var batchFountFlg = '0';
+var booCheck = true; //校验批次
+var booCheckAagentCode = true; //校验供应商
+//采集结果记录
+var matCode = '';
+var batchNo = '';
+var sn = '';
+var pdate = '';
+var vdays = '';
+var matControlFlag = '';
+var strMsg = '';
+
+var protype = '';
+var siteFlag = 'Y';
+var batchFlag = 'Y';
+var finishFlag = '';
+var workStation = '';
+
+var roomMatControl = '';
+var matSendControl = '';
+var mtlCheckMode = '';
+var erpRoom = '';
+
+var resFlag = '';
+var taskComment = '';
+var taskNo = '';
+var taskId = '';
+var storeRoom = '';
+var roomTag = '';
+var checkType = '';
+var siteTable = [];
+let isWhole = '';
+
+export default {
+	components: {
+		scanCode
+	},
+	data() {
+		return {
+			show_popup: false,
+			linkage: false,
+			show_p: false,
+			checkedList: [],
+
+			//数据格式二
+			options: [
+				{
+					text: '拣选位置',
+					color: '#E55D52'
+				},
+				{
+					text: '采集结果',
+					color: '#E55D52'
+				},
+				{
+					text: '提交',
+					color: '#F37B1D'
+				},
+				{
+					text: '更多',
+					name: 'menu',
+					size: 24,
+					width: 1
+				}
+			],
+			//二级菜单
+			subItems: [
+				{
+					text: '查询指令'
+				},
+				{
+					text: '单个托盘'
+				},
+				{
+					text: '回库'
+				},
+				{
+					text: '全部托盘'
+				}
+			],
+			height: 100,
+			show: false,
+
+			curTab: 0,
+			tabs,
+			column1: [
+				{ prop: 'palletno', label: '托盘号',width: 180,sortable: true },
+				{ prop: 'storesite', label: '库位',width: 183,sortable: true },
+				{ prop: 'collectdataqty', label: '盘库数量' },
+				{ prop: 'checkmethod_nm', label: '盘库类型' },
+				{ prop: 'checktaskno', label: '任务号',width: 210 },
+				{ prop: 'co_checkitemid', label: '任务ID' },
+				{ prop: 'storeroomno', label: '库房' }
+			],
+			column2: [
+				{ prop: 'palletno', label: '托盘号',width: 180 ,sortable: true},
+				{ prop: 'storesite', label: '库位',width: 183,sortable: true },
+				{ prop: 'collectdataqty', label: '盘库数量' },
+				{ prop: 'checkmethod_nm', label: '盘库类型' },
+				{ prop: 'checktaskno', label: '任务号',width: 210 },
+				{ prop: 'co_checkitemid', label: '任务ID' },
+				{ prop: 'storeroomno', label: '库房' }
+			],
+			show1: false,
+			InOutdt: [],
+			InOutdt2: [],
+			checkedList: [],
+			Step: {
+				_2DBarcode: '_2DBarcode',
+				Site: 'Site',
+				Quantity: 'Quantity',
+				TrayNo: 'TrayNo'
+			},
+			CheckType: {
+				Site: 'Site',
+				Mtl: 'Mtl'
+			},
+			MtlCheckMode: {
+				Mtl: 'Mtl', // 检查物料
+				MtlBatch: 'MtlBatch', // 物料+批号
+				MtlSite: 'MtlSite', // 物料+库位
+				MtlBatchSite: 'MtlBatchSite' // 物料+批号+库位
+			},
+
+			placeholder: '请扫描托盘',
+			//扫描内容
+			scanningContent: { text: '' },
+
+			repqty: 0,
+			storeSite: '', //采集的库位
+			collectQty: 0,
+
+			//查询条件
+			checktask: {
+				taskComment: '',
+				taskNo: '',
+				taskId: '',
+				roomTag: '',
+				sortType: '',
+				sortColumn: '',
+				searchKey: ''
+			},
+
+			//采集结果
+			BarcodeContent: {
+				matcode: '', //物料编码
+				qty: '', //采集数量
+				matname: '', //物料名称
+				batchno: '', //批次
+				sn: '', //序列
+				pdate: '', //生产日期
+				vdays: '', //保质期
+				seqctrl: '', //控制方式
+				id_old: '', //编码方式 新格式，就格式
+				materialid: ''
+			},
+			//查询结果
+			detailListView: [],
+			detailListViewColl: [],
+
+			dicSeq: new Map(), //key: outtaskitemid value: 0:开始采集数  1：本次数量
+			dicMtlInfo: new Map(),
+			stocks: [],
+			focus: false,
+			storeRoom: '',
+			trayNo: '',
+			endAddr: '',
+			inArray,
+			checkedIds: [],
+			dicPalletNo: new Map(),
+			palletnum: {
+				calling_num: '10'
+			}
+		};
+	},
+	onLoad(options) {
+		var _this = this;
+		let checkTask = JSON.parse(decodeURIComponent(options.item));
+
+		_this.checktask.taskcomment = checkTask.taskcomment;
+		_this.checktask.checktaskno = checkTask.checktaskno;
+		_this.checktask.roomTag = '1';
+		_this.storeRoom = checkTask.storeroomno;
+
+		taskNo = checkTask.checktaskno;
+		taskId = checkTask.checktaskid;
+		storeRoom = checkTask.storeroomno;
+		taskComment = checkTask.taskcomment;
+
+		_this.getList();
+		_this.getInOutdt();
+		/* uni.$off('scancodedate'); */ // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			_this.PerformingBarcode(content);
+		});
+	},
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+	},
+	onShow() {
+		setTimeout(() => {
+			try {
+				/* console.log('进入onshow'); */
+				let updateflag = uni.getStorageSync('up_updateflag');
+				if (updateflag == '1') {
+					/* console.log('进入onshow'); */
+					let value22 = uni.getStorageSync('up_inTaskItemList');
+					if (value22) {
+						this.detailListView = value22;
+						this.stocks = uni.getStorageSync('up_stocks');
+						this.taskcollAdd(this.trayNo);
+						uni.setStorage({
+							key: 'up_updateflag',
+							data: '0', //未修改
+							success: function () {
+								console.log('采集状态修改标志恢复');
+							}
+						});
+					}
+				}
+			} catch (e) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: e
+				});
+			}
+		}, 100);
+		var _this = this;
+		uni.$off('scancodedate'); // 每次进来先 移除全局自定义事件监听器
+		uni.$on('scancodedate', function (content) {
+			_this.PerformingBarcode(content);
+		});
+	},
+onBackPress(options) {
+		// 如果是返回按钮，才做执行
+		if (options.from === 'backbutton') {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '提示',
+					content: '当前采集记录尚未提交 确定退出采集吗？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.$off('scancodedate');
+							uni.reLaunch({
+								url: '/pages/aswhInventorytask/aswhInventoryTask' // 你可以根据需要调整跳转的页面
+							});
+						}
+					}
+				});
+				// 禁止默认返回
+				return true;
+			} else {
+				uni.$off('scancodedate');
+				uni.reLaunch({
+					url: '/pages/aswhInventorytask/aswhInventoryTask' // 你可以根据需要调整跳转的页面
+				});
+				return true;
+			}
+		}
+	},
+	methods: {
+		initCurTab(options) {
+			const app = this;
+			if (options.dataType) {
+				const indextab = app.tabs.findIndex((item) => item.value == options.dataType);
+				app.curTab = indextab > -1 ? indextab : 0;
+			}
+		},
+		onChangeTab(tab) {
+			const app = this;
+			app.curTab = tab.index;
+
+			console.log(this.curTab);
+		},
+
+		taskcollAdd(trayNo) {
+			this.detailListViewColl = [];
+			let coli = 0;
+			let tmpPalletno = '';
+
+			if (trayNo != undefined && trayNo != null && trayNo.length != 0) {
+				for (coli = 0; coli < this.detailListView.length; coli++) {
+					tmpPalletno = this.detailListView[coli].palletno;
+					if (trayNo == tmpPalletno) {
+						this.detailListViewColl.push(this.detailListView[coli]);
+					}
+				}
+			}
+			if (this.detailListViewColl.length <= 0) {
+				this.curTab = 0;
+			} else {
+				this.curTab = 1;
+			}
+		},
+
+		getInOutdt() {
+			GetInOutLocation('1').then((response) => {
+				this.InOutdt2 = response.data;
+				this.InOutdt.push(this.InOutdt2);
+				if (this.InOutdt.length <= 0) {
+					uni.showModal({
+						title: '立库盘点',
+						showCancel: false,
+						content: '立体库进出口相关位置未维护!'
+					});
+					return;
+				}
+			});
+		},
+		//已接收未完成单据加载
+		getList() {
+			uni.showLoading({
+				title: '加载中'
+			});
+			getInventoryTaskItem(this.checktask).then((response) => {
+				console.log(response.data);
+				this.detailListView = response.data;
+				if (this.detailListView.length > 0) {
+					if (this.detailListView[0].checkmethod_nm == '库位') {
+						checkType = this.CheckType.Site;
+						for (let aa = 0; aa < this.detailListView.length; aa++) {
+							/* console.log('palletno:' + this.detailListView[aa].palletno); */
+							if (!this.dicMtlInfo.has(this.detailListView[aa].storesite)) {
+								let lsaa = [];
+								lsaa[0] = aa;
+								lsaa[1] = 0;
+								this.dicMtlInfo.set(this.detailListView[aa].storesiteno, lsaa);
+							}
+						}
+					}
+
+					if (this.detailListView[0].checkmethod_nm == '全盘盘点') {
+						for (let aa = 0; aa < this.detailListView.length; aa++) {
+							if (!this.dicMtlInfo.has(this.detailListView[aa].storeroomno)) {
+								let lsaa = [];
+								lsaa[0] = aa;
+								lsaa[1] = 0;
+								this.dicMtlInfo.set(this.detailListView[aa].storeroomno, lsaa);
+							}
+						}
+						isWhole = 'Y';
+					} else {
+						isWhole = 'N';
+					}
+
+					if (this.detailListView[0].checkmethod_nm == '物料') {
+						checkType = this.CheckType.Mtl;
+						for (let aa = 0; aa < this.detailListView.length; aa++) {
+							if (!this.dicMtlInfo.has(this.detailListView[aa].matcode2)) {
+								let lsaa = [];
+								lsaa[0] = aa;
+								lsaa[1] = 0;
+								this.dicMtlInfo.set(this.detailListView[aa].matcode2, lsaa);
+							}
+						}
+					}
+				}
+
+				uni.setStorage({
+					key: 'up_stocks',
+					data: null, //未修改
+					success: function () {
+						console.log('采集结果初始化');
+					}
+				});
+				uni.setStorage({
+					key: 'up_updateflag',
+					data: '0',
+					success: function () {
+						console.log('采集状态修改标志初始化');
+					}
+				});
+				uni.setStorage({
+					key: 'up_inTaskItemList',
+					data: response.data,
+					success: function () {
+						console.log('采集任务初始化');
+					}
+				});
+
+				setTimeout(function () {
+					uni.hideLoading();
+				}, 100);
+				if (this.detailListView.length <= 0) {
+					this.$u.toast('当前任务列表没有待处理任务！');
+				}
+			});
+		},
+		search(event) {
+			this.PerformingBarcode(event.detail.value);
+		},
+
+		//进入采集界面
+		actionsClick(url, item) {
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?item=' + encodeURIComponent(JSON.stringify(item))
+				});
+			}, 100);
+		},
+		//采集内容处理
+		async PerformingBarcode(barcode) {
+			try {
+				var strSiteCode = '';
+				var strBatch = '';
+				var strMtlCode = '';
+
+				if (barcode == undefined || barcode == null || barcode.length == 0) {
+					throw new Error('采集内容为空,请重新采集');
+				}
+				let currStep = '';
+				//采集内容判断
+				//物料编码
+				if (barcode.includes('MC') > 0) {
+					currStep = this.Step._2DBarcode;
+					//库位判断
+				} else if (barcode.includes('$KW$')) {
+					currStep = this.Step.Site;
+				} else if (barcode.includes('$TP$')) {
+					currStep = this.Step.TrayNo;
+				}
+				//数量
+				else if (this.checkIntAndFloat(barcode)) {
+					currStep = this.Step.Quantity;
+				} else {
+					throw new Error('采集内容不合法');
+				}
+
+				switch (currStep) {
+					case this.Step._2DBarcode:
+						var BarcodeContent2 = null;
+						//物料条码分析
+						let response = await this.getPmMaterialInfoByQR(barcode);
+						if (response.code == '200') {
+							BarcodeContent2 = response.data;
+						}
+
+						if (BarcodeContent2 == undefined || BarcodeContent2 == null || BarcodeContent2.length == 0) {
+							this.$set(this.scanningContent, 'text', '');
+							throw new Error('物料条码识别出现问题');
+						}
+						let mtlCode = BarcodeContent2.matcode;
+
+						//二维码新旧格式
+						var newmarttask = BarcodeContent2.id_old.toString();
+						//物料控制模式 序列还是批次
+						var matControl = BarcodeContent2.seqctrl.toString();
+
+						if (checkType != this.CheckType.Site) {
+							if (!this.dicMtlInfo.has(mtlCode)) {
+								this.$set(this.scanningContent, 'text', '');
+								throw new Error('物料【' + mtlCode + '】不在盘点任务清单');
+							}
+						}
+						if (matControl == '0') {
+							if (this.dicSeq.has(BarcodeContent2.matcode + '@' + BarcodeContent2.sn)) {
+								matCode = '';
+								this.$set(this.scanningContent, 'text', '');
+								throw new Error('序列号【' + BarcodeContent2.sn + '】不允许重复采集，请确认');
+							}
+							this.BarcodeContent = BarcodeContent2;
+							this.BarcodeContent.batchNo = newmarttask == 1 ? BarcodeContent2.batchno : '';
+							this.BarcodeContent.qty = 1;
+
+							batchNo = '';
+							sn = '';
+							batchNo = newmarttask == 1 ? BarcodeContent2.batchno : '';
+							sn = BarcodeContent2.sn;
+							this.collectQty = 1;
+						}
+						if (matControl == '1' || matControl == '2') {
+							batchNo = BarcodeContent2.batchno == undefined || BarcodeContent2.batchno == '' || BarcodeContent2.batchno == null ? '' : BarcodeContent2.batchno;
+							sn = '';
+						}
+						matCode = BarcodeContent2.matcode;
+						matControlFlag = matControl;
+						this.BarcodeContent = BarcodeContent2;
+						this.$set(this.scanningContent, 'text', '');
+						break;
+
+					case this.Step.Site:
+						var str1 = barcode.toString();
+						let sArry = str1.split('$');
+
+						let responseroom = await this.getStoreSiteByRoom(this.storeRoom, sArry[2]);
+						if (responseroom.code == '200') {
+							let siteList = responseroom.data;
+							if (siteList.Length <= 0) {
+								this.$set(this.scanningContent, 'text', '');
+								throw new Error('库房【' + this.storeRoom + '】下无库位号【' + sArry[2] + '】');
+							}
+							if (checkType == this.CheckType.Site) {
+								if (!this.dicMtlInfo.has(sArry[2])) {
+									this.$set(this.scanningContent, 'text', '');
+									throw new Error('库位【' + sArry[2] + '】不在盘点任务清单');
+								}
+							}
+						}
+
+						this.storeSite = sArry[2];
+						this.$set(this.scanningContent, 'text', '');
+						break;
+
+					case this.Step.TrayNo:
+						let str11 = barcode.toString();
+						let sArry2 = str11.split('$');
+						let temptrayNo0 = sArry2[2];
+						if (temptrayNo0 == '' || temptrayNo0 == null || temptrayNo0 == undefined) {
+							throw new Error('托盘号不能为空!');
+						}
+
+						let tmpTrayNo = '';
+						let tmpstoreSite = '';
+						let res2 = '0';
+						for (let ir = 0; ir < this.detailListView.length; ir++) {
+							tmpTrayNo = this.detailListView[ir].palletno;
+							if (tmpTrayNo == temptrayNo0) {
+								res2 = '1';
+								break;
+							}
+						}
+						if (res2 == '0' && isWhole != 'Y') {
+							throw new Error('任务明细中不存在托盘号【' + temptrayNo0 + '】');
+						}
+
+						res2 = '0';
+						for (let ir2 = 0; ir2 < this.detailListView.length; ir2++) {
+							tmpTrayNo = this.detailListView[ir2].palletno;
+							tmpstoreSite = this.detailListView[ir2].storesiteno;
+							if (tmpTrayNo == temptrayNo0) {
+								this.storeSite = tmpstoreSite;
+								res2 = '1';
+								break;
+							}
+						}
+						if (res2 == '0' && isWhole != 'Y') {
+							throw new Error('任务明细中不存在托盘号【' + temptrayNo0 + '】');
+						}
+						this.trayNo = sArry2[2];
+						this.$set(this.scanningContent, 'text', '');
+						this.taskcollAdd(this.trayNo);
+						break;
+
+					case this.Step.Quantity:
+						if (sn != undefined && sn != '' && sn != null && sn != undefined) {
+							this.$set(this.scanningContent, 'text', '');
+							throw new Error('已采集序列号无需采集数量，请扫描二维码');
+						}
+						this.collectQty = parseFloat(barcode);
+						break;
+
+					default:
+						break;
+				}
+
+				strMsg = this.getPlaceMsg();
+				//表示条码都扫描完毕
+				if (strMsg == '') {
+					let matFlag = matControlFlag;
+					let qty = this.collectQty;
+
+					var matCode = this.BarcodeContent.matcode.toString();
+					var batchNo = this.BarcodeContent.batchno.toString();
+					var matId = this.BarcodeContent.materialid;
+					var sn = null;
+
+					matFlag = Number(matFlag);
+					if (matFlag == undefined || matFlag == null || matFlag.length == 0) {
+						throw new Error('获取物料编码属性失败');
+					}
+					if (matFlag == 0) {
+						sn = this.BarcodeContent.sn.toString();
+					}
+					if (qty <= 0) {
+						throw new Error('采集数量必须大于0');
+					}
+
+					let strSite = this.storeSite;
+					let strMatCode = this.BarcodeContent.matcode;
+					let strSn = this.BarcodeContent.sn;
+					let strBatch = this.BarcodeContent.batchno;
+
+					let tmpMat = '';
+					let tmpSite = '';
+					let invTaskItemid = '';
+					let tmp = '';
+
+					if (checkType == this.CheckType.Mtl) {
+						tmp = this.BarcodeContent.matcode;
+					} else if (checkType == this.CheckType.Site) {
+						tmp = this.storeSite;
+					} else {
+						tmp = this.BarcodeContent.matcode;
+					}
+					for (let i2 = 0; i2 < this.detailListView.length; i2++) {
+						tmpMat = this.detailListView[i2].matcode2.toString(); //物料
+						tmpSite = this.detailListView[i2].storesiteno.toString();
+						invTaskItemid = this.detailListView[i2].co_checkitemid.toString();
+						if (!(tmp == tmpMat || tmp == tmpSite)) {
+							continue;
+						}
+						if (!this.dicMtlInfo.has(invTaskItemid)) {
+							let lsi2 = [];
+							lsi2[0] = 0;
+							lsi2[1] = 0;
+							this.dicMtlInfo.set(invTaskItemid, lsi2);
+						}
+						let lsi3 = this.dicMtlInfo.get(invTaskItemid);
+						lsi3[1] = lsi3[1] + qty;
+						this.dicMtlInfo.set(invTaskItemid, lsi3);
+						this.detailListView[i2].collectdataqty = lsi3[1];
+
+						if ((invTaskItemid == null || invTaskItemid == '' || invTaskItemid == undefined) && this.detailListView[0].checkmethod_nm == '全盘盘点') {
+							invTaskItemid = this.detailListView[i2].co_checkitemid.toString(); //获取明细Id
+						}
+						if (!(strSn == null || strSn == '' || strSn == undefined) && !this.dicSeq.has(strMatCode + '@' + strSn)) {
+							this.dicSeq.set(strMatCode + '@' + strSn, strMatCode + '@' + strSn);
+						}
+
+						//添加采集记录;对于采集记录的修改操作统一在采集明细中操作
+						this.AddCollectData(strMatCode, strBatch, strSn, qty, this.storeRoom, this.storeSite, matId, invTaskItemid, this.trayNo);
+						break;
+					}
+
+					await this.localSave();
+					this.taskcollAdd(this.trayNo);
+					this.InitializeCollect();
+				}
+				this.$set(this.scanningContent, 'text', '');
+				this.placeholder = this.getPlaceMsg();
+			} catch (error) {
+				uni.showModal({
+					title: '立库盘点采集异常',
+					showCancel: false,
+					content: error.message
+				});
+				this.$set(this.scanningContent, 'text', '');
+				this.InitializeCollect();
+			}
+		},
+
+		async GetMatControl(matcode) {
+			return new Promise(function (resolve, reject) {
+				GetMatControl(matcode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+
+		async GetRoomMatControl(taskId) {
+			return new Promise(function (resolve, reject) {
+				GetRoomMatControl(taskId).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+
+		async CheckSite(siteCode) {
+			let response = await this.getStoreSiteByRoom(this.storeRoom, siteCode);
+			/* console.log(response); */
+			if (response.msg && response.code != '200') {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: response.msg
+				});
+				return;
+			}
+			if (response.code == '200') {
+				let siteList = response.data;
+				if (siteList.Length <= 0) {
+					uni.showModal({
+						title: '立库盘点',
+						showCancel: false,
+						content: '库房【' + this.storeRoom + '】下无库位号【' + siteCode + '】'
+					});
+					return;
+				}
+
+				if (siteList[0].isfrozen != '0') {
+					uni.showModal({
+						title: '立库盘点',
+						showCancel: false,
+						content: '库位【' + siteCode + '】被锁定或者冻结'
+					});
+					return;
+				}
+			}
+		},
+		async getStoreSiteByRoom(storeRoomNo, storeSiteNo) {
+			return new Promise(function (resolve, reject) {
+				getStoreSiteByRoom(storeRoomNo, storeSiteNo).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+
+		async getMtlRepertoryByStoresiteNo(storeSite, matCode, erp_storeroom, batchno, sn) {
+			return new Promise(function (resolve, reject) {
+				getMtlRepertoryByStoresiteNo(storeSite, matCode, erp_storeroom, batchno, sn).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		async getPmMaterialInfoByQR(barcode) {
+			return new Promise(function (resolve, reject) {
+				getPmMaterialInfoByQR(barcode).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		/// 设定提示信息
+		/// </summary>
+		/// <param name="msg"></param>
+		getPlaceMsg() {
+			if (this.trayNo == '' || this.trayNo == null || this.trayNo == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描托盘';
+			}
+			if (this.BarcodeContent.matcode == '' || this.BarcodeContent.matcode == null || this.BarcodeContent.matcode == undefined) {
+				//条码为空 采集条码
+				this.focus = false;
+				return '请扫描二维码';
+				/* } else if ((this.BarcodeContent.sn == '' || this.BarcodeContent.sn == null || this
+							.BarcodeContent.sn == undefined) && (this.collectQty == '' || this.collectQty == null || this.collectQty ==
+							undefined || this.collectQty == 0)) */ //肯定是批次  如数量为空
+			} else if (this.BarcodeContent.sn == null && this.collectQty == 0) {
+				this.focus = true;
+				return '请输入数量';
+			} else {
+				this.focus = false;
+				return '';
+			}
+		},
+		/// <summary>
+		/// 重新初始采集
+		/// </summary>
+		InitializeCollect() {
+			matCode = null;
+			batchNo = null;
+			sn = null;
+			pdate = null;
+			vdays = null;
+			this.collectQty = 0;
+			this.BarcodeContent = [];
+			collectFlg = '';
+			matFoundFlg = '';
+			booCheck = true; //是否校验批次
+			this.storeRoom = ''; //子库
+			batchFountFlg = '0';
+			matControlFlag = '';
+			this.focus = false;
+		},
+		localSave() {
+			uni.setStorage({
+				key: 'up_inTaskItemList',
+				data: this.detailListView,
+				success: function () {
+					console.log('采集成功后 任务列表保存成功');
+				}
+			});
+			uni.setStorage({
+				key: 'up_stocks',
+				data: this.stocks,
+				success: function () {
+					console.log('采集成功后 采集列表保存成功');
+				}
+			});
+		},
+		async showConfirm(title, content) {
+			return new Promise(function (resolve, reject) {
+				// 一段耗时的异步操作
+				uni.showModal({
+					title: title,
+					content: content,
+					cancelText: '取消',
+					confirmText: '确认',
+					success: (res) => {
+						if (res.confirm) {
+							resolve(true); // 数据处理完成
+						} else if (res.cancel) {
+							/* console.log('用户点击取消'); */
+							resolve(false);
+						}
+					}
+				});
+			});
+		},
+
+		AddCollectData(matCode, batchNo, sn, collectQty, storeRoom, storeSite, matId, invTaskItemid, trayNo) {
+			let stock = {};
+			stock.stockid = uuid();
+			stock.matcode = matCode;
+			stock.batchno = batchNo;
+			stock.sn = sn;
+			stock.InventoryQty = collectQty; //计划数
+			stock.MatId = matId;
+			stock.storeRoom = storeRoom;
+			stock.storeSite = storeSite;
+			stock.InvTaskItemid = invTaskItemid;
+			stock.TrayNo = trayNo;
+			this.stocks.push(stock);
+		},
+		commitButton_Click() {
+			if (this.stocks.length == 0) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '本次无采集明细，请确认！'
+				});
+				return;
+			}
+			let tmpMat = '';
+			let taskQty1 = 0;
+			let tmpQty1 = 0;
+			let msg = '';
+			let tmpStore = '';
+
+			msg += '，请确认是否提交？';
+			uni.showModal({
+				title: '提交确认',
+				content: msg,
+				success: (res) => {
+					if (res.confirm) {
+						uni.showLoading({
+							title: '加载中'
+						});
+
+						let collectStocks = this.stocks;
+						let taskcomment = this.checktask.taskcomment;
+
+						let inventoryInfos = [];
+						for (let io = 0; io < collectStocks.length; io++) {
+							let inventoryInfo = {};
+							let upStock = collectStocks[io];
+
+							inventoryInfo.TaskComment = taskcomment;
+							inventoryInfo.matCode = upStock.matcode; //物料号
+							inventoryInfo.batchNo = upStock.batchno; //批号
+							inventoryInfo.sn = upStock.sn; //序列号
+							inventoryInfo.collectQty = upStock.InventoryQty; //已采集数量
+							inventoryInfo.storeRoomNo = upStock.storeRoom;
+							inventoryInfo.storeSiteNo = upStock.storeSite;
+							inventoryInfo.invTaskItemid = upStock.InvTaskItemid;
+							inventoryInfo.materialId = upStock.MatId;
+							inventoryInfo.trayNo = upStock.TrayNo;
+							inventoryInfos.push(inventoryInfo);
+						}
+						commitInventoryInfos(inventoryInfos, taskcomment).then((response) => {
+							setTimeout(function () {
+								uni.hideLoading();
+							}, 100);
+							this.stocks = [];
+
+							uni.showModal({
+								title: '信息提示',
+								showCancel: false,
+								content: '提交成功！'
+							});
+							uni.setStorage({
+								key: 'up_stocks',
+								data: null, //未修改
+								success: function () {
+									console.log('采集结果初始化');
+								}
+							});
+							uni.setStorage({
+								key: 'up_updateflag',
+								data: '0',
+								success: function () {
+									console.log('采集状态修改标志初始化');
+								}
+							});
+							uni.setStorage({
+								key: 'up_inTaskItemList',
+								data: null,
+								success: function () {
+									console.log('采集任务初始化');
+								}
+							});
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		},
+
+		//查询指令
+		GetPalletItemByTaskID(url) {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '采集数据未提交,不允许查看指令'
+				});
+				return;
+			}
+
+			setTimeout(() => {
+				uni.navigateTo({
+					url: url + '?taskComment=' + taskComment + '&taskId=' + taskId + '&taskType=99'
+				});
+			}, 100);
+		},
+
+		//单个来料盘
+		SingleButton() {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '采集数据未提交,不允许获取新的来料盘！'
+				});
+				return;
+			}
+			if (taskNo == null || taskNo == '' || taskNo == undefined) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '任务号为空，请确认'
+				});
+				return;
+			}
+
+			if (this.endAddr == null || this.endAddr == '' || this.endAddr == undefined) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '拣选口位置不能为空'
+				});
+				return;
+			}
+
+			uni.showModal({
+				title: '立库盘点',
+				content: '请确认获取来料托盘吗？',
+				success: (res) => {
+					if (res.confirm) {
+						var checkedList1 = this.checkedList;
+						if (checkedList1.length <= 0) {
+							uni.showModal({
+								title: '立库盘点',
+								showCancel: false,
+								content: '请至少选择一行记录'
+							});
+							return;
+						}
+						uni.showModal({
+							title: '立库盘点',
+							content: '请确认将托盘送至拣选口：【' + this.endAddr + '】?',
+							success: (res2) => {
+								if (res2.confirm) {
+									for (let aa = 0; aa < checkedList1.length; aa++) {
+										let startAddr = checkedList1[aa].storesiteno;
+										let sourcetrayNo = checkedList1[aa].palletno;
+										commitInvDownWmsToWcs(taskId, taskNo, sourcetrayNo, startAddr, this.endAddr, '1').then((response) => {
+											if (response.code == '200') {
+												uni.showModal({
+													title: '提示信息',
+													showCancel: false,
+													content: '获取来料盘成功,请等待'
+												});
+											}
+										});
+									}
+								} else {
+									return;
+								}
+							}
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		},
+
+		//全部来料盘
+		//全部来料盘
+		async WCSbutton() {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '采集异常',
+					showCancel: false,
+					content: '采集数据未提交,不允许查看指令！'
+				});
+				this.closePopup();
+				return;
+			}
+
+			let result = await this.showConfirm('立库盘点', '请确认获取来料托盘吗？');
+			if (result) {
+				if (taskNo == null || taskNo == '' || taskNo == undefined) {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: '凭证号为空，请确认'
+					});
+					this.closePopup();
+					return;
+				}
+
+				if (this.endAddr == null || this.endAddr == '' || this.endAddr == undefined) {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: '拣选口位置不能为空'
+					});
+					this.closePopup();
+					return;
+				}
+
+				if (this.palletnum.calling_num == null || this.palletnum.calling_num == '' || this.palletnum.calling_num == undefined) {
+					uni.showModal({
+						title: '采集异常',
+						showCancel: false,
+						content: '获取来料盘数据不能为空！'
+					});
+					this.closePopup();
+					return;
+				}
+				let tempPalletnum = this.palletnum.calling_num;
+
+				let result2 = await this.showConfirm('立库盘点', '请确认将托盘送至拣选口：【' + this.endAddr + '】?');
+				if (result2) {
+					uni.showLoading({
+						title: '加载中'
+					});
+					var checkedList = [];
+					let sourcetrayNo = '';
+					let startAddr = '';
+					let errMessage = '';
+					let successFlg = '';
+					let j = this.detailListView.length - 1;
+
+					for (let i = j; i >= 0; i--) {
+						if (tempPalletnum > 0) {
+							startAddr = this.detailListView[i].storesiteno;
+							sourcetrayNo = this.detailListView[i].palletno;
+							if (!this.dicPalletNo.has(sourcetrayNo)) {
+								let response = await this.commitInvDownWmsToWcs_aw(taskId, taskNo, sourcetrayNo, startAddr, this.endAddr, '1');
+								if (response.code != '200') {
+									errMessage = errMessage + '、' + sourcetrayNo;
+								}
+								if (response.code == '200') {
+									tempPalletnum = tempPalletnum - 1;
+								}
+								this.dicPalletNo.set(sourcetrayNo, sourcetrayNo);
+								if (i == 0 && (errMessage == '' || errMessage == null || errMessage == undefined)) {
+									uni.showModal({
+										title: '采集异常',
+										showCancel: false,
+										content: '获取来料盘成功,请等待！'
+									});
+									this.closePopup();
+									return;
+								}
+
+								if (!(errMessage == '' || errMessage == null || errMessage == undefined)) {
+									uni.showModal({
+										title: '采集异常',
+										showCancel: false,
+										content: '来料盘【' + errMessage + '】获取失败，请逐个选择这些托盘，点击【单个来料盘】按钮获取详细错误信息！'
+									});
+									this.closePopup();
+									return;
+								}
+							}
+						} else {
+							this.closePopup();
+							break;
+							return;
+						}
+
+						this.closePopup();
+						setTimeout(function () {
+							uni.hideLoading();
+						}, 100);
+					}
+					this.closePopup();
+					setTimeout(function () {
+						uni.hideLoading();
+					}, 100);
+				} else {
+					this.closeSort('showNum');
+					return;
+				}
+			} else {
+				this.closeSort('showNum');
+				return;
+			}
+		},
+
+		//托盘回库
+		INButton() {
+			if (this.stocks.length > 0) {
+				uni.showModal({
+					title: '立库盘点',
+					showCancel: false,
+					content: '采集数据未提交,不允许下发回库指令！'
+				});
+				return;
+			}
+
+			uni.showModal({
+				title: '立库盘点',
+				content: '请确认来料托盘回库吗？',
+				success: (res) => {
+					if (res.confirm) {
+						if (taskNo == null || taskNo == '' || taskNo == undefined) {
+							uni.showModal({
+								title: '立库盘点',
+								showCancel: false,
+								content: '凭证号为空，请确认'
+							});
+							return;
+						}
+
+						if (this.endAddr == null || this.endAddr == '' || this.endAddr == undefined) {
+							uni.showModal({
+								title: '立库盘点',
+								showCancel: false,
+								content: '拣选口位置不能为空'
+							});
+							return;
+						}
+
+						if (this.trayNo == null || this.trayNo == '' || this.trayNo == undefined) {
+							uni.showModal({
+								title: '采集异常',
+								showCancel: false,
+								content: '请采集托盘号！'
+							});
+
+							return;
+						}
+
+						let startAddr = this.endAddr;
+
+						let tmpEndAddr = '';
+						for (let au = 0; au <= this.detailListView.length; au++) {
+							if (this.detailListView[au].palletno == this.trayNo) {
+								tmpEndAddr = this.detailListView[au].storesiteno;
+								break;
+							}
+						}
+						CommitInvResetWmsToWcs(taskId, taskNo, this.trayNo, startAddr, tmpEndAddr).then((response) => {
+							if (response.code == '200') {
+								uni.showModal({
+									title: '采集异常',
+									showCancel: false,
+									content: '托盘回库成功,请等待'
+								});
+							}
+						});
+					} else {
+						return;
+					}
+				}
+			});
+		},
+
+		async commitInvDownWmsToWcs_aw(taskId, taskNo, trayNo, startAddr, endAddr, singleFlag) {
+			return new Promise(function (resolve, reject) {
+				commitInvDownWmsToWcs(taskId, taskNo, trayNo, startAddr, endAddr, singleFlag).then((response) => {
+					resolve(response);
+				});
+			});
+		},
+		checkIntAndFloat(source) {
+			var regex = /^[0-9]+(\.[0-9]+)?$/g;
+			return regex.test(source);
+		},
+
+		handleCheckAll(selectItem) {
+			const { checkedIds, detailListView } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.detailListView.map((item) => item.co_checkitemid);
+			} else {
+				this.checkedIds = [];
+			}
+			this.checkedList = this.detailListView.filter((item) => inArray(item.co_checkitemid, this.checkedIds));
+		},
+
+		handleCheckItem(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.co_checkitemid);
+			if (selectItem.is_selected) {
+				if (index <= 0) {
+					this.checkedIds.push(selectItem.item.co_checkitemid);
+				}
+			} else {
+				if (index > 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+			this.checkedList = this.detailListView.filter((item) => inArray(item.co_checkitemid, this.checkedIds));
+		},
+
+		handleCheckAll2(selectItem) {
+			const { checkedIds, detailListView2 } = this;
+			if (selectItem.is_selected) {
+				this.checkedIds = this.detailListView2.map((item) => item.co_checkitemid);
+			} else {
+				this.checkedIds = [];
+			}
+			this.checkedList = this.detailListView2.filter((item) => inArray(item.co_checkitemid, this.checkedIds));
+		},
+
+		handleCheckItem2(selectItem) {
+			const { checkedIds } = this;
+			const index = this.checkedIds.findIndex((id) => id === selectItem.item.co_checkitemid);
+			if (selectItem.is_selected) {
+				if (index < 0) {
+					this.checkedIds.push(selectItem.item.co_checkitemid);
+				}
+			} else {
+				if (index >= 0) {
+					this.checkedIds.splice(index, 1);
+				}
+			}
+			this.checkedList = this.detailListView2.filter((item) => inArray(item.co_checkitemid, this.checkedIds));
+		},
+
+		//导航栏初始化事件
+		init(e) {
+			this.height = Math.ceil((e.height / e.windowWidth) * 750);
+		},
+		//导航栏点击事件
+		onClick(e) {
+			console.log(e);
+			if (e.index === 0) {
+				this.pickerShow_p();
+			}
+			if (e.index === 1) {
+				this.actionsClick('aswhInventorytaskCollectDetail');
+			}
+			if (e.index === 2) {
+				this.commitButton_Click();
+			}
+			if (e.index === 3) {
+				this.show = true;
+			} else {
+			}
+		},
+		//二级菜单点击事件
+		subClick(e) {
+			console.log(e);
+			if (e.index === 3) {
+				this.showPopup();
+			} else if (e.index === 2) {
+				this.INButton();
+			} else if (e.index === 1) {
+				this.SingleButton();
+			} else if (e.index === 0) {
+				this.GetPalletItemByTaskID('aswhInventoryCheckorder');
+			}
+			this.onClose();
+		},
+		//关闭二级菜单
+		onClose() {
+			this.show = false;
+		},
+
+		change_p(e) {
+			this.show_p = false;
+			this.endAddr = e.text;
+		},
+		cancel_p() {
+			this.show_p = false;
+		},
+		pickerShow_p() {
+			this.show_p = false;
+			this.layer = 1;
+			this.linkage = false;
+			this.items = this.options;
+
+			this.$nextTick(() => {
+				setTimeout(() => {
+					this.show_p = true;
+				}, 50);
+			});
+		},
+		showPopup() {
+			this.show_popup = true;
+		},
+		closePopup() {
+			this.show_popup = false;
+		},
+		page_back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		}
+	}
+};
+</script>
+
+<style lang="scss">
+/* #ifndef APP-NVUE */
+page {
+	font-weight: normal;
+}
+/* #endif */
+
+.fui-page__bd {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	/* #endif */
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.fui-custom__wrap {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 520rpx;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 案例一 start*/
+.fui-popup__container {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	position: relative;
+	justify-content: center;
+	flex-direction: column;
+	padding: 24rpx 32rpx;
+}
+
+.fui-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	text-align: center;
+}
+
+.fui-sub__title {
+	/* #ifndef APP-NVUE */
+	display: block;
+	/* #endif */
+	text-align: center;
+	font-size: 24rpx;
+	color: #7f7f7f;
+	transform: scale(0.9);
+}
+
+.fui-descr {
+	font-weight: bold;
+	padding-top: 64rpx;
+}
+
+.fui-sub__descr {
+	font-size: 26rpx;
+	color: #b2b2b2;
+	padding: 32rpx 0;
+}
+
+.fui-btn__box {
+	/* #ifndef APP-NVUE */
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: row;
+	justify-content: center;
+	padding: 32rpx 0;
+	height: 144rpx;
+}
+
+.fui-icon__close {
+	position: absolute;
+	top: 24rpx;
+	left: 24rpx;
+}
+
+/* 案例一 end*/
+.fui-scroll__wrap {
+	padding-top: 30rpx;
+	position: relative;
+}
+
+.fui-scroll__view {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	/* #endif */
+	/* #ifdef APP-NVUE */
+	width: 750rpx;
+	/* #endif */
+	height: 600rpx;
+}
+
+.fui-title__pb {
+	padding-bottom: 24rpx;
+}
+.table_hide {
+	width: 100%;
+	height: 0rpx;
+}
+.fui-list__item {
+	/* #ifndef APP-NVUE */
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	/* #endif */
+	flex-direction: row;
+	align-items: center;
+	background-color: #ffffff;
+	justify-content: center;
+	padding: 28rpx 32rpx;
+}
+.fui-align__center {
+	/* #ifndef APP-NVUE */
+	display: flex !important;
+	/* #endif */
+	align-items: center;
+	justify-content: center;
+	flex-direction: row !important;
+}
+</style>

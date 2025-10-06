@@ -1,0 +1,74 @@
+<template>
+	<view class="fui-wrap fui-padding">
+		<view class="fui-title__box">
+			<text class="fui-title__size">重置密码</text>
+		</view>
+		<view class="fui-form__box">
+			<fui-input type="number" :padding="['28rpx','0']" placeholder="请输入手机号码" bottomLeft="0" maxlength="11">
+				<template v-slot:left>
+					<view class="fui-areacode__box fui-highlight" @tap.stop="area">
+						<text class="fui-area__code fui-color__primary">{{areaCode}}</text>
+						<fui-icon name="arrowdown" size="44" color="#465CFF"></fui-icon>
+					</view>
+				</template>
+			</fui-input>
+			<view class="fui-btn__box">
+				<fui-button text="获取验证码" radius="96rpx" bold @click="captcha"></fui-button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		mapState
+	} from 'vuex';
+	export default {
+		data() {
+			return {
+
+			}
+		},
+		computed: mapState(['areaCode']),
+		methods: {
+			area() {
+				// this.fui.href('/pages/common/area/area')
+				
+				uni.navigateTo({
+					url: '/pages/common/area/area'
+				});
+			},
+			captcha() {
+				// this.fui.href('/pages/common/captcha/captcha?type=2')
+				
+				uni.navigateTo({
+					url: '/pages/common/captcha/captcha?type=2'
+				});
+			}
+		}
+	}
+</script>
+
+<style>
+	.fui-areacode__box {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		flex-shrink: 0;
+		/* #endif */
+		flex-direction: row;
+		align-items: center;
+		margin-right: 64rpx;
+		/* #ifdef H5 */
+		cursor: pointer;
+		/* #endif */
+	}
+
+	.fui-area__code {
+		/* #ifndef APP-NVUE */
+		display: block;
+		white-space: nowrap;
+		/* #endif */
+		font-weight: 500;
+		padding-right: 12rpx;
+	}
+</style>

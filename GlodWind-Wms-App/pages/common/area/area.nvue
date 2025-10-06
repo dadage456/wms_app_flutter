@@ -1,0 +1,69 @@
+<template>
+	<fui-index-list :listData="lists" keyColor="#555" @init="init" @click="itemClick">
+		<fui-search-bar @search="search"></fui-search-bar>
+		<template v-slot:footer>
+			<fui-loadmore v-if="!show"></fui-loadmore>
+			<fui-divider text="此数据由firstui.cn提供" backgroundColor="#fff" v-if="show"></fui-divider>
+			<!-- <view class="fui-divider" v-if="show"></view> -->
+		</template>
+	</fui-index-list>
+</template>
+
+<script>
+	import lists from './area.code.js'
+	import {
+		mapMutations
+	} from 'vuex';
+	export default {
+		data() {
+			return {
+				lists: lists,
+				show: false
+			}
+		},
+		onLoad() {
+			// setTimeout(() => {
+			// 	this.show = true;
+			// }, 1000)
+		},
+		methods: {
+			...mapMutations(['setAreaCode']),
+			init() {
+				this.show = true;
+			},
+			itemClick(e) {
+				console.log(e)
+				this.setAreaCode(e.subText)
+
+				//选择后返回上一页面
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 50)
+			},
+			search(e) {
+				// this.fui.toast(`搜索关键词：${e.detail.value}`)
+
+				uni.showToast({
+					title: `搜索关键词：${e.detail.value}`,
+					icon: 'none'
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	/* #ifndef APP-NVUE */
+	page {
+		--fui-color-border: #EEEEEE;
+	}
+
+	/* #endif */
+	.fui-divider {
+		/* #ifndef APP-NVUE */
+		width: 100%;
+		/* #endif */
+		flex: 1;
+		padding-bottom: 64rpx;
+	}
+</style>

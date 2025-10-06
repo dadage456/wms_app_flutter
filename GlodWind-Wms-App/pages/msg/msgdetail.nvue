@@ -1,0 +1,63 @@
+<template>
+	<view class="gui-padding">
+		<fui-nav-bar isFixed title="通知列表" @leftClick="page_back">
+			<fui-icon name="arrowleft"></fui-icon>
+		</fui-nav-bar>
+		<view class="fui-block"></view>
+
+		<view class="gui-comments">
+			<view class="gui-comments-items gui-flex gui-rows gui-nowrap gui-space-between">
+				<view class="gui-comments-body">
+					<view class="gui-flex gui-rows gui-nowrap gui-space-between gui-align-items-center">
+						<text class="gui-comments-header-text gui-text gui-primary-color">{{ Notice.noticeTitle }}</text>
+						<text class="gui-comments-header-text gui-icons gui-color-gray gui-text-small" :class="[Notice.nickName ? 'gui-color-blue' : '']">
+							&#xe6ea; {{ Notice.nickName }}
+						</text>
+					</view>
+					<text class="gui-comments-content gui-block-text">{{ Notice.noticeContent }}</text>
+
+					<view class="gui-comments-info gui-flex gui-rows gui-nowrap gui-space-between gui-align-items-center">
+						<text class="gui-comments-info-text">{{ Notice.createTime }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+<script>
+import { getNoticeDetail } from '@/api/system/goodsUp';
+export default {
+	data() {
+		return {
+			Notice: {},
+			noticeId: ''
+		};
+	},
+	onLoad(options) {
+		var _this = this;
+		_this.noticeId = options.noticeId;
+		_this.getNotice();
+	},
+	methods: {
+		showImgs: function (commentsIndex, imgIndex) {
+			console.log(commentsIndex, imgIndex);
+			uni.previewImage({
+				urls: this.commentContents[commentsIndex].imgs,
+				current: this.commentContents[commentsIndex].imgs[imgIndex]
+			});
+		},
+		getNotice() {
+			getNoticeDetail(this.noticeId).then((response) => {
+				this.Notice = response.data;
+			});
+		}
+	}
+};
+</script>
+<style scoped>
+.fui-block {
+	width: 100%;
+	height: 130rpx;
+	background-color: #fff;
+}
+</style>

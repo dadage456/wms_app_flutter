@@ -1,0 +1,130 @@
+/* 文本核心色 一般为黑色 */
+.gui-primary-color{color:#2B2E3D;}
+
+/* 核心背景色 */
+.gui-bg-primary{background-color:#2B2E3D !important;}
+
+
+/* 点击元素通用样式 */
+.gui-tap{opacity:0.85;}
+
+
+/* 购物按钮渐变背景色 */
+.gui-bg-add-card{background-image:linear-gradient(to right, #F1CF53,#F29C39) !important;}
+.gui-bg-buy{background-image:linear-gradient(to right, #E86E35,#EB5058) !important;}
+
+
+/* *** 间距设置 */
+.gui-padding{padding-left:30rpx; padding-right:30rpx;} /* 左右内间距 */
+.gui-margin{margin-left:30rpx; margin-right:30rpx;} /* 左右外间距 */
+.gui-margin-top{margin-top:30rpx;} /* 顶部外间距 */
+.gui-margin-top-large{margin-top:58rpx;} /* 顶部外间距 大 */
+/* 间距设置 *** */
+
+
+/* 文本尺寸 */
+.gui-text{font-size:28rpx; line-height:50rpx; color:#2B2E3D;}
+.gui-text-small{font-size:22rpx;}
+.gui-h1{font-size:80rpx;}
+.gui-h2{font-size:60rpx;}
+.gui-h3{font-size:45rpx;}
+.gui-h4{font-size:32rpx;}
+.gui-h5{font-size:30rpx;}
+.gui-h6{font-size:28rpx;}
+/* #ifndef APP-NVUE */
+.gui-indent{text-indent:56rpx;}
+/* #endif */
+/* #ifdef APP-NVUE */
+.gui-indent{padding-left:56rpx;}
+/* #endif */
+
+
+/* *** gui-page 页面组件相关  */
+.gui-page-loading-bg{background-color:rgba(255,255,255,0.88);} /* 页面内置全屏 Loading 背景颜色 */
+.gui-page-loading-color{background-color:#2B2E3D;} /* 页面内置全屏 Loading 颜色 */
+.gui-header-buttons-bg{background-color:rgba(0,0,0,0.8);} /* 自定义导航左侧按钮背景颜色 */
+.gui-header-buttons-color{color:#FFFFFF;} /* 自定义导航左侧按钮颜色 */
+.gui-nav-bottom-color{color:#B6C3D2;}/* 底部自定义导航默认色 */
+.gui-nav-bottom-active-color{color:#2B2E3D;} /* 底部自定义导航切换色 */
+/* gui-page 页面组件相关 *** */
+
+
+/* 圆角 */
+.gui-border-radius-small{border-radius:6rpx;}
+.gui-border-radius{border-radius:10rpx;}
+.gui-border-radius-large{border-radius:20rpx;}
+
+
+/* 按钮 基于原生组件的修饰 */
+.button-hover{opacity:0.8;}
+.gui-button-text{font-size:28rpx; line-height:88rpx; text-align:center;}
+.gui-button-text-mini{font-size:22rpx; line-height:58rpx; text-align:center;}
+.gui-button-mini{height:58rpx;}
+/* #ifndef APP-NVUE */
+.gui-button{line-height:88rpx; border-radius:5rpx; background:transparent; margin:0; color:transparent; border:0; text-align:center; padding:0;}
+.gui-button::after{width:0; height:0; transform: scale(1); display:none; background:transparent;}
+.gui-button[disabled][type=default]{opacity:0.5;}
+.gui-button[type=default][size=mini]{font-size:22rpx; height:58rpx; line-height:58rpx; background:none;}
+/* #endif */
+/* #ifdef APP-NVUE */
+.gui-button{height:86rpx; line-height:86rpx; border-radius:5rpx; background-color:transparent; margin:0; color:transparent; border-width:0; border-style:solid; border-color:#323232; text-align:center;}
+/* #endif */
+
+/* 按钮 组件 框架自定义样式 */
+.gui-sbutton{width:230rpx; height:80rpx; border-radius:8rpx; padding:0; margin:0;}
+.gui-sbutton-text{font-size:30rpx; line-height:80rpx; text-align:center; color:#FFFFFF;}
+.gui-sbutton-loading-point{width:8rpx; height:8rpx; border-radius:8rpx; margin:8rpx; background-color:#FFFFFF;}
+.gui-sbutton-default{background-color:#3688FF;}
+.gui-sbutton-loading{background-color:#3688FF; opacity:0.8;}
+.gui-sbutton-success{background-color:#07C160 !important;}
+.gui-sbutton-fail{background-color:#FF0036 !important;}
+
+
+/* *** gui-select-list 可选列表样式 */
+.gui-select-list-ring{font-size:32rpx; font-weight:bold;} /* 左侧选择圆环 */
+.gui-select-list-img{width:66rpx; height:66rpx; border-radius:60rpx; margin-right:28rpx;} /* 图片样式 */
+.gui-select-list-title{font-size:28rpx; line-height:50rpx; color:#2B2E3D;} /* 标题样式 */
+.gui-select-list-desc{font-size:22rpx; color:#828282; line-height:33rpx;} /* 描述小文本 */
+.gui-select-list-icon{width:60rpx; line-height:60rpx; font-size:36rpx; text-align:center; color:rgba(69, 90, 100, 0.3);} /* 选中图标 */
+.gui-select-list-current{color:#2B2E3D !important;} /* 选中颜色 */
+/* 可选列表样式 *** */
+
+
+/* *** gui-slide-list 滑动列表样式 */
+.gui-slide-list-img-wrap{width:80rpx; height:80rpx; margin-left:25rpx;} /* 列表图片外层样式 */
+.gui-slide-list-img{width:80rpx; height:80rpx; border-radius:6rpx;} /* 列表图片外层样式 */
+.gui-slide-list-point{border-radius:32rpx; height:32rpx; line-height:32rpx; padding:0 10rpx; font-size:20rpx;} /* 消息数标签样式 */
+/* #ifndef APP-NVUE */
+.gui-slide-list-point{min-width:12rpx;}
+/* #endif */
+.gui-slide-list-title-text{line-height:38rpx; height:38rpx; font-size:28rpx; color:#2B2E3D; overflow:hidden;} /* 消息标题样式 */
+.gui-slide-list-desc{line-height:32rpx; height:32rpx; font-size:22rpx; color:rgba(69, 90, 100, 0.3); overflow:hidden; margin-right:25rpx; margin-top:2px;} /* 消息描述样式 */
+/* 滑动列表样式 *** */
+
+/* *** gui-tree 树状列表样式 */
+.gui-tree-icons{width:50rpx;} /* 图标样式 */
+.gui-tree-icons-text{font-size:32rpx; color:rgba(69, 90, 100, 0.3);}
+.gui-tree-title{line-height:80rpx; font-size:28rpx; width:200rpx;} /* 标题样式 */
+.gui-tree-current{color:#2B2E3D;} /* 选中样式 */
+/* 树状列表样式 *** */
+
+
+/* *** gui-segmented-control 分段器样式 */
+.gui-segmented-control{background-color:#F8F8F8; padding:8rpx;} /* 外层主体 */
+.gui-segmented-control-item{color:#2B2E3D; font-size:26rpx; line-height:66rpx;} /* 项目标题 */
+.gui-segmented-current{background-color:#2B2E3D; color:#FFFFFF;} /* 激活样式 */
+/* 分段器样式 *** */
+
+
+/* *** 为空展示默认图片大小 */
+.gui-empty-img{width:320rpx; height:320rpx; margin-top:200rpx;}
+
+
+/* 演示 : 提交按钮 自定义样式  */
+.mygui-sbutton{width:230rpx; height:80rpx; border-radius:80rpx; padding:0; margin:0;}
+.mygui-sbutton-text{font-size:28rpx; line-height:80rpx; text-align:center; color:#FFFFFF;}
+.mygui-sbutton-loading-point{width:6rpx; height:6rpx; border-radius:10rpx; margin:8rpx; background-color:#FFFFFF;}
+.mygui-sbutton-default{background-color:#2B2E3D;}
+.mygui-sbutton-loading{background-color:#3688FF; opacity:0.8;}
+.mygui-sbutton-success{background-color:#07C160;}
+.mygui-sbutton-fail{background-color:#FF0036;}
