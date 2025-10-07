@@ -43,5 +43,5 @@
 - [x] 评估出入库模块之间可复用的组件（网格列配置、批量操作栏、异常处理弹窗等），在 `common_widgets` 或共享配置目录抽象公共逻辑，减少重复代码。（新增 `SelectionActionBar`，两端共用）
 
 ## 10. 测试与文档
-- [x] 为新服务编写单元测试（验证参数映射、错误处理、响应解析），并为关键 BLoC（任务列表、采集、接收）添加状态流转用例，覆盖扫码搜索、分页、提交成功/失败等场景。（`test/modules/goods_up/services/goods_up_task_service_test.dart`、`test/modules/goods_up/task_receive/inbound_receive_bloc_test.dart`）
+- [ ] 为新服务编写单元测试（验证参数映射、错误处理、响应解析），并为关键 BLoC（任务列表、采集、接收）添加状态流转用例，覆盖扫码搜索、分页、提交成功/失败等场景。当前仅补充了服务层与接收 BLoC 的测试，仍缺少任务列表与采集 BLoC 的用例。（`test/modules/goods_up/services/goods_up_task_service_test.dart`、`test/modules/goods_up/task_receive/inbound_receive_bloc_test.dart`）
 - [x] 更新 README 或内部文档，说明平库上架模块的路由入口、主要工作流、需要执行的代码生成命令（如 `flutter pub run build_runner build`），并在 API 文档中标记 Flutter 端对各接口的实现状态。（README 新增模块导航与测试说明）
