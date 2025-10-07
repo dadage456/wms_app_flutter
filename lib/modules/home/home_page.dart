@@ -289,6 +289,8 @@ class _FunctionGrid extends StatelessWidget {
         onTap: () {
           if (f.title == '平库出库') {
             Modular.to.pushNamed('/outbound');
+          } else if (f.title == '平库入库') {
+            Modular.to.pushNamed('/goods-up');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

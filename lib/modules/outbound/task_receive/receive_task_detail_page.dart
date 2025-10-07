@@ -16,7 +16,7 @@ import 'package:wms_app/modules/outbound/task_receive/bloc/receive_task_detail_s
 
 import 'bloc/receive_task_detail_bloc.dart';
 import 'bloc/receive_task_detail_event.dart';
-import 'widgets/receive_batch_action_bar.dart';
+import 'package:wms_app/common_widgets/common_grid/selection_action_bar.dart';
 
 class ReceiveTaskDetailPage extends StatefulWidget {
   final OutboundTask task;
@@ -139,9 +139,10 @@ class _ReceiveTaskDetailPageState extends State<ReceiveTaskDetailPage> {
                     CommonDataGridState<OutboundTaskItem>
                   >(
                     builder: (context, gridState) {
-                      return ReceiveBatchActionBar(
+                      return SelectionActionBar(
                         selectedCount: gridState.selectedRows.length,
                         totalCount: gridState.data.length,
+                        confirmLabel: '接收',
                         onConfirm: () {
                           _bloc.add(
                             ReceiveSelectedItemsEvent(gridState.selectedRows),
