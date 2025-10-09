@@ -54,7 +54,7 @@ class _GoodsUpReceivePageState extends State<GoodsUpReceivePage> {
 
   Widget _buildScanner() {
     final config = ScannerConfig().copyWith(
-      placeholder: '请扫描凭证号',
+      placeholder: '请扫描单号',
       clearOnSubmit: true,
     );
 
@@ -73,44 +73,47 @@ class _GoodsUpReceivePageState extends State<GoodsUpReceivePage> {
   Widget _buildTable() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<
-          CommonDataGridBloc<GoodsUpTask>, CommonDataGridState<GoodsUpTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<GoodsUpTask>,
+            CommonDataGridState<GoodsUpTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<GoodsUpTask>(
-            columns: InboundReceiveTaskGridConfig.columns((task) {
-              Modular.to.pushNamed(
-                '/goods-up/receive/detail/${task.inTaskId}',
-                arguments: {'task': task},
-              );
-            }),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            allowSelect: false,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<GoodsUpTask>(pageIndex));
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载失败',
+                );
+              }
             },
-            selectedRows: const [],
-            headerHeight: 44,
-            rowHeight: 48,
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<GoodsUpTask>(
+                columns: InboundReceiveTaskGridConfig.columns((task) {
+                  Modular.to.pushNamed(
+                    '/goods-up/receive/detail/${task.inTaskId}',
+                    arguments: {'task': task},
+                  );
+                }),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                allowSelect: false,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<GoodsUpTask>(pageIndex));
+                },
+                selectedRows: const [],
+                headerHeight: 44,
+                rowHeight: 48,
+              );
+            },
+          ),
     );
   }
 }

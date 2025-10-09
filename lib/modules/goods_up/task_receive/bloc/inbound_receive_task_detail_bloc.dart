@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
@@ -17,11 +20,11 @@ class InboundReceiveTaskDetailBloc
     this._service,
     this._userManager, {
     UserInfoModel? userInfoOverride,
-  })  : _userInfoOverride = userInfoOverride,
-        super(const InboundReceiveTaskDetailState()) {
+  }) : _userInfoOverride = userInfoOverride,
+       super(const InboundReceiveTaskDetailState()) {
     gridBloc = CommonDataGridBloc<GoodsUpTaskItem>(
       dataLoader: _createLoader(),
-      dataCommiter: _createCommitter(),
+      dataDeleter: _createDeleter(),
     );
 
     on<SearchInboundReceiveTaskItemsEvent>(_onSearch);
@@ -45,8 +48,10 @@ class InboundReceiveTaskDetailBloc
 
     _currentQuery = GoodsUpTaskItemQuery(
       inTaskId: task.inTaskId,
-      userId: '${userInfo.userId}',
+      userId: 'ALL',
       workStation: task.workStation,
+      pageIndex: 1,
+      pageSize: 100,
     );
 
     gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(0));
@@ -54,7 +59,7 @@ class InboundReceiveTaskDetailBloc
 
   DataGridLoader<GoodsUpTaskItem> _createLoader() {
     return (pageIndex) async {
-      final query = _currentQuery?.copyWith(pageIndex: pageIndex + 1);
+      final query = _currentQuery?.copyWith(pageIndex: pageIndex);
       if (query == null) {
         return const DataGridResponseData<GoodsUpTaskItem>(
           totalPages: 0,
@@ -71,18 +76,18 @@ class InboundReceiveTaskDetailBloc
     };
   }
 
-  DataGridCommiter _createCommitter() {
-    return (selectedRows) async {
+  DataGridDeleter _createDeleter() {
+    return (indices) async {
       final data = gridBloc.state.data;
-      if (selectedRows.isEmpty) {
-        return;
-      }
-      final ids = selectedRows.map((index) => data[index].inTaskItemId).toList();
+      final ids = indices
+          .map((index) => data[index].inTaskItemId)
+          .map((id) => id)
+          .toList();
       await _service.commitInboundTaskItems(
         inTaskItemIds: ids,
         isCancel: false,
       );
-      gridBloc.add(const RefrenshLoadDataEvent<GoodsUpTaskItem>());
+      gridBloc.add(LoadDataEvent(1));
     };
   }
 
@@ -97,14 +102,14 @@ class InboundReceiveTaskDetailBloc
       pageIndex: 1,
     );
 
-    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(0));
+    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(_currentQuery!.pageIndex));
   }
 
   Future<void> _onReceiveSelected(
     ReceiveSelectedInboundItemsEvent event,
     Emitter<InboundReceiveTaskDetailState> emit,
   ) async {
-    gridBloc.add(CommitSelectedRowsEvent<GoodsUpTaskItem>(event.selectedRows));
+    gridBloc.add(DeleteSelectedRowsEvent<GoodsUpTaskItem>(event.selectedRows));
   }
 
   Future<void> _onRefresh(

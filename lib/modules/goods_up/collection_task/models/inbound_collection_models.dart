@@ -79,22 +79,22 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        inTaskItemId,
-        inTaskId,
-        materialCode,
-        materialName,
-        storeSiteNo,
-        storeRoomNo,
-        subInventoryCode,
-        batchNo,
-        serialNo,
-        unit,
-        planQty,
-        collectedQty,
-        repertoryQty,
-        expireDays,
-        productionDate,
-      ];
+    inTaskItemId,
+    inTaskId,
+    materialCode,
+    materialName,
+    storeSiteNo,
+    storeRoomNo,
+    subInventoryCode,
+    batchNo,
+    serialNo,
+    unit,
+    planQty,
+    collectedQty,
+    repertoryQty,
+    expireDays,
+    productionDate,
+  ];
 }
 
 /// 扫码解析内容
@@ -105,7 +105,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     this.batchNo,
     this.serialNo,
     this.seqCtrl,
-    this.quantity,
+    required this.quantity,
     this.expireDays,
     this.productionDate,
   });
@@ -151,15 +151,15 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        materialCode,
-        materialName,
-        batchNo,
-        serialNo,
-        seqCtrl,
-        quantity,
-        expireDays,
-        productionDate,
-      ];
+    materialCode,
+    materialName,
+    batchNo,
+    serialNo,
+    seqCtrl,
+    quantity,
+    expireDays,
+    productionDate,
+  ];
 }
 
 /// 入库采集缓存记录
@@ -191,7 +191,8 @@ class InboundCollectionStock extends HiveObject with EquatableMixin {
       serialNo: json['sn']?.toString(),
       taskQty: _parseDouble(json['taskQty']),
       collectQty: _parseDouble(json['collectQty']),
-      inTaskItemId: (json['inTaskItemid'] ?? json['intaskitemid'] ?? '').toString(),
+      inTaskItemId: (json['inTaskItemid'] ?? json['intaskitemid'] ?? '')
+          .toString(),
       inTaskId: (json['taskid'] ?? json['intaskid'] ?? '').toString(),
       storeRoom: json['storeRoom']?.toString(),
       storeSite: json['storeSite']?.toString(),
@@ -240,26 +241,27 @@ class InboundCollectionStock extends HiveObject with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        stockId,
-        materialCode,
-        materialName,
-        batchNo,
-        serialNo,
-        taskQty,
-        collectQty,
-        inTaskItemId,
-        inTaskId,
-        storeRoom,
-        storeSite,
-        erpStore,
-        trayNo,
-        productionDate,
-        expireDays,
-      ];
+    stockId,
+    materialCode,
+    materialName,
+    batchNo,
+    serialNo,
+    taskQty,
+    collectQty,
+    inTaskItemId,
+    inTaskId,
+    storeRoom,
+    storeSite,
+    erpStore,
+    trayNo,
+    productionDate,
+    expireDays,
+  ];
 }
 
 /// Hive 适配器注册
-class InboundCollectTaskItemAdapter extends TypeAdapter<InboundCollectTaskItem> {
+class InboundCollectTaskItemAdapter
+    extends TypeAdapter<InboundCollectTaskItem> {
   @override
   final int typeId = 3;
 
@@ -372,7 +374,8 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
   }
 }
 
-class InboundCollectionStockAdapter extends TypeAdapter<InboundCollectionStock> {
+class InboundCollectionStockAdapter
+    extends TypeAdapter<InboundCollectionStock> {
   @override
   final int typeId = 5;
 

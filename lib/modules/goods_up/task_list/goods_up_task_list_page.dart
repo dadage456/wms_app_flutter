@@ -70,69 +70,59 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     return ScannerWidget(
       config: config,
       controller: _scannerController,
-      onScanResult: (value) =>
-          _bloc.add(SearchGoodsUpTasksEvent(value)),
+      onScanResult: (value) => _bloc.add(SearchGoodsUpTasksEvent(value)),
       onError: (message) =>
           LoadingDialogManager.instance.showErrorDialog(context, message),
-      suffix: IconButton(
-        icon: SvgPicture.asset('assets/images/icon_filter.svg'),
-        onPressed: () {
-          GoodsUpTaskFilterDialog.show(
-            context: context,
-            currentFilter: _bloc.currentQuery.finishFlag,
-            onFilterChanged: (value) {
-              _bloc.add(FilterGoodsUpTasksEvent(value));
-            },
-          );
-        },
-      ),
     );
   }
 
   Widget _buildTable() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<GoodsUpTask>,
-          CommonDataGridState<GoodsUpTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
-
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载任务失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<GoodsUpTask>(
-            columns: GoodsUpTaskGridConfig.columns((task, type) {
-              if (type == 0) {
-                _navigateToCollect(task);
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<GoodsUpTask>,
+            CommonDataGridState<GoodsUpTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
               } else {
-                _navigateToDetail(task);
+                LoadingDialogManager.instance.hideLoadingDialog(context);
               }
-            }),
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            onLoadData: (index) async {
-              _gridBloc.add(LoadDataEvent<GoodsUpTask>(index));
+
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载任务失败',
+                );
+              }
             },
-            selectedRows: state.selectedRows,
-            onSelectionChanged: (rows) =>
-                _gridBloc.add(ChangeSelectedRowsEvent<GoodsUpTask>(rows)),
-            datas: state.data,
-            allowPager: false,
-            allowSelect: false,
-            headerHeight: 44,
-            rowHeight: 50,
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<GoodsUpTask>(
+                columns: GoodsUpTaskGridConfig.columns((task, type) {
+                  if (type == 0) {
+                    _navigateToCollect(task);
+                  } else {
+                    _navigateToDetail(task);
+                  }
+                }),
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                onLoadData: (index) async {
+                  _gridBloc.add(LoadDataEvent<GoodsUpTask>(index));
+                },
+                selectedRows: state.selectedRows,
+                onSelectionChanged: (rows) =>
+                    _gridBloc.add(ChangeSelectedRowsEvent<GoodsUpTask>(rows)),
+                datas: state.data,
+                allowPager: true,
+                allowSelect: false,
+                headerHeight: 44,
+                rowHeight: 48,
+              );
+            },
+          ),
     );
   }
 
@@ -147,8 +137,7 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     final userManager = Modular.get<UserManager>();
     final userInfo = userManager.userInfo;
     if (userInfo == null) {
-      LoadingDialogManager.instance
-          .showErrorDialog(context, '用户信息获取失败');
+      LoadingDialogManager.instance.showErrorDialog(context, '用户信息获取失败');
       return;
     }
 

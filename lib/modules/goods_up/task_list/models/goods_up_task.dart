@@ -72,17 +72,17 @@ class GoodsUpTask extends Equatable {
 
   @override
   List<Object?> get props => [
-        inTaskId,
-        inTaskNo,
-        inboundOrderNo,
-        sourceOrderNo,
-        storeRoomNo,
-        workStation,
-        partnerName,
-        taskComment,
-        taskQty,
-        finishQty,
-      ];
+    inTaskId,
+    inTaskNo,
+    inboundOrderNo,
+    sourceOrderNo,
+    storeRoomNo,
+    workStation,
+    partnerName,
+    taskComment,
+    taskQty,
+    finishQty,
+  ];
 }
 
 class GoodsUpTaskListData extends Equatable {
@@ -98,15 +98,14 @@ class GoodsUpTaskListData extends Equatable {
     final rowsJson = json['rows'] as List<dynamic>? ?? const [];
     return GoodsUpTaskListData(
       total: GoodsUpTask._parseInt(json['total']),
-      rows: rowsJson.map((e) => GoodsUpTask.fromJson(e as Map<String, dynamic>)).toList(),
+      rows: rowsJson
+          .map((e) => GoodsUpTask.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'total': total,
-      'rows': rows.map((e) => e.toJson()).toList(),
-    };
+    return {'total': total, 'rows': rows.map((e) => e.toJson()).toList()};
   }
 
   @override
@@ -174,12 +173,12 @@ class GoodsUpTaskQuery extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'sortType': sortType,
-      'sortColumn': sortColumn,
+      // 'sortType': sortType,
+      // 'sortColumn': sortColumn,
       'searchKey': searchKey,
       'userId': userId,
       'roleoRuserId': roleOrUserId,
-      'roomTag': roomTag,
+      'roomtag': roomTag,
       'batchflag': batchFlag,
       'transferType': transferType,
       'beatflag': beatFlag,
@@ -191,17 +190,17 @@ class GoodsUpTaskQuery extends Equatable {
 
   @override
   List<Object?> get props => [
-        sortType,
-        sortColumn,
-        searchKey,
-        userId,
-        roleOrUserId,
-        roomTag,
-        batchFlag,
-        transferType,
-        beatFlag,
-        pageIndex,
-        pageSize,
-        finishFlag,
-      ];
+    sortType,
+    sortColumn,
+    searchKey,
+    userId,
+    roleOrUserId,
+    roomTag,
+    batchFlag,
+    transferType,
+    beatFlag,
+    pageIndex,
+    pageSize,
+    finishFlag,
+  ];
 }

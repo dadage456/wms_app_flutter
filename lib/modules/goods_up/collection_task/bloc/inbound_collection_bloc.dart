@@ -17,8 +17,8 @@ import 'inbound_collection_state.dart';
 class InboundCollectionBloc
     extends Bloc<InboundCollectionEvent, InboundCollectionState> {
   InboundCollectionBloc({required GoodsUpTaskService service})
-      : _service = service,
-        super(const InboundCollectionState()) {
+    : _service = service,
+      super(const InboundCollectionState()) {
     on<InitializeInboundCollectionEvent>(_onInitialize);
     on<PerformInboundScanEvent>(_onPerformScan);
     on<ChangeInboundTabEvent>(_onChangeTab);
@@ -72,9 +72,7 @@ class InboundCollectionBloc
     try {
       emit(state.copyWith(status: CollectionStatus.loading()));
 
-      final items = await _service.getInboundCollectItems(
-        query: _buildQuery(),
-      );
+      final items = await _service.getInboundCollectItems(query: _buildQuery());
 
       emit(
         state.copyWith(
@@ -82,10 +80,13 @@ class InboundCollectionBloc
           collectionList: state.storeSite.isEmpty
               ? const []
               : items
-                  .where((item) =>
-                      (item.storeSiteNo ?? '').trim() == state.storeSite.trim())
-                  .map(_cloneDetail)
-                  .toList(),
+                    .where(
+                      (item) =>
+                          (item.storeSiteNo ?? '').trim() ==
+                          state.storeSite.trim(),
+                    )
+                    .map(_cloneDetail)
+                    .toList(),
           storeRoom: _task.storeRoomNo ?? '',
           status: CollectionStatus.success(),
           placeholder: state.scanStep == InboundScanStep.site
@@ -129,23 +130,24 @@ class InboundCollectionBloc
       );
 
       final detailList = List<dynamic>.from(cachedDetails)
-          .map((item) => InboundCollectTaskItem.fromJson(
-                Map<String, dynamic>.from(item as Map),
-              ))
+          .map(
+            (item) => InboundCollectTaskItem.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
           .map(_cloneDetail)
           .toList();
 
       final stocks = List<dynamic>.from(cachedStocks)
-          .map((item) => InboundCollectionStock.fromJson(
-                Map<String, dynamic>.from(item as Map),
-              ))
+          .map(
+            (item) => InboundCollectionStock.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
           .toList();
 
       final dicMtlQty = cachedDicMtlQtyRaw.map(
-        (key, value) => MapEntry(
-          key,
-          List<dynamic>.from(value as List),
-        ),
+        (key, value) => MapEntry(key, List<dynamic>.from(value as List)),
       );
 
       emit(
@@ -154,9 +156,12 @@ class InboundCollectionBloc
           collectionList: state.storeSite.isEmpty
               ? detailList
               : detailList
-                  .where((item) =>
-                      (item.storeSiteNo ?? '').trim() == state.storeSite.trim())
-                  .toList(),
+                    .where(
+                      (item) =>
+                          (item.storeSiteNo ?? '').trim() ==
+                          state.storeSite.trim(),
+                    )
+                    .toList(),
           stocks: stocks,
           dicSeq: cachedDicSeq,
           dicMtlQty: dicMtlQty,
@@ -181,10 +186,7 @@ class InboundCollectionBloc
       'detailList',
       newState.detailList.map((e) => e.toJson()).toList(),
     );
-    await box.put(
-      'stocks',
-      newState.stocks.map((e) => e.toJson()).toList(),
-    );
+    await box.put('stocks', newState.stocks.map((e) => e.toJson()).toList());
     await box.put('dicSeq', newState.dicSeq);
     await box.put('dicInvMtlQty', newState.dicInvMtlQty);
     await box.put('dicMtlQty', newState.dicMtlQty);
@@ -197,11 +199,7 @@ class InboundCollectionBloc
   ) async {
     final payload = event.payload.trim();
     if (payload.isEmpty) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('扫描内容不能为空'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('扫描内容不能为空')));
       return;
     }
 
@@ -225,11 +223,7 @@ class InboundCollectionBloc
     try {
       final storeRoom = _task.storeRoomNo ?? '';
       if (storeRoom.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('任务缺少库房信息，无法校验库位'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('任务缺少库房信息，无法校验库位')));
         return;
       }
 
@@ -239,9 +233,7 @@ class InboundCollectionBloc
       );
       if (result.isEmpty) {
         emit(
-          state.copyWith(
-            status: CollectionStatus.error('库位【$site】不存在或不在当前库房'),
-          ),
+          state.copyWith(status: CollectionStatus.error('库位【$site】不存在或不在当前库房')),
         );
         return;
       }
@@ -274,16 +266,13 @@ class InboundCollectionBloc
     Emitter<InboundCollectionState> emit,
   ) async {
     try {
-      final barcodeContent =
-          await _service.getInboundBarcodeInfo(barcode.trim());
+      final barcodeContent = await _service.getInboundBarcodeInfo(
+        barcode.trim(),
+      );
 
       final materialCode = barcodeContent.materialCode ?? '';
       if (materialCode.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('未解析到有效的物料编码'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('未解析到有效的物料编码')));
         return;
       }
 
@@ -306,11 +295,7 @@ class InboundCollectionBloc
       });
 
       if (targetItem == null) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('未在任务明细中找到匹配的物料'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('未在任务明细中找到匹配的物料')));
         return;
       }
 
@@ -344,32 +329,20 @@ class InboundCollectionBloc
   ) async {
     final quantity = double.tryParse(payload);
     if (quantity == null || quantity <= 0) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('请输入有效的数量'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('请输入有效的数量')));
       return;
     }
 
     final item = state.currentItem;
     final barcode = state.currentBarcode;
     if (item == null || barcode == null) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('请先扫描物料信息'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描物料信息')));
       return;
     }
 
     final available = item.planQty - item.collectedQty;
     if (quantity > available + 1e-6) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('采集数量超过剩余可采集数量'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('采集数量超过剩余可采集数量')));
       return;
     }
 
@@ -378,11 +351,7 @@ class InboundCollectionBloc
       (detail) => detail.inTaskItemId == item.inTaskItemId,
     );
     if (targetIndex < 0) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('当前物料不在任务明细中'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('当前物料不在任务明细中')));
       return;
     }
 
@@ -419,11 +388,7 @@ class InboundCollectionBloc
     final updatedDicMtlQty = Map<String, List<dynamic>>.from(state.dicMtlQty);
     final key = item.inTaskItemId.toString();
     final updatedCollected = targetDetail.collectedQty;
-    updatedDicMtlQty[key] = [
-      item.planQty,
-      updatedCollected,
-      item.materialCode,
-    ];
+    updatedDicMtlQty[key] = [item.planQty, updatedCollected, item.materialCode];
 
     final updatedDicSeq = Map<String, String>.from(state.dicSeq);
     final serial = stock.serialNo;
@@ -444,9 +409,11 @@ class InboundCollectionBloc
     final updatedCollectionList = state.storeSite.isEmpty
         ? updatedDetails
         : updatedDetails
-            .where((detail) =>
-                (detail.storeSiteNo ?? '').trim() == state.storeSite.trim())
-            .toList();
+              .where(
+                (detail) =>
+                    (detail.storeSiteNo ?? '').trim() == state.storeSite.trim(),
+              )
+              .toList();
 
     final newState = state.copyWith(
       detailList: updatedDetails,
@@ -489,11 +456,7 @@ class InboundCollectionBloc
     Emitter<InboundCollectionState> emit,
   ) async {
     if (state.stocks.isEmpty) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error('请先采集数据后再提交'),
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.error('请先采集数据后再提交')));
       return;
     }
 
@@ -557,10 +520,13 @@ class InboundCollectionBloc
           collectionList: state.storeSite.isEmpty
               ? const []
               : freshItems
-                  .where((item) =>
-                      (item.storeSiteNo ?? '').trim() == state.storeSite.trim())
-                  .map(_cloneDetail)
-                  .toList(),
+                    .where(
+                      (item) =>
+                          (item.storeSiteNo ?? '').trim() ==
+                          state.storeSite.trim(),
+                    )
+                    .map(_cloneDetail)
+                    .toList(),
           stocks: const [],
           dicMtlQty: const {},
           dicSeq: const {},
@@ -614,8 +580,11 @@ class InboundCollectionBloc
       return;
     }
 
-    await _removeStocks(toDelete, emit,
-        successMessage: '已删除 ${toDelete.length} 条采集记录');
+    await _removeStocks(
+      toDelete,
+      emit,
+      successMessage: '已删除 ${toDelete.length} 条采集记录',
+    );
   }
 
   Future<void> _onUpdateFromResult(
@@ -625,8 +594,7 @@ class InboundCollectionBloc
     if (event.deletedStocks.isEmpty) {
       return;
     }
-    await _removeStocks(event.deletedStocks, emit,
-        successMessage: '采集记录已更新');
+    await _removeStocks(event.deletedStocks, emit, successMessage: '采集记录已更新');
   }
 
   Future<void> _removeStocks(
@@ -647,8 +615,8 @@ class InboundCollectionBloc
       for (var i = 0; i < updatedDetails.length; i++) {
         final detail = updatedDetails[i];
         if (detail.inTaskItemId.toString() == stock.inTaskItemId) {
-          final newCollected =
-              (detail.collectedQty - stock.collectQty).clamp(0, detail.planQty);
+          final double newCollected = (detail.collectedQty - stock.collectQty)
+              .clamp(0, detail.planQty);
           final updatedDetail = _cloneDetail(detail);
           updatedDetail.collectedQty = newCollected;
           updatedDetails[i] = updatedDetail;
@@ -691,9 +659,11 @@ class InboundCollectionBloc
     final updatedCollectionList = state.storeSite.isEmpty
         ? updatedDetails
         : updatedDetails
-            .where((detail) =>
-                (detail.storeSiteNo ?? '').trim() == state.storeSite.trim())
-            .toList();
+              .where(
+                (detail) =>
+                    (detail.storeSiteNo ?? '').trim() == state.storeSite.trim(),
+              )
+              .toList();
 
     final newState = state.copyWith(
       stocks: remainingStocks,
@@ -724,11 +694,7 @@ class InboundCollectionBloc
     await _clearCache();
   }
 
-  String _buildInventoryKey(
-    String site,
-    String materialCode,
-    String? batchNo,
-  ) {
+  String _buildInventoryKey(String site, String materialCode, String? batchNo) {
     return '${site.trim()}|$materialCode|${batchNo ?? ''}';
   }
 

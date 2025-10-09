@@ -50,8 +50,8 @@ class ScannerConfig {
   final bool clearOnSubmit;
 
   const ScannerConfig({
-    this.placeholder = '请扫描或输入条码',
-    this.keyboardType = TextInputType.number,
+    this.placeholder = '请扫描条码',
+    this.keyboardType = TextInputType.text,
     this.autoFocus = false,
     this.backgroundColor = Colors.white,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),

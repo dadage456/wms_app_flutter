@@ -92,22 +92,22 @@ class GoodsUpTaskItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        inTaskItemId,
-        inTaskId,
-        inTaskNo,
-        materialCode,
-        materialName,
-        oldMaterialCode,
-        quantity,
-        collectedQuantity,
-        batchNo,
-        serialNumber,
-        subInventoryCode,
-        storeRoomNo,
-        storeSiteNo,
-        inboundOrderNo,
-        taskComment,
-      ];
+    inTaskItemId,
+    inTaskId,
+    inTaskNo,
+    materialCode,
+    materialName,
+    oldMaterialCode,
+    quantity,
+    collectedQuantity,
+    batchNo,
+    serialNumber,
+    subInventoryCode,
+    storeRoomNo,
+    storeSiteNo,
+    inboundOrderNo,
+    taskComment,
+  ];
 }
 
 class GoodsUpTaskItemListData extends Equatable {
@@ -130,10 +130,7 @@ class GoodsUpTaskItemListData extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'total': total,
-      'rows': rows.map((e) => e.toJson()).toList(),
-    };
+    return {'total': total, 'rows': rows.map((e) => e.toJson()).toList()};
   }
 
   @override
@@ -150,6 +147,7 @@ class GoodsUpTaskItemQuery extends Equatable {
     this.sortColumn = '',
     this.pageIndex = 1,
     this.pageSize = 100,
+    this.roomtag = '0',
   });
 
   final int inTaskId;
@@ -160,6 +158,7 @@ class GoodsUpTaskItemQuery extends Equatable {
   final String sortColumn;
   final int pageIndex;
   final int pageSize;
+  final String roomtag;
 
   GoodsUpTaskItemQuery copyWith({
     int? inTaskId,
@@ -188,23 +187,25 @@ class GoodsUpTaskItemQuery extends Equatable {
       'userId': userId,
       'intaskid': inTaskId,
       'workstation': workStation,
-      'sortType': sortType,
-      'sortColumn': sortColumn,
-      'searchKey': searchKey,
+
+      // 'sortType': sortType,
+      // 'sortColumn': sortColumn,
+      if (searchKey.isNotEmpty) 'searchKey': searchKey,
       'PageIndex': pageIndex.toString(),
       'PageSize': pageSize.toString(),
+      'roomtag': roomtag,
     };
   }
 
   @override
   List<Object?> get props => [
-        inTaskId,
-        userId,
-        workStation,
-        searchKey,
-        sortType,
-        sortColumn,
-        pageIndex,
-        pageSize,
-      ];
+    inTaskId,
+    userId,
+    workStation,
+    searchKey,
+    sortType,
+    sortColumn,
+    pageIndex,
+    pageSize,
+  ];
 }

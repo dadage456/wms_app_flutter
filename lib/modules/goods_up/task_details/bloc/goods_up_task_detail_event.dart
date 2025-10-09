@@ -26,15 +26,6 @@ class SearchEvent extends GoodsUpTaskDetailEvent {
   List<Object?> get props => [searchKey];
 }
 
-class ScanEvent extends GoodsUpTaskDetailEvent {
-  const ScanEvent({required this.qrContent});
-
-  final String qrContent;
-
-  @override
-  List<Object?> get props => [qrContent];
-}
-
 class CancelSelectedEvent extends GoodsUpTaskDetailEvent {
   const CancelSelectedEvent({required this.selectedRows});
 

@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
-import 'package:wms_app/utils/error_handler.dart';
 
 import '../../../../services/user_manager.dart';
 import '../../services/goods_up_task_service.dart';
@@ -15,10 +11,9 @@ import 'goods_up_task_detail_state.dart';
 class GoodsUpTaskDetailBloc
     extends Bloc<GoodsUpTaskDetailEvent, GoodsUpTaskDetailState> {
   GoodsUpTaskDetailBloc(this._service, this._userManager)
-      : super(const GoodsUpTaskDetailState()) {
+    : super(const GoodsUpTaskDetailState()) {
     on<InitializedEvent>(_onInitialized);
     on<SearchEvent>(_onSearch);
-    on<ScanEvent>(_onScan);
     on<CancelSelectedEvent>(_onCancelSelected);
     on<RefreshEvent>(_onRefresh);
 
@@ -36,7 +31,7 @@ class GoodsUpTaskDetailBloc
 
   DataGridLoader<GoodsUpTaskItem> _createLoader() {
     return (pageIndex) async {
-      final query = currentQuery?.copyWith(pageIndex: pageIndex + 1);
+      final query = currentQuery?.copyWith(pageIndex: pageIndex);
       if (query == null) {
         return const DataGridResponseData<GoodsUpTaskItem>(
           totalPages: 0,
@@ -59,10 +54,7 @@ class GoodsUpTaskDetailBloc
           .map((index) => data[index].inTaskItemId)
           .map((id) => id)
           .toList();
-      await _service.commitInboundTaskItems(
-        inTaskItemIds: ids,
-        isCancel: true,
-      );
+      await _service.commitInboundTaskItems(inTaskItemIds: ids, isCancel: true);
       gridBloc.add(RefrenshLoadDataEvent<GoodsUpTaskItem>());
     };
   }
@@ -84,13 +76,10 @@ class GoodsUpTaskDetailBloc
     );
 
     emit(
-      state.copyWith(
-        inTaskId: event.inTaskId,
-        workStation: event.workStation,
-      ),
+      state.copyWith(inTaskId: event.inTaskId, workStation: event.workStation),
     );
 
-    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(0));
+    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(currentQuery!.pageIndex));
   }
 
   Future<void> _onSearch(
@@ -98,33 +87,11 @@ class GoodsUpTaskDetailBloc
     Emitter<GoodsUpTaskDetailState> emit,
   ) async {
     if (currentQuery == null) return;
-    currentQuery = currentQuery!.copyWith(searchKey: event.searchKey, pageIndex: 1);
-    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(0));
-  }
-
-  Future<void> _onScan(
-    ScanEvent event,
-    Emitter<GoodsUpTaskDetailState> emit,
-  ) async {
-    try {
-      if (event.qrContent.contains(r'\$KW\$')) {
-        final parts = event.qrContent.split(r'\$');
-        if (parts.length > 2) {
-          add(SearchEvent(searchKey: parts[2]));
-          return;
-        }
-      }
-
-      final response = await _service.getMaterialInfoByQR(event.qrContent);
-      add(SearchEvent(searchKey: response.data.matCode));
-    } catch (error, stackTrace) {
-      log('扫码失败: $error', stackTrace: stackTrace);
-      emit(
-        state.copyWith(
-          errorMessage: ErrorHandler.handleError(error),
-        ),
-      );
-    }
+    currentQuery = currentQuery!.copyWith(
+      searchKey: event.searchKey,
+      pageIndex: 1,
+    );
+    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(currentQuery!.pageIndex));
   }
 
   Future<void> _onCancelSelected(

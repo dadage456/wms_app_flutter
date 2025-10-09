@@ -18,10 +18,10 @@ class InboundReceiveTaskBloc
     required GoodsUpTaskService taskService,
     required UserManager userManager,
     UserInfoModel? userInfoOverride,
-  })  : _taskService = taskService,
-        _userManager = userManager,
-        _userInfoOverride = userInfoOverride,
-        super(const InboundReceiveTaskState()) {
+  }) : _taskService = taskService,
+       _userManager = userManager,
+       _userInfoOverride = userInfoOverride,
+       super(const InboundReceiveTaskState()) {
     currentQuery = _buildDefaultQuery();
     gridBloc = CommonDataGridBloc<GoodsUpTask>(dataLoader: _createLoader());
 
@@ -38,7 +38,7 @@ class InboundReceiveTaskBloc
 
   DataGridLoader<GoodsUpTask> _createLoader() {
     return (pageIndex) async {
-      final query = currentQuery.copyWith(pageIndex: pageIndex + 1);
+      final query = currentQuery.copyWith(pageIndex: pageIndex);
       final response = await _taskService.getInboundTaskList(query: query);
       final totalPages = (response.total / query.pageSize).ceil();
       return DataGridResponseData<GoodsUpTask>(
@@ -55,8 +55,9 @@ class InboundReceiveTaskBloc
     }
 
     return GoodsUpTaskQuery(
-      userId: '${userInfo.userId}',
+      userId: 'ALL',
       roleOrUserId: '${userInfo.userId}',
+      pageIndex: 1,
       pageSize: 100,
       finishFlag: '0',
     );

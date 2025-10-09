@@ -15,11 +15,10 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
   GoodsUpTaskBloc({
     required GoodsUpTaskService taskService,
     required UserManager userManager,
-  })  : _taskService = taskService,
-        _userManager = userManager,
-        super(const GoodsUpTaskState()) {
+  }) : _taskService = taskService,
+       _userManager = userManager,
+       super(const GoodsUpTaskState()) {
     on<SearchGoodsUpTasksEvent>(_onSearch);
-    on<FilterGoodsUpTasksEvent>(_onFilter);
     on<RefreshGoodsUpTasksEvent>(_onRefresh);
 
     currentQuery = _buildDefaultQuery();
@@ -34,7 +33,7 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
 
   DataGridLoader<GoodsUpTask> _createDataLoader() {
     return (pageIndex) async {
-      final query = currentQuery.copyWith(pageIndex: pageIndex + 1);
+      final query = currentQuery.copyWith(pageIndex: pageIndex);
       final result = await _taskService.getInboundTaskList(query: query);
       final totalPages = (result.total / query.pageSize).ceil();
       return DataGridResponseData<GoodsUpTask>(
@@ -50,6 +49,7 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
       userId: '${userInfo.userId}',
       roleOrUserId: '${userInfo.userId}',
       pageSize: 100,
+      pageIndex: 1,
     );
   }
 
@@ -57,24 +57,11 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
     SearchGoodsUpTasksEvent event,
     Emitter<GoodsUpTaskState> emit,
   ) async {
-    currentQuery = currentQuery.copyWith(searchKey: event.searchKey, pageIndex: 1);
+    currentQuery = currentQuery.copyWith(
+      searchKey: event.searchKey,
+      pageIndex: 1,
+    );
     gridBloc.add(LoadDataEvent<GoodsUpTask>(0));
-  }
-
-  Future<void> _onFilter(
-    FilterGoodsUpTasksEvent event,
-    Emitter<GoodsUpTaskState> emit,
-  ) async {
-    emit(state.copyWith(finishFlag: event.finishFlag));
-    currentQuery = currentQuery.copyWith(finishFlag: event.finishFlag, pageIndex: 1);
-    final completer = Completer<DataGridResponseData<GoodsUpTask>>();
-    gridBloc.add(LoadDataEvent<GoodsUpTask>(0, completer: completer));
-    try {
-      final response = await completer.future;
-      debugPrint('Loaded ${response.data.length} inbound tasks');
-    } catch (e) {
-      debugPrint('Failed to load inbound tasks: $e');
-    }
   }
 
   Future<void> _onRefresh(

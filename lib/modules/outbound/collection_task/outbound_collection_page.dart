@@ -319,6 +319,7 @@ class _OutboundCollectionPageState extends State<OutboundCollectionPage>
       placeholder: placeholder,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       height: 48,
+      keyboardType: TextInputType.number,
     );
 
     return ScannerWidget(

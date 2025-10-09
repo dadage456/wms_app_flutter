@@ -25,9 +25,8 @@ class GoodsUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => GoodsUpTaskListData.fromJson(
-        Map<String, dynamic>.from(data as Map),
-      ),
+      dataExtractor: (data) =>
+          GoodsUpTaskListData.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
@@ -57,9 +56,8 @@ class GoodsUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => MaterialInfoResponse.fromJson(
-        Map<String, dynamic>.from(data as Map),
-      ),
+      dataExtractor: (data) =>
+          MaterialInfoResponse.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
@@ -78,9 +76,11 @@ class GoodsUpTaskService {
         final map = Map<String, dynamic>.from(data as Map);
         final rows = map['rows'] as List? ?? [];
         return rows
-            .map((item) => InboundCollectTaskItem.fromJson(
-                  Map<String, dynamic>.from(item as Map),
-                ))
+            .map(
+              (item) => InboundCollectTaskItem.fromJson(
+                Map<String, dynamic>.from(item as Map),
+              ),
+            )
             .toList();
       },
     );
@@ -109,9 +109,9 @@ class GoodsUpTaskService {
   }) async {
     await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitRCInTaskItem',
-      options: Options(headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      }),
+      options: Options(
+        headers: {'content-type': 'application/json;charset=UTF-8'},
+      ),
       data: {
         'intaskitemids': inTaskItemIds,
         'roomTag': roomTag,
@@ -121,14 +121,12 @@ class GoodsUpTaskService {
   }
 
   /// 上架采集提交
-  Future<void> commitUpShelves({
-    required GoodsUpCommitRequest request,
-  }) async {
+  Future<void> commitUpShelves({required GoodsUpCommitRequest request}) async {
     await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitUp',
-      options: Options(headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      }),
+      options: Options(
+        headers: {'content-type': 'application/json;charset=UTF-8'},
+      ),
       data: request.toJson(),
     );
   }
@@ -142,22 +140,10 @@ class GoodsUpTaskService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getStoreSite',
-      queryParameters: {
-        'storeRoomNo': storeRoomNo,
-        'storeSiteNo': storeSiteNo,
-      },
+      queryParameters: {'storeRoomNo': storeRoomNo, 'storeSiteNo': storeSiteNo},
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) {
-        final map = Map<String, dynamic>.from(data as Map);
-        return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
-        );
-      },
-    );
+    return response.data?['data'] as List<Map<String, dynamic>>;
   }
 
   /// 根据库位与物料编码获取库存
@@ -167,10 +153,7 @@ class GoodsUpTaskService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getMtlRepertory',
-      queryParameters: {
-        'storeSite': storeSite,
-        'matCode': materialCode,
-      },
+      queryParameters: {'storeSite': storeSite, 'matCode': materialCode},
     );
 
     return ApiResponseHandler.handleResponse(
@@ -178,8 +161,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );
@@ -205,8 +189,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );
@@ -230,8 +215,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );
@@ -255,8 +241,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );
@@ -281,14 +268,12 @@ class GoodsUpTaskService {
   }
 
   /// 上架转储提交
-  Future<void> commitTransfer({
-    required GoodsUpTransferRequest request,
-  }) async {
+  Future<void> commitTransfer({required GoodsUpTransferRequest request}) async {
     await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitTransfer',
-      options: Options(headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      }),
+      options: Options(
+        headers: {'content-type': 'application/json;charset=UTF-8'},
+      ),
       data: request.toJson(),
     );
   }
@@ -300,10 +285,7 @@ class GoodsUpTaskService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getMtlQtyByMtlCode',
-      queryParameters: {
-        'mtlCode': materialCode,
-        'siteNo': siteNo,
-      },
+      queryParameters: {'mtlCode': materialCode, 'siteNo': siteNo},
     );
 
     return ApiResponseHandler.handleResponse(
@@ -311,8 +293,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );
@@ -328,9 +311,7 @@ class GoodsUpTaskService {
       response: response,
       dataExtractor: (data) {
         final list = data as List? ?? [];
-        return list
-            .map((e) => Map<String, dynamic>.from(e as Map))
-            .toList();
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       },
     );
   }
@@ -345,9 +326,7 @@ class GoodsUpTaskService {
       response: response,
       dataExtractor: (data) {
         final list = data as List? ?? [];
-        return list
-            .map((e) => Map<String, dynamic>.from(e as Map))
-            .toList();
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       },
     );
   }
@@ -385,8 +364,9 @@ class GoodsUpTaskService {
       dataExtractor: (data) {
         final map = Map<String, dynamic>.from(data as Map);
         return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? [])
-              .map((e) => Map<String, dynamic>.from(e as Map)),
+          (map['rows'] as List? ?? []).map(
+            (e) => Map<String, dynamic>.from(e as Map),
+          ),
         );
       },
     );

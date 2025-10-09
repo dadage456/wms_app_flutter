@@ -6,6 +6,7 @@ import 'package:wms_app/modules/outbound/collection_task/models/collection_model
 import 'package:wms_app/modules/outbound/collection_task/services/collection_service.dart';
 import 'package:wms_app/modules/outbound/exception_collection/models/exception_collection_models.dart';
 import 'package:wms_app/modules/outbound/task_list/models/outbound_task.dart';
+import 'package:wms_app/utils/error_handler.dart';
 
 import 'exception_collection_event.dart';
 import 'exception_collection_state.dart';
@@ -335,7 +336,12 @@ class ExceptionCollectionBloc
       clearedState = _applyPlaceholder(clearedState);
       emit(clearedState);
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: '提交异常：${_formatError(e)}'));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: '提交异常：${ErrorHandler.handleError(e)}',
+        ),
+      );
     }
   }
 

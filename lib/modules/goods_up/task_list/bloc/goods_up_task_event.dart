@@ -16,15 +16,6 @@ class SearchGoodsUpTasksEvent extends GoodsUpTaskEvent {
   List<Object?> get props => [searchKey];
 }
 
-class FilterGoodsUpTasksEvent extends GoodsUpTaskEvent {
-  const FilterGoodsUpTasksEvent(this.finishFlag);
-
-  final String finishFlag;
-
-  @override
-  List<Object?> get props => [finishFlag];
-}
-
 class RefreshGoodsUpTasksEvent extends GoodsUpTaskEvent {
   const RefreshGoodsUpTasksEvent();
 }

@@ -312,7 +312,7 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
                   source: _source,
                   allowSorting: true,
                   allowColumnsResizing: true,
-                  columnWidthMode: ColumnWidthMode.none,
+                  columnWidthMode: ColumnWidthMode.auto,
                   gridLinesVisibility: GridLinesVisibility.both,
                   headerGridLinesVisibility: GridLinesVisibility.both,
                   onSelectionChanged: _handleSelectionChanged,
@@ -486,17 +486,17 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
   }
 
   GridColumn _buildGridColumn(GridColumnConfig cfg) {
-    final effectiveWidth = columnWidths[cfg.name] ?? cfg.width ?? 120.0;
+    final effectiveWidth = columnWidths[cfg.name] ?? cfg.width ?? double.nan;
 
     return GridColumn(
       columnName: cfg.name,
       width: effectiveWidth,
-      minimumWidth: cfg.minimumWidth ?? 80.0,
-      maximumWidth: cfg.maximumWidth ?? double.infinity,
+      minimumWidth: cfg.minimumWidth ?? double.nan,
+      maximumWidth: cfg.maximumWidth ?? double.nan,
       autoFitPadding: const EdgeInsets.symmetric(horizontal: 8),
       label: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        alignment: Alignment.centerLeft,
+        alignment: cfg.alignment,
         child:
             cfg.headerBuilder?.call(cfg.name, cfg.headerText) ??
             Text(cfg.headerText, style: _titleStyle),
@@ -603,7 +603,7 @@ class _CommonDataSource<T> extends DataGridSource {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      alignment: Alignment.centerLeft,
+      alignment: config.alignment,
       child: config.enableSelectableText
           ? SelectableText(text, style: config.textStyle ?? _infoStyle)
           : Text(
@@ -649,6 +649,23 @@ class GridColumnConfig<T> {
   final TextOverflow? overflow;
   final TextStyle? textStyle;
   final String Function(dynamic value, T row)? formatter;
+
+  AlignmentGeometry get alignment {
+    switch (textAlign) {
+      case TextAlign.left:
+        return Alignment.centerLeft;
+      case TextAlign.right:
+        return Alignment.centerRight;
+      case TextAlign.center:
+        return Alignment.center;
+      case TextAlign.start:
+        return AlignmentDirectional.centerStart;
+      case TextAlign.end:
+        return AlignmentDirectional.centerEnd;
+      default:
+        return Alignment.centerLeft;
+    }
+  }
 
   GridColumnConfig({
     this.enableSelectableText = false,

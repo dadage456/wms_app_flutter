@@ -8,6 +8,7 @@ import 'package:wms_app/common_widgets/custom_app_bar.dart';
 import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
 import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
 import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
+import 'package:wms_app/modules/outbound/task_details/widgets/outbound_batch_action_bar.dart';
 
 import 'bloc/goods_up_task_detail_bloc.dart';
 import 'bloc/goods_up_task_detail_event.dart';
@@ -40,25 +41,53 @@ class _GoodsUpTaskDetailPageState extends State<GoodsUpTaskDetailPage> {
     _gridBloc = _bloc.gridBloc;
 
     _bloc.add(
-      InitializedEvent(inTaskId: widget.inTaskId, workStation: widget.workStation),
+      InitializedEvent(
+        inTaskId: widget.inTaskId,
+        workStation: widget.workStation,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
-      appBar: CustomAppBar(
-        title: '上架任务明细',
-        onBackPressed: () => Navigator.of(context).pop(),
-      ).appBar,
-      body: Column(
-        children: [
-          _buildScanner(),
-          Expanded(child: _buildTable()),
-          _buildBottomActions(),
-        ],
-      ),
+    return BlocProvider.value(
+      value: _gridBloc,
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<GoodsUpTaskItem>,
+            CommonDataGridState<GoodsUpTaskItem>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
+
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载明细失败',
+                );
+              }
+            },
+            builder: (context, state) {
+              return Scaffold(
+                backgroundColor: const Color(0xFFF6F6F6),
+                appBar: CustomAppBar(
+                  title: '上架任务明细',
+                  onBackPressed: () => Navigator.of(context).pop(),
+                ).appBar,
+                body: Column(
+                  children: [
+                    _buildScanner(),
+                    Expanded(child: _buildTable(state)),
+                    _buildBatchActionBar(),
+                  ],
+                ),
+              );
+            },
+          ),
     );
   }
 
@@ -71,84 +100,57 @@ class _GoodsUpTaskDetailPageState extends State<GoodsUpTaskDetailPage> {
     return ScannerWidget(
       config: config,
       controller: _scannerController,
-      onScanResult: (value) =>
-          _bloc.add(ScanEvent(qrContent: value)),
+      onScanResult: (value) => _bloc.add(SearchEvent(searchKey: value)),
       onError: (message) =>
           LoadingDialogManager.instance.showErrorDialog(context, message),
     );
   }
 
-  Widget _buildTable() {
-    return BlocProvider.value(
-      value: _gridBloc,
-      child: BlocConsumer<CommonDataGridBloc<GoodsUpTaskItem>,
-          CommonDataGridState<GoodsUpTaskItem>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
-
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载明细失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<GoodsUpTaskItem>(
-            columns: GoodsUpTaskDetailGridConfig.columns(),
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            onLoadData: (index) async {
-              _gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(index));
-            },
-            selectedRows: state.selectedRows,
-            onSelectionChanged: (rows) =>
-                _gridBloc.add(ChangeSelectedRowsEvent<GoodsUpTaskItem>(rows)),
-            datas: state.data,
-            allowPager: false,
-            allowSelect: true,
-            headerHeight: 44,
-            rowHeight: 52,
-          );
-        },
-      ),
+  Widget _buildTable(CommonDataGridState<GoodsUpTaskItem> state) {
+    return CommonDataGrid<GoodsUpTaskItem>(
+      columns: GoodsUpTaskDetailGridConfig.columns(),
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      onLoadData: (index) async {
+        _gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(index));
+      },
+      selectedRows: state.selectedRows,
+      onSelectionChanged: (rows) =>
+          _gridBloc.add(ChangeSelectedRowsEvent<GoodsUpTaskItem>(rows)),
+      datas: state.data,
+      allowPager: true,
+      allowSelect: true,
     );
   }
 
-  Widget _buildBottomActions() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                final selected = _gridBloc.state.selectedRows;
-                if (selected.isEmpty) {
-                  LoadingDialogManager.instance
-                      .showErrorDialog(context, '请先选择需要撤销的明细');
-                  return;
-                }
-                _bloc.add(
-                  CancelSelectedEvent(selectedRows: selected),
-                );
-              },
-              child: const Text('撤销'),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () => _bloc.add(const RefreshEvent()),
-              child: const Text('刷新'),
-            ),
-          ),
-        ],
+  /// 构建批量操作栏
+  Widget _buildBatchActionBar() {
+    final selectedCount = _gridBloc.state.selectedRows.length;
+    final totalCount = _gridBloc.state.data.length;
+
+    if (selectedCount == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: 54,
+      child: OutboundBatchActionBar(
+        selectedCount: selectedCount,
+        totalCount: totalCount,
+        onSelectAll: () {},
+        onDeselectAll: () {},
+        onCancelSelected: () {
+          final selected = _gridBloc.state.selectedRows;
+          if (selected.isEmpty) {
+            LoadingDialogManager.instance.showErrorDialog(
+              context,
+              '请先选择需要撤销的明细',
+            );
+            return;
+          }
+          _bloc.add(CancelSelectedEvent(selectedRows: selected));
+        },
+        onClearSelection: () {},
       ),
     );
   }

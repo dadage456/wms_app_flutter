@@ -49,8 +49,8 @@ class GoodsUpCollectTaskItemQuery extends Equatable {
       'taskFinishFlag': taskFinishFlag,
       'roomtag': roomTag,
       'workstation': workStation,
-      'sortType': sortType,
-      'sortColumn': sortColumn,
+      // 'sortType': sortType,
+      // 'sortColumn': sortColumn,
       'searchKey': searchKey,
       if (userId != null) 'userId': userId,
       if (collecter != null) 'collecter': collecter,
@@ -99,23 +99,23 @@ class GoodsUpCollectTaskItemQuery extends Equatable {
 
   @override
   List<Object?> get props => [
-        inTaskNo,
-        inTaskId,
-        storeRoomNo,
-        forceSite,
-        forceBatch,
-        taskComment,
-        taskFinishFlag,
-        roomTag,
-        workStation,
-        sortType,
-        sortColumn,
-        searchKey,
-        userId,
-        collecter,
-        pageIndex,
-        pageSize,
-      ];
+    inTaskNo,
+    inTaskId,
+    storeRoomNo,
+    forceSite,
+    forceBatch,
+    taskComment,
+    taskFinishFlag,
+    roomTag,
+    workStation,
+    sortType,
+    sortColumn,
+    searchKey,
+    userId,
+    collecter,
+    pageIndex,
+    pageSize,
+  ];
 }
 
 /// 上架提交参数模型
@@ -141,18 +141,12 @@ class GoodsUpCommitRequest {
 
 /// 上架转储请求
 class GoodsUpTransferRequest {
-  GoodsUpTransferRequest({
-    required this.transferInfos,
-    this.filter = '',
-  });
+  GoodsUpTransferRequest({required this.transferInfos, this.filter = ''});
 
   final List<Map<String, dynamic>> transferInfos;
   final String filter;
 
   Map<String, dynamic> toJson() {
-    return {
-      'transferInfos': transferInfos,
-      'filter': filter,
-    };
+    return {'transferInfos': transferInfos, 'filter': filter};
   }
 }
