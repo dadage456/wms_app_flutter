@@ -210,6 +210,9 @@ class InboundCollectionBloc
       case InboundScanStep.material:
         await _handleMaterialScan(payload, emit);
         break;
+      case InboundScanStep.dangerousSupplement:
+        await _handleDangerousSupplement(payload, emit);
+        break;
       case InboundScanStep.quantity:
         await _handleQuantityInput(payload, emit);
         break;
@@ -238,6 +241,18 @@ class InboundCollectionBloc
         return;
       }
 
+      final siteInfo = result.first;
+      final frozenFlag = siteInfo['isfrozen'] ?? siteInfo['isFrozen'];
+      final isFrozen = frozenFlag != null && frozenFlag.toString() != '0';
+      if (isFrozen) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('库位【$site】被锁定或冻结，无法采集'),
+          ),
+        );
+        return;
+      }
+
       final collectionList = state.detailList
           .where((item) => (item.storeSiteNo ?? '').trim() == site.trim())
           .toList();
@@ -250,6 +265,12 @@ class InboundCollectionBloc
           scanStep: InboundScanStep.material,
           status: CollectionStatus.success(),
           focus: true,
+          currentBarcode: null,
+          currentItem: null,
+          repQty: 0,
+          collectQty: 0,
+          isDangerous: false,
+          requireDangerousSupplement: false,
         ),
       );
     } catch (error) {
@@ -299,19 +320,104 @@ class InboundCollectionBloc
         return;
       }
 
+      final resolvedSite = state.storeSite.isNotEmpty
+          ? state.storeSite.trim()
+          : (targetItem.storeSiteNo ?? '').trim();
+
+      double repQty = targetItem.repertoryQty;
+      if (resolvedSite.isNotEmpty) {
+        try {
+          repQty = await _queryInventoryQuantity(
+            storeSite: resolvedSite,
+            item: targetItem,
+            barcode: barcodeContent,
+          );
+        } catch (error) {
+          emit(
+            state.copyWith(
+              status: CollectionStatus.error(ErrorHandler.handleError(error)),
+            ),
+          );
+          return;
+        }
+      }
+
+      final clonedItem = _cloneDetail(targetItem);
+      final isDangerous = (barcodeContent.dgFlag ?? '').toUpperCase() == 'Y';
+      final missingMessage =
+          isDangerous ? _buildDangerousMissingMessage(barcodeContent) : null;
+      final requiresSupplement = missingMessage != null;
+      final nextStep = requiresSupplement
+          ? InboundScanStep.dangerousSupplement
+          : InboundScanStep.quantity;
+      final placeholder = requiresSupplement
+          ? '请扫描供应商二维码，采集生产日期、有效期'
+          : '请输入采集数量';
+
       emit(
         state.copyWith(
           currentBarcode: barcodeContent,
-          currentItem: _cloneDetail(targetItem),
-          storeSite: state.storeSite.isNotEmpty
-              ? state.storeSite
-              : (targetItem.storeSiteNo ?? ''),
-          placeholder: '请输入采集数量',
-          scanStep: InboundScanStep.quantity,
-          status: CollectionStatus.success(),
+          currentItem: clonedItem,
+          storeSite: resolvedSite,
+          placeholder: placeholder,
+          scanStep: nextStep,
+          status: requiresSupplement && missingMessage != null
+              ? CollectionStatus.error(missingMessage)
+              : CollectionStatus.success(),
           focus: true,
-          repQty: targetItem.repertoryQty,
-          collectQty: targetItem.collectedQty,
+          repQty: repQty,
+          collectQty: clonedItem.collectedQty,
+          isDangerous: isDangerous,
+          requireDangerousSupplement: requiresSupplement,
+        ),
+      );
+    } catch (error) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(ErrorHandler.handleError(error)),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleDangerousSupplement(
+    String barcode,
+    Emitter<InboundCollectionState> emit,
+  ) async {
+    final currentItem = state.currentItem;
+    final currentBarcode = state.currentBarcode;
+    if (currentItem == null || currentBarcode == null) {
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描物料信息')));
+      return;
+    }
+
+    try {
+      final supplement = await _service.getInboundBarcodeInfo(barcode.trim());
+      final mergedBarcode = currentBarcode.copyWith(
+        productionDate:
+            supplement.productionDate ?? currentBarcode.productionDate,
+        expireDays: supplement.expireDays ?? currentBarcode.expireDays,
+        dgFlag: supplement.dgFlag ?? currentBarcode.dgFlag,
+      );
+
+      final missingMessage = _buildDangerousMissingMessage(mergedBarcode);
+      final requiresSupplement = missingMessage != null;
+
+      emit(
+        state.copyWith(
+          currentBarcode: mergedBarcode,
+          placeholder: requiresSupplement
+              ? '请扫描供应商二维码，采集生产日期、有效期'
+              : '请输入采集数量',
+          scanStep: requiresSupplement
+              ? InboundScanStep.dangerousSupplement
+              : InboundScanStep.quantity,
+          status: requiresSupplement
+              ? CollectionStatus.error(missingMessage)
+              : CollectionStatus.success(),
+          focus: true,
+          isDangerous: true,
+          requireDangerousSupplement: requiresSupplement,
         ),
       );
     } catch (error) {
@@ -327,6 +433,16 @@ class InboundCollectionBloc
     String payload,
     Emitter<InboundCollectionState> emit,
   ) async {
+    if (state.requireDangerousSupplement) {
+      emit(
+        state.copyWith(
+          status:
+              CollectionStatus.error('该物料为危化品，请先采集生产日期、效期信息'),
+        ),
+      );
+      return;
+    }
+
     final quantity = double.tryParse(payload);
     if (quantity == null || quantity <= 0) {
       emit(state.copyWith(status: CollectionStatus.error('请输入有效的数量')));
@@ -428,9 +544,11 @@ class InboundCollectionBloc
       currentItem: null,
       currentTab: 1,
       collectQty: quantity,
-      repQty: targetDetail.repertoryQty,
+      repQty: state.repQty,
       status: CollectionStatus.success('采集成功'),
       focus: true,
+      isDangerous: false,
+      requireDangerousSupplement: false,
     );
 
     emit(newState);
@@ -692,6 +810,106 @@ class InboundCollectionBloc
     Emitter<InboundCollectionState> emit,
   ) async {
     await _clearCache();
+  }
+
+  String? _buildDangerousMissingMessage(InboundBarcodeContent barcode) {
+    final missing = <String>[];
+    if ((barcode.productionDate ?? '').trim().isEmpty) {
+      missing.add('生产日期');
+    }
+    final expire = barcode.expireDays;
+    if (expire == null) {
+      missing.add('效期');
+    }
+    if (missing.isEmpty) {
+      return null;
+    }
+    return '该物料为危化品，请采集${missing.join('、')}信息';
+  }
+
+  Future<double> _queryInventoryQuantity({
+    required String storeSite,
+    required InboundCollectTaskItem item,
+    required InboundBarcodeContent barcode,
+  }) async {
+    final repertoryList = await _service.getMtlRepertoryByStoreSite(
+      storeSite: storeSite,
+      materialCode: item.materialCode,
+    );
+
+    if (repertoryList.isEmpty) {
+      return 0;
+    }
+
+    final normalized =
+        repertoryList.map((row) => Map<String, dynamic>.from(row)).toList();
+
+    final matchKey =
+        (barcode.batchNo ?? barcode.serialNo ?? item.batchNo ?? item.serialNo)
+            ?.trim();
+    final filtered = _filterInventoryByKey(normalized, matchKey);
+
+    final baseList = filtered.isNotEmpty ? filtered : normalized;
+    final erpStore = _readString(
+      baseList.first['erpStoreroom'] ??
+          baseList.first['erpstoreroom'] ??
+          baseList.first['erpStore'],
+    )?.trim();
+
+    final expected = (item.subInventoryCode ?? '').trim();
+    if (expected.isNotEmpty && erpStore != null && erpStore.isNotEmpty) {
+      if (erpStore != expected) {
+        throw Exception(
+          '当前物料明细指定子库【$expected】与库位物料批次子库【$erpStore】存在不一致，请确认',
+        );
+      }
+    }
+
+    var repQty = 0.0;
+    for (final row in (filtered.isNotEmpty ? filtered : normalized)) {
+      repQty += _toDouble(
+        row['repqty'] ?? row['repQty'] ?? row['quantity'] ?? row['qty'],
+      );
+    }
+    return repQty;
+  }
+
+  List<Map<String, dynamic>> _filterInventoryByKey(
+    List<Map<String, dynamic>> source,
+    String? matchKey,
+  ) {
+    final trimmed = matchKey?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return source;
+    }
+
+    final filtered = source.where((row) {
+      final candidates = [
+        row['batchno'],
+        row['batchNo'],
+        row['batch'],
+        row['sn'],
+        row['SN'],
+      ];
+      return candidates.any(
+        (value) => value != null && value.toString().trim() == trimmed,
+      );
+    }).toList();
+
+    return filtered.isEmpty ? source : filtered;
+  }
+
+  String? _readString(dynamic value) {
+    if (value == null) return null;
+    return value.toString();
+  }
+
+  double _toDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? 0;
+    }
+    return 0;
   }
 
   String _buildInventoryKey(String site, String materialCode, String? batchNo) {

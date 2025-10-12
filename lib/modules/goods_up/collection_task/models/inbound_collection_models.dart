@@ -108,6 +108,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     required this.quantity,
     this.expireDays,
     this.productionDate,
+    this.dgFlag,
   });
 
   factory InboundBarcodeContent.fromJson(Map<String, dynamic> json) {
@@ -120,6 +121,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
       quantity: _parseDouble(json['qty']),
       expireDays: _parseIntNullable(json['vdays']),
       productionDate: json['pdate']?.toString(),
+      dgFlag: json['dgFlg']?.toString(),
     );
   }
 
@@ -131,6 +133,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
   final double quantity;
   final int? expireDays;
   final String? productionDate;
+  final String? dgFlag;
 
   Map<String, dynamic> toJson() {
     return {
@@ -142,12 +145,37 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
       'qty': quantity,
       'vdays': expireDays,
       'pdate': productionDate,
+      'dgFlg': dgFlag,
     };
   }
 
   bool get isEmpty => (materialCode == null || materialCode!.isEmpty);
 
   bool get isNotEmpty => !isEmpty;
+
+  InboundBarcodeContent copyWith({
+    String? materialCode,
+    String? materialName,
+    String? batchNo,
+    String? serialNo,
+    String? seqCtrl,
+    double? quantity,
+    int? expireDays,
+    String? productionDate,
+    String? dgFlag,
+  }) {
+    return InboundBarcodeContent(
+      materialCode: materialCode ?? this.materialCode,
+      materialName: materialName ?? this.materialName,
+      batchNo: batchNo ?? this.batchNo,
+      serialNo: serialNo ?? this.serialNo,
+      seqCtrl: seqCtrl ?? this.seqCtrl,
+      quantity: quantity ?? this.quantity,
+      expireDays: expireDays ?? this.expireDays,
+      productionDate: productionDate ?? this.productionDate,
+      dgFlag: dgFlag ?? this.dgFlag,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -159,6 +187,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     quantity,
     expireDays,
     productionDate,
+    dgFlag,
   ];
 }
 
@@ -348,13 +377,14 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
       quantity: fields[5] as double,
       expireDays: fields[6] as int?,
       productionDate: fields[7] as String?,
+      dgFlag: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, InboundBarcodeContent obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.materialCode)
       ..writeByte(1)
@@ -370,7 +400,9 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
       ..writeByte(6)
       ..write(obj.expireDays)
       ..writeByte(7)
-      ..write(obj.productionDate);
+      ..write(obj.productionDate)
+      ..writeByte(8)
+      ..write(obj.dgFlag);
   }
 }
 

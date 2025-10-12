@@ -273,6 +273,9 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
     final material = barcode?.materialCode ?? state.currentItem?.materialCode;
     final batchNo = barcode?.batchNo ?? state.currentItem?.batchNo;
     final serial = barcode?.serialNo ?? state.currentItem?.serialNo;
+    final productionDate =
+        barcode?.productionDate ?? state.currentItem?.productionDate ?? '';
+    final expireDays = barcode?.expireDays ?? state.currentItem?.expireDays;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -300,6 +303,13 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
             _buildInfoRow('序列：', serial ?? '', '', '')
           else
             _buildInfoRow('批次：', batchNo ?? '', '', ''),
+          _buildDottedDivider(),
+          _buildInfoRow(
+            '生产日期：',
+            productionDate,
+            '有效期(天)：',
+            expireDays == null ? '' : expireDays.toString(),
+          ),
           _buildDottedDivider(),
           _buildInfoRow('名称：', barcode?.materialName ?? '', '', ''),
         ],

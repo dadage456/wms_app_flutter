@@ -143,7 +143,14 @@ class GoodsUpTaskService {
       queryParameters: {'storeRoomNo': storeRoomNo, 'storeSiteNo': storeSiteNo},
     );
 
-    return response.data?['data'] as List<Map<String, dynamic>>;
+    final data = response.data?['data'];
+    if (data is List) {
+      return data
+          .where((item) => item is Map)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList();
+    }
+    return const [];
   }
 
   /// 根据库位与物料编码获取库存
