@@ -19,6 +19,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
     this.repertoryQty = 0,
     this.expireDays,
     this.productionDate,
+    this.proType,
   });
 
   factory InboundCollectTaskItem.fromJson(Map<String, dynamic> json) {
@@ -38,6 +39,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       repertoryQty: _parseDouble(json['repqty']),
       expireDays: _parseIntNullable(json['vdays']),
       productionDate: json['pdate']?.toString(),
+      proType: json['protype']?.toString(),
     );
   }
 
@@ -56,6 +58,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
   final double repertoryQty;
   final int? expireDays;
   final String? productionDate;
+  final String? proType;
 
   Map<String, dynamic> toJson() {
     return {
@@ -74,6 +77,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       'repqty': repertoryQty,
       'vdays': expireDays,
       'pdate': productionDate,
+      'protype': proType,
     };
   }
 
@@ -94,6 +98,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
     repertoryQty,
     expireDays,
     productionDate,
+    proType,
   ];
 }
 
