@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../../../../models/page_status.dart';
 import '../models/inbound_collection_models.dart';
 
-enum InboundScanStep { site, material, quantity }
+enum InboundScanStep { site, material, dangerousSupplement, quantity }
 
 class InboundCollectionState extends Equatable {
   const InboundCollectionState({
@@ -25,6 +25,8 @@ class InboundCollectionState extends Equatable {
     this.dicSeq = const {},
     this.dicInvMtlQty = const {},
     this.focus = false,
+    this.isDangerous = false,
+    this.requireDangerousSupplement = false,
   });
 
   final CollectionStatus status;
@@ -45,6 +47,8 @@ class InboundCollectionState extends Equatable {
   final Map<String, String> dicSeq;
   final Map<String, double> dicInvMtlQty;
   final bool focus;
+  final bool isDangerous;
+  final bool requireDangerousSupplement;
 
   InboundCollectionState copyWith({
     CollectionStatus? status,
@@ -65,6 +69,8 @@ class InboundCollectionState extends Equatable {
     Map<String, String>? dicSeq,
     Map<String, double>? dicInvMtlQty,
     bool? focus,
+    bool? isDangerous,
+    bool? requireDangerousSupplement,
   }) {
     return InboundCollectionState(
       status: status ?? this.status,
@@ -85,6 +91,9 @@ class InboundCollectionState extends Equatable {
       dicSeq: dicSeq ?? this.dicSeq,
       dicInvMtlQty: dicInvMtlQty ?? this.dicInvMtlQty,
       focus: focus ?? this.focus,
+      isDangerous: isDangerous ?? this.isDangerous,
+      requireDangerousSupplement:
+          requireDangerousSupplement ?? this.requireDangerousSupplement,
     );
   }
 
@@ -108,5 +117,7 @@ class InboundCollectionState extends Equatable {
         dicSeq,
         dicInvMtlQty,
         focus,
+        isDangerous,
+        requireDangerousSupplement,
       ];
 }

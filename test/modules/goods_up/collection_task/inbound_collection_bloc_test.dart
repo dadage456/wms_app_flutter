@@ -17,7 +17,9 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
     required this.collectItems,
     required this.storeSiteRows,
     required this.barcodeContent,
-  }) : super(Dio());
+    List<Map<String, dynamic>>? inventoryRows,
+  }) : inventoryRows = inventoryRows ?? const [],
+        super(Dio());
 
   List<InboundCollectTaskItem> collectItems;
   GoodsUpCollectTaskItemQuery? lastCollectQuery;
@@ -26,6 +28,10 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
   String? lastStoreSite;
   String? lastBarcode;
   InboundBarcodeContent barcodeContent;
+  final Map<String, InboundBarcodeContent> barcodeResponses = {};
+  List<Map<String, dynamic>> inventoryRows;
+  String? lastInventorySite;
+  String? lastInventoryMaterial;
 
   @override
   Future<List<InboundCollectTaskItem>> getInboundCollectItems({
@@ -48,7 +54,17 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
   @override
   Future<InboundBarcodeContent> getInboundBarcodeInfo(String barcode) async {
     lastBarcode = barcode;
-    return barcodeContent;
+    return barcodeResponses[barcode] ?? barcodeContent;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getMtlRepertoryByStoreSite({
+    required String storeSite,
+    required String materialCode,
+  }) async {
+    lastInventorySite = storeSite;
+    lastInventoryMaterial = materialCode;
+    return inventoryRows;
   }
 }
 
@@ -116,7 +132,11 @@ void main() {
         batchNo: 'BATCH-1',
         quantity: 1,
       ),
+      inventoryRows: [
+        {'repqty': sampleItem.repertoryQty, 'erpStoreroom': 'ERP'},
+      ],
     );
+    service.barcodeResponses['BARCODE-1'] = service.barcodeContent;
 
     bloc = InboundCollectionBloc(service: service);
   });
@@ -179,5 +199,51 @@ void main() {
     );
 
     expect(state.status.message, contains('超过剩余可采集数量'));
+  });
+
+  test('dangerous goods requires supplement before quantity', () async {
+    service.barcodeResponses['BARCODE-DG'] = InboundBarcodeContent(
+      materialCode: sampleItem.materialCode,
+      materialName: sampleItem.materialName,
+      batchNo: 'BATCH-1',
+      quantity: 1,
+      dgFlag: 'Y',
+    );
+    service.barcodeResponses['SUPP-1'] = InboundBarcodeContent(
+      materialCode: sampleItem.materialCode,
+      materialName: sampleItem.materialName,
+      batchNo: 'BATCH-1',
+      quantity: 1,
+      dgFlag: 'Y',
+      productionDate: '2024-01-01',
+      expireDays: 180,
+    );
+    bloc.add(const InitializeInboundCollectionEvent(task: task, userId: 7));
+    await bloc.stream.firstWhere((state) => state.status.isSuccess);
+
+    bloc.add(const PerformInboundScanEvent('SITE-1'));
+    await bloc.stream.firstWhere(
+      (state) => state.scanStep == InboundScanStep.material,
+    );
+
+    bloc.add(const PerformInboundScanEvent('BARCODE-DG'));
+
+    final hazardState = await bloc.stream.firstWhere(
+      (state) => state.scanStep == InboundScanStep.dangerousSupplement,
+    );
+
+    expect(hazardState.requireDangerousSupplement, isTrue);
+    expect(hazardState.placeholder, contains('供应商二维码'));
+
+    bloc.add(const PerformInboundScanEvent('SUPP-1'));
+
+    final readyState = await bloc.stream.firstWhere(
+      (state) =>
+          state.scanStep == InboundScanStep.quantity &&
+          !state.requireDangerousSupplement,
+    );
+
+    expect(readyState.currentBarcode?.productionDate, '2024-01-01');
+    expect(readyState.currentBarcode?.expireDays, 180);
   });
 }
