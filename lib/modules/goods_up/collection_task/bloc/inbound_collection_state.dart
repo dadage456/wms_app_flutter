@@ -21,12 +21,15 @@ class InboundCollectionState extends Equatable {
     this.scanStep = InboundScanStep.site,
     this.currentTab = 0,
     this.checkedIds = const [],
+    this.candidateItemIds = const [],
     this.dicMtlQty = const {},
     this.dicSeq = const {},
     this.dicInvMtlQty = const {},
     this.focus = false,
     this.isDangerous = false,
     this.requireDangerousSupplement = false,
+    this.shouldCheckBatch = true,
+    this.allowErpStoreBypass = false,
   });
 
   final CollectionStatus status;
@@ -43,12 +46,15 @@ class InboundCollectionState extends Equatable {
   final InboundScanStep scanStep;
   final int currentTab;
   final List<int> checkedIds;
+  final List<int> candidateItemIds;
   final Map<String, List<dynamic>> dicMtlQty;
   final Map<String, String> dicSeq;
   final Map<String, double> dicInvMtlQty;
   final bool focus;
   final bool isDangerous;
   final bool requireDangerousSupplement;
+  final bool shouldCheckBatch;
+  final bool allowErpStoreBypass;
 
   InboundCollectionState copyWith({
     CollectionStatus? status,
@@ -65,12 +71,15 @@ class InboundCollectionState extends Equatable {
     InboundScanStep? scanStep,
     int? currentTab,
     List<int>? checkedIds,
+    List<int>? candidateItemIds,
     Map<String, List<dynamic>>? dicMtlQty,
     Map<String, String>? dicSeq,
     Map<String, double>? dicInvMtlQty,
     bool? focus,
     bool? isDangerous,
     bool? requireDangerousSupplement,
+    bool? shouldCheckBatch,
+    bool? allowErpStoreBypass,
   }) {
     return InboundCollectionState(
       status: status ?? this.status,
@@ -87,6 +96,7 @@ class InboundCollectionState extends Equatable {
       scanStep: scanStep ?? this.scanStep,
       currentTab: currentTab ?? this.currentTab,
       checkedIds: checkedIds ?? this.checkedIds,
+      candidateItemIds: candidateItemIds ?? this.candidateItemIds,
       dicMtlQty: dicMtlQty ?? this.dicMtlQty,
       dicSeq: dicSeq ?? this.dicSeq,
       dicInvMtlQty: dicInvMtlQty ?? this.dicInvMtlQty,
@@ -94,6 +104,8 @@ class InboundCollectionState extends Equatable {
       isDangerous: isDangerous ?? this.isDangerous,
       requireDangerousSupplement:
           requireDangerousSupplement ?? this.requireDangerousSupplement,
+      shouldCheckBatch: shouldCheckBatch ?? this.shouldCheckBatch,
+      allowErpStoreBypass: allowErpStoreBypass ?? this.allowErpStoreBypass,
     );
   }
 
@@ -113,11 +125,14 @@ class InboundCollectionState extends Equatable {
         scanStep,
         currentTab,
         checkedIds,
+        candidateItemIds,
         dicMtlQty,
         dicSeq,
         dicInvMtlQty,
         focus,
         isDangerous,
         requireDangerousSupplement,
+        shouldCheckBatch,
+        allowErpStoreBypass,
       ];
 }
