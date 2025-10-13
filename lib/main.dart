@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wms_app/services/user_manager.dart';
 import 'package:wms_app/modules/home/home_page.dart';
 import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
+import 'package:wms_app/modules/inbound/goods_up_task/models/goods_up_models.dart';
 import 'modules/home/login/login_page.dart';
 import 'app_module.dart';
 
@@ -16,6 +17,9 @@ void main() async {
   Hive.registerAdapter(OutTaskItemAdapter());
   Hive.registerAdapter(BarcodeContentAdapter());
   Hive.registerAdapter(CollectionStockAdapter());
+  Hive.registerAdapter(InTaskItemAdapter());
+  Hive.registerAdapter(UpBarcodeContentAdapter());
+  Hive.registerAdapter(UpCollectionStockAdapter());
   runApp(ModularApp(module: AppModule(), child: const MyApp()));
 }
 
