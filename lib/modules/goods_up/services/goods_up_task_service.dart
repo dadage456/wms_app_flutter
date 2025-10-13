@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:wms_app/modules/outbound/task_details/models/outbound_task_item.dart';
 import 'package:wms_app/services/api_response_handler.dart';
 
+import '../collection_task/models/inbound_collection_models.dart';
+import '../collection_task/models/inbound_collection_request.dart';
 import '../task_details/models/goods_up_task_item.dart';
 import '../task_list/models/goods_up_task.dart';
 
@@ -44,6 +46,31 @@ class GoodsUpTaskService {
     );
   }
 
+  /// 获取上架采集任务明细
+  Future<List<InboundCollectTaskItem>> getInboundCollectItems({
+    required GoodsUpCollectTaskItemQuery query,
+  }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/system/terminal/intaskitemList',
+      queryParameters: query.toJson(),
+    );
+
+    return ApiResponseHandler.handleResponse(
+      response: response,
+      dataExtractor: (data) {
+        final map = Map<String, dynamic>.from(data as Map);
+        final rows = map['rows'] as List? ?? const [];
+        return rows
+            .map(
+              (e) => InboundCollectTaskItem.fromJson(
+                Map<String, dynamic>.from(e as Map),
+              ),
+            )
+            .toList();
+      },
+    );
+  }
+
   /// 提交接收/撤销入库任务明细
   Future<void> commitInboundTaskItems({
     required List<int> inTaskItemIds,
@@ -83,6 +110,31 @@ class GoodsUpTaskService {
           .toList();
     }
     return const [];
+  }
+
+  /// 根据二维码获取物料信息
+  Future<InboundBarcodeContent> getInboundBarcodeInfo(String barcode) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/system/terminal/materialInfo',
+      queryParameters: {'QRstring': barcode},
+    );
+
+    final data = response.data;
+    if (data is! Map<String, dynamic>) {
+      throw Exception('物料条码识别出现问题');
+    }
+
+    final code = data['code'] as int?;
+    if (code != 200) {
+      throw Exception(data['msg']?.toString() ?? '物料条码识别出现问题');
+    }
+
+    final content = data['data'];
+    if (content is! Map<String, dynamic>) {
+      throw Exception('物料条码识别出现问题');
+    }
+
+    return InboundBarcodeContent.fromJson(content);
   }
 
   /// 根据库位与物料编码获取库存
@@ -160,6 +212,29 @@ class GoodsUpTaskService {
         );
       },
     );
+  }
+
+  /// 提交平库上架采集结果
+  Future<Map<String, dynamic>> commitUpShelves({
+    required List<Map<String, dynamic>> upShelvesInfos,
+    required List<Map<String, dynamic>> itemListInfos,
+    String filter = '',
+  }) async {
+    final request = InboundCommitRequest(
+      upShelvesInfos: upShelvesInfos,
+      itemListInfos: itemListInfos,
+      filter: filter,
+    );
+
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/system/terminal/commitUp',
+      data: request.toJson(),
+      options: Options(
+        headers: {'content-type': 'application/json;charset=UTF-8'},
+      ),
+    );
+
+    return response.data ?? const {};
   }
 
   /// 查询托盘可用库位
