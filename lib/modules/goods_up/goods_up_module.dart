@@ -5,6 +5,8 @@ import 'package:flutter_modular/flutter_modular.dart';
 import '../../app_module.dart';
 import '../../services/dio_client.dart';
 import '../../services/user_manager.dart';
+import 'collection_task/bloc/inbound_collection_bloc.dart';
+import 'collection_task/inbound_collection_page.dart';
 import 'services/goods_up_task_service.dart';
 import 'task_details/bloc/goods_up_task_detail_bloc.dart';
 import 'task_details/goods_up_task_detail_page.dart';
@@ -52,6 +54,10 @@ class GoodsUpModule extends Module {
         i.get<GoodsUpTaskService>(),
         i.get<UserManager>(),
       ),
+    );
+
+    i.add<InboundCollectionBloc>(
+      () => InboundCollectionBloc(service: i.get<GoodsUpTaskService>()),
     );
   }
 
@@ -108,6 +114,20 @@ class GoodsUpModule extends Module {
         return BlocProvider(
           create: (_) => Modular.get<InboundReceiveTaskDetailBloc>(),
           child: GoodsUpReceiveDetailPage(task: task),
+        );
+      },
+    );
+
+    r.child(
+      '/collection',
+      child: (_) {
+        final task = Modular.args.data as GoodsUpTask?;
+        if (task == null) {
+          return const _TodoPlaceholder(title: '缺少任务信息，无法进入采集页面');
+        }
+        return BlocProvider(
+          create: (_) => Modular.get<InboundCollectionBloc>(),
+          child: InboundCollectionPage(task: task),
         );
       },
     );
