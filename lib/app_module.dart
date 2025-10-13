@@ -8,6 +8,7 @@ import 'package:wms_app/modules/home/login/login_page.dart';
 import 'package:wms_app/services/api_service.dart';
 import 'modules/outbound/outbound_module.dart';
 import 'modules/goods_up/goods_up_module.dart';
+import 'modules/inbound/goods_up_task/goods_up_task_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -44,5 +45,8 @@ class AppModule extends Module {
 
     // 平库上架模块
     r.module('/goods-up', module: GoodsUpModule());
+
+    // 入库上架采集模块
+    r.module('/inbound/goods-up', module: GoodsUpTaskModule());
   }
 }
