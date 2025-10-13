@@ -53,3 +53,6 @@ class GoodsUpTaskItemQueryRequest with _$GoodsUpTaskItemQueryRequest {
   factory GoodsUpTaskItemQueryRequest.fromJson(Map<String, dynamic> json) =>
       _$GoodsUpTaskItemQueryRequestFromJson(json);
 }
+
+/// `GoodsUpTaskItemQuery` 的别名，方便在 service 中引用
+typedef GoodsUpTaskItemQuery = GoodsUpTaskItemQueryRequest;
