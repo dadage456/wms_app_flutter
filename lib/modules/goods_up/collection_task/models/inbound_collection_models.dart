@@ -22,6 +22,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
     this.inboundOrderNo,
     this.taskComment,
     this.repertoryQty = 0,
+    this.proType,
   });
 
   @HiveField(0)
@@ -56,12 +57,15 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
   final String? taskComment;
   @HiveField(15)
   final double repertoryQty;
+  @HiveField(16)
+  final String? proType;
 
   double get remainingQty => planQty - collectedQty;
 
   InboundCollectTaskItem copyWith({
     double? planQty,
     double? collectedQty,
+    String? proType,
   }) {
     return InboundCollectTaskItem(
       inTaskItemId: inTaskItemId,
@@ -80,6 +84,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       inboundOrderNo: inboundOrderNo,
       taskComment: taskComment,
       repertoryQty: repertoryQty,
+      proType: proType ?? this.proType,
     );
   }
 
@@ -101,6 +106,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       inboundOrderNo: json['orderno']?.toString(),
       taskComment: json['taskcomment']?.toString(),
       repertoryQty: _parseDouble(json['repqty']),
+      proType: json['protype']?.toString(),
     );
   }
 
@@ -122,6 +128,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       'orderno': inboundOrderNo,
       'taskcomment': taskComment,
       'repqty': repertoryQty,
+      'protype': proType,
     };
   }
 
@@ -155,6 +162,7 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
         batchNo,
         serialNumber,
         storeSiteNo,
+        proType,
       ];
 }
 

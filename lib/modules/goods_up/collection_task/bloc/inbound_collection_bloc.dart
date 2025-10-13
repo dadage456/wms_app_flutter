@@ -113,10 +113,19 @@ class InboundCollectionBloc
       );
     }
 
+    final proType = items
+        .map((item) => (item.proType ?? '').trim())
+        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
+    final requireBatchValidation =
+        ['10', '12', '15', '16', '17', '18'].contains(proType);
+    final requireSupplierValidation = ['9', '10'].contains(proType);
+
     emit(
       state.copyWith(
         detailList: items,
         dicMtlQty: qtyMap,
+        requireBatchValidation: requireBatchValidation,
+        requireSupplierValidation: requireSupplierValidation,
       ),
     );
   }
@@ -213,18 +222,21 @@ class InboundCollectionBloc
     String barcode,
     Emitter<InboundCollectionState> emit,
   ) async {
-    final site = barcode.replaceAll('\\$KW\\$', '').trim();
-    if (site.isEmpty) {
-      throw Exception('库位信息不能为空');
-    }
-
+    final site = _extractSiteCode(barcode);
     final room = state.storeRoom;
+
     final siteList = await _service.getStoreSiteByRoom(
       storeRoomNo: room,
       storeSiteNo: site,
     );
     if (siteList.isEmpty) {
       throw Exception('库房【$room】下无库位号【$site】');
+    }
+
+    final first = siteList.first;
+    final frozenFlag = first['isfrozen']?.toString();
+    if (frozenFlag != null && frozenFlag != '0') {
+      throw Exception('库位【$site】被锁定或者冻结');
     }
 
     final collection = state.detailList
@@ -236,13 +248,14 @@ class InboundCollectionBloc
         status: CollectionStatus.success(),
         storeSite: site,
         scanStep: InboundScanStep.material,
-        placeholder: '请扫描物料二维码',
+        placeholder: '请扫描二维码',
         collectionList: collection,
         focus: true,
         requireDangerousSupplement: false,
         currentBarcode: null,
         repQty: 0,
         collectQty: 0,
+        expectedSubInventory: null,
       ),
     );
   }
@@ -251,6 +264,10 @@ class InboundCollectionBloc
     String barcode,
     Emitter<InboundCollectionState> emit,
   ) async {
+    if (state.storeSite.trim().isEmpty) {
+      throw Exception('请先扫描库位');
+    }
+
     final content = await _service.getInboundBarcodeInfo(barcode);
     if (content.isEmpty) {
       throw Exception('物料条码识别出现问题');
@@ -264,12 +281,23 @@ class InboundCollectionBloc
       throw Exception('任务明细中物料【$materialCode】不存在');
     }
 
-    final requireSupplement = _needsDangerousSupplement(content);
+    final expectedSubInventory = matched
+        .map((item) => (item.subInventoryCode ?? '').trim())
+        .firstWhere((value) => value.isNotEmpty, orElse: () => '');
 
-    final repQty = await _queryInventory(
+    final inventory = await _queryInventoryInfo(
       storeSite: state.storeSite,
       materialCode: materialCode,
     );
+
+    _validateInventory(
+      inventory,
+      expectedSubInventory: expectedSubInventory,
+    );
+
+    final requireSupplement = _needsDangerousSupplement(content);
+    final requiresQuantityInput = _requiresQuantityInput(content);
+    final autoQty = _determineAutoQuantity(content);
 
     emit(
       state.copyWith(
@@ -280,13 +308,20 @@ class InboundCollectionBloc
             : InboundScanStep.quantity,
         placeholder: requireSupplement
             ? '请扫描供应商二维码，采集生产日期、有效期'
-            : '请输入数量',
-        collectQty: requireSupplement ? 0 : (content.quantity ?? 0),
+            : (requiresQuantityInput ? '请输入数量' : '请输入数量'),
+        collectQty:
+            requireSupplement || requiresQuantityInput ? 0 : autoQty,
         requireDangerousSupplement: requireSupplement,
-        repQty: repQty,
-        focus: !requireSupplement,
+        repQty: inventory.sumQty,
+        focus: !requireSupplement && requiresQuantityInput,
+        expectedSubInventory:
+            expectedSubInventory.isEmpty ? null : expectedSubInventory,
       ),
     );
+
+    if (!requireSupplement && !requiresQuantityInput) {
+      await _applyQuantity(autoQty, emit);
+    }
   }
 
   Future<void> _handleDangerousSupplement(
@@ -310,6 +345,8 @@ class InboundCollectionBloc
     );
 
     final requireSupplement = _needsDangerousSupplement(merged);
+    final requiresQuantityInput = _requiresQuantityInput(merged);
+    final autoQty = _determineAutoQuantity(merged);
 
     emit(
       state.copyWith(
@@ -322,9 +359,15 @@ class InboundCollectionBloc
             ? '请扫描供应商二维码，采集生产日期、有效期'
             : '请输入数量',
         requireDangerousSupplement: requireSupplement,
-        focus: !requireSupplement,
+        focus: !requireSupplement && requiresQuantityInput,
+        collectQty:
+            requireSupplement || requiresQuantityInput ? state.collectQty : autoQty,
       ),
     );
+
+    if (!requireSupplement && !requiresQuantityInput) {
+      await _applyQuantity(autoQty, emit);
+    }
   }
 
   bool _needsDangerousSupplement(InboundBarcodeContent content) {
@@ -336,10 +379,10 @@ class InboundCollectionBloc
     return productionDate.isEmpty || expireDays <= 0;
   }
 
-  void _onUpdateProductionDate(
+  Future<void> _onUpdateProductionDate(
     UpdateInboundProductionDateEvent event,
     Emitter<InboundCollectionState> emit,
-  ) {
+  ) async {
     final barcode = state.currentBarcode;
     if (barcode == null) {
       return;
@@ -351,6 +394,9 @@ class InboundCollectionBloc
       resetProductionDate: trimmed.isEmpty,
     );
     final requireSupplement = _needsDangerousSupplement(updated);
+    final requiresQuantityInput = _requiresQuantityInput(updated);
+    final autoQty = _determineAutoQuantity(updated);
+    final wasDangerousStep = state.scanStep == InboundScanStep.dangerousSupplement;
 
     emit(
       state.copyWith(
@@ -362,15 +408,21 @@ class InboundCollectionBloc
         placeholder: requireSupplement
             ? '请扫描供应商二维码，采集生产日期、有效期'
             : '请输入数量',
-        focus: !requireSupplement,
+        focus: !requireSupplement && requiresQuantityInput,
+        collectQty:
+            requireSupplement || requiresQuantityInput ? state.collectQty : autoQty,
       ),
     );
+
+    if (wasDangerousStep && !requireSupplement && !requiresQuantityInput) {
+      await _applyQuantity(autoQty, emit);
+    }
   }
 
-  void _onUpdateExpireDays(
+  Future<void> _onUpdateExpireDays(
     UpdateInboundExpireDaysEvent event,
     Emitter<InboundCollectionState> emit,
-  ) {
+  ) async {
     final barcode = state.currentBarcode;
     if (barcode == null) {
       return;
@@ -383,6 +435,9 @@ class InboundCollectionBloc
       resetExpireDays: trimmed.isEmpty,
     );
     final requireSupplement = _needsDangerousSupplement(updated);
+    final requiresQuantityInput = _requiresQuantityInput(updated);
+    final autoQty = _determineAutoQuantity(updated);
+    final wasDangerousStep = state.scanStep == InboundScanStep.dangerousSupplement;
 
     emit(
       state.copyWith(
@@ -394,9 +449,15 @@ class InboundCollectionBloc
         placeholder: requireSupplement
             ? '请扫描供应商二维码，采集生产日期、有效期'
             : '请输入数量',
-        focus: !requireSupplement,
+        focus: !requireSupplement && requiresQuantityInput,
+        collectQty:
+            requireSupplement || requiresQuantityInput ? state.collectQty : autoQty,
       ),
     );
+
+    if (wasDangerousStep && !requireSupplement && !requiresQuantityInput) {
+      await _applyQuantity(autoQty, emit);
+    }
   }
 
   Future<void> _handleQuantity(
@@ -408,15 +469,30 @@ class InboundCollectionBloc
       throw Exception('采集数量必须大于0');
     }
 
+    await _applyQuantity(qty, emit);
+  }
+
+  Future<void> _applyQuantity(
+    double qty,
+    Emitter<InboundCollectionState> emit,
+  ) async {
+    if (qty <= 0) {
+      throw Exception('采集数量必须大于0');
+    }
+
     final barcodeContent = state.currentBarcode;
     if (barcodeContent == null || barcodeContent.isEmpty) {
       throw Exception('请先扫描物料二维码');
+    }
+    if (state.storeSite.trim().isEmpty) {
+      throw Exception('请先扫描库位');
     }
 
     final materialCode = barcodeContent.materialKey;
     final batchNo = (barcodeContent.batchNo ?? '').trim();
     final serial = (barcodeContent.serialNumber ?? '').trim();
     final seqCtrl = (barcodeContent.seqCtrl ?? '').trim();
+    final requireBatchValidation = state.requireBatchValidation;
 
     final matchedItems = state.detailList.where((item) {
       if ((item.materialCode ?? '').trim() != materialCode) {
@@ -427,6 +503,9 @@ class InboundCollectionBloc
         return itemSn.isEmpty || itemSn == serial;
       }
       if (seqCtrl == '1' || seqCtrl == '2') {
+        if (!requireBatchValidation) {
+          return true;
+        }
         final itemBatch = (item.batchNo ?? '').trim();
         if (itemBatch.isEmpty) {
           return true;
@@ -448,8 +527,8 @@ class InboundCollectionBloc
     }
 
     if (totalCollected + qty > totalPlan) {
-      final remain = (totalPlan - totalCollected).toStringAsFixed(2);
-      throw Exception('本次采集数量【$qty】大于剩余可采集数量【$remain】');
+      final remainQty = (totalPlan - totalCollected).toStringAsFixed(2);
+      throw Exception('本次采集数量【$qty】大于剩余可采集数量【$remainQty】');
     }
 
     final updatedItems = List<InboundCollectTaskItem>.from(state.detailList);
@@ -458,6 +537,7 @@ class InboundCollectionBloc
     final dicSeq = Map<String, String>.from(state.dicSeq);
 
     double remain = qty;
+    var serialKeyRecorded = false;
     for (var i = 0; i < updatedItems.length && remain > 0; i++) {
       final item = updatedItems[i];
       if ((item.materialCode ?? '').trim() != materialCode) {
@@ -468,17 +548,18 @@ class InboundCollectionBloc
         if (itemSn.isNotEmpty && itemSn != serial) {
           continue;
         }
-        if (serial.isNotEmpty) {
+        if (serial.isNotEmpty && !serialKeyRecorded) {
           final key = '$materialCode@$serial';
           if (dicSeq.containsKey(key)) {
             throw Exception('物料$materialCode 序列号【$serial】不允许重复采集，请确认');
           }
           dicSeq[key] = key;
+          serialKeyRecorded = true;
         }
       }
-      if ((seqCtrl == '1' || seqCtrl == '2') && batchNo.isNotEmpty) {
+      if ((seqCtrl == '1' || seqCtrl == '2') && requireBatchValidation) {
         final itemBatch = (item.batchNo ?? '').trim();
-        if (itemBatch.isNotEmpty && itemBatch != batchNo) {
+        if (itemBatch.isNotEmpty && batchNo.isNotEmpty && itemBatch != batchNo) {
           continue;
         }
       }
@@ -565,30 +646,117 @@ class InboundCollectionBloc
     );
   }
 
-  Future<double> _queryInventory({
+  bool _requiresQuantityInput(InboundBarcodeContent content) {
+    final hasSerial = (content.serialNumber ?? '').trim().isNotEmpty;
+    final qty = content.quantity ?? 0;
+    return !hasSerial && qty <= 0;
+  }
+
+  double _determineAutoQuantity(InboundBarcodeContent content) {
+    final qty = content.quantity ?? 0;
+    if (qty > 0) {
+      return qty;
+    }
+    final hasSerial = (content.serialNumber ?? '').trim().isNotEmpty;
+    if (hasSerial) {
+      return 1;
+    }
+    return qty;
+  }
+
+
+  String _extractSiteCode(String barcode) {
+    final trimmed = barcode.trim();
+    if (trimmed.isEmpty) {
+      throw Exception('库位信息不能为空');
+    }
+
+    final regex = RegExp(r'\$KW\$(.+)');
+    final match = regex.firstMatch(trimmed);
+    if (match != null) {
+      final site = match.group(1)!.trim();
+      if (site.isEmpty) {
+        throw Exception('库位信息不能为空');
+      }
+      return site;
+    }
+
+    final parts = trimmed.split('\$');
+    if (parts.length >= 3) {
+      final site = parts[2].trim();
+      if (site.isEmpty) {
+        throw Exception('库位信息不能为空');
+      }
+      return site;
+    }
+
+    return trimmed;
+  }
+
+  void _validateInventory(
+    _InventoryInfo info, {
+    String? expectedSubInventory,
+  }) {
+    final expected = (expectedSubInventory ?? '').trim();
+    if (expected.isEmpty) {
+      return;
+    }
+    if (_shouldSkipSubInventoryCheck()) {
+      return;
+    }
+    final actual = (info.erpStoreroom ?? '').trim();
+    if (actual.isEmpty) {
+      return;
+    }
+    if (actual.toUpperCase() != expected.toUpperCase()) {
+      throw Exception('此物料在当前货位存在其他物权属性的库存，请选择其他上架库位');
+    }
+  }
+
+  bool _shouldSkipSubInventoryCheck() {
+    if (!state.requireSupplierValidation) {
+      return false;
+    }
+    return state.storeRoom.trim().toUpperCase() == 'XN-BL';
+  }
+
+  Future<_InventoryInfo> _queryInventoryInfo({
     required String storeSite,
     required String materialCode,
   }) async {
     if (storeSite.isEmpty || materialCode.isEmpty) {
-      return 0;
+      return const _InventoryInfo(sumQty: 0);
     }
     final rows = await _service.getMtlRepertoryByStoreSite(
       storeSite: storeSite,
       materialCode: materialCode,
     );
     if (rows.isEmpty) {
-      return 0;
+      return const _InventoryInfo(sumQty: 0);
     }
+
     double sum = 0;
-    for (final row in rows) {
+    String? erpStoreroom;
+    String? owner;
+    for (var index = 0; index < rows.length; index++) {
+      final row = rows[index];
       final qty = row['repqty'];
       if (qty is num) {
         sum += qty.toDouble();
       } else if (qty is String) {
         sum += double.tryParse(qty) ?? 0;
       }
+      if (index == 0) {
+        erpStoreroom = row['erpStoreroom']?.toString();
+        owner = row['parno']?.toString();
+      }
     }
-    return sum;
+
+    return _InventoryInfo(
+      sumQty: sum,
+      erpStoreroom: erpStoreroom,
+      owner: owner,
+    );
   }
 
   Future<void> _localSave({
@@ -813,4 +981,17 @@ class InboundCollectionBloc
       ),
     );
   }
+}
+
+
+class _InventoryInfo {
+  const _InventoryInfo({
+    required this.sumQty,
+    this.erpStoreroom,
+    this.owner,
+  });
+
+  final double sumQty;
+  final String? erpStoreroom;
+  final String? owner;
 }
