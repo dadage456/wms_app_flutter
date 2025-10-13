@@ -31,13 +31,14 @@ class InboundCollectTaskItemAdapter
       inboundOrderNo: fields[13] as String?,
       taskComment: fields[14] as String?,
       repertoryQty: (fields[15] as num?)?.toDouble() ?? 0,
+      proType: fields[16] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, InboundCollectTaskItem obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.inTaskItemId)
       ..writeByte(1)
@@ -69,7 +70,9 @@ class InboundCollectTaskItemAdapter
       ..writeByte(14)
       ..write(obj.taskComment)
       ..writeByte(15)
-      ..write(obj.repertoryQty);
+      ..write(obj.repertoryQty)
+      ..writeByte(16)
+      ..write(obj.proType);
   }
 }
 

@@ -24,6 +24,9 @@ class InboundCollectionState {
     this.focus = false,
     this.requireDangerousSupplement = false,
     this.userId = 0,
+    this.requireBatchValidation = false,
+    this.requireSupplierValidation = false,
+    this.expectedSubInventory,
   });
 
   final CollectionStatus status;
@@ -46,6 +49,9 @@ class InboundCollectionState {
   final bool focus;
   final bool requireDangerousSupplement;
   final int userId;
+  final bool requireBatchValidation;
+  final bool requireSupplierValidation;
+  final String? expectedSubInventory;
 
   InboundCollectionState copyWith({
     CollectionStatus? status,
@@ -68,6 +74,9 @@ class InboundCollectionState {
     bool? focus,
     bool? requireDangerousSupplement,
     int? userId,
+    bool? requireBatchValidation,
+    bool? requireSupplierValidation,
+    String? expectedSubInventory,
     bool resetBarcode = false,
   }) {
     return InboundCollectionState(
@@ -93,6 +102,11 @@ class InboundCollectionState {
       requireDangerousSupplement:
           requireDangerousSupplement ?? this.requireDangerousSupplement,
       userId: userId ?? this.userId,
+      requireBatchValidation:
+          requireBatchValidation ?? this.requireBatchValidation,
+      requireSupplierValidation:
+          requireSupplierValidation ?? this.requireSupplierValidation,
+      expectedSubInventory: expectedSubInventory ?? this.expectedSubInventory,
     );
   }
 }
