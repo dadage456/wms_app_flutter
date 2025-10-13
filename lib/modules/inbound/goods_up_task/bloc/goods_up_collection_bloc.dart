@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 import '../models/goods_up_collection_task.dart';
 import '../services/goods_up_collection_service.dart';
+import '../services/goods_up_service.dart';
 import '../../../../services/user_manager.dart';
 
 @immutable
@@ -33,12 +34,16 @@ class GoodsUpCollectionLoadFailure extends GoodsUpCollectionState {
 class GoodsUpCollectionBloc extends Cubit<GoodsUpCollectionState> {
   GoodsUpCollectionBloc({
     required GoodsUpCollectionService service,
+    required GoodsUpService goodsUpService,
     required UserManager userManager,
   })  : _service = service,
+        _goodsUpService = goodsUpService,
         _userManager = userManager,
         super(const GoodsUpCollectionInitial());
 
   final GoodsUpCollectionService _service;
+  // ignore: unused_field
+  final GoodsUpService _goodsUpService;
   final UserManager _userManager;
 
   Future<void> loadTasks() async {

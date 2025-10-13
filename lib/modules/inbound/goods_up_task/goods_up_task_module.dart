@@ -7,6 +7,7 @@ import '../../../../services/user_manager.dart';
 import 'bloc/goods_up_collection_bloc.dart';
 import 'goods_up_collection_page.dart';
 import 'services/goods_up_collection_service.dart';
+import 'services/goods_up_service.dart';
 
 class GoodsUpTaskModule extends Module {
   @override
@@ -14,13 +15,18 @@ class GoodsUpTaskModule extends Module {
 
   @override
   void binds(Injector i) {
-    i.addSingleton<GoodsUpCollectionService>(
-      () => GoodsUpCollectionService(i.get<DioClient>().dio),
-    );
+    i
+      ..addSingleton<GoodsUpCollectionService>(
+        () => GoodsUpCollectionService(i.get<DioClient>().dio),
+      )
+      ..addSingleton<GoodsUpService>(
+        () => GoodsUpService(i.get<DioClient>().dio),
+      );
 
     i.add<GoodsUpCollectionBloc>(
       () => GoodsUpCollectionBloc(
         service: i.get<GoodsUpCollectionService>(),
+        goodsUpService: i.get<GoodsUpService>(),
         userManager: i.get<UserManager>(),
       ),
     );
