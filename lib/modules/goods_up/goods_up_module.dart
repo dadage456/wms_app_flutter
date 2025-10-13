@@ -8,10 +8,6 @@ import '../../services/user_manager.dart';
 import 'services/goods_up_task_service.dart';
 import 'task_details/bloc/goods_up_task_detail_bloc.dart';
 import 'task_details/goods_up_task_detail_page.dart';
-import 'collection_task/bloc/inbound_collection_bloc.dart';
-import 'collection_task/goods_up_collection_page.dart';
-import 'collection_task/goods_up_collection_result_page.dart';
-import 'collection_task/models/inbound_collection_models.dart';
 import 'task_receive/bloc/inbound_receive_task_bloc.dart';
 import 'task_receive/bloc/inbound_receive_task_detail_bloc.dart';
 import 'task_receive/goods_up_receive_detail_page.dart';
@@ -42,10 +38,6 @@ class GoodsUpModule extends Module {
         i.get<GoodsUpTaskService>(),
         i.get<UserManager>(),
       ),
-    );
-
-    i.add<InboundCollectionBloc>(
-      () => InboundCollectionBloc(service: i.get<GoodsUpTaskService>()),
     );
 
     i.add<InboundReceiveTaskBloc>(
@@ -95,35 +87,6 @@ class GoodsUpModule extends Module {
             workStation: workStation,
           ),
         );
-      },
-    );
-
-    r.child(
-      '/collect/:inTaskNo',
-      child: (_) {
-        final data = Modular.args.data as Map? ?? {};
-        final task = data['task'] as GoodsUpTask?;
-        if (task == null) {
-          return const _TodoPlaceholder(title: '缺少任务信息，无法进入采集');
-        }
-        return BlocProvider(
-          create: (_) => Modular.get<InboundCollectionBloc>(),
-          child: GoodsUpCollectionPage(task: task),
-        );
-      },
-    );
-
-    r.child(
-      '/collect/result',
-      child: (_) {
-        final args = Modular.args.data;
-        List<InboundCollectionStock> stocks = const [];
-        if (args is Map && args['stocks'] is List<InboundCollectionStock>) {
-          stocks = List<InboundCollectionStock>.from(args['stocks']);
-        } else if (args is List<InboundCollectionStock>) {
-          stocks = List<InboundCollectionStock>.from(args);
-        }
-        return GoodsUpCollectionResultPage(initialStocks: stocks);
       },
     );
 

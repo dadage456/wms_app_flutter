@@ -2,9 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:wms_app/modules/outbound/task_details/models/outbound_task_item.dart';
 import 'package:wms_app/services/api_response_handler.dart';
 
-import '../collection_task/models/inbound_collection_models.dart';
-import '../collection_task/models/inbound_collection_request.dart';
-
 import '../task_details/models/goods_up_task_item.dart';
 import '../task_list/models/goods_up_task.dart';
 
@@ -47,60 +44,6 @@ class GoodsUpTaskService {
     );
   }
 
-  /// 通过二维码获取物料信息
-  Future<MaterialInfoResponse> getMaterialInfoByQR(String qrContent) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/getPmMaterialInfoByQR',
-      data: {'qrContent': qrContent},
-    );
-
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) =>
-          MaterialInfoResponse.fromJson(Map<String, dynamic>.from(data as Map)),
-    );
-  }
-
-  /// 获取采集任务明细列表
-  Future<List<InboundCollectTaskItem>> getInboundCollectItems({
-    required GoodsUpCollectTaskItemQuery query,
-  }) async {
-    final response = await _dio.get<Map<String, dynamic>>(
-      '/system/terminal/intaskitemList',
-      queryParameters: query.toJson(),
-    );
-
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) {
-        final map = Map<String, dynamic>.from(data as Map);
-        final rows = map['rows'] as List? ?? [];
-        return rows
-            .map(
-              (item) => InboundCollectTaskItem.fromJson(
-                Map<String, dynamic>.from(item as Map),
-              ),
-            )
-            .toList();
-      },
-    );
-  }
-
-  /// 通过二维码解析入库物料信息
-  Future<InboundBarcodeContent> getInboundBarcodeInfo(String barcode) async {
-    final response = await _dio.get<Map<String, dynamic>>(
-      '/system/terminal/materialInfo',
-      queryParameters: {'QRstring': barcode},
-    );
-
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => InboundBarcodeContent.fromJson(
-        Map<String, dynamic>.from(data as Map),
-      ),
-    );
-  }
-
   /// 提交接收/撤销入库任务明细
   Future<void> commitInboundTaskItems({
     required List<int> inTaskItemIds,
@@ -117,17 +60,6 @@ class GoodsUpTaskService {
         'roomTag': roomTag,
         'isCanel': isCancel.toString(),
       },
-    );
-  }
-
-  /// 上架采集提交
-  Future<void> commitUpShelves({required GoodsUpCommitRequest request}) async {
-    await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/commitUp',
-      options: Options(
-        headers: {'content-type': 'application/json;charset=UTF-8'},
-      ),
-      data: request.toJson(),
     );
   }
 
@@ -271,17 +203,6 @@ class GoodsUpTaskService {
         'roomTag': roomTag,
         'isCanel': isCancel ? 'true' : 'false',
       },
-    );
-  }
-
-  /// 上架转储提交
-  Future<void> commitTransfer({required GoodsUpTransferRequest request}) async {
-    await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/commitTransfer',
-      options: Options(
-        headers: {'content-type': 'application/json;charset=UTF-8'},
-      ),
-      data: request.toJson(),
     );
   }
 
