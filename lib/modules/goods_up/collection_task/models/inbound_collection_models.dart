@@ -110,6 +110,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     this.batchNo,
     this.serialNo,
     this.seqCtrl,
+    this.idOld,
     required this.quantity,
     this.expireDays,
     this.productionDate,
@@ -123,6 +124,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
       batchNo: json['batchno']?.toString(),
       serialNo: json['sn']?.toString(),
       seqCtrl: json['seqctrl']?.toString(),
+      idOld: json['id_old']?.toString() ?? json['idOld']?.toString(),
       quantity: _parseDouble(json['qty']),
       expireDays: _parseIntNullable(json['vdays']),
       productionDate: json['pdate']?.toString(),
@@ -135,6 +137,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
   final String? batchNo;
   final String? serialNo;
   final String? seqCtrl;
+  final String? idOld;
   final double quantity;
   final int? expireDays;
   final String? productionDate;
@@ -147,6 +150,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
       'batchno': batchNo,
       'sn': serialNo,
       'seqctrl': seqCtrl,
+      'id_old': idOld,
       'qty': quantity,
       'vdays': expireDays,
       'pdate': productionDate,
@@ -164,6 +168,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     String? batchNo,
     String? serialNo,
     String? seqCtrl,
+    String? idOld,
     double? quantity,
     int? expireDays,
     String? productionDate,
@@ -175,6 +180,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
       batchNo: batchNo ?? this.batchNo,
       serialNo: serialNo ?? this.serialNo,
       seqCtrl: seqCtrl ?? this.seqCtrl,
+      idOld: idOld ?? this.idOld,
       quantity: quantity ?? this.quantity,
       expireDays: expireDays ?? this.expireDays,
       productionDate: productionDate ?? this.productionDate,
@@ -189,6 +195,7 @@ class InboundBarcodeContent extends HiveObject with EquatableMixin {
     batchNo,
     serialNo,
     seqCtrl,
+    idOld,
     quantity,
     expireDays,
     productionDate,
@@ -379,6 +386,7 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
       batchNo: fields[2] as String?,
       serialNo: fields[3] as String?,
       seqCtrl: fields[4] as String?,
+      idOld: fields[9] as String?,
       quantity: fields[5] as double,
       expireDays: fields[6] as int?,
       productionDate: fields[7] as String?,
@@ -389,7 +397,7 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
   @override
   void write(BinaryWriter writer, InboundBarcodeContent obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.materialCode)
       ..writeByte(1)
@@ -407,7 +415,9 @@ class InboundBarcodeContentAdapter extends TypeAdapter<InboundBarcodeContent> {
       ..writeByte(7)
       ..write(obj.productionDate)
       ..writeByte(8)
-      ..write(obj.dgFlag);
+      ..write(obj.dgFlag)
+      ..writeByte(9)
+      ..write(obj.idOld);
   }
 }
 

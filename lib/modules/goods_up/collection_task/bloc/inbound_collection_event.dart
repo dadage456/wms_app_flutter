@@ -51,7 +51,12 @@ class UpdateInboundSelectionEvent extends InboundCollectionEvent {
 }
 
 class CommitInboundCollectionEvent extends InboundCollectionEvent {
-  const CommitInboundCollectionEvent();
+  const CommitInboundCollectionEvent({this.force = false});
+
+  final bool force;
+
+  @override
+  List<Object?> get props => [force];
 }
 
 class ResetInboundStatusEvent extends InboundCollectionEvent {
