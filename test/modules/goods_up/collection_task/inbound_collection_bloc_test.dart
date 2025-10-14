@@ -18,6 +18,7 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
     required this.storeSiteRows,
     required this.barcodeContent,
     List<Map<String, dynamic>>? inventoryRows,
+    this.commitShouldFail = false,
   }) : inventoryRows = inventoryRows ?? const [],
         super(Dio());
 
@@ -32,6 +33,8 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
   List<Map<String, dynamic>> inventoryRows;
   String? lastInventorySite;
   String? lastInventoryMaterial;
+  GoodsUpCommitRequest? lastCommitRequest;
+  bool commitShouldFail;
 
   @override
   Future<List<InboundCollectTaskItem>> getInboundCollectItems({
@@ -65,6 +68,16 @@ class StubGoodsUpTaskService extends GoodsUpTaskService {
     lastInventorySite = storeSite;
     lastInventoryMaterial = materialCode;
     return inventoryRows;
+  }
+
+  @override
+  Future<void> commitUpShelves({
+    required GoodsUpCommitRequest request,
+  }) async {
+    lastCommitRequest = request;
+    if (commitShouldFail) {
+      throw Exception('commit failed');
+    }
   }
 }
 
@@ -130,6 +143,7 @@ void main() {
         materialCode: sampleItem.materialCode,
         materialName: sampleItem.materialName,
         batchNo: 'BATCH-1',
+        seqCtrl: '1',
         quantity: 1,
       ),
       inventoryRows: [
@@ -245,5 +259,100 @@ void main() {
 
     expect(readyState.currentBarcode?.productionDate, '2024-01-01');
     expect(readyState.currentBarcode?.expireDays, 180);
+  });
+
+  test('commit requires force flag when task items remain unfinished', () async {
+    bloc.add(const InitializeInboundCollectionEvent(task: task, userId: 7));
+    await bloc.stream.firstWhere((state) => state.status.isSuccess);
+
+    bloc.add(const PerformInboundScanEvent('SITE-1'));
+    await bloc.stream.firstWhere(
+      (state) => state.scanStep == InboundScanStep.material,
+    );
+
+    bloc.add(const PerformInboundScanEvent('BARCODE-1'));
+    await bloc.stream.firstWhere(
+      (state) => state.scanStep == InboundScanStep.quantity,
+    );
+
+    bloc.add(const PerformInboundScanEvent('2'));
+    await bloc.stream.firstWhere(
+      (state) => state.status.isSuccess && state.status.message == '采集成功',
+    );
+
+    bloc.add(const CommitInboundCollectionEvent());
+
+    final warnState = await bloc.stream.firstWhere(
+      (state) => state.status.isError,
+    );
+
+    expect(warnState.status.message, contains('还剩'));
+
+    bloc.add(const CommitInboundCollectionEvent(force: true));
+
+    final committedState = await bloc.stream.firstWhere(
+      (state) => state.status.isSuccess && state.status.message == '提交成功',
+    );
+
+    expect(service.lastCommitRequest, isNotNull);
+    expect(committedState.stocks, isEmpty);
+  });
+
+  test('serial controlled barcode auto completes with quantity one', () async {
+    service.collectItems = [
+      InboundCollectTaskItem(
+        inTaskItemId: 21,
+        inTaskId: 1,
+        materialCode: 'MAT-002',
+        materialName: 'Serial Material',
+        storeSiteNo: 'SITE-1',
+        storeRoomNo: 'RM1',
+        subInventoryCode: 'ERP',
+        batchNo: 'BATCH-2',
+        serialNo: 'SN-001',
+        planQty: 1,
+        collectedQty: 0,
+        repertoryQty: 0,
+      ),
+    ];
+
+    service.inventoryRows = [
+      {
+        'repqty': 0,
+        'erpStoreroom': 'ERP',
+        'batchno': 'BATCH-2',
+        'sn': 'SN-001',
+      },
+    ];
+
+    service.barcodeResponses['SERIAL-1'] = InboundBarcodeContent(
+      materialCode: 'MAT-002',
+      materialName: 'Serial Material',
+      batchNo: 'BATCH-2',
+      serialNo: 'SN-001',
+      seqCtrl: '0',
+      quantity: 1,
+    );
+
+    bloc.add(const InitializeInboundCollectionEvent(task: task, userId: 7));
+    await bloc.stream.firstWhere((state) => state.status.isSuccess);
+
+    bloc.add(const PerformInboundScanEvent('SITE-1'));
+    await bloc.stream.firstWhere(
+      (state) => state.scanStep == InboundScanStep.material,
+    );
+
+    bloc.add(const PerformInboundScanEvent('SERIAL-1'));
+
+    final successState = await bloc.stream.firstWhere(
+      (state) => state.status.isSuccess && state.status.message == '采集成功',
+    );
+
+    expect(successState.scanStep, InboundScanStep.site);
+    expect(successState.stocks, isNotEmpty);
+    final stock = successState.stocks.last;
+    expect(stock.collectQty, 1);
+    expect(stock.serialNo, 'SN-001');
+    expect(stock.batchNo, 'BATCH-2');
   });
 }

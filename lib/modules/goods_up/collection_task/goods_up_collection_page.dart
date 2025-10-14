@@ -457,11 +457,16 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
       return;
     }
 
+    final incompleteMessage = _buildIncompleteMessage(state);
+    final content = incompleteMessage == null
+        ? '是否确认提交当前采集数据？'
+        : incompleteMessage + '\n是否继续提交当前采集数据？';
+
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('提交确认'),
-        content: const Text('是否确认提交当前采集数据？'),
+        content: Text(content),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -470,13 +475,43 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _bloc.add(const CommitInboundCollectionEvent());
+              _bloc.add(
+                CommitInboundCollectionEvent(force: incompleteMessage != null),
+              );
             },
             child: const Text('确定'),
           ),
         ],
       ),
     );
+  }
+
+  String? _buildIncompleteMessage(InboundCollectionState state) {
+    for (final detail in state.detailList) {
+      final remain = detail.planQty - detail.collectedQty;
+      if (remain > 1e-6) {
+        final site = (detail.storeSiteNo ?? '').trim();
+        final displaySite = site.isEmpty ? '-' : site;
+        final formatted = _formatQuantity(remain);
+        return '库位【$displaySite】物料【${detail.materialCode}】还剩【$formatted】未做';
+      }
+    }
+    return null;
+  }
+
+  String _formatQuantity(double value) {
+    final rounded = value.roundToDouble();
+    if ((rounded - value).abs() < 1e-6) {
+      return rounded.toStringAsFixed(0);
+    }
+    var textValue = value.toStringAsFixed(3);
+    while (textValue.contains('.') && textValue.endsWith('0')) {
+      textValue = textValue.substring(0, textValue.length - 1);
+    }
+    if (textValue.endsWith('.')) {
+      textValue = textValue.substring(0, textValue.length - 1);
+    }
+    return textValue;
   }
 
   List<GridColumnConfig<InboundCollectTaskItem>> _collectionColumns() {
