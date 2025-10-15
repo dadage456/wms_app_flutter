@@ -146,7 +146,6 @@ class GoodsUpTaskService {
     final data = response.data?['data'];
     if (data is List) {
       return data
-          .where((item) => item is Map)
           .map((item) => Map<String, dynamic>.from(item as Map))
           .toList();
     }
@@ -166,12 +165,7 @@ class GoodsUpTaskService {
     return ApiResponseHandler.handleResponse(
       response: response,
       dataExtractor: (data) {
-        final map = Map<String, dynamic>.from(data as Map);
-        return List<Map<String, dynamic>>.from(
-          (map['rows'] as List? ?? []).map(
-            (e) => Map<String, dynamic>.from(e as Map),
-          ),
-        );
+        return List<Map<String, dynamic>>.from(data);
       },
     );
   }

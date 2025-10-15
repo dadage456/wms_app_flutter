@@ -81,11 +81,11 @@ class InboundCollectionBloc
       final filteredCollection = state.storeSite.isEmpty
           ? const <InboundCollectTaskItem>[]
           : clonedItems
-              .where(
-                (item) =>
-                    (item.storeSiteNo ?? '').trim() == state.storeSite.trim(),
-              )
-              .toList();
+                .where(
+                  (item) =>
+                      (item.storeSiteNo ?? '').trim() == state.storeSite.trim(),
+                )
+                .toList();
 
       emit(
         state.copyWith(
@@ -93,9 +93,7 @@ class InboundCollectionBloc
           collectionList: filteredCollection,
           storeRoom: _task.storeRoomNo ?? '',
           status: CollectionStatus.success(),
-          placeholder: state.scanStep == InboundScanStep.site
-              ? '请扫描库位'
-              : state.placeholder,
+          placeholder: _getPlaceMessage(),
           shouldCheckBatch: shouldCheckBatch,
           allowErpStoreBypass: allowErpStoreBypass,
         ),
@@ -206,6 +204,10 @@ class InboundCollectionBloc
     await box.put('updateFlag', '1');
   }
 
+  bool _isNumeric(String str) {
+    return RegExp(r'^[0-9]+(\.[0-9]+)?').hasMatch(str);
+  }
+
   Future<void> _onPerformScan(
     PerformInboundScanEvent event,
     Emitter<InboundCollectionState> emit,
@@ -216,20 +218,31 @@ class InboundCollectionBloc
       return;
     }
 
-    switch (state.scanStep) {
-      case InboundScanStep.site:
-        await _handleSiteScan(payload, emit);
-        break;
-      case InboundScanStep.material:
-        await _handleMaterialScan(payload, emit);
-        break;
-      case InboundScanStep.dangerousSupplement:
-        await _handleDangerousSupplement(payload, emit);
-        break;
-      case InboundScanStep.quantity:
-        await _handleQuantityInput(payload, emit);
-        break;
+    if (payload.contains('MC')) {
+      await _handleMaterialScan(payload, emit);
+    } else if (payload.contains('\$KW\$')) {
+      await _handleSiteScan(payload, emit);
+    } else if (_isNumeric(payload)) {
+      await _handleQuantityInput(payload, emit);
+    } else {
+      emit(state.copyWith(status: CollectionStatus.error('采集内容不合法！')));
+      return;
     }
+
+    // switch (state.scanStep) {
+    //   case InboundScanStep.site:
+    //     await _handleSiteScan(payload, emit);
+    //     break;
+    //   case InboundScanStep.material:
+    //     await _handleMaterialScan(payload, emit);
+    //     break;
+    //   case InboundScanStep.dangerousSupplement:
+    //     await _handleDangerousSupplement(payload, emit);
+    //     break;
+    //   case InboundScanStep.quantity:
+    //     await _handleQuantityInput(payload, emit);
+    //     break;
+    // }
   }
 
   Future<void> _handleSiteScan(
@@ -275,20 +288,21 @@ class InboundCollectionBloc
       }
 
       final collectionList = state.detailList
-          .where((item) => (item.storeSiteNo ?? '').trim() == resolvedSite.trim())
+          .where(
+            (item) => (item.storeSiteNo ?? '').trim() == resolvedSite.trim(),
+          )
           .toList();
 
       emit(
         state.copyWith(
           storeSite: resolvedSite,
           collectionList: collectionList,
-          placeholder: '请扫描物料二维码',
           scanStep: InboundScanStep.material,
-          status: CollectionStatus.success(),
-          focus: true,
+          focus: false,
           currentBarcode: null,
           currentItem: null,
           candidateItemIds: const [],
+          currentTab: 1,
           repQty: 0,
           collectQty: 0,
           isDangerous: false,
@@ -320,10 +334,11 @@ class InboundCollectionBloc
       }
 
       final isOldFormat = (barcodeContent.idOld ?? '').trim() == '0';
-      final controlType =
-          _resolveSeqControl(barcodeContent.seqCtrl, materialCode, isOldFormat);
+      final controlType = _parseSeqCtrl(barcodeContent.seqCtrl);
       if (controlType == null) {
-        emit(state.copyWith(status: CollectionStatus.error('条码缺少管控方式，无法匹配任务明细')));
+        emit(
+          state.copyWith(status: CollectionStatus.error('条码缺少管控方式，无法匹配任务明细')),
+        );
         return;
       }
 
@@ -336,26 +351,27 @@ class InboundCollectionBloc
         return;
       }
 
+      if (controlType == _SeqControlType.serial) {
+        final seqKey = '$materialCode@$trimmedSerial';
+        if (state.dicSeq.containsKey(seqKey)) {
+          emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复扫描')));
+          return;
+        }
+      }
+
       if (trimmedBatch.isEmpty &&
           controlType != _SeqControlType.serial &&
           state.shouldCheckBatch) {
         trimmedBatch = trimmedSerial;
       }
 
-      final requiresBatch = state.shouldCheckBatch ||
+      final requiresBatch =
+          state.shouldCheckBatch ||
           controlType == _SeqControlType.batch ||
           controlType == _SeqControlType.serial;
       if (requiresBatch && trimmedBatch.isEmpty) {
         emit(state.copyWith(status: CollectionStatus.error('批次号不能为空')));
         return;
-      }
-
-      if (trimmedSerial.isNotEmpty) {
-        final seqKey = '${materialCode}@$trimmedSerial';
-        if (state.dicSeq.containsKey(seqKey)) {
-          emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复扫描')));
-          return;
-        }
       }
 
       final matchingDetails = _findMatchingDetails(
@@ -373,7 +389,7 @@ class InboundCollectionBloc
       }
 
       final availableDetails = matchingDetails
-          .where((detail) => detail.planQty - detail.collectedQty > 1e-6)
+          .where((detail) => detail.planQty - detail.collectedQty > 0)
           .toList();
 
       if (availableDetails.isEmpty) {
@@ -390,7 +406,8 @@ class InboundCollectionBloc
       final storeRoom = state.storeRoom.isNotEmpty
           ? state.storeRoom
           : (targetItem.storeRoomNo ?? '');
-      final shouldBypassErpCheck = state.allowErpStoreBypass &&
+      final shouldBypassErpCheck =
+          state.allowErpStoreBypass &&
           storeRoom.trim().toUpperCase() == 'XN-BL';
 
       double repQty = targetItem.repertoryQty;
@@ -412,8 +429,9 @@ class InboundCollectionBloc
         }
       }
 
-      final candidateIds =
-          availableDetails.map((detail) => detail.inTaskItemId).toList();
+      final candidateIds = availableDetails
+          .map((detail) => detail.inTaskItemId)
+          .toList();
       final normalizedBarcode = barcodeContent.copyWith(
         batchNo: trimmedBatch,
         serialNo: trimmedSerial,
@@ -421,8 +439,9 @@ class InboundCollectionBloc
       );
 
       final isDangerous = (normalizedBarcode.dgFlag ?? '').toUpperCase() == 'Y';
-      final missingMessage =
-          isDangerous ? _buildDangerousMissingMessage(normalizedBarcode) : null;
+      final missingMessage = isDangerous
+          ? _buildDangerousMissingMessage(normalizedBarcode)
+          : null;
       final requiresSupplement = missingMessage != null;
 
       if (!requiresSupplement && controlType == _SeqControlType.serial) {
@@ -440,9 +459,6 @@ class InboundCollectionBloc
       final nextStep = requiresSupplement
           ? InboundScanStep.dangerousSupplement
           : InboundScanStep.quantity;
-      final placeholder = requiresSupplement
-          ? '请扫描供应商二维码，采集生产日期、有效期'
-          : '请输入采集数量';
 
       emit(
         state.copyWith(
@@ -450,12 +466,10 @@ class InboundCollectionBloc
           currentItem: clonedItem,
           storeSite: resolvedSite,
           storeRoom: storeRoom,
-          placeholder: placeholder,
           scanStep: nextStep,
-          status: requiresSupplement && missingMessage != null
+          status: requiresSupplement
               ? CollectionStatus.error(missingMessage)
               : CollectionStatus.success(),
-          focus: true,
           repQty: repQty,
           collectQty: clonedItem.collectedQty,
           isDangerous: isDangerous,
@@ -510,13 +524,7 @@ class InboundCollectionBloc
 
       final materialCode =
           (mergedBarcode.materialCode ?? currentItem.materialCode).trim();
-      final controlType =
-          _resolveSeqControl(
-                mergedBarcode.seqCtrl,
-                materialCode,
-                (mergedBarcode.idOld ?? '').trim() == '0',
-              ) ??
-              _inferSeqControl(materialCode);
+      final controlType = _parseSeqCtrl(mergedBarcode.seqCtrl);
 
       if (controlType == _SeqControlType.serial) {
         final candidateIds = state.candidateItemIds.isNotEmpty
@@ -558,10 +566,7 @@ class InboundCollectionBloc
   ) async {
     if (state.requireDangerousSupplement) {
       emit(
-        state.copyWith(
-          status:
-              CollectionStatus.error('该物料为危化品，请先采集生产日期、效期信息'),
-        ),
+        state.copyWith(status: CollectionStatus.error('该物料为危化品，请先采集生产日期、效期信息')),
       );
       return;
     }
@@ -591,6 +596,7 @@ class InboundCollectionBloc
       emit: emit,
     );
   }
+
   Future<void> _processCollection({
     required double quantity,
     required InboundBarcodeContent barcode,
@@ -603,21 +609,16 @@ class InboundCollectionBloc
       return;
     }
 
-    final materialCode =
-        (barcode.materialCode ?? referenceItem.materialCode).trim();
+    final materialCode = (barcode.materialCode ?? referenceItem.materialCode)
+        .trim();
     final resolvedSite = state.storeSite.isNotEmpty
         ? state.storeSite.trim()
         : (referenceItem.storeSiteNo ?? '').trim();
     var batchNo = (barcode.batchNo ?? '').trim();
     final serialNo = (barcode.serialNo ?? '').trim();
 
-    final controlType =
-        _resolveSeqControl(
-              barcode.seqCtrl,
-              materialCode,
-              (barcode.idOld ?? '').trim() == '0',
-            ) ??
-            _inferSeqControl(materialCode);
+    final controlType = _parseSeqCtrl(barcode.seqCtrl);
+
     if (controlType == null) {
       emit(state.copyWith(status: CollectionStatus.error('无法识别物料的管控方式')));
       return;
@@ -629,8 +630,9 @@ class InboundCollectionBloc
       batchNo = serialNo;
     }
 
-    final candidateIdSet =
-        candidateItemIds.isEmpty ? null : candidateItemIds.toSet();
+    final candidateIdSet = candidateItemIds.isEmpty
+        ? null
+        : candidateItemIds.toSet();
 
     final updatedDetails = state.detailList.map(_cloneDetail).toList();
     final candidates = _findMatchingDetails(
@@ -669,14 +671,6 @@ class InboundCollectionBloc
     final updatedDicMtlQty = Map<String, List<dynamic>>.from(state.dicMtlQty);
     final updatedDicSeq = Map<String, String>.from(state.dicSeq);
     final updatedDicInv = Map<String, double>.from(state.dicInvMtlQty);
-
-    if (serialNo.isNotEmpty) {
-      final seqKey = '${materialCode}@$serialNo';
-      if (updatedDicSeq.containsKey(seqKey)) {
-        emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复扫描')));
-        return;
-      }
-    }
 
     var remaining = quantity;
     final newStocks = <InboundCollectionStock>[];
@@ -742,7 +736,7 @@ class InboundCollectionBloc
     }
 
     if (serialNo.isNotEmpty) {
-      final seqKey = '${materialCode}@$serialNo';
+      final seqKey = '$materialCode@$serialNo';
       updatedDicSeq[seqKey] = seqKey;
     }
 
@@ -751,11 +745,11 @@ class InboundCollectionBloc
     final updatedCollectionList = state.storeSite.isEmpty
         ? updatedDetails
         : updatedDetails
-            .where(
-              (detail) =>
-                  (detail.storeSiteNo ?? '').trim() == state.storeSite.trim(),
-            )
-            .toList();
+              .where(
+                (detail) =>
+                    (detail.storeSiteNo ?? '').trim() == state.storeSite.trim(),
+              )
+              .toList();
 
     final newState = state.copyWith(
       detailList: updatedDetails,
@@ -764,16 +758,12 @@ class InboundCollectionBloc
       dicSeq: updatedDicSeq,
       dicInvMtlQty: updatedDicInv,
       collectionList: updatedCollectionList,
-      placeholder: '请扫描库位',
-      scanStep: InboundScanStep.site,
-      currentBarcode: null,
-      currentItem: null,
+      currentBarcode: InboundBarcodeContent.fromJson({}),
+      currentItem: InboundCollectTaskItem.fromJson({}),
       candidateItemIds: const [],
-      currentTab: 1,
-      collectQty: quantity,
-      repQty: state.repQty,
+      collectQty: 0,
       status: CollectionStatus.success('采集成功'),
-      focus: true,
+      focus: false,
       isDangerous: false,
       requireDangerousSupplement: false,
     );
@@ -873,18 +863,19 @@ class InboundCollectionBloc
         query: _buildQuery(),
       );
       final clonedFreshItems = freshItems.map(_cloneDetail).toList();
-      final proType =
-          clonedFreshItems.isEmpty ? null : clonedFreshItems.first.proType;
+      final proType = clonedFreshItems.isEmpty
+          ? null
+          : clonedFreshItems.first.proType;
       final shouldCheckBatch = _requiresBatchValidation(proType);
       final allowErpStoreBypass = _allowsErpStoreBypass(proType);
       final refreshedCollection = state.storeSite.isEmpty
           ? const <InboundCollectTaskItem>[]
           : clonedFreshItems
-              .where(
-                (item) =>
-                    (item.storeSiteNo ?? '').trim() == state.storeSite.trim(),
-              )
-              .toList();
+                .where(
+                  (item) =>
+                      (item.storeSiteNo ?? '').trim() == state.storeSite.trim(),
+                )
+                .toList();
 
       emit(
         state.copyWith(
@@ -895,11 +886,10 @@ class InboundCollectionBloc
           dicMtlQty: const {},
           dicSeq: const {},
           dicInvMtlQty: const {},
-          currentBarcode: null,
-          currentItem: null,
+          currentBarcode: InboundBarcodeContent.fromJson({}),
+          currentItem: InboundCollectTaskItem.fromJson({}),
           candidateItemIds: const [],
           scanStep: InboundScanStep.site,
-          placeholder: '请扫描库位',
           currentTab: 0,
           checkedIds: const [],
           focus: true,
@@ -1129,37 +1119,6 @@ class InboundCollectionBloc
     return null;
   }
 
-  _SeqControlType? _resolveSeqControl(
-    String? seqCtrl,
-    String materialCode,
-    bool isOldFormat,
-  ) {
-    final parsed = _parseSeqCtrl(seqCtrl);
-    if (parsed != null) {
-      return parsed;
-    }
-    if (isOldFormat) {
-      return _inferSeqControl(materialCode);
-    }
-    return null;
-  }
-
-  _SeqControlType? _inferSeqControl(String materialCode) {
-    final related = state.detailList
-        .where((item) => item.materialCode == materialCode)
-        .toList();
-    if (related.isEmpty) {
-      return null;
-    }
-    if (related.any((item) => (item.serialNo ?? '').trim().isNotEmpty)) {
-      return _SeqControlType.serial;
-    }
-    if (related.any((item) => (item.batchNo ?? '').trim().isNotEmpty)) {
-      return _SeqControlType.batch;
-    }
-    return _SeqControlType.none;
-  }
-
   String _seqCtrlCode(_SeqControlType type) {
     switch (type) {
       case _SeqControlType.serial:
@@ -1181,7 +1140,8 @@ class InboundCollectionBloc
     Set<int>? limitIds,
   }) {
     final trimmedSite = storeSite.trim();
-    final requiresBatch = state.shouldCheckBatch ||
+    final requiresBatch =
+        state.shouldCheckBatch ||
         controlType == _SeqControlType.batch ||
         controlType == _SeqControlType.serial;
     final requiresSerial =
@@ -1244,7 +1204,7 @@ class InboundCollectionBloc
         final site = (detail.storeSiteNo ?? '').trim();
         final displaySite = site.isEmpty ? '-' : site;
         final formatted = _formatQuantity(remain);
-        return '库位【' + displaySite + '】物料【' + detail.materialCode + '】还剩【' + formatted + '】未做';
+        return '库位【$displaySite】物料【${detail.materialCode}】还剩【$formatted】未做';
       }
     }
     return null;
@@ -1274,8 +1234,9 @@ class InboundCollectionBloc
       return 0;
     }
 
-    final normalized =
-        repertoryList.map((row) => Map<String, dynamic>.from(row)).toList();
+    final normalized = repertoryList
+        .map((row) => Map<String, dynamic>.from(row))
+        .toList();
 
     final matchKey =
         (barcode.batchNo ?? barcode.serialNo ?? item.batchNo ?? item.serialNo)
@@ -1295,9 +1256,7 @@ class InboundCollectionBloc
         erpStore != null &&
         erpStore.isNotEmpty) {
       if (erpStore != expected) {
-        throw Exception(
-          '当前物料明细指定子库【$expected】与库位物料批次子库【$erpStore】存在不一致，请确认',
-        );
+        throw Exception('当前物料明细指定子库【$expected】与库位物料批次子库【$erpStore】存在不一致，请确认');
       }
     }
 
@@ -1350,6 +1309,22 @@ class InboundCollectionBloc
 
   String _buildInventoryKey(String site, String materialCode, String? batchNo) {
     return '${site.trim()}|$materialCode|${batchNo ?? ''}';
+  }
+
+  String _getPlaceMessage() {
+    if (state.storeSite.isEmpty) {
+      return '请扫描库位';
+    }
+    if (state.currentBarcode?.isEmpty ?? true) {
+      return '请扫描二维码';
+    }
+
+    final seqCtrl = _parseSeqCtrl(state.currentBarcode?.seqCtrl);
+
+    if ((seqCtrl != _SeqControlType.serial) && state.collectQty == 0) {
+      return '请输入数量';
+    }
+    return '';
   }
 
   InboundCollectTaskItem _cloneDetail(InboundCollectTaskItem source) {
