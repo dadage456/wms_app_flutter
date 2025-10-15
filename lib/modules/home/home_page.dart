@@ -291,6 +291,8 @@ class _FunctionGrid extends StatelessWidget {
             Modular.to.pushNamed('/outbound');
           } else if (f.title == '平库入库') {
             Modular.to.pushNamed('/goods-up');
+          } else if (f.title == '立库组盘') {
+            Modular.to.pushNamed('/aswh-up');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
