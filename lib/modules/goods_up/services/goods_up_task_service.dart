@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:wms_app/modules/outbound/task_details/models/outbound_task_item.dart';
 import 'package:wms_app/services/api_response_handler.dart';
@@ -121,14 +123,24 @@ class GoodsUpTaskService {
   }
 
   /// 上架采集提交
-  Future<void> commitUpShelves({required GoodsUpCommitRequest request}) async {
-    await _dio.post<Map<String, dynamic>>(
+  Future<void> commitUpShelves(
+    List<Map<String, dynamic>> upShelvesInfos,
+    List<Map<String, dynamic>> itemListInfos,
+    String filter,
+  ) async {
+    final response = await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitUp',
       options: Options(
         headers: {'content-type': 'application/json;charset=UTF-8'},
       ),
-      data: request.toJson(),
+      data: {
+        'upShelvesInfos': upShelvesInfos,
+        'itemListInfos': itemListInfos,
+        'filter': filter,
+      },
     );
+
+    log('-------------- response ${response.data}');
   }
 
   /// 根据库房编码和库位编码校验库位

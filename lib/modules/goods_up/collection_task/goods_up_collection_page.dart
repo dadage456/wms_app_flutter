@@ -85,13 +85,13 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => _showMoreOptions(context),
-              child: const Text(
-                '更多',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: () => _showMoreOptions(context),
+            //   child: const Text(
+            //     '更多',
+            //     style: TextStyle(color: Colors.white, fontSize: 16),
+            //   ),
+            // ),
           ],
         ),
         body: BlocConsumer<InboundCollectionBloc, InboundCollectionState>(
@@ -106,8 +106,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
                 state.status.message ?? '操作失败',
               );
               _bloc.add(const ResetInboundStatusEvent());
-            } else if (state.status.isSuccess &&
-                state.status.message != null) {
+            } else if (state.status.isSuccess && state.status.message != null) {
               LoadingDialogManager.instance.showSnackSuccessMsg(
                 context,
                 state.status.message!,
@@ -150,8 +149,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
                       Tab(text: '任务列表'),
                       Tab(text: '正在采集'),
                     ],
-                    onTap: (index) =>
-                        _bloc.add(ChangeInboundTabEvent(index)),
+                    onTap: (index) => _bloc.add(ChangeInboundTabEvent(index)),
                   ),
                 ),
                 Expanded(
@@ -254,6 +252,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
       placeholder: placeholder,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       height: 48,
+      keyboardType: TextInputType.number,
     );
 
     return ScannerWidget(
@@ -450,10 +449,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
   void _showCommitConfirmation(BuildContext context) {
     final state = _bloc.state;
     if (state.stocks.isEmpty) {
-      LoadingDialogManager.instance.showErrorDialog(
-        context,
-        '暂无采集数据',
-      );
+      LoadingDialogManager.instance.showErrorDialog(context, '暂无采集数据');
       return;
     }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wms_app/utils/custom_extension.dart';
 
 import '../../../../models/page_status.dart';
 import '../../../../utils/error_handler.dart';
@@ -190,6 +191,7 @@ class InboundCollectionBloc
   }
 
   Future<void> _persistCache(InboundCollectionState newState) async {
+    return;
     final box = _cacheBox;
     if (box == null) return;
 
@@ -229,20 +231,11 @@ class InboundCollectionBloc
       return;
     }
 
-    // switch (state.scanStep) {
-    //   case InboundScanStep.site:
-    //     await _handleSiteScan(payload, emit);
-    //     break;
-    //   case InboundScanStep.material:
-    //     await _handleMaterialScan(payload, emit);
-    //     break;
-    //   case InboundScanStep.dangerousSupplement:
-    //     await _handleDangerousSupplement(payload, emit);
-    //     break;
-    //   case InboundScanStep.quantity:
-    //     await _handleQuantityInput(payload, emit);
-    //     break;
-    // }
+    final placeholder = _getPlaceMessage();
+
+    final focus = placeholder == '请输入数量';
+
+    emit(state.copyWith(placeholder: placeholder, focus: focus));
   }
 
   Future<void> _handleSiteScan(
@@ -471,84 +464,9 @@ class InboundCollectionBloc
               ? CollectionStatus.error(missingMessage)
               : CollectionStatus.success(),
           repQty: repQty,
-          collectQty: clonedItem.collectedQty,
           isDangerous: isDangerous,
           requireDangerousSupplement: requiresSupplement,
           candidateItemIds: candidateIds,
-        ),
-      );
-    } catch (error) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error(ErrorHandler.handleError(error)),
-        ),
-      );
-    }
-  }
-
-  Future<void> _handleDangerousSupplement(
-    String barcode,
-    Emitter<InboundCollectionState> emit,
-  ) async {
-    final currentItem = state.currentItem;
-    final currentBarcode = state.currentBarcode;
-    if (currentItem == null || currentBarcode == null) {
-      emit(state.copyWith(status: CollectionStatus.error('请先扫描物料信息')));
-      return;
-    }
-
-    try {
-      final supplement = await _service.getInboundBarcodeInfo(barcode.trim());
-      final mergedBarcode = currentBarcode.copyWith(
-        productionDate:
-            supplement.productionDate ?? currentBarcode.productionDate,
-        expireDays: supplement.expireDays ?? currentBarcode.expireDays,
-        dgFlag: supplement.dgFlag ?? currentBarcode.dgFlag,
-      );
-
-      final missingMessage = _buildDangerousMissingMessage(mergedBarcode);
-      if (missingMessage != null) {
-        emit(
-          state.copyWith(
-            currentBarcode: mergedBarcode,
-            placeholder: '请扫描供应商二维码，采集生产日期、有效期',
-            scanStep: InboundScanStep.dangerousSupplement,
-            status: CollectionStatus.error(missingMessage),
-            focus: true,
-            isDangerous: true,
-            requireDangerousSupplement: true,
-          ),
-        );
-        return;
-      }
-
-      final materialCode =
-          (mergedBarcode.materialCode ?? currentItem.materialCode).trim();
-      final controlType = _parseSeqCtrl(mergedBarcode.seqCtrl);
-
-      if (controlType == _SeqControlType.serial) {
-        final candidateIds = state.candidateItemIds.isNotEmpty
-            ? state.candidateItemIds
-            : [currentItem.inTaskItemId];
-        await _processCollection(
-          quantity: 1,
-          barcode: mergedBarcode.copyWith(quantity: 1),
-          candidateItemIds: candidateIds,
-          referenceItem: currentItem,
-          emit: emit,
-        );
-        return;
-      }
-
-      emit(
-        state.copyWith(
-          currentBarcode: mergedBarcode,
-          placeholder: '请输入采集数量',
-          scanStep: InboundScanStep.quantity,
-          status: CollectionStatus.success(),
-          focus: true,
-          isDangerous: true,
-          requireDangerousSupplement: false,
         ),
       );
     } catch (error) {
@@ -709,12 +627,23 @@ class InboundCollectionBloc
 
       newStocks.add(stock);
 
-      final key = detail.inTaskItemId.toString();
-      updatedDicMtlQty[key] = [
-        detail.planQty,
-        detail.collectedQty,
-        detail.materialCode,
-      ];
+      // 循环分配到每个候选明细：统一 old/new 写法（关键修复点）
+      // 1) 初始化该明细的 old/new 语义
+      final beforeScanCollected =
+          detail.collectedQty - toCollect; // 该明细在本次分配前的已采集值
+      _ensureOldNewTriplet(
+        dicMtlQty: updatedDicMtlQty,
+        inTaskItemId: detail.inTaskItemId.toString(),
+        materialCode: detail.materialCode,
+        currentCollectedBeforeScan: beforeScanCollected,
+      );
+      // 2) 对该明细的 new 累加 incQty，并可选封顶为明细的计划数 planQty
+      _incNewCollected(
+        dicMtlQty: updatedDicMtlQty,
+        inTaskItemId: detail.inTaskItemId.toString(),
+        incQty: toCollect,
+        planCap: detail.planQty, // 封顶（等价于"能装满就装满"）
+      );
 
       final invKey = _buildInventoryKey(
         stock.storeSite ?? '',
@@ -815,48 +744,46 @@ class InboundCollectionBloc
           'taskNo': _task.inTaskNo,
           'matCode': stock.materialCode,
           'batchNo': stock.batchNo ?? '',
-          'sn': stock.serialNo ?? '',
+          'sn': stock.serialNo,
           'taskQty': stock.taskQty,
           'collectQty': stock.collectQty,
           'storeRoomNo': stock.storeRoom ?? '',
           'storeSiteNo': stock.storeSite ?? '',
-          'taskid': stock.inTaskId,
+          'taskid': int.parse(stock.inTaskId),
           'inTaskItemid': stock.inTaskItemId,
           'data1': stock.productionDate,
-          'data2': stock.expireDays,
+          'data2': stock.expireDays?.toString(),
         };
       }).toList();
 
-      final itemListInfos = state.dicMtlQty.entries.map((entry) {
-        final values = entry.value;
-        final double planQty = values.isNotEmpty && values[0] is num
-            ? (values[0] as num).toDouble()
-            : 0;
-        final double collectedQty = values.length > 1 && values[1] is num
-            ? (values[1] as num).toDouble()
-            : 0;
-        final String materialCode = values.length > 2
-            ? values[2]?.toString() ?? ''
-            : '';
-        return {
-          'mtlQty': [planQty, collectedQty],
-          'inTaskItemid': entry.key,
-          'mtlCode': materialCode,
-        };
-      }).toList();
+      // 组装提交的 itemListInfos（修复为 [old, new]）
+      final List<Map<String, dynamic>> itemListInfos = [];
+      state.dicMtlQty.forEach((inTaskItemId, vals) {
+        if (vals.length >= 3) {
+          final oldCollected = (vals[0] as num).toDouble();
+          final newCollected = (vals[1] as num).toDouble();
+          final mtlCode = vals[2] as String;
+          itemListInfos.add({
+            'mtlQty': [
+              oldCollected.toFormatString(),
+              newCollected.toFormatString(),
+            ], // ✅ 正确语义
+            'inTaskItemid': inTaskItemId,
+            'mtlCode': mtlCode,
+          });
+        }
+      });
 
       final filterValues = state.dicSeq.values
           .map((value) => '"' + value.trim() + '"')
           .toList();
       final filter = filterValues.isEmpty ? '' : filterValues.join(',');
 
-      await _service.commitUpShelves(
-        request: GoodsUpCommitRequest(
-          upShelvesInfos: upShelvesInfos,
-          itemListInfos: itemListInfos,
-          filter: filter,
-        ),
-      );
+      // 可选：打印调试日志（上线可关）
+      // debugPrint('[COMMIT] dicMtlQty(old,new,code): ${state.dicMtlQty}');
+      // debugPrint('[COMMIT] filter(SN): $filter');
+
+      await _service.commitUpShelves(upShelvesInfos, itemListInfos, filter);
 
       await _clearCache();
       final freshItems = await _service.getInboundCollectItems(
@@ -889,10 +816,8 @@ class InboundCollectionBloc
           currentBarcode: InboundBarcodeContent.fromJson({}),
           currentItem: InboundCollectTaskItem.fromJson({}),
           candidateItemIds: const [],
-          scanStep: InboundScanStep.site,
-          currentTab: 0,
           checkedIds: const [],
-          focus: true,
+          focus: false,
           shouldCheckBatch: shouldCheckBatch,
           allowErpStoreBypass: allowErpStoreBypass,
         ),
@@ -980,20 +905,16 @@ class InboundCollectionBloc
         }
       }
 
+      // 新逻辑：dicMtlQty 统一 old/new 语义，[old, new, code]
       final key = stock.inTaskItemId;
-      final existing = updatedDicMtlQty[key];
-      if (existing != null) {
-        final plan = existing.isNotEmpty && existing[0] is num
-            ? (existing[0] as num).toDouble()
-            : 0;
-        final collected = existing.length > 1 && existing[1] is num
-            ? (existing[1] as num).toDouble() - stock.collectQty
-            : 0;
-        updatedDicMtlQty[key] = [
-          plan,
-          collected < 0 ? 0 : collected,
-          existing.length > 2 ? existing[2] : stock.materialCode,
-        ];
+      final vals = updatedDicMtlQty[key];
+      if (vals != null && vals.length >= 3) {
+        // 回滚 new := max(new - dec, old)
+        _rollbackNewCollected(
+          dicMtlQty: updatedDicMtlQty,
+          inTaskItemId: key,
+          decQty: stock.collectQty,
+        );
       }
 
       if (stock.serialNo != null && stock.serialNo!.isNotEmpty) {
@@ -1326,6 +1247,69 @@ class InboundCollectionBloc
     }
     return '';
   }
+
+  // ======================= BEGIN: DICMtlQty helpers (统一 old/new 语义) =======================
+  // 语义：dicMtlQty[inTaskItemId] = [oldCollectedBeforeThisScan, newCollectedAfterThisScan, materialCode]
+  List<dynamic> _ensureOldNewTriplet({
+    required Map<String, List<dynamic>> dicMtlQty,
+    required String inTaskItemId,
+    required String materialCode,
+    required double currentCollectedBeforeScan,
+  }) {
+    final exists = dicMtlQty[inTaskItemId];
+    if (exists == null || exists.length < 3) {
+      // 初始化为 [old=new=扫描前已采集数, 物料编码]
+      dicMtlQty[inTaskItemId] = <dynamic>[
+        currentCollectedBeforeScan, // old
+        currentCollectedBeforeScan, // new
+        materialCode, // code
+      ];
+    } else {
+      // 若已存在，但缺项或被误写，强制修正长度与位置
+      dicMtlQty[inTaskItemId] = <dynamic>[
+        (exists.length >= 1
+            ? (exists[0] as num?)?.toDouble() ?? currentCollectedBeforeScan
+            : currentCollectedBeforeScan),
+        (exists.length >= 2
+            ? (exists[1] as num?)?.toDouble() ?? currentCollectedBeforeScan
+            : currentCollectedBeforeScan),
+        (exists.length >= 3
+            ? (exists[2] as String?) ?? materialCode
+            : materialCode),
+      ];
+    }
+    return dicMtlQty[inTaskItemId]!;
+  }
+
+  void _incNewCollected({
+    required Map<String, List<dynamic>> dicMtlQty,
+    required String inTaskItemId,
+    required double incQty,
+    double? planCap, // 可选上限（计划数）——封顶
+  }) {
+    final v = dicMtlQty[inTaskItemId]!;
+    final oldVal = (v[0] as num).toDouble();
+    var newVal = (v[1] as num).toDouble() + incQty;
+    if (planCap != null) {
+      if (newVal > planCap) newVal = planCap;
+    }
+    // new 不得小于 old
+    if (newVal < oldVal) newVal = oldVal;
+    dicMtlQty[inTaskItemId] = <dynamic>[oldVal, newVal, v[2]];
+  }
+
+  void _rollbackNewCollected({
+    required Map<String, List<dynamic>> dicMtlQty,
+    required String inTaskItemId,
+    required double decQty,
+  }) {
+    final v = dicMtlQty[inTaskItemId]!;
+    final oldVal = (v[0] as num).toDouble();
+    var newVal = (v[1] as num).toDouble() - decQty;
+    if (newVal < oldVal) newVal = oldVal; // 关键：回滚不得低于 old
+    dicMtlQty[inTaskItemId] = <dynamic>[oldVal, newVal, v[2]];
+  }
+  // =======================  END:  DICMtlQty helpers  =========================================
 
   InboundCollectTaskItem _cloneDetail(InboundCollectTaskItem source) {
     return InboundCollectTaskItem(
