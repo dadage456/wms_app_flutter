@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,9 +22,9 @@ class AswhUpCollectionBloc
   AswhUpCollectionBloc({
     required AswhUpTask task,
     required AswhUpTaskService service,
-  })  : _task = task,
-        _service = service,
-        super(AswhUpCollectionState.initial(task)) {
+  }) : _task = task,
+       _service = service,
+       super(AswhUpCollectionState.initial(task)) {
     on<InitializeAswhUpCollectionEvent>(_onInitialize);
     on<AswhUpPerformScanEvent>(_onPerformScan);
     on<AswhUpChangeTabEvent>(_onChangeTab);
@@ -53,8 +54,9 @@ class AswhUpCollectionBloc
   }
 
   Future<void> _openCacheBox() async {
-    _cacheBox ??=
-        await Hive.openBox('aswh_up_collect_${_task.inTaskId.toString()}');
+    _cacheBox ??= await Hive.openBox(
+      'aswh_up_collect_${_task.inTaskId.toString()}',
+    );
   }
 
   AswhUpTaskDetailQuery _buildQuery() {
@@ -107,9 +109,7 @@ class AswhUpCollectionBloc
     }
     final trimmed = storeSite.trim();
     return source
-        .where(
-          (item) => (item.storeSiteNo ?? '').trim() == trimmed,
-        )
+        .where((item) => (item.storeSiteNo ?? '').trim() == trimmed)
         .toList();
   }
 
@@ -152,9 +152,11 @@ class AswhUpCollectionBloc
       serialRaw.forEach((key, value) {
         final id = int.tryParse(key);
         if (id != null) {
-          serialRecord[id] =
-              Set<String>.from(List<dynamic>.from(value as List<dynamic>)
-                  .map((item) => item.toString()));
+          serialRecord[id] = Set<String>.from(
+            List<dynamic>.from(
+              value as List<dynamic>,
+            ).map((item) => item.toString()),
+          );
         }
       });
 
@@ -163,8 +165,10 @@ class AswhUpCollectionBloc
       final scanStepIndex =
           int.tryParse(box.get('scanStep', defaultValue: '1').toString()) ?? 1;
       final capacity =
-          double.tryParse(box.get('trayCapacity', defaultValue: '0').toString()) ??
-              0;
+          double.tryParse(
+            box.get('trayCapacity', defaultValue: '0').toString(),
+          ) ??
+          0;
       final used = cachedStocks.fold<double>(
         0,
         (prev, stock) => prev + (stock.collectQty),
@@ -180,11 +184,13 @@ class AswhUpCollectionBloc
           serialRecord: serialRecord,
           trayCapacity: capacity,
           trayUsed: used,
-          scanStep: AswhUpCollectionScanStep.values
-              .elementAt(math.min(scanStepIndex, 2)),
+          scanStep: AswhUpCollectionScanStep.values.elementAt(
+            math.min(scanStepIndex, 2),
+          ),
           placeholder: _placeholderForStep(
-            AswhUpCollectionScanStep.values
-                .elementAt(math.min(scanStepIndex, 2)),
+            AswhUpCollectionScanStep.values.elementAt(
+              math.min(scanStepIndex, 2),
+            ),
           ),
           message: cachedStocks.isEmpty ? null : '已恢复上次采集记录',
           focus: true,
@@ -193,8 +199,7 @@ class AswhUpCollectionBloc
     } catch (error) {
       emit(
         state.copyWith(
-          status:
-              CollectionStatus.error('恢复缓存失败：${error.toString()}'),
+          status: CollectionStatus.error('恢复缓存失败：${error.toString()}'),
         ),
       );
     }
@@ -209,10 +214,7 @@ class AswhUpCollectionBloc
     await box.put('storeSite', newState.storeSite);
     await box.put('scanStep', newState.scanStep.index.toString());
     await box.put('trayCapacity', newState.trayCapacity.toString());
-    await box.put(
-      'stocks',
-      newState.stocks.map((e) => e.toJson()).toList(),
-    );
+    await box.put('stocks', newState.stocks.map((e) => e.toJson()).toList());
     await box.put(
       'collected',
       newState.collectedByItem.map(
@@ -279,7 +281,8 @@ class AswhUpCollectionBloc
         trayNo: trayNo,
         taskType: 'ASWHUP',
       );
-      final capacity = _parseDouble(trayInfo['capacity']) ??
+      final capacity =
+          _parseDouble(trayInfo['capacity']) ??
           _parseDouble(trayInfo['trayMaxCapacity']) ??
           state.trayCapacity;
 
@@ -347,11 +350,7 @@ class AswhUpCollectionBloc
       final barcode = await _service.getMaterialInfoByQR(payload);
       final materialCode = barcode.materialCode ?? '';
       if (materialCode.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('二维码未解析出物料编码'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('二维码未解析出物料编码')));
         return;
       }
 
@@ -359,17 +358,16 @@ class AswhUpCollectionBloc
         (item) =>
             item.materialCode == materialCode ||
             (item.oldMaterialCode ?? '') == materialCode,
-        orElse: () =>
-            state.detailList.firstWhere(
-              (item) =>
-                  item.materialCode == materialCode ||
-                  (item.oldMaterialCode ?? '') == materialCode,
-              orElse: () => const AswhUpTaskDetailItem(
-                inTaskItemId: 0,
-                inTaskId: 0,
-                materialCode: '',
-              ),
-            ),
+        orElse: () => state.detailList.firstWhere(
+          (item) =>
+              item.materialCode == materialCode ||
+              (item.oldMaterialCode ?? '') == materialCode,
+          orElse: () => const AswhUpTaskDetailItem(
+            inTaskItemId: 0,
+            inTaskId: 0,
+            materialCode: '',
+          ),
+        ),
       );
 
       if (candidate.inTaskItemId == 0) {
@@ -382,15 +380,11 @@ class AswhUpCollectionBloc
       }
 
       final matControl = await _service.getMatControl(materialCode);
-      final seqCtrlFlag =
-          (matControl['seqCtrl'] ?? matControl['seqctrl'] ?? '').toString();
+      final seqCtrlFlag = (matControl['seqCtrl'] ?? matControl['seqctrl'] ?? '')
+          .toString();
       if (seqCtrlFlag.toUpperCase() == 'Y' &&
           (barcode.serialNo == null || barcode.serialNo!.isEmpty)) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('序列管控物料必须扫描序列号'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('序列管控物料必须扫描序列号')));
         return;
       }
 
@@ -398,11 +392,7 @@ class AswhUpCollectionBloc
       if (serialNo.isNotEmpty) {
         final serialSet = state.serialRecord[candidate.inTaskItemId];
         if (serialSet != null && serialSet.contains(serialNo)) {
-          emit(
-            state.copyWith(
-              status: CollectionStatus.error('序列号已采集，请勿重复扫描'),
-            ),
-          );
+          emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复扫描')));
           return;
         }
       }
@@ -488,8 +478,11 @@ class AswhUpCollectionBloc
     final updatedStocks = List<AswhUpCollectionStock>.from(state.stocks)
       ..add(newStock);
     final updatedCollected = Map<int, double>.from(state.collectedByItem)
-      ..update(item.inTaskItemId, (value) => value + quantity,
-          ifAbsent: () => quantity);
+      ..update(
+        item.inTaskItemId,
+        (value) => value + quantity,
+        ifAbsent: () => quantity,
+      );
     final updatedSerial = Map<int, Set<String>>.from(state.serialRecord);
     if (serialNo.isNotEmpty) {
       final set = updatedSerial[item.inTaskItemId] ?? <String>{};
@@ -669,7 +662,10 @@ class AswhUpCollectionBloc
       final itemId = int.tryParse(stock.taskItemId);
       if (itemId != null) {
         final current = updatedCollected[itemId] ?? 0;
-        final newValue = (current - stock.collectQty).clamp(0, double.infinity);
+        final double newValue = (current - stock.collectQty).clamp(
+          0,
+          double.infinity,
+        );
         if (newValue == 0) {
           updatedCollected.remove(itemId);
         } else {
