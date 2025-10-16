@@ -12,12 +12,10 @@ part of 'arrival_collect_progress.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ArrivalCollectProgress _$ArrivalCollectProgressFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _ArrivalCollectProgress.fromJson(json);
 }
 
@@ -41,31 +39,27 @@ mixin _$ArrivalCollectProgress {
 
 /// @nodoc
 abstract class $ArrivalCollectProgressCopyWith<$Res> {
-  factory $ArrivalCollectProgressCopyWith(
-    ArrivalCollectProgress value,
-    $Res Function(ArrivalCollectProgress) then,
-  ) = _$ArrivalCollectProgressCopyWithImpl<$Res, ArrivalCollectProgress>;
+  factory $ArrivalCollectProgressCopyWith(ArrivalCollectProgress value,
+          $Res Function(ArrivalCollectProgress) then) =
+      _$ArrivalCollectProgressCopyWithImpl<$Res, ArrivalCollectProgress>;
   @useResult
-  $Res call({
-    String id,
-    @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
-    ArrivalCollectTask task,
-    double collectQty,
-    String? batchNo,
-    String? serialNumber,
-    String? productionDate,
-    String? validDays,
-    bool submitted,
-  });
+  $Res call(
+      {String id,
+      @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
+      ArrivalCollectTask task,
+      double collectQty,
+      String? batchNo,
+      String? serialNumber,
+      String? productionDate,
+      String? validDays,
+      bool submitted});
 
   $ArrivalCollectTaskCopyWith<$Res> get task;
 }
 
 /// @nodoc
-class _$ArrivalCollectProgressCopyWithImpl<
-  $Res,
-  $Val extends ArrivalCollectProgress
->
+class _$ArrivalCollectProgressCopyWithImpl<$Res,
+        $Val extends ArrivalCollectProgress>
     implements $ArrivalCollectProgressCopyWith<$Res> {
   _$ArrivalCollectProgressCopyWithImpl(this._value, this._then);
 
@@ -86,43 +80,40 @@ class _$ArrivalCollectProgressCopyWithImpl<
     Object? validDays = freezed,
     Object? submitted = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            task: null == task
-                ? _value.task
-                : task // ignore: cast_nullable_to_non_nullable
-                      as ArrivalCollectTask,
-            collectQty: null == collectQty
-                ? _value.collectQty
-                : collectQty // ignore: cast_nullable_to_non_nullable
-                      as double,
-            batchNo: freezed == batchNo
-                ? _value.batchNo
-                : batchNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            serialNumber: freezed == serialNumber
-                ? _value.serialNumber
-                : serialNumber // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            productionDate: freezed == productionDate
-                ? _value.productionDate
-                : productionDate // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            validDays: freezed == validDays
-                ? _value.validDays
-                : validDays // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            submitted: null == submitted
-                ? _value.submitted
-                : submitted // ignore: cast_nullable_to_non_nullable
-                      as bool,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      task: null == task
+          ? _value.task
+          : task // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectTask,
+      collectQty: null == collectQty
+          ? _value.collectQty
+          : collectQty // ignore: cast_nullable_to_non_nullable
+              as double,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+      submitted: null == submitted
+          ? _value.submitted
+          : submitted // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
   }
 
   @override
@@ -138,22 +129,21 @@ class _$ArrivalCollectProgressCopyWithImpl<
 abstract class _$$ArrivalCollectProgressImplCopyWith<$Res>
     implements $ArrivalCollectProgressCopyWith<$Res> {
   factory _$$ArrivalCollectProgressImplCopyWith(
-    _$ArrivalCollectProgressImpl value,
-    $Res Function(_$ArrivalCollectProgressImpl) then,
-  ) = __$$ArrivalCollectProgressImplCopyWithImpl<$Res>;
+          _$ArrivalCollectProgressImpl value,
+          $Res Function(_$ArrivalCollectProgressImpl) then) =
+      __$$ArrivalCollectProgressImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
-    ArrivalCollectTask task,
-    double collectQty,
-    String? batchNo,
-    String? serialNumber,
-    String? productionDate,
-    String? validDays,
-    bool submitted,
-  });
+  $Res call(
+      {String id,
+      @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
+      ArrivalCollectTask task,
+      double collectQty,
+      String? batchNo,
+      String? serialNumber,
+      String? productionDate,
+      String? validDays,
+      bool submitted});
 
   @override
   $ArrivalCollectTaskCopyWith<$Res> get task;
@@ -161,13 +151,13 @@ abstract class _$$ArrivalCollectProgressImplCopyWith<$Res>
 
 /// @nodoc
 class __$$ArrivalCollectProgressImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectProgressCopyWithImpl<$Res, _$ArrivalCollectProgressImpl>
+    extends _$ArrivalCollectProgressCopyWithImpl<$Res,
+        _$ArrivalCollectProgressImpl>
     implements _$$ArrivalCollectProgressImplCopyWith<$Res> {
   __$$ArrivalCollectProgressImplCopyWithImpl(
-    _$ArrivalCollectProgressImpl _value,
-    $Res Function(_$ArrivalCollectProgressImpl) _then,
-  ) : super(_value, _then);
+      _$ArrivalCollectProgressImpl _value,
+      $Res Function(_$ArrivalCollectProgressImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -181,42 +171,40 @@ class __$$ArrivalCollectProgressImplCopyWithImpl<$Res>
     Object? validDays = freezed,
     Object? submitted = null,
   }) {
-    return _then(
-      _$ArrivalCollectProgressImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        task: null == task
-            ? _value.task
-            : task // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectTask,
-        collectQty: null == collectQty
-            ? _value.collectQty
-            : collectQty // ignore: cast_nullable_to_non_nullable
-                  as double,
-        batchNo: freezed == batchNo
-            ? _value.batchNo
-            : batchNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        serialNumber: freezed == serialNumber
-            ? _value.serialNumber
-            : serialNumber // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        productionDate: freezed == productionDate
-            ? _value.productionDate
-            : productionDate // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        validDays: freezed == validDays
-            ? _value.validDays
-            : validDays // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        submitted: null == submitted
-            ? _value.submitted
-            : submitted // ignore: cast_nullable_to_non_nullable
-                  as bool,
-      ),
-    );
+    return _then(_$ArrivalCollectProgressImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      task: null == task
+          ? _value.task
+          : task // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectTask,
+      collectQty: null == collectQty
+          ? _value.collectQty
+          : collectQty // ignore: cast_nullable_to_non_nullable
+              as double,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+      submitted: null == submitted
+          ? _value.submitted
+          : submitted // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
   }
 }
 
@@ -224,17 +212,16 @@ class __$$ArrivalCollectProgressImplCopyWithImpl<$Res>
 
 @JsonSerializable(explicitToJson: true)
 class _$ArrivalCollectProgressImpl implements _ArrivalCollectProgress {
-  const _$ArrivalCollectProgressImpl({
-    required this.id,
-    @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
-    required this.task,
-    required this.collectQty,
-    this.batchNo,
-    this.serialNumber,
-    this.productionDate,
-    this.validDays,
-    this.submitted = false,
-  });
+  const _$ArrivalCollectProgressImpl(
+      {required this.id,
+      @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
+      required this.task,
+      required this.collectQty,
+      this.batchNo,
+      this.serialNumber,
+      this.productionDate,
+      this.validDays,
+      this.submitted = false});
 
   factory _$ArrivalCollectProgressImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArrivalCollectProgressImplFromJson(json);
@@ -285,46 +272,35 @@ class _$ArrivalCollectProgressImpl implements _ArrivalCollectProgress {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    task,
-    collectQty,
-    batchNo,
-    serialNumber,
-    productionDate,
-    validDays,
-    submitted,
-  );
+  int get hashCode => Object.hash(runtimeType, id, task, collectQty, batchNo,
+      serialNumber, productionDate, validDays, submitted);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectProgressImplCopyWith<_$ArrivalCollectProgressImpl>
-  get copyWith =>
-      __$$ArrivalCollectProgressImplCopyWithImpl<_$ArrivalCollectProgressImpl>(
-        this,
-        _$identity,
-      );
+      get copyWith => __$$ArrivalCollectProgressImplCopyWithImpl<
+          _$ArrivalCollectProgressImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectProgressImplToJson(this);
+    return _$$ArrivalCollectProgressImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectProgress implements ArrivalCollectProgress {
-  const factory _ArrivalCollectProgress({
-    required final String id,
-    @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
-    required final ArrivalCollectTask task,
-    required final double collectQty,
-    final String? batchNo,
-    final String? serialNumber,
-    final String? productionDate,
-    final String? validDays,
-    final bool submitted,
-  }) = _$ArrivalCollectProgressImpl;
+  const factory _ArrivalCollectProgress(
+      {required final String id,
+      @JsonKey(fromJson: ArrivalCollectTask.fromJson, toJson: _taskToJson)
+      required final ArrivalCollectTask task,
+      required final double collectQty,
+      final String? batchNo,
+      final String? serialNumber,
+      final String? productionDate,
+      final String? validDays,
+      final bool submitted}) = _$ArrivalCollectProgressImpl;
 
   factory _ArrivalCollectProgress.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectProgressImpl.fromJson;
@@ -349,12 +325,11 @@ abstract class _ArrivalCollectProgress implements ArrivalCollectProgress {
   @override
   @JsonKey(ignore: true)
   _$$ArrivalCollectProgressImplCopyWith<_$ArrivalCollectProgressImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 ArrivalCollectSummary _$ArrivalCollectSummaryFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _ArrivalCollectSummary.fromJson(json);
 }
 
@@ -379,30 +354,26 @@ mixin _$ArrivalCollectSummary {
 
 /// @nodoc
 abstract class $ArrivalCollectSummaryCopyWith<$Res> {
-  factory $ArrivalCollectSummaryCopyWith(
-    ArrivalCollectSummary value,
-    $Res Function(ArrivalCollectSummary) then,
-  ) = _$ArrivalCollectSummaryCopyWithImpl<$Res, ArrivalCollectSummary>;
+  factory $ArrivalCollectSummaryCopyWith(ArrivalCollectSummary value,
+          $Res Function(ArrivalCollectSummary) then) =
+      _$ArrivalCollectSummaryCopyWithImpl<$Res, ArrivalCollectSummary>;
   @useResult
-  $Res call({
-    String id,
-    String materialCode,
-    String? materialName,
-    String? batchNo,
-    String? serialNumber,
-    double? collectQty,
-    double? taskQty,
-    String? productionDate,
-    String? validDays,
-    bool committed,
-  });
+  $Res call(
+      {String id,
+      String materialCode,
+      String? materialName,
+      String? batchNo,
+      String? serialNumber,
+      double? collectQty,
+      double? taskQty,
+      String? productionDate,
+      String? validDays,
+      bool committed});
 }
 
 /// @nodoc
-class _$ArrivalCollectSummaryCopyWithImpl<
-  $Res,
-  $Val extends ArrivalCollectSummary
->
+class _$ArrivalCollectSummaryCopyWithImpl<$Res,
+        $Val extends ArrivalCollectSummary>
     implements $ArrivalCollectSummaryCopyWith<$Res> {
   _$ArrivalCollectSummaryCopyWithImpl(this._value, this._then);
 
@@ -425,51 +396,48 @@ class _$ArrivalCollectSummaryCopyWithImpl<
     Object? validDays = freezed,
     Object? committed = null,
   }) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            materialCode: null == materialCode
-                ? _value.materialCode
-                : materialCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            materialName: freezed == materialName
-                ? _value.materialName
-                : materialName // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            batchNo: freezed == batchNo
-                ? _value.batchNo
-                : batchNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            serialNumber: freezed == serialNumber
-                ? _value.serialNumber
-                : serialNumber // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            collectQty: freezed == collectQty
-                ? _value.collectQty
-                : collectQty // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            taskQty: freezed == taskQty
-                ? _value.taskQty
-                : taskQty // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            productionDate: freezed == productionDate
-                ? _value.productionDate
-                : productionDate // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            validDays: freezed == validDays
-                ? _value.validDays
-                : validDays // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            committed: null == committed
-                ? _value.committed
-                : committed // ignore: cast_nullable_to_non_nullable
-                      as bool,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: freezed == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      collectQty: freezed == collectQty
+          ? _value.collectQty
+          : collectQty // ignore: cast_nullable_to_non_nullable
+              as double?,
+      taskQty: freezed == taskQty
+          ? _value.taskQty
+          : taskQty // ignore: cast_nullable_to_non_nullable
+              as double?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+      committed: null == committed
+          ? _value.committed
+          : committed // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ) as $Val);
   }
 }
 
@@ -477,34 +445,32 @@ class _$ArrivalCollectSummaryCopyWithImpl<
 abstract class _$$ArrivalCollectSummaryImplCopyWith<$Res>
     implements $ArrivalCollectSummaryCopyWith<$Res> {
   factory _$$ArrivalCollectSummaryImplCopyWith(
-    _$ArrivalCollectSummaryImpl value,
-    $Res Function(_$ArrivalCollectSummaryImpl) then,
-  ) = __$$ArrivalCollectSummaryImplCopyWithImpl<$Res>;
+          _$ArrivalCollectSummaryImpl value,
+          $Res Function(_$ArrivalCollectSummaryImpl) then) =
+      __$$ArrivalCollectSummaryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String materialCode,
-    String? materialName,
-    String? batchNo,
-    String? serialNumber,
-    double? collectQty,
-    double? taskQty,
-    String? productionDate,
-    String? validDays,
-    bool committed,
-  });
+  $Res call(
+      {String id,
+      String materialCode,
+      String? materialName,
+      String? batchNo,
+      String? serialNumber,
+      double? collectQty,
+      double? taskQty,
+      String? productionDate,
+      String? validDays,
+      bool committed});
 }
 
 /// @nodoc
 class __$$ArrivalCollectSummaryImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectSummaryCopyWithImpl<$Res, _$ArrivalCollectSummaryImpl>
+    extends _$ArrivalCollectSummaryCopyWithImpl<$Res,
+        _$ArrivalCollectSummaryImpl>
     implements _$$ArrivalCollectSummaryImplCopyWith<$Res> {
-  __$$ArrivalCollectSummaryImplCopyWithImpl(
-    _$ArrivalCollectSummaryImpl _value,
-    $Res Function(_$ArrivalCollectSummaryImpl) _then,
-  ) : super(_value, _then);
+  __$$ArrivalCollectSummaryImplCopyWithImpl(_$ArrivalCollectSummaryImpl _value,
+      $Res Function(_$ArrivalCollectSummaryImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -520,68 +486,65 @@ class __$$ArrivalCollectSummaryImplCopyWithImpl<$Res>
     Object? validDays = freezed,
     Object? committed = null,
   }) {
-    return _then(
-      _$ArrivalCollectSummaryImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        materialCode: null == materialCode
-            ? _value.materialCode
-            : materialCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        materialName: freezed == materialName
-            ? _value.materialName
-            : materialName // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        batchNo: freezed == batchNo
-            ? _value.batchNo
-            : batchNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        serialNumber: freezed == serialNumber
-            ? _value.serialNumber
-            : serialNumber // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        collectQty: freezed == collectQty
-            ? _value.collectQty
-            : collectQty // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        taskQty: freezed == taskQty
-            ? _value.taskQty
-            : taskQty // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        productionDate: freezed == productionDate
-            ? _value.productionDate
-            : productionDate // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        validDays: freezed == validDays
-            ? _value.validDays
-            : validDays // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        committed: null == committed
-            ? _value.committed
-            : committed // ignore: cast_nullable_to_non_nullable
-                  as bool,
-      ),
-    );
+    return _then(_$ArrivalCollectSummaryImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: freezed == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      collectQty: freezed == collectQty
+          ? _value.collectQty
+          : collectQty // ignore: cast_nullable_to_non_nullable
+              as double?,
+      taskQty: freezed == taskQty
+          ? _value.taskQty
+          : taskQty // ignore: cast_nullable_to_non_nullable
+              as double?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+      committed: null == committed
+          ? _value.committed
+          : committed // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ArrivalCollectSummaryImpl implements _ArrivalCollectSummary {
-  const _$ArrivalCollectSummaryImpl({
-    required this.id,
-    required this.materialCode,
-    this.materialName,
-    this.batchNo,
-    this.serialNumber,
-    this.collectQty,
-    this.taskQty,
-    this.productionDate,
-    this.validDays,
-    this.committed = false,
-  });
+  const _$ArrivalCollectSummaryImpl(
+      {required this.id,
+      required this.materialCode,
+      this.materialName,
+      this.batchNo,
+      this.serialNumber,
+      this.collectQty,
+      this.taskQty,
+      this.productionDate,
+      this.validDays,
+      this.committed = false});
 
   factory _$ArrivalCollectSummaryImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArrivalCollectSummaryImplFromJson(json);
@@ -640,48 +603,45 @@ class _$ArrivalCollectSummaryImpl implements _ArrivalCollectSummary {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    materialCode,
-    materialName,
-    batchNo,
-    serialNumber,
-    collectQty,
-    taskQty,
-    productionDate,
-    validDays,
-    committed,
-  );
+      runtimeType,
+      id,
+      materialCode,
+      materialName,
+      batchNo,
+      serialNumber,
+      collectQty,
+      taskQty,
+      productionDate,
+      validDays,
+      committed);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectSummaryImplCopyWith<_$ArrivalCollectSummaryImpl>
-  get copyWith =>
-      __$$ArrivalCollectSummaryImplCopyWithImpl<_$ArrivalCollectSummaryImpl>(
-        this,
-        _$identity,
-      );
+      get copyWith => __$$ArrivalCollectSummaryImplCopyWithImpl<
+          _$ArrivalCollectSummaryImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectSummaryImplToJson(this);
+    return _$$ArrivalCollectSummaryImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectSummary implements ArrivalCollectSummary {
-  const factory _ArrivalCollectSummary({
-    required final String id,
-    required final String materialCode,
-    final String? materialName,
-    final String? batchNo,
-    final String? serialNumber,
-    final double? collectQty,
-    final double? taskQty,
-    final String? productionDate,
-    final String? validDays,
-    final bool committed,
-  }) = _$ArrivalCollectSummaryImpl;
+  const factory _ArrivalCollectSummary(
+      {required final String id,
+      required final String materialCode,
+      final String? materialName,
+      final String? batchNo,
+      final String? serialNumber,
+      final double? collectQty,
+      final double? taskQty,
+      final String? productionDate,
+      final String? validDays,
+      final bool committed}) = _$ArrivalCollectSummaryImpl;
 
   factory _ArrivalCollectSummary.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectSummaryImpl.fromJson;
@@ -709,5 +669,5 @@ abstract class _ArrivalCollectSummary implements ArrivalCollectSummary {
   @override
   @JsonKey(ignore: true)
   _$$ArrivalCollectSummaryImplCopyWith<_$ArrivalCollectSummaryImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }

@@ -12,8 +12,7 @@ part of 'arrival_collect_state.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ArrivalCollectState {
@@ -39,24 +38,22 @@ mixin _$ArrivalCollectState {
 /// @nodoc
 abstract class $ArrivalCollectStateCopyWith<$Res> {
   factory $ArrivalCollectStateCopyWith(
-    ArrivalCollectState value,
-    $Res Function(ArrivalCollectState) then,
-  ) = _$ArrivalCollectStateCopyWithImpl<$Res, ArrivalCollectState>;
+          ArrivalCollectState value, $Res Function(ArrivalCollectState) then) =
+      _$ArrivalCollectStateCopyWithImpl<$Res, ArrivalCollectState>;
   @useResult
-  $Res call({
-    ArrivalSignTask? headerTask,
-    bool isLoading,
-    bool isSubmitting,
-    List<ArrivalCollectTask> taskItems,
-    ArrivalCollectTask? selectedTask,
-    List<ArrivalCollectProgress> progresses,
-    ArrivalCollectScanStep currentStep,
-    Set<String> selectedProgressIds,
-    int activeTabIndex,
-    String? successMessage,
-    String? errorMessage,
-    ArrivalCollectCache? cache,
-  });
+  $Res call(
+      {ArrivalSignTask? headerTask,
+      bool isLoading,
+      bool isSubmitting,
+      List<ArrivalCollectTask> taskItems,
+      ArrivalCollectTask? selectedTask,
+      List<ArrivalCollectProgress> progresses,
+      ArrivalCollectScanStep currentStep,
+      Set<String> selectedProgressIds,
+      int activeTabIndex,
+      String? successMessage,
+      String? errorMessage,
+      ArrivalCollectCache? cache});
 
   $ArrivalSignTaskCopyWith<$Res>? get headerTask;
   $ArrivalCollectTaskCopyWith<$Res>? get selectedTask;
@@ -89,59 +86,56 @@ class _$ArrivalCollectStateCopyWithImpl<$Res, $Val extends ArrivalCollectState>
     Object? errorMessage = freezed,
     Object? cache = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            headerTask: freezed == headerTask
-                ? _value.headerTask
-                : headerTask // ignore: cast_nullable_to_non_nullable
-                      as ArrivalSignTask?,
-            isLoading: null == isLoading
-                ? _value.isLoading
-                : isLoading // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            isSubmitting: null == isSubmitting
-                ? _value.isSubmitting
-                : isSubmitting // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            taskItems: null == taskItems
-                ? _value.taskItems
-                : taskItems // ignore: cast_nullable_to_non_nullable
-                      as List<ArrivalCollectTask>,
-            selectedTask: freezed == selectedTask
-                ? _value.selectedTask
-                : selectedTask // ignore: cast_nullable_to_non_nullable
-                      as ArrivalCollectTask?,
-            progresses: null == progresses
-                ? _value.progresses
-                : progresses // ignore: cast_nullable_to_non_nullable
-                      as List<ArrivalCollectProgress>,
-            currentStep: null == currentStep
-                ? _value.currentStep
-                : currentStep // ignore: cast_nullable_to_non_nullable
-                      as ArrivalCollectScanStep,
-            selectedProgressIds: null == selectedProgressIds
-                ? _value.selectedProgressIds
-                : selectedProgressIds // ignore: cast_nullable_to_non_nullable
-                      as Set<String>,
-            activeTabIndex: null == activeTabIndex
-                ? _value.activeTabIndex
-                : activeTabIndex // ignore: cast_nullable_to_non_nullable
-                      as int,
-            successMessage: freezed == successMessage
-                ? _value.successMessage
-                : successMessage // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            errorMessage: freezed == errorMessage
-                ? _value.errorMessage
-                : errorMessage // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            cache: freezed == cache
-                ? _value.cache
-                : cache // ignore: cast_nullable_to_non_nullable
-                      as ArrivalCollectCache?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      headerTask: freezed == headerTask
+          ? _value.headerTask
+          : headerTask // ignore: cast_nullable_to_non_nullable
+              as ArrivalSignTask?,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isSubmitting: null == isSubmitting
+          ? _value.isSubmitting
+          : isSubmitting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      taskItems: null == taskItems
+          ? _value.taskItems
+          : taskItems // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectTask>,
+      selectedTask: freezed == selectedTask
+          ? _value.selectedTask
+          : selectedTask // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectTask?,
+      progresses: null == progresses
+          ? _value.progresses
+          : progresses // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectProgress>,
+      currentStep: null == currentStep
+          ? _value.currentStep
+          : currentStep // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectScanStep,
+      selectedProgressIds: null == selectedProgressIds
+          ? _value.selectedProgressIds
+          : selectedProgressIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      activeTabIndex: null == activeTabIndex
+          ? _value.activeTabIndex
+          : activeTabIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      successMessage: freezed == successMessage
+          ? _value.successMessage
+          : successMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      cache: freezed == cache
+          ? _value.cache
+          : cache // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectCache?,
+    ) as $Val);
   }
 
   @override
@@ -184,26 +178,24 @@ class _$ArrivalCollectStateCopyWithImpl<$Res, $Val extends ArrivalCollectState>
 /// @nodoc
 abstract class _$$ArrivalCollectStateImplCopyWith<$Res>
     implements $ArrivalCollectStateCopyWith<$Res> {
-  factory _$$ArrivalCollectStateImplCopyWith(
-    _$ArrivalCollectStateImpl value,
-    $Res Function(_$ArrivalCollectStateImpl) then,
-  ) = __$$ArrivalCollectStateImplCopyWithImpl<$Res>;
+  factory _$$ArrivalCollectStateImplCopyWith(_$ArrivalCollectStateImpl value,
+          $Res Function(_$ArrivalCollectStateImpl) then) =
+      __$$ArrivalCollectStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    ArrivalSignTask? headerTask,
-    bool isLoading,
-    bool isSubmitting,
-    List<ArrivalCollectTask> taskItems,
-    ArrivalCollectTask? selectedTask,
-    List<ArrivalCollectProgress> progresses,
-    ArrivalCollectScanStep currentStep,
-    Set<String> selectedProgressIds,
-    int activeTabIndex,
-    String? successMessage,
-    String? errorMessage,
-    ArrivalCollectCache? cache,
-  });
+  $Res call(
+      {ArrivalSignTask? headerTask,
+      bool isLoading,
+      bool isSubmitting,
+      List<ArrivalCollectTask> taskItems,
+      ArrivalCollectTask? selectedTask,
+      List<ArrivalCollectProgress> progresses,
+      ArrivalCollectScanStep currentStep,
+      Set<String> selectedProgressIds,
+      int activeTabIndex,
+      String? successMessage,
+      String? errorMessage,
+      ArrivalCollectCache? cache});
 
   @override
   $ArrivalSignTaskCopyWith<$Res>? get headerTask;
@@ -217,10 +209,9 @@ abstract class _$$ArrivalCollectStateImplCopyWith<$Res>
 class __$$ArrivalCollectStateImplCopyWithImpl<$Res>
     extends _$ArrivalCollectStateCopyWithImpl<$Res, _$ArrivalCollectStateImpl>
     implements _$$ArrivalCollectStateImplCopyWith<$Res> {
-  __$$ArrivalCollectStateImplCopyWithImpl(
-    _$ArrivalCollectStateImpl _value,
-    $Res Function(_$ArrivalCollectStateImpl) _then,
-  ) : super(_value, _then);
+  __$$ArrivalCollectStateImplCopyWithImpl(_$ArrivalCollectStateImpl _value,
+      $Res Function(_$ArrivalCollectStateImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -238,81 +229,79 @@ class __$$ArrivalCollectStateImplCopyWithImpl<$Res>
     Object? errorMessage = freezed,
     Object? cache = freezed,
   }) {
-    return _then(
-      _$ArrivalCollectStateImpl(
-        headerTask: freezed == headerTask
-            ? _value.headerTask
-            : headerTask // ignore: cast_nullable_to_non_nullable
-                  as ArrivalSignTask?,
-        isLoading: null == isLoading
-            ? _value.isLoading
-            : isLoading // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        isSubmitting: null == isSubmitting
-            ? _value.isSubmitting
-            : isSubmitting // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        taskItems: null == taskItems
-            ? _value._taskItems
-            : taskItems // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectTask>,
-        selectedTask: freezed == selectedTask
-            ? _value.selectedTask
-            : selectedTask // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectTask?,
-        progresses: null == progresses
-            ? _value._progresses
-            : progresses // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectProgress>,
-        currentStep: null == currentStep
-            ? _value.currentStep
-            : currentStep // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectScanStep,
-        selectedProgressIds: null == selectedProgressIds
-            ? _value._selectedProgressIds
-            : selectedProgressIds // ignore: cast_nullable_to_non_nullable
-                  as Set<String>,
-        activeTabIndex: null == activeTabIndex
-            ? _value.activeTabIndex
-            : activeTabIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-        successMessage: freezed == successMessage
-            ? _value.successMessage
-            : successMessage // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        errorMessage: freezed == errorMessage
-            ? _value.errorMessage
-            : errorMessage // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        cache: freezed == cache
-            ? _value.cache
-            : cache // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectCache?,
-      ),
-    );
+    return _then(_$ArrivalCollectStateImpl(
+      headerTask: freezed == headerTask
+          ? _value.headerTask
+          : headerTask // ignore: cast_nullable_to_non_nullable
+              as ArrivalSignTask?,
+      isLoading: null == isLoading
+          ? _value.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isSubmitting: null == isSubmitting
+          ? _value.isSubmitting
+          : isSubmitting // ignore: cast_nullable_to_non_nullable
+              as bool,
+      taskItems: null == taskItems
+          ? _value._taskItems
+          : taskItems // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectTask>,
+      selectedTask: freezed == selectedTask
+          ? _value.selectedTask
+          : selectedTask // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectTask?,
+      progresses: null == progresses
+          ? _value._progresses
+          : progresses // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectProgress>,
+      currentStep: null == currentStep
+          ? _value.currentStep
+          : currentStep // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectScanStep,
+      selectedProgressIds: null == selectedProgressIds
+          ? _value._selectedProgressIds
+          : selectedProgressIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      activeTabIndex: null == activeTabIndex
+          ? _value.activeTabIndex
+          : activeTabIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      successMessage: freezed == successMessage
+          ? _value.successMessage
+          : successMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      cache: freezed == cache
+          ? _value.cache
+          : cache // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectCache?,
+    ));
   }
 }
 
 /// @nodoc
 
 class _$ArrivalCollectStateImpl implements _ArrivalCollectState {
-  const _$ArrivalCollectStateImpl({
-    this.headerTask,
-    this.isLoading = false,
-    this.isSubmitting = false,
-    final List<ArrivalCollectTask> taskItems = const <ArrivalCollectTask>[],
-    this.selectedTask,
-    final List<ArrivalCollectProgress> progresses =
-        const <ArrivalCollectProgress>[],
-    this.currentStep = ArrivalCollectScanStep.materialQRCode,
-    final Set<String> selectedProgressIds = const <String>{},
-    this.activeTabIndex = 0,
-    this.successMessage,
-    this.errorMessage,
-    this.cache,
-  }) : _taskItems = taskItems,
-       _progresses = progresses,
-       _selectedProgressIds = selectedProgressIds;
+  const _$ArrivalCollectStateImpl(
+      {this.headerTask,
+      this.isLoading = false,
+      this.isSubmitting = false,
+      final List<ArrivalCollectTask> taskItems = const <ArrivalCollectTask>[],
+      this.selectedTask,
+      final List<ArrivalCollectProgress> progresses =
+          const <ArrivalCollectProgress>[],
+      this.currentStep = ArrivalCollectScanStep.materialQRCode,
+      final Set<String> selectedProgressIds = const <String>{},
+      this.activeTabIndex = 0,
+      this.successMessage,
+      this.errorMessage,
+      this.cache})
+      : _taskItems = taskItems,
+        _progresses = progresses,
+        _selectedProgressIds = selectedProgressIds;
 
   @override
   final ArrivalSignTask? headerTask;
@@ -381,22 +370,16 @@ class _$ArrivalCollectStateImpl implements _ArrivalCollectState {
                 other.isLoading == isLoading) &&
             (identical(other.isSubmitting, isSubmitting) ||
                 other.isSubmitting == isSubmitting) &&
-            const DeepCollectionEquality().equals(
-              other._taskItems,
-              _taskItems,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._taskItems, _taskItems) &&
             (identical(other.selectedTask, selectedTask) ||
                 other.selectedTask == selectedTask) &&
-            const DeepCollectionEquality().equals(
-              other._progresses,
-              _progresses,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._progresses, _progresses) &&
             (identical(other.currentStep, currentStep) ||
                 other.currentStep == currentStep) &&
-            const DeepCollectionEquality().equals(
-              other._selectedProgressIds,
-              _selectedProgressIds,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedProgressIds, _selectedProgressIds) &&
             (identical(other.activeTabIndex, activeTabIndex) ||
                 other.activeTabIndex == activeTabIndex) &&
             (identical(other.successMessage, successMessage) ||
@@ -408,46 +391,42 @@ class _$ArrivalCollectStateImpl implements _ArrivalCollectState {
 
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    headerTask,
-    isLoading,
-    isSubmitting,
-    const DeepCollectionEquality().hash(_taskItems),
-    selectedTask,
-    const DeepCollectionEquality().hash(_progresses),
-    currentStep,
-    const DeepCollectionEquality().hash(_selectedProgressIds),
-    activeTabIndex,
-    successMessage,
-    errorMessage,
-    cache,
-  );
+      runtimeType,
+      headerTask,
+      isLoading,
+      isSubmitting,
+      const DeepCollectionEquality().hash(_taskItems),
+      selectedTask,
+      const DeepCollectionEquality().hash(_progresses),
+      currentStep,
+      const DeepCollectionEquality().hash(_selectedProgressIds),
+      activeTabIndex,
+      successMessage,
+      errorMessage,
+      cache);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectStateImplCopyWith<_$ArrivalCollectStateImpl> get copyWith =>
       __$$ArrivalCollectStateImplCopyWithImpl<_$ArrivalCollectStateImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 }
 
 abstract class _ArrivalCollectState implements ArrivalCollectState {
-  const factory _ArrivalCollectState({
-    final ArrivalSignTask? headerTask,
-    final bool isLoading,
-    final bool isSubmitting,
-    final List<ArrivalCollectTask> taskItems,
-    final ArrivalCollectTask? selectedTask,
-    final List<ArrivalCollectProgress> progresses,
-    final ArrivalCollectScanStep currentStep,
-    final Set<String> selectedProgressIds,
-    final int activeTabIndex,
-    final String? successMessage,
-    final String? errorMessage,
-    final ArrivalCollectCache? cache,
-  }) = _$ArrivalCollectStateImpl;
+  const factory _ArrivalCollectState(
+      {final ArrivalSignTask? headerTask,
+      final bool isLoading,
+      final bool isSubmitting,
+      final List<ArrivalCollectTask> taskItems,
+      final ArrivalCollectTask? selectedTask,
+      final List<ArrivalCollectProgress> progresses,
+      final ArrivalCollectScanStep currentStep,
+      final Set<String> selectedProgressIds,
+      final int activeTabIndex,
+      final String? successMessage,
+      final String? errorMessage,
+      final ArrivalCollectCache? cache}) = _$ArrivalCollectStateImpl;
 
   @override
   ArrivalSignTask? get headerTask;
