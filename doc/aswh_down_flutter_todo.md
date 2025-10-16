@@ -8,10 +8,10 @@
 - [x] **路由接入**：编写 `lib/modules/aswh_down/aswh_down_module.dart`，通过 `flutter_modular` 注册列表、明细、采集、接收、指令等子路由，并在 `lib/app_module.dart` 中新增 `/aswh-down` 模块引用。
 - [x] **服务封装**：实现 `AswhDownService`/`AswhDownCollectionService` 等类，分别封装 `goodsDown.js` 与 `aswhUp.js` 中使用的接口（如 `/system/terminal/outList`、`/getOutTaskItem`、`/commitASWHDownShelves`、`/commitDownWmsToWcs`、`/getWmsToWcsByTaskID` 等），统一走 `ApiResponseHandler`。
 - [x] **数据模型**：使用 Freezed + json_serializable + Hive（如需缓存）定义以下核心模型：`OnlinePickTask`、`OnlinePickTaskQuery`、`OnlinePickTaskItem`、`OnlinePickTaskItemQuery`、`OnlinePickCollectionStock`、`OnlinePickBarcodeContent`、`OnlinePickWcsCommand`、`OnlinePickLocationOption` 等。
-- [ ] **Hive 适配器**：为需要本地缓存的模型（采集过程、WCS 指令草稿等）注册 `HiveType`，在应用初始化时（参考 `CollectionBloc`）进行 `Hive.registerAdapter`。
-- [ ] **共享组件**：复用 `ScannerWidget`、`CommonDataGrid`、`SelectionActionBar` 等通用组件；如需新增控件（如多标签统计、托盘确认弹窗），放置于 `lib/modules/aswh_down/widgets/`。
+- [x] **Hive 适配器**：为需要本地缓存的模型（采集过程、WCS 指令草稿等）注册 `HiveType`，在应用初始化时（参考 `CollectionBloc`）进行 `Hive.registerAdapter`。
+- [x] **共享组件**：复用 `ScannerWidget`、`CommonDataGrid`、`SelectionActionBar` 等通用组件；如需新增控件（如多标签统计、托盘确认弹窗），放置于 `lib/modules/aswh_down/widgets/`。
 - [x] **依赖注入**：在模块 `binds` 中注册所有 BLoC、Service，并注入 `UserManager`、`DioClient`；确保 BLoC 生命周期与其它模块一致。
-- [ ] **命名规范**：统一使用 `online_pick_*.dart` 前缀，避免与现有出库/入库命名冲突，方便 `build_runner` 生成代码。
+- [x] **命名规范**：统一使用 `online_pick_*.dart` 前缀，避免与现有出库/入库命名冲突，方便 `build_runner` 生成代码。
 - [x] **构建脚本**：在新增 Freezed 文件后，执行并记录 `flutter pub run build_runner build --delete-conflicting-outputs`。
 - [ ] **测试基线**：规划 BLoC 与 Service 层的单元测试，复用 `mocktail`/`dio_mock_adapter` 等现有测试工具，确保关键路径（采集提交流程、WCS 指令、撤销/接收）均有覆盖。
 
@@ -51,10 +51,10 @@
 
 ## 页面：采集结果（`task_collect/aswhDownCollectDetail.nvue`）
 - [x] **数据绑定**：从 Bloc 或导航参数接收 `OnlinePickCollectionStock` 列表，支持本地删除并回写缓存。
-- [ ] **UI 展示**：使用 `CommonDataGrid` 呈现托盘、物料、任务/采集数量、批次、序列等列，并提供多选框。
-- [ ] **删除逻辑**：实现批量删除操作，同步更新主采集 Bloc 状态（减少采集数量、移除序列缓存），保持与 UniApp 逻辑一致。
-- [ ] **反馈**：删除成功提示，支持空列表展示。
-- [ ] **测试**：添加 Bloc/Service 测试验证删除后状态同步正确。
+- [x] **UI 展示**：使用 `CommonDataGrid` 呈现托盘、物料、任务/采集数量、批次、序列等列，并提供多选框。
+- [x] **删除逻辑**：实现批量删除操作，同步更新主采集 Bloc 状态（减少采集数量、移除序列缓存），保持与 UniApp 逻辑一致。
+- [x] **反馈**：删除成功提示，支持空列表展示。
+- [x] **测试**：添加 Bloc/Service 测试验证删除后状态同步正确。
 
 ## 页面：WMS ↔ WCS 指令查询（`task_collect/aswhDownWmsToWcs.nvue`）
 - [x] **数据模型**：定义 `OnlinePickWcsCommand`（托盘号、起始/目标地址、堆垛机、状态、任务类型、错误信息等字段）。
