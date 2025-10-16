@@ -219,6 +219,11 @@ class ScannerController {
     _state = null;
   }
 
+  /// 释放控制器，与组件解绑。
+  void dispose() {
+    _detach();
+  }
+
   /// 请求焦点
   void requestFocus() {
     _state?.requestFocus();
