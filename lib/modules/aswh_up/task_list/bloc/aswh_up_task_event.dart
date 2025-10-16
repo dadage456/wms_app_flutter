@@ -19,22 +19,3 @@ class SearchAswhUpTasksEvent extends AswhUpTaskEvent {
 class RefreshAswhUpTasksEvent extends AswhUpTaskEvent {
   const RefreshAswhUpTasksEvent();
 }
-
-class ClearAswhUpTaskMessageEvent extends AswhUpTaskEvent {
-  const ClearAswhUpTaskMessageEvent();
-}
-
-class _GridStateChangedEvent extends AswhUpTaskEvent {
-  const _GridStateChangedEvent({
-    required this.currentPage,
-    required this.total,
-    required this.showEmptyMessage,
-  });
-
-  final int currentPage;
-  final int total;
-  final bool showEmptyMessage;
-
-  @override
-  List<Object?> get props => [currentPage, total, showEmptyMessage];
-}

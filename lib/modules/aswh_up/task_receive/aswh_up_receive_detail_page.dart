@@ -46,20 +46,18 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
 
   @override
   void dispose() {
-    _scannerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<
-      AswhUpReceiveDetailBloc,
-      AswhUpReceiveDetailState
-    >(
+    return BlocConsumer<AswhUpReceiveDetailBloc, AswhUpReceiveDetailState>(
       listener: (context, state) {
         if (state.errorMessage != null) {
-          LoadingDialogManager.instance
-              .showErrorDialog(context, state.errorMessage!);
+          LoadingDialogManager.instance.showErrorDialog(
+            context,
+            state.errorMessage!,
+          );
         }
       },
       builder: (context, state) {
@@ -101,10 +99,7 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
 
   Future<void> _handleScanValue(String value) async {
     if (value.isEmpty) {
-      LoadingDialogManager.instance.showErrorDialog(
-        context,
-        '采集内容为空，请重新采集',
-      );
+      LoadingDialogManager.instance.showErrorDialog(context, '采集内容为空，请重新采集');
       return;
     }
 
@@ -114,10 +109,7 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
         final info = await _service.getMaterialInfoByQR(value);
         LoadingDialogManager.instance.hideLoadingDialog(context);
         if (info.materialCode == null || info.materialCode!.isEmpty) {
-          LoadingDialogManager.instance.showErrorDialog(
-            context,
-            '未识别到物料编码',
-          );
+          LoadingDialogManager.instance.showErrorDialog(context, '未识别到物料编码');
           return;
         }
         _bloc.add(SearchAswhUpReceiveDetailEvent(info.materialCode!));
@@ -126,72 +118,65 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
         if (parts.length >= 3) {
           _bloc.add(SearchAswhUpReceiveDetailEvent(parts[2]));
         } else {
-          LoadingDialogManager.instance.showErrorDialog(
-            context,
-            '库位条码格式不正确',
-          );
+          LoadingDialogManager.instance.showErrorDialog(context, '库位条码格式不正确');
         }
       } else {
-        LoadingDialogManager.instance.showErrorDialog(
-          context,
-          '采集内容不合法',
-        );
+        LoadingDialogManager.instance.showErrorDialog(context, '采集内容不合法');
       }
     } catch (error) {
       LoadingDialogManager.instance.hideLoadingDialog(context);
-      LoadingDialogManager.instance
-          .showErrorDialog(context, error.toString());
+      LoadingDialogManager.instance.showErrorDialog(context, error.toString());
     }
   }
 
   Widget _buildTable() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<
-        CommonDataGridBloc<AswhUpTaskDetailItem>,
-        CommonDataGridState<AswhUpTaskDetailItem>
-      >(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<AswhUpTaskDetailItem>,
+            CommonDataGridState<AswhUpTaskDetailItem>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载失败',
-            );
-          } else if (state.status == GridStatus.success) {
-            LoadingDialogManager.instance.showSnackSuccessMsg(
-              context,
-              '接收成功',
-              duration: const Duration(milliseconds: 800),
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<AswhUpTaskDetailItem>(
-            columns: AswhUpTaskDetailGridConfig.columns(),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            allowSelect: true,
-            selectedRows: state.selectedRows,
-            onSelectionChanged: (rows) {
-              _gridBloc
-                  .add(ChangeSelectedRowsEvent<AswhUpTaskDetailItem>(rows));
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载失败',
+                );
+              } else if (state.status == GridStatus.success) {
+                LoadingDialogManager.instance.showSnackSuccessMsg(
+                  context,
+                  '接收成功',
+                  duration: const Duration(milliseconds: 800),
+                );
+              }
             },
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(pageIndex));
+            builder: (context, state) {
+              return CommonDataGrid<AswhUpTaskDetailItem>(
+                columns: AswhUpTaskDetailGridConfig.columns(),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                allowSelect: true,
+                selectedRows: state.selectedRows,
+                onSelectionChanged: (rows) {
+                  _gridBloc.add(
+                    ChangeSelectedRowsEvent<AswhUpTaskDetailItem>(rows),
+                  );
+                },
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(pageIndex));
+                },
+              );
             },
-            rowHeight: 48,
-            headerHeight: 44,
-          );
-        },
-      ),
+          ),
     );
   }
 

@@ -121,36 +121,33 @@ class AswhUpTaskDetailItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        inTaskItemId,
-        inTaskId,
-        materialCode,
-        materialName,
-        storeSiteNo,
-        storeRoomNo,
-        subInventoryCode,
-        batchNo,
-        serialNo,
-        planQty,
-        collectedQty,
-        repertoryQty,
-        unit,
-        expireDays,
-        productionDate,
-        proType,
-        erpStore,
-        supplierName,
-        inTaskNo,
-        taskComment,
-        oldMaterialCode,
-        inboundOrderNo,
-      ];
+    inTaskItemId,
+    inTaskId,
+    materialCode,
+    materialName,
+    storeSiteNo,
+    storeRoomNo,
+    subInventoryCode,
+    batchNo,
+    serialNo,
+    planQty,
+    collectedQty,
+    repertoryQty,
+    unit,
+    expireDays,
+    productionDate,
+    proType,
+    erpStore,
+    supplierName,
+    inTaskNo,
+    taskComment,
+    oldMaterialCode,
+    inboundOrderNo,
+  ];
 }
 
 class AswhUpTaskDetailListData {
-  const AswhUpTaskDetailListData({
-    required this.total,
-    required this.rows,
-  });
+  const AswhUpTaskDetailListData({required this.total, required this.rows});
 
   final int total;
   final List<AswhUpTaskDetailItem> rows;
@@ -158,9 +155,11 @@ class AswhUpTaskDetailListData {
   factory AswhUpTaskDetailListData.fromJson(Map<String, dynamic> json) {
     final total = (json['total'] as num?)?.toInt() ?? 0;
     final rows = (json['rows'] as List<dynamic>? ?? const [])
-        .map((item) => AswhUpTaskDetailItem.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            ))
+        .map(
+          (item) => AswhUpTaskDetailItem.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          ),
+        )
         .toList();
     return AswhUpTaskDetailListData(total: total, rows: rows);
   }

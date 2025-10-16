@@ -588,17 +588,26 @@ AswhUpTaskQuery _$AswhUpTaskQueryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AswhUpTaskQuery {
+  @JsonKey(includeToJson: false)
   String get sortType => throw _privateConstructorUsedError;
+  @JsonKey(includeToJson: false)
   String get sortColumn => throw _privateConstructorUsedError;
   String get searchKey => throw _privateConstructorUsedError;
   String get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'roleoRuserId')
   String get roleOrUserId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'roomTag')
   String get roomTag => throw _privateConstructorUsedError;
+  @JsonKey(name: 'batchflag')
   String get batchFlag => throw _privateConstructorUsedError;
   String get transferType => throw _privateConstructorUsedError;
+  @JsonKey(name: 'beatflag')
   String get beatFlag => throw _privateConstructorUsedError;
+  @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
   int get pageIndex => throw _privateConstructorUsedError;
+  @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
   int get pageSize => throw _privateConstructorUsedError;
+  @JsonKey(name: 'finshFlg')
   String get finishFlag => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -614,18 +623,20 @@ abstract class $AswhUpTaskQueryCopyWith<$Res> {
       _$AswhUpTaskQueryCopyWithImpl<$Res, AswhUpTaskQuery>;
   @useResult
   $Res call(
-      {String sortType,
-      String sortColumn,
+      {@JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       String searchKey,
       String userId,
-      String roleOrUserId,
-      String roomTag,
-      String batchFlag,
+      @JsonKey(name: 'roleoRuserId') String roleOrUserId,
+      @JsonKey(name: 'roomTag') String roomTag,
+      @JsonKey(name: 'batchflag') String batchFlag,
       String transferType,
-      String beatFlag,
+      @JsonKey(name: 'beatflag') String beatFlag,
+      @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
       int pageIndex,
+      @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
       int pageSize,
-      String finishFlag});
+      @JsonKey(name: 'finshFlg') String finishFlag});
 }
 
 /// @nodoc
@@ -716,18 +727,20 @@ abstract class _$$AswhUpTaskQueryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String sortType,
-      String sortColumn,
+      {@JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       String searchKey,
       String userId,
-      String roleOrUserId,
-      String roomTag,
-      String batchFlag,
+      @JsonKey(name: 'roleoRuserId') String roleOrUserId,
+      @JsonKey(name: 'roomTag') String roomTag,
+      @JsonKey(name: 'batchflag') String batchFlag,
       String transferType,
-      String beatFlag,
+      @JsonKey(name: 'beatflag') String beatFlag,
+      @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
       int pageIndex,
+      @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
       int pageSize,
-      String finishFlag});
+      @JsonKey(name: 'finshFlg') String finishFlag});
 }
 
 /// @nodoc
@@ -811,27 +824,29 @@ class __$$AswhUpTaskQueryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AswhUpTaskQueryImpl implements _AswhUpTaskQuery {
   const _$AswhUpTaskQueryImpl(
-      {this.sortType = '',
-      this.sortColumn = '',
+      {@JsonKey(includeToJson: false) this.sortType = '',
+      @JsonKey(includeToJson: false) this.sortColumn = '',
       this.searchKey = '',
       this.userId = '',
-      this.roleOrUserId = '',
-      this.roomTag = '0',
-      this.batchFlag = '0',
+      @JsonKey(name: 'roleoRuserId') this.roleOrUserId = '',
+      @JsonKey(name: 'roomTag') this.roomTag = '0',
+      @JsonKey(name: 'batchflag') this.batchFlag = '0',
       this.transferType = '0',
-      this.beatFlag = 'N',
+      @JsonKey(name: 'beatflag') this.beatFlag = 'N',
+      @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
       this.pageIndex = 1,
+      @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
       this.pageSize = 100,
-      this.finishFlag = '0'});
+      @JsonKey(name: 'finshFlg') this.finishFlag = '0'});
 
   factory _$AswhUpTaskQueryImpl.fromJson(Map<String, dynamic> json) =>
       _$$AswhUpTaskQueryImplFromJson(json);
 
   @override
-  @JsonKey()
+  @JsonKey(includeToJson: false)
   final String sortType;
   @override
-  @JsonKey()
+  @JsonKey(includeToJson: false)
   final String sortColumn;
   @override
   @JsonKey()
@@ -840,28 +855,28 @@ class _$AswhUpTaskQueryImpl implements _AswhUpTaskQuery {
   @JsonKey()
   final String userId;
   @override
-  @JsonKey()
+  @JsonKey(name: 'roleoRuserId')
   final String roleOrUserId;
   @override
-  @JsonKey()
+  @JsonKey(name: 'roomTag')
   final String roomTag;
   @override
-  @JsonKey()
+  @JsonKey(name: 'batchflag')
   final String batchFlag;
   @override
   @JsonKey()
   final String transferType;
   @override
-  @JsonKey()
+  @JsonKey(name: 'beatflag')
   final String beatFlag;
   @override
-  @JsonKey()
+  @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
   final int pageIndex;
   @override
-  @JsonKey()
+  @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
   final int pageSize;
   @override
-  @JsonKey()
+  @JsonKey(name: 'finshFlg')
   final String finishFlag;
 
   @override
@@ -932,45 +947,57 @@ class _$AswhUpTaskQueryImpl implements _AswhUpTaskQuery {
 
 abstract class _AswhUpTaskQuery implements AswhUpTaskQuery {
   const factory _AswhUpTaskQuery(
-      {final String sortType,
-      final String sortColumn,
+      {@JsonKey(includeToJson: false) final String sortType,
+      @JsonKey(includeToJson: false) final String sortColumn,
       final String searchKey,
       final String userId,
-      final String roleOrUserId,
-      final String roomTag,
-      final String batchFlag,
+      @JsonKey(name: 'roleoRuserId') final String roleOrUserId,
+      @JsonKey(name: 'roomTag') final String roomTag,
+      @JsonKey(name: 'batchflag') final String batchFlag,
       final String transferType,
-      final String beatFlag,
+      @JsonKey(name: 'beatflag') final String beatFlag,
+      @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
       final int pageIndex,
+      @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
       final int pageSize,
+      @JsonKey(name: 'finshFlg')
       final String finishFlag}) = _$AswhUpTaskQueryImpl;
 
   factory _AswhUpTaskQuery.fromJson(Map<String, dynamic> json) =
       _$AswhUpTaskQueryImpl.fromJson;
 
   @override
+  @JsonKey(includeToJson: false)
   String get sortType;
   @override
+  @JsonKey(includeToJson: false)
   String get sortColumn;
   @override
   String get searchKey;
   @override
   String get userId;
   @override
+  @JsonKey(name: 'roleoRuserId')
   String get roleOrUserId;
   @override
+  @JsonKey(name: 'roomTag')
   String get roomTag;
   @override
+  @JsonKey(name: 'batchflag')
   String get batchFlag;
   @override
   String get transferType;
   @override
+  @JsonKey(name: 'beatflag')
   String get beatFlag;
   @override
+  @JsonKey(name: 'PageIndex', fromJson: _stringToInt, toJson: _intToString)
   int get pageIndex;
   @override
+  @JsonKey(name: 'PageSize', fromJson: _stringToInt, toJson: _intToString)
   int get pageSize;
   @override
+  @JsonKey(name: 'finshFlg')
   String get finishFlag;
   @override
   @JsonKey(ignore: true)

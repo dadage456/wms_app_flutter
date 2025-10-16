@@ -13,16 +13,27 @@ class AswhUpReceiveGridConfig {
       GridColumnConfig<AswhUpTask>(
         name: 'actions',
         headerText: '操作',
-        width: 120,
-        textAlign: TextAlign.center,
+        width: 80,
         valueGetter: (task) => '',
+        textAlign: TextAlign.center,
         cellBuilder: (task, _, __) {
-          return Center(
+          return Container(
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 32,
-              child: OutlinedButton(
-                onPressed: () => onDetail(task),
-                child: const Text('明细', style: TextStyle(fontSize: 12)),
+              height: 30,
+              child: ElevatedButton(
+                onPressed: () => onDetail?.call(task),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007AFF), // Blue background
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                ),
+                child: Text('明细', style: TextStyle(color: Colors.white)),
               ),
             ),
           );
@@ -32,49 +43,45 @@ class AswhUpReceiveGridConfig {
         name: 'inboundOrderNo',
         headerText: '入库单号',
         valueGetter: (task) => task.inboundOrderNo ?? '-',
-        width: 180,
         textAlign: TextAlign.center,
       ),
       GridColumnConfig<AswhUpTask>(
         name: 'sourceOrderNo',
         headerText: '来源单号',
         valueGetter: (task) => task.sourceOrderNo ?? '-',
-        width: 160,
         textAlign: TextAlign.center,
       ),
       GridColumnConfig<AswhUpTask>(
         name: 'storeRoomNo',
         headerText: '库房号',
-        valueGetter: (task) => task.storeRoomNo ?? '-',
         width: 100,
+        valueGetter: (task) => task.storeRoomNo ?? '-',
         textAlign: TextAlign.center,
       ),
       GridColumnConfig<AswhUpTask>(
         name: 'workStation',
         headerText: '工位',
-        valueGetter: (task) => task.workStation ?? '-',
         width: 100,
+        valueGetter: (task) => task.workStation ?? '-',
         textAlign: TextAlign.center,
       ),
       GridColumnConfig<AswhUpTask>(
         name: 'inTaskNo',
         headerText: '任务号',
         valueGetter: (task) => task.inTaskNo,
-        width: 160,
         textAlign: TextAlign.center,
       ),
+
       GridColumnConfig<AswhUpTask>(
         name: 'partnerName',
         headerText: '供应商',
         valueGetter: (task) => task.partnerName ?? '-',
-        width: 200,
         textAlign: TextAlign.center,
       ),
       GridColumnConfig<AswhUpTask>(
         name: 'taskComment',
         headerText: '凭证号',
         valueGetter: (task) => task.taskComment ?? '-',
-        width: 180,
         textAlign: TextAlign.center,
       ),
     ];

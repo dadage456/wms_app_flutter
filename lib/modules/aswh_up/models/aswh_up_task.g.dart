@@ -123,31 +123,24 @@ _$AswhUpTaskQueryImpl _$$AswhUpTaskQueryImplFromJson(
       sortColumn: json['sortColumn'] as String? ?? '',
       searchKey: json['searchKey'] as String? ?? '',
       userId: json['userId'] as String? ?? '',
-  roleOrUserId: json['roleoRuserId'] as String? ?? '',
-  roomTag: json['roomtag'] as String? ?? '0',
-  batchFlag: json['batchflag'] as String? ?? '0',
-  transferType: json['transferType'] as String? ?? '0',
-  beatFlag: json['beatflag'] as String? ?? 'N',
-  pageIndex: (() {
-    final parsed = _stringToInt(json['PageIndex']);
-    return parsed == 0 ? 1 : parsed;
-  })(),
-  pageSize: (() {
-    final parsed = _stringToInt(json['PageSize']);
-    return parsed == 0 ? 100 : parsed;
-  })(),
-  finishFlag: json['finshFlg'] as String? ?? '0',
+      roleOrUserId: json['roleoRuserId'] as String? ?? '',
+      roomTag: json['roomTag'] as String? ?? '0',
+      batchFlag: json['batchflag'] as String? ?? '0',
+      transferType: json['transferType'] as String? ?? '0',
+      beatFlag: json['beatflag'] as String? ?? 'N',
+      pageIndex:
+          json['PageIndex'] == null ? 1 : _stringToInt(json['PageIndex']),
+      pageSize: json['PageSize'] == null ? 100 : _stringToInt(json['PageSize']),
+      finishFlag: json['finshFlg'] as String? ?? '0',
     );
 
 Map<String, dynamic> _$$AswhUpTaskQueryImplToJson(
         _$AswhUpTaskQueryImpl instance) =>
     <String, dynamic>{
-      'sortType': instance.sortType,
-      'sortColumn': instance.sortColumn,
       'searchKey': instance.searchKey,
       'userId': instance.userId,
       'roleoRuserId': instance.roleOrUserId,
-      'roomtag': instance.roomTag,
+      'roomTag': instance.roomTag,
       'batchflag': instance.batchFlag,
       'transferType': instance.transferType,
       'beatflag': instance.beatFlag,

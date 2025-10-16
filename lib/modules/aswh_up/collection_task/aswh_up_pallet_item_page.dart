@@ -38,8 +38,10 @@ class _AswhUpPalletItemPageState extends State<AswhUpPalletItemPage> {
         }
 
         if (state.errorMessage != null) {
-          LoadingDialogManager.instance
-              .showErrorDialog(context, state.errorMessage!);
+          LoadingDialogManager.instance.showErrorDialog(
+            context,
+            state.errorMessage!,
+          );
         }
       },
       builder: (context, state) {
@@ -79,10 +81,7 @@ class _AswhUpPalletItemPageState extends State<AswhUpPalletItemPage> {
                 children: [
                   const Text(
                     '当前托盘',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF666666),
-                    ),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -118,6 +117,7 @@ class _AswhUpPalletItemPageState extends State<AswhUpPalletItemPage> {
       selectedRows: const [],
       rowHeight: 48,
       headerHeight: 44,
+      onLoadData: (_) async {},
     );
   }
 

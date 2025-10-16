@@ -35,7 +35,6 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     super.initState();
     _bloc = BlocProvider.of<GoodsUpTaskBloc>(context);
     _gridBloc = _bloc.gridBloc;
-    _gridBloc.add(LoadDataEvent<GoodsUpTask>(0));
   }
 
   @override

@@ -32,7 +32,6 @@ class _GoodsUpReceivePageState extends State<GoodsUpReceivePage> {
     super.initState();
     _bloc = BlocProvider.of<InboundReceiveTaskBloc>(context);
     _gridBloc = _bloc.gridBloc;
-    _gridBloc.add(LoadDataEvent<GoodsUpTask>(0));
   }
 
   @override

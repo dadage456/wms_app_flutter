@@ -37,7 +37,6 @@ class _AswhUpReceivePageState extends State<AswhUpReceivePage> {
 
   @override
   void dispose() {
-    _scannerController.dispose();
     super.dispose();
   }
 
@@ -79,47 +78,48 @@ class _AswhUpReceivePageState extends State<AswhUpReceivePage> {
   Widget _buildTable() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<
-        CommonDataGridBloc<AswhUpTask>,
-        CommonDataGridState<AswhUpTask>
-      >(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<AswhUpTask>,
+            CommonDataGridState<AswhUpTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载失败',
-            );
-          } else if (state.status == GridStatus.loaded &&
-              state.data.isEmpty) {
-            LoadingDialogManager.instance.showSnackWarningMsg(
-              context,
-              '当前任务列表没有待处理任务',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<AswhUpTask>(
-            columns: AswhUpReceiveGridConfig.columns(_openDetail),
-            datas: state.data,
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            allowPager: true,
-            allowSelect: false,
-            selectedRows: const [],
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent<AswhUpTask>(pageIndex));
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载失败',
+                );
+              } else if (state.status == GridStatus.loaded &&
+                  state.data.isEmpty) {
+                LoadingDialogManager.instance.showSnackWarningMsg(
+                  context,
+                  '当前任务列表没有待处理任务',
+                );
+              }
             },
-            rowHeight: 48,
-            headerHeight: 44,
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<AswhUpTask>(
+                columns: AswhUpReceiveGridConfig.columns(_openDetail),
+                datas: state.data,
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                allowPager: true,
+                allowSelect: false,
+                selectedRows: const [],
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent<AswhUpTask>(pageIndex));
+                },
+                rowHeight: 48,
+                headerHeight: 44,
+              );
+            },
+          ),
     );
   }
 

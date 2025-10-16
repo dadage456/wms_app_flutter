@@ -15,28 +15,14 @@ class AswhUpTaskBloc extends Bloc<AswhUpTaskEvent, AswhUpTaskState> {
   AswhUpTaskBloc({
     required AswhUpTaskService taskService,
     required UserManager userManager,
-  })  : _taskService = taskService,
-        _userManager = userManager,
-        super(const AswhUpTaskState()) {
+  }) : _taskService = taskService,
+       _userManager = userManager,
+       super(const AswhUpTaskState()) {
     on<SearchAswhUpTasksEvent>(_onSearch);
     on<RefreshAswhUpTasksEvent>(_onRefresh);
-    on<ClearAswhUpTaskMessageEvent>(_onClearMessage);
-    on<_GridStateChangedEvent>(_onGridStateChanged);
 
     currentQuery = _buildDefaultQuery();
     gridBloc = CommonDataGridBloc<AswhUpTask>(dataLoader: _createDataLoader());
-
-    _gridSubscription = gridBloc.stream.listen((gridState) {
-      if (gridState.status == GridStatus.loaded) {
-        add(
-          _GridStateChangedEvent(
-            currentPage: gridState.currentPage,
-            total: _latestTotal,
-            showEmptyMessage: gridState.data.isEmpty,
-          ),
-        );
-      }
-    });
   }
 
   final AswhUpTaskService _taskService;
@@ -44,12 +30,11 @@ class AswhUpTaskBloc extends Bloc<AswhUpTaskEvent, AswhUpTaskState> {
 
   late AswhUpTaskQuery currentQuery;
   late final CommonDataGridBloc<AswhUpTask> gridBloc;
-  late final StreamSubscription _gridSubscription;
   int _latestTotal = 0;
 
   DataGridLoader<AswhUpTask> _createDataLoader() {
     return (pageIndex) async {
-      final query = currentQuery.copyWith(pageIndex: pageIndex + 1);
+      final query = currentQuery.copyWith(pageIndex: pageIndex);
       currentQuery = query;
       final result = await _taskService.fetchTasks(query);
       _latestTotal = result.total;
@@ -71,6 +56,7 @@ class AswhUpTaskBloc extends Bloc<AswhUpTaskEvent, AswhUpTaskState> {
       roleOrUserId: '${userInfo?.userId ?? ''}',
       pageSize: 100,
       pageIndex: 1,
+      roomTag: '1',
     );
   }
 
@@ -91,37 +77,5 @@ class AswhUpTaskBloc extends Bloc<AswhUpTaskEvent, AswhUpTaskState> {
     Emitter<AswhUpTaskState> emit,
   ) async {
     gridBloc.add(LoadDataEvent<AswhUpTask>(state.currentPage));
-  }
-
-  void _onClearMessage(
-    ClearAswhUpTaskMessageEvent event,
-    Emitter<AswhUpTaskState> emit,
-  ) {
-    emit(state.copyWith(clearToast: true));
-  }
-
-  void _onGridStateChanged(
-    _GridStateChangedEvent event,
-    Emitter<AswhUpTaskState> emit,
-  ) {
-    final message = event.showEmptyMessage
-        ? '当前任务列表没有待处理任务！'
-        : null;
-
-    emit(
-      state.copyWith(
-        currentPage: event.currentPage,
-        total: event.total,
-        toastMessage: message,
-        clearToast: !event.showEmptyMessage,
-      ),
-    );
-  }
-
-  @override
-  Future<void> close() async {
-    await _gridSubscription.cancel();
-    await gridBloc.close();
-    return super.close();
   }
 }

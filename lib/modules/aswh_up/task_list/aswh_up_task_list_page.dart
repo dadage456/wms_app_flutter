@@ -34,7 +34,6 @@ class _AswhUpTaskListPageState extends State<AswhUpTaskListPage> {
     super.initState();
     _bloc = BlocProvider.of<AswhUpTaskBloc>(context);
     _gridBloc = _bloc.gridBloc;
-    _gridBloc.add(const LoadDataEvent<AswhUpTask>(0));
   }
 
   @override
@@ -54,9 +53,10 @@ class _AswhUpTaskListPageState extends State<AswhUpTaskListPage> {
       body: BlocListener<AswhUpTaskBloc, AswhUpTaskState>(
         listener: (context, state) {
           if (state.toastMessage != null) {
-            LoadingDialogManager.instance
-                .showErrorDialog(context, state.toastMessage!);
-            _bloc.add(const ClearAswhUpTaskMessageEvent());
+            LoadingDialogManager.instance.showErrorDialog(
+              context,
+              state.toastMessage!,
+            );
           }
         },
         child: Column(
@@ -87,47 +87,50 @@ class _AswhUpTaskListPageState extends State<AswhUpTaskListPage> {
   Widget _buildTable() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<
-          CommonDataGridBloc<AswhUpTask>, CommonDataGridState<AswhUpTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
-
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载任务失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          return CommonDataGrid<AswhUpTask>(
-            columns: AswhUpTaskGridConfig.columns((task, type) {
-              if (type == 0) {
-                _navigateToCollect(task);
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<AswhUpTask>,
+            CommonDataGridState<AswhUpTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
               } else {
-                _navigateToDetail(task);
+                LoadingDialogManager.instance.hideLoadingDialog(context);
               }
-            }),
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            onLoadData: (index) async {
-              _gridBloc.add(LoadDataEvent<AswhUpTask>(index));
+
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载任务失败',
+                );
+              }
             },
-            selectedRows: state.selectedRows,
-            onSelectionChanged: (rows) =>
-                _gridBloc.add(ChangeSelectedRowsEvent<AswhUpTask>(rows)),
-            datas: state.data,
-            allowPager: true,
-            allowSelect: false,
-            headerHeight: 44,
-            rowHeight: 48,
-          );
-        },
-      ),
+            builder: (context, state) {
+              return CommonDataGrid<AswhUpTask>(
+                columns: AswhUpTaskGridConfig.columns((task, type) {
+                  if (type == 0) {
+                    _navigateToCollect(task);
+                  } else {
+                    _navigateToDetail(task);
+                  }
+                }),
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                onLoadData: (index) async {
+                  _gridBloc.add(LoadDataEvent<AswhUpTask>(index));
+                },
+                selectedRows: state.selectedRows,
+                onSelectionChanged: (rows) =>
+                    _gridBloc.add(ChangeSelectedRowsEvent<AswhUpTask>(rows)),
+                datas: state.data,
+                allowPager: true,
+                allowSelect: false,
+                headerHeight: 44,
+                rowHeight: 48,
+              );
+            },
+          ),
     );
   }
 

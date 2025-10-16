@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:syncfusion_flutter_datagrid/datapager.dart';
 import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
@@ -72,8 +71,10 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
               }
             },
           ),
-          BlocListener<CommonDataGridBloc<AswhUpTaskDetailItem>,
-              CommonDataGridState<AswhUpTaskDetailItem>>(
+          BlocListener<
+            CommonDataGridBloc<AswhUpTaskDetailItem>,
+            CommonDataGridState<AswhUpTaskDetailItem>
+          >(
             listener: (context, gridState) {
               if (gridState.status == GridStatus.loading) {
                 LoadingDialogManager.instance.showLoadingDialog(context);
@@ -95,9 +96,9 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
             backgroundColor: const Color(0xFFF6F6F6),
             appBar: CustomAppBar(
               title: '组盘任务明细',
-              subtitle: widget.workStation?.isNotEmpty == true
-                  ? '工位：${widget.workStation}'
-                  : null,
+              // subtitle: widget.workStation?.isNotEmpty == true
+              //     ? '工位：${widget.workStation}'
+              //     : null,
               onBackPressed: () => Navigator.of(context).pop(),
               actions: [
                 IconButton(
@@ -139,8 +140,10 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
   }
 
   Widget _buildDataGrid() {
-    return BlocBuilder<CommonDataGridBloc<AswhUpTaskDetailItem>,
-        CommonDataGridState<AswhUpTaskDetailItem>>(
+    return BlocBuilder<
+      CommonDataGridBloc<AswhUpTaskDetailItem>,
+      CommonDataGridState<AswhUpTaskDetailItem>
+    >(
       builder: (context, gridState) {
         return Column(
           children: [
@@ -172,12 +175,10 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
     );
   }
 
-  Widget _buildActionBar(
-    CommonDataGridState<AswhUpTaskDetailItem> gridState,
-  ) {
+  Widget _buildActionBar(CommonDataGridState<AswhUpTaskDetailItem> gridState) {
     final selectedCount = gridState.selectedRows.length;
     final total = gridState.data.length;
-    if (total == 0) {
+    if (selectedCount == 0) {
       return const SizedBox.shrink();
     }
 
@@ -210,10 +211,12 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
               icon: const Icon(Icons.delete_outline),
               label: const Text('删除'),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    selectedCount > 0 ? Colors.red : Colors.grey.shade300,
-                foregroundColor:
-                    selectedCount > 0 ? Colors.white : Colors.grey.shade600,
+                backgroundColor: selectedCount > 0
+                    ? Colors.red
+                    : Colors.grey.shade300,
+                foregroundColor: selectedCount > 0
+                    ? Colors.white
+                    : Colors.grey.shade600,
               ),
             ),
           ],

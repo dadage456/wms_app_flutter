@@ -14,15 +14,14 @@ class AswhUpTaskService {
   /// 获取立库组盘任务列表
   Future<AswhUpTaskListData> fetchTasks(AswhUpTaskQuery query) async {
     final response = await _dio.get<Map<String, dynamic>>(
-      '/system/terminal/aswhInList',
+      '/system/terminal/intaskList',
       queryParameters: query.toJson(),
     );
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => AswhUpTaskListData.fromJson(
-        Map<String, dynamic>.from(data as Map),
-      ),
+      dataExtractor: (data) =>
+          AswhUpTaskListData.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
@@ -170,9 +169,8 @@ class AswhUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => AswhUpBarcodeContent.fromJson(
-        Map<String, dynamic>.from(data as Map),
-      ),
+      dataExtractor: (data) =>
+          AswhUpBarcodeContent.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
@@ -196,10 +194,7 @@ class AswhUpTaskService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getStoreSite',
-      queryParameters: {
-        'storeRoomNo': storeRoomNo,
-        'storeSiteNo': storeSiteNo,
-      },
+      queryParameters: {'storeRoomNo': storeRoomNo, 'storeSiteNo': storeSiteNo},
     );
 
     final data = response.data?['data'];
@@ -218,10 +213,7 @@ class AswhUpTaskService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getMtlRepertory',
-      queryParameters: {
-        'storeSite': storeSite,
-        'matCode': materialCode,
-      },
+      queryParameters: {'storeSite': storeSite, 'matCode': materialCode},
     );
 
     return ApiResponseHandler.handleResponse(

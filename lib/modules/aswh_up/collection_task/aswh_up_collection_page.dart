@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wms_app/modules/aswh_up/task_details/models/aswh_up_task_detail_item.dart';
 
 import '../../../common_widgets/common_grid/common_data_grid.dart';
 import '../../../common_widgets/loading_dialog_manager.dart';
@@ -88,8 +89,9 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
             }
 
             if (state.message?.isNotEmpty == true) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message!)));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message!)));
             }
 
             if (state.currentTab != _tabController.index) {
@@ -126,17 +128,13 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                       Tab(text: '任务列表'),
                       Tab(text: '采集记录'),
                     ],
-                    onTap: (index) =>
-                        _bloc.add(AswhUpChangeTabEvent(index)),
+                    onTap: (index) => _bloc.add(AswhUpChangeTabEvent(index)),
                   ),
                 ),
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: [
-                      _buildDetailGrid(state),
-                      _buildStockGrid(state),
-                    ],
+                    children: [_buildDetailGrid(state), _buildStockGrid(state)],
                   ),
                 ),
               ],
@@ -154,12 +152,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
       color: Colors.white,
       child: ScannerWidget(
         controller: _scannerController,
-        config: ScannerConfig(
-          placeholder: placeholder,
-          hintText: placeholder,
-        ),
-        onSubmitted: (value) {
-          if (value.isEmpty) return;
+        config: ScannerConfig(placeholder: placeholder),
+        onScanResult: (String value) {
           _bloc.add(AswhUpPerformScanEvent(value));
         },
       ),
@@ -201,16 +195,10 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -218,7 +206,10 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
 
   Widget _buildDetailGrid(AswhUpCollectionState state) {
     final columns = _detailColumns();
-    final selected = _selectedIndicesFor(state.visibleDetails, state.selectedDetailIds);
+    final selected = _selectedIndicesFor(
+      state.visibleDetails,
+      state.selectedDetailIds,
+    );
 
     return CommonDataGrid<AswhUpTaskDetailItem>(
       columns: columns,
@@ -252,7 +243,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildBottomBar(BuildContext context) {
-    final state = context.watch<AswhUpCollectionBloc>().state;
+    final state = BlocProvider.of<AswhUpCollectionBloc>(context).state;
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -403,9 +394,9 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('异常处理'),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('异常处理暂未开放')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('异常处理暂未开放')));
                 },
               ),
               ListTile(
@@ -415,17 +406,14 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                   Navigator.pop(sheetContext);
                   final trayNo = _bloc.state.trayNo;
                   if (trayNo.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('请先扫描托盘号')),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('请先扫描托盘号')));
                     return;
                   }
                   Modular.to.pushNamed(
                     '/aswh-up/pallet-item',
-                    arguments: {
-                      'trayNo': trayNo,
-                      'task': _bloc.state.task,
-                    },
+                    arguments: {'trayNo': trayNo, 'task': _bloc.state.task},
                   );
                 },
               ),
@@ -449,9 +437,9 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('托盘上架'),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('请先完成组盘提交后再上架')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('请先完成组盘提交后再上架')));
                 },
               ),
               ListTile(
