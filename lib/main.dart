@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wms_app/services/user_manager.dart';
+import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
 import 'package:wms_app/modules/home/home_page.dart';
 import 'package:wms_app/modules/goods_up/collection_task/models/inbound_collection_models.dart';
 import 'package:wms_app/modules/outbound/collection_task/models/collection_models.dart';
@@ -20,6 +21,9 @@ void main() async {
   Hive.registerAdapter(InboundCollectTaskItemAdapter());
   Hive.registerAdapter(InboundBarcodeContentAdapter());
   Hive.registerAdapter(InboundCollectionStockAdapter());
+  Hive.registerAdapter(OnlinePickBarcodeContentAdapter());
+  Hive.registerAdapter(OnlinePickCollectionStockAdapter());
+  Hive.registerAdapter(OnlinePickCollectionCacheSnapshotAdapter());
   runApp(ModularApp(module: AppModule(), child: const MyApp()));
 }
 
