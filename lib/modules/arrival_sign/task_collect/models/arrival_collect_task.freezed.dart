@@ -12,8 +12,7 @@ part of 'arrival_collect_task.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ArrivalCollectTask _$ArrivalCollectTaskFromJson(Map<String, dynamic> json) {
   return _ArrivalCollectTask.fromJson(json);
@@ -89,27 +88,25 @@ mixin _$ArrivalCollectTask {
 /// @nodoc
 abstract class $ArrivalCollectTaskCopyWith<$Res> {
   factory $ArrivalCollectTaskCopyWith(
-    ArrivalCollectTask value,
-    $Res Function(ArrivalCollectTask) then,
-  ) = _$ArrivalCollectTaskCopyWithImpl<$Res, ArrivalCollectTask>;
+          ArrivalCollectTask value, $Res Function(ArrivalCollectTask) then) =
+      _$ArrivalCollectTaskCopyWithImpl<$Res, ArrivalCollectTask>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'matcode') String materialCode,
-    @JsonKey(name: 'matname') String? materialName,
-    @JsonKey(name: 'arrivalsBillno') String? arrivalsBillNo,
-    @JsonKey(name: 'arrivalsBillid') String? arrivalsBillId,
-    @JsonKey(name: 'orderno') String? orderNo,
-    @JsonKey(name: 'qty') double plannedQuantity,
-    @JsonKey(name: 'goodqty') double collectedQuantity,
-    @JsonKey(ignore: true) double baseCollectedQuantity,
-    @JsonKey(name: 'meins') String? unit,
-    @JsonKey(name: 'batchno') String? batchNo,
-    String? serialNumber,
-    @JsonKey(name: 'subinventoryCode') String? subInventoryCode,
-    @JsonKey(name: 'matcodecontrol') int? materialControlType,
-    @JsonKey(name: 'pdate') String? productionDate,
-    @JsonKey(name: 'vdays') String? validDays,
-  });
+  $Res call(
+      {@JsonKey(name: 'matcode') String materialCode,
+      @JsonKey(name: 'matname') String? materialName,
+      @JsonKey(name: 'arrivalsBillno') String? arrivalsBillNo,
+      @JsonKey(name: 'arrivalsBillid') String? arrivalsBillId,
+      @JsonKey(name: 'orderno') String? orderNo,
+      @JsonKey(name: 'qty') double plannedQuantity,
+      @JsonKey(name: 'goodqty') double collectedQuantity,
+      @JsonKey(ignore: true) double baseCollectedQuantity,
+      @JsonKey(name: 'meins') String? unit,
+      @JsonKey(name: 'batchno') String? batchNo,
+      String? serialNumber,
+      @JsonKey(name: 'subinventoryCode') String? subInventoryCode,
+      @JsonKey(name: 'matcodecontrol') int? materialControlType,
+      @JsonKey(name: 'pdate') String? productionDate,
+      @JsonKey(name: 'vdays') String? validDays});
 }
 
 /// @nodoc
@@ -141,110 +138,104 @@ class _$ArrivalCollectTaskCopyWithImpl<$Res, $Val extends ArrivalCollectTask>
     Object? productionDate = freezed,
     Object? validDays = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            materialCode: null == materialCode
-                ? _value.materialCode
-                : materialCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            materialName: freezed == materialName
-                ? _value.materialName
-                : materialName // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            arrivalsBillNo: freezed == arrivalsBillNo
-                ? _value.arrivalsBillNo
-                : arrivalsBillNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            arrivalsBillId: freezed == arrivalsBillId
-                ? _value.arrivalsBillId
-                : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            orderNo: freezed == orderNo
-                ? _value.orderNo
-                : orderNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            plannedQuantity: null == plannedQuantity
-                ? _value.plannedQuantity
-                : plannedQuantity // ignore: cast_nullable_to_non_nullable
-                      as double,
-            collectedQuantity: null == collectedQuantity
-                ? _value.collectedQuantity
-                : collectedQuantity // ignore: cast_nullable_to_non_nullable
-                      as double,
-            baseCollectedQuantity: null == baseCollectedQuantity
-                ? _value.baseCollectedQuantity
-                : baseCollectedQuantity // ignore: cast_nullable_to_non_nullable
-                      as double,
-            unit: freezed == unit
-                ? _value.unit
-                : unit // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            batchNo: freezed == batchNo
-                ? _value.batchNo
-                : batchNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            serialNumber: freezed == serialNumber
-                ? _value.serialNumber
-                : serialNumber // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            subInventoryCode: freezed == subInventoryCode
-                ? _value.subInventoryCode
-                : subInventoryCode // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            materialControlType: freezed == materialControlType
-                ? _value.materialControlType
-                : materialControlType // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            productionDate: freezed == productionDate
-                ? _value.productionDate
-                : productionDate // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            validDays: freezed == validDays
-                ? _value.validDays
-                : validDays // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: freezed == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      arrivalsBillNo: freezed == arrivalsBillNo
+          ? _value.arrivalsBillNo
+          : arrivalsBillNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      arrivalsBillId: freezed == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNo: freezed == orderNo
+          ? _value.orderNo
+          : orderNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      plannedQuantity: null == plannedQuantity
+          ? _value.plannedQuantity
+          : plannedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      collectedQuantity: null == collectedQuantity
+          ? _value.collectedQuantity
+          : collectedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      baseCollectedQuantity: null == baseCollectedQuantity
+          ? _value.baseCollectedQuantity
+          : baseCollectedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      unit: freezed == unit
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      subInventoryCode: freezed == subInventoryCode
+          ? _value.subInventoryCode
+          : subInventoryCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      materialControlType: freezed == materialControlType
+          ? _value.materialControlType
+          : materialControlType // ignore: cast_nullable_to_non_nullable
+              as int?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$ArrivalCollectTaskImplCopyWith<$Res>
     implements $ArrivalCollectTaskCopyWith<$Res> {
-  factory _$$ArrivalCollectTaskImplCopyWith(
-    _$ArrivalCollectTaskImpl value,
-    $Res Function(_$ArrivalCollectTaskImpl) then,
-  ) = __$$ArrivalCollectTaskImplCopyWithImpl<$Res>;
+  factory _$$ArrivalCollectTaskImplCopyWith(_$ArrivalCollectTaskImpl value,
+          $Res Function(_$ArrivalCollectTaskImpl) then) =
+      __$$ArrivalCollectTaskImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'matcode') String materialCode,
-    @JsonKey(name: 'matname') String? materialName,
-    @JsonKey(name: 'arrivalsBillno') String? arrivalsBillNo,
-    @JsonKey(name: 'arrivalsBillid') String? arrivalsBillId,
-    @JsonKey(name: 'orderno') String? orderNo,
-    @JsonKey(name: 'qty') double plannedQuantity,
-    @JsonKey(name: 'goodqty') double collectedQuantity,
-    @JsonKey(ignore: true) double baseCollectedQuantity,
-    @JsonKey(name: 'meins') String? unit,
-    @JsonKey(name: 'batchno') String? batchNo,
-    String? serialNumber,
-    @JsonKey(name: 'subinventoryCode') String? subInventoryCode,
-    @JsonKey(name: 'matcodecontrol') int? materialControlType,
-    @JsonKey(name: 'pdate') String? productionDate,
-    @JsonKey(name: 'vdays') String? validDays,
-  });
+  $Res call(
+      {@JsonKey(name: 'matcode') String materialCode,
+      @JsonKey(name: 'matname') String? materialName,
+      @JsonKey(name: 'arrivalsBillno') String? arrivalsBillNo,
+      @JsonKey(name: 'arrivalsBillid') String? arrivalsBillId,
+      @JsonKey(name: 'orderno') String? orderNo,
+      @JsonKey(name: 'qty') double plannedQuantity,
+      @JsonKey(name: 'goodqty') double collectedQuantity,
+      @JsonKey(ignore: true) double baseCollectedQuantity,
+      @JsonKey(name: 'meins') String? unit,
+      @JsonKey(name: 'batchno') String? batchNo,
+      String? serialNumber,
+      @JsonKey(name: 'subinventoryCode') String? subInventoryCode,
+      @JsonKey(name: 'matcodecontrol') int? materialControlType,
+      @JsonKey(name: 'pdate') String? productionDate,
+      @JsonKey(name: 'vdays') String? validDays});
 }
 
 /// @nodoc
 class __$$ArrivalCollectTaskImplCopyWithImpl<$Res>
     extends _$ArrivalCollectTaskCopyWithImpl<$Res, _$ArrivalCollectTaskImpl>
     implements _$$ArrivalCollectTaskImplCopyWith<$Res> {
-  __$$ArrivalCollectTaskImplCopyWithImpl(
-    _$ArrivalCollectTaskImpl _value,
-    $Res Function(_$ArrivalCollectTaskImpl) _then,
-  ) : super(_value, _then);
+  __$$ArrivalCollectTaskImplCopyWithImpl(_$ArrivalCollectTaskImpl _value,
+      $Res Function(_$ArrivalCollectTaskImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -265,93 +256,91 @@ class __$$ArrivalCollectTaskImplCopyWithImpl<$Res>
     Object? productionDate = freezed,
     Object? validDays = freezed,
   }) {
-    return _then(
-      _$ArrivalCollectTaskImpl(
-        materialCode: null == materialCode
-            ? _value.materialCode
-            : materialCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        materialName: freezed == materialName
-            ? _value.materialName
-            : materialName // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        arrivalsBillNo: freezed == arrivalsBillNo
-            ? _value.arrivalsBillNo
-            : arrivalsBillNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        arrivalsBillId: freezed == arrivalsBillId
-            ? _value.arrivalsBillId
-            : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        orderNo: freezed == orderNo
-            ? _value.orderNo
-            : orderNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        plannedQuantity: null == plannedQuantity
-            ? _value.plannedQuantity
-            : plannedQuantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-        collectedQuantity: null == collectedQuantity
-            ? _value.collectedQuantity
-            : collectedQuantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-        baseCollectedQuantity: null == baseCollectedQuantity
-            ? _value.baseCollectedQuantity
-            : baseCollectedQuantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-        unit: freezed == unit
-            ? _value.unit
-            : unit // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        batchNo: freezed == batchNo
-            ? _value.batchNo
-            : batchNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        serialNumber: freezed == serialNumber
-            ? _value.serialNumber
-            : serialNumber // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        subInventoryCode: freezed == subInventoryCode
-            ? _value.subInventoryCode
-            : subInventoryCode // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        materialControlType: freezed == materialControlType
-            ? _value.materialControlType
-            : materialControlType // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        productionDate: freezed == productionDate
-            ? _value.productionDate
-            : productionDate // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        validDays: freezed == validDays
-            ? _value.validDays
-            : validDays // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$ArrivalCollectTaskImpl(
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: freezed == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      arrivalsBillNo: freezed == arrivalsBillNo
+          ? _value.arrivalsBillNo
+          : arrivalsBillNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      arrivalsBillId: freezed == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      orderNo: freezed == orderNo
+          ? _value.orderNo
+          : orderNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      plannedQuantity: null == plannedQuantity
+          ? _value.plannedQuantity
+          : plannedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      collectedQuantity: null == collectedQuantity
+          ? _value.collectedQuantity
+          : collectedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      baseCollectedQuantity: null == baseCollectedQuantity
+          ? _value.baseCollectedQuantity
+          : baseCollectedQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+      unit: freezed == unit
+          ? _value.unit
+          : unit // ignore: cast_nullable_to_non_nullable
+              as String?,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      subInventoryCode: freezed == subInventoryCode
+          ? _value.subInventoryCode
+          : subInventoryCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      materialControlType: freezed == materialControlType
+          ? _value.materialControlType
+          : materialControlType // ignore: cast_nullable_to_non_nullable
+              as int?,
+      productionDate: freezed == productionDate
+          ? _value.productionDate
+          : productionDate // ignore: cast_nullable_to_non_nullable
+              as String?,
+      validDays: freezed == validDays
+          ? _value.validDays
+          : validDays // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ArrivalCollectTaskImpl extends _ArrivalCollectTask {
-  const _$ArrivalCollectTaskImpl({
-    @JsonKey(name: 'matcode') required this.materialCode,
-    @JsonKey(name: 'matname') this.materialName,
-    @JsonKey(name: 'arrivalsBillno') this.arrivalsBillNo,
-    @JsonKey(name: 'arrivalsBillid') this.arrivalsBillId,
-    @JsonKey(name: 'orderno') this.orderNo,
-    @JsonKey(name: 'qty') required this.plannedQuantity,
-    @JsonKey(name: 'goodqty') required this.collectedQuantity,
-    @JsonKey(ignore: true) this.baseCollectedQuantity = 0,
-    @JsonKey(name: 'meins') this.unit,
-    @JsonKey(name: 'batchno') this.batchNo,
-    this.serialNumber,
-    @JsonKey(name: 'subinventoryCode') this.subInventoryCode,
-    @JsonKey(name: 'matcodecontrol') this.materialControlType,
-    @JsonKey(name: 'pdate') this.productionDate,
-    @JsonKey(name: 'vdays') this.validDays,
-  }) : super._();
+  const _$ArrivalCollectTaskImpl(
+      {@JsonKey(name: 'matcode') required this.materialCode,
+      @JsonKey(name: 'matname') this.materialName,
+      @JsonKey(name: 'arrivalsBillno') this.arrivalsBillNo,
+      @JsonKey(name: 'arrivalsBillid') this.arrivalsBillId,
+      @JsonKey(name: 'orderno') this.orderNo,
+      @JsonKey(name: 'qty') required this.plannedQuantity,
+      @JsonKey(name: 'goodqty') required this.collectedQuantity,
+      @JsonKey(ignore: true) this.baseCollectedQuantity = 0,
+      @JsonKey(name: 'meins') this.unit,
+      @JsonKey(name: 'batchno') this.batchNo,
+      this.serialNumber,
+      @JsonKey(name: 'subinventoryCode') this.subInventoryCode,
+      @JsonKey(name: 'matcodecontrol') this.materialControlType,
+      @JsonKey(name: 'pdate') this.productionDate,
+      @JsonKey(name: 'vdays') this.validDays})
+      : super._();
 
   factory _$ArrivalCollectTaskImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArrivalCollectTaskImplFromJson(json);
@@ -472,118 +461,132 @@ class _$ArrivalCollectTaskImpl extends _ArrivalCollectTask {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    materialCode,
-    materialName,
-    arrivalsBillNo,
-    arrivalsBillId,
-    orderNo,
-    plannedQuantity,
-    collectedQuantity,
-    baseCollectedQuantity,
-    unit,
-    batchNo,
-    serialNumber,
-    subInventoryCode,
-    materialControlType,
-    productionDate,
-    validDays,
-  );
+      runtimeType,
+      materialCode,
+      materialName,
+      arrivalsBillNo,
+      arrivalsBillId,
+      orderNo,
+      plannedQuantity,
+      collectedQuantity,
+      baseCollectedQuantity,
+      unit,
+      batchNo,
+      serialNumber,
+      subInventoryCode,
+      materialControlType,
+      productionDate,
+      validDays);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectTaskImplCopyWith<_$ArrivalCollectTaskImpl> get copyWith =>
       __$$ArrivalCollectTaskImplCopyWithImpl<_$ArrivalCollectTaskImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectTaskImplToJson(this);
+    return _$$ArrivalCollectTaskImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectTask extends ArrivalCollectTask {
-  const factory _ArrivalCollectTask({
-    @JsonKey(name: 'matcode') required final String materialCode,
-    @JsonKey(name: 'matname') final String? materialName,
-    @JsonKey(name: 'arrivalsBillno') final String? arrivalsBillNo,
-    @JsonKey(name: 'arrivalsBillid') final String? arrivalsBillId,
-    @JsonKey(name: 'orderno') final String? orderNo,
-    @JsonKey(name: 'qty') required final double plannedQuantity,
-    @JsonKey(name: 'goodqty') required final double collectedQuantity,
-    @JsonKey(ignore: true) final double baseCollectedQuantity,
-    @JsonKey(name: 'meins') final String? unit,
-    @JsonKey(name: 'batchno') final String? batchNo,
-    final String? serialNumber,
-    @JsonKey(name: 'subinventoryCode') final String? subInventoryCode,
-    @JsonKey(name: 'matcodecontrol') final int? materialControlType,
-    @JsonKey(name: 'pdate') final String? productionDate,
-    @JsonKey(name: 'vdays') final String? validDays,
-  }) = _$ArrivalCollectTaskImpl;
+  const factory _ArrivalCollectTask(
+          {@JsonKey(name: 'matcode') required final String materialCode,
+          @JsonKey(name: 'matname') final String? materialName,
+          @JsonKey(name: 'arrivalsBillno') final String? arrivalsBillNo,
+          @JsonKey(name: 'arrivalsBillid') final String? arrivalsBillId,
+          @JsonKey(name: 'orderno') final String? orderNo,
+          @JsonKey(name: 'qty') required final double plannedQuantity,
+          @JsonKey(name: 'goodqty') required final double collectedQuantity,
+          @JsonKey(ignore: true) final double baseCollectedQuantity,
+          @JsonKey(name: 'meins') final String? unit,
+          @JsonKey(name: 'batchno') final String? batchNo,
+          final String? serialNumber,
+          @JsonKey(name: 'subinventoryCode') final String? subInventoryCode,
+          @JsonKey(name: 'matcodecontrol') final int? materialControlType,
+          @JsonKey(name: 'pdate') final String? productionDate,
+          @JsonKey(name: 'vdays') final String? validDays}) =
+      _$ArrivalCollectTaskImpl;
   const _ArrivalCollectTask._() : super._();
 
   factory _ArrivalCollectTask.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectTaskImpl.fromJson;
 
   @override
+
   /// 物料编码
   @JsonKey(name: 'matcode')
   String get materialCode;
   @override
+
   /// 物料名称
   @JsonKey(name: 'matname')
   String? get materialName;
   @override
+
   /// 到货单号
   @JsonKey(name: 'arrivalsBillno')
   String? get arrivalsBillNo;
   @override
+
   /// 到货单行ID
   @JsonKey(name: 'arrivalsBillid')
   String? get arrivalsBillId;
   @override
+
   /// 采购单号
   @JsonKey(name: 'orderno')
   String? get orderNo;
   @override
+
   /// 计划数量
   @JsonKey(name: 'qty')
   double get plannedQuantity;
   @override
+
   /// 已良品数量
   @JsonKey(name: 'goodqty')
   double get collectedQuantity;
   @override
+
   /// 初始良品数量（用于删除/恢复时回写）
   @JsonKey(ignore: true)
   double get baseCollectedQuantity;
   @override
+
   /// 单位
   @JsonKey(name: 'meins')
   String? get unit;
   @override
+
   /// 批次号
   @JsonKey(name: 'batchno')
   String? get batchNo;
   @override
+
   /// 序列号
   String? get serialNumber;
   @override
+
   /// 库位编码
   @JsonKey(name: 'subinventoryCode')
   String? get subInventoryCode;
   @override
+
   /// 物料控制类型（0 无、1 批次、2 序列）
   @JsonKey(name: 'matcodecontrol')
   int? get materialControlType;
   @override
+
   /// 生产日期
   @JsonKey(name: 'pdate')
   String? get productionDate;
   @override
+
   /// 有效天数
   @JsonKey(name: 'vdays')
   String? get validDays;

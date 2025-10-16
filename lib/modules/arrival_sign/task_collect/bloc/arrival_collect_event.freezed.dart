@@ -12,8 +12,7 @@ part of 'arrival_collect_event.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$ArrivalCollectEvent {
@@ -31,8 +30,9 @@ mixin _$ArrivalCollectEvent {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
-  }) => throw _privateConstructorUsedError;
+        resultPageClosed,
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ArrivalSignTask task)? initialized,
@@ -47,8 +47,9 @@ mixin _$ArrivalCollectEvent {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
-  }) => throw _privateConstructorUsedError;
+        resultPageClosed,
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ArrivalSignTask task)? initialized,
@@ -64,7 +65,8 @@ mixin _$ArrivalCollectEvent {
     TResult Function()? persistCache,
     TResult Function(List<ArrivalCollectProgress> progresses)? resultPageClosed,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Initialized value) initialized,
@@ -74,13 +76,14 @@ mixin _$ArrivalCollectEvent {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
     required TResult Function(_PersistCache value) persistCache,
     required TResult Function(_ResultPageClosed value) resultPageClosed,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initialized value)? initialized,
@@ -95,7 +98,8 @@ mixin _$ArrivalCollectEvent {
     TResult? Function(_RestoreFromCache value)? restoreFromCache,
     TResult? Function(_PersistCache value)? persistCache,
     TResult? Function(_ResultPageClosed value)? resultPageClosed,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initialized value)? initialized,
@@ -111,15 +115,15 @@ mixin _$ArrivalCollectEvent {
     TResult Function(_PersistCache value)? persistCache,
     TResult Function(_ResultPageClosed value)? resultPageClosed,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $ArrivalCollectEventCopyWith<$Res> {
   factory $ArrivalCollectEventCopyWith(
-    ArrivalCollectEvent value,
-    $Res Function(ArrivalCollectEvent) then,
-  ) = _$ArrivalCollectEventCopyWithImpl<$Res, ArrivalCollectEvent>;
+          ArrivalCollectEvent value, $Res Function(ArrivalCollectEvent) then) =
+      _$ArrivalCollectEventCopyWithImpl<$Res, ArrivalCollectEvent>;
 }
 
 /// @nodoc
@@ -136,9 +140,8 @@ class _$ArrivalCollectEventCopyWithImpl<$Res, $Val extends ArrivalCollectEvent>
 /// @nodoc
 abstract class _$$InitializedImplCopyWith<$Res> {
   factory _$$InitializedImplCopyWith(
-    _$InitializedImpl value,
-    $Res Function(_$InitializedImpl) then,
-  ) = __$$InitializedImplCopyWithImpl<$Res>;
+          _$InitializedImpl value, $Res Function(_$InitializedImpl) then) =
+      __$$InitializedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({ArrivalSignTask task});
 
@@ -150,21 +153,20 @@ class __$$InitializedImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$InitializedImpl>
     implements _$$InitializedImplCopyWith<$Res> {
   __$$InitializedImplCopyWithImpl(
-    _$InitializedImpl _value,
-    $Res Function(_$InitializedImpl) _then,
-  ) : super(_value, _then);
+      _$InitializedImpl _value, $Res Function(_$InitializedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? task = null}) {
-    return _then(
-      _$InitializedImpl(
-        null == task
-            ? _value.task
-            : task // ignore: cast_nullable_to_non_nullable
-                  as ArrivalSignTask,
-      ),
-    );
+  $Res call({
+    Object? task = null,
+  }) {
+    return _then(_$InitializedImpl(
+      null == task
+          ? _value.task
+          : task // ignore: cast_nullable_to_non_nullable
+              as ArrivalSignTask,
+    ));
   }
 
   @override
@@ -221,7 +223,7 @@ class _$InitializedImpl implements _Initialized {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return initialized(task);
   }
@@ -241,7 +243,7 @@ class _$InitializedImpl implements _Initialized {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return initialized?.call(task);
   }
@@ -279,7 +281,7 @@ class _$InitializedImpl implements _Initialized {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -343,10 +345,9 @@ abstract class _Initialized implements ArrivalCollectEvent {
 
 /// @nodoc
 abstract class _$$RefreshDetailsImplCopyWith<$Res> {
-  factory _$$RefreshDetailsImplCopyWith(
-    _$RefreshDetailsImpl value,
-    $Res Function(_$RefreshDetailsImpl) then,
-  ) = __$$RefreshDetailsImplCopyWithImpl<$Res>;
+  factory _$$RefreshDetailsImplCopyWith(_$RefreshDetailsImpl value,
+          $Res Function(_$RefreshDetailsImpl) then) =
+      __$$RefreshDetailsImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -354,9 +355,8 @@ class __$$RefreshDetailsImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$RefreshDetailsImpl>
     implements _$$RefreshDetailsImplCopyWith<$Res> {
   __$$RefreshDetailsImplCopyWithImpl(
-    _$RefreshDetailsImpl _value,
-    $Res Function(_$RefreshDetailsImpl) _then,
-  ) : super(_value, _then);
+      _$RefreshDetailsImpl _value, $Res Function(_$RefreshDetailsImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -393,7 +393,7 @@ class _$RefreshDetailsImpl implements _RefreshDetails {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return refreshDetails();
   }
@@ -413,7 +413,7 @@ class _$RefreshDetailsImpl implements _RefreshDetails {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return refreshDetails?.call();
   }
@@ -451,7 +451,7 @@ class _$RefreshDetailsImpl implements _RefreshDetails {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -511,9 +511,8 @@ abstract class _RefreshDetails implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$SelectTaskImplCopyWith<$Res> {
   factory _$$SelectTaskImplCopyWith(
-    _$SelectTaskImpl value,
-    $Res Function(_$SelectTaskImpl) then,
-  ) = __$$SelectTaskImplCopyWithImpl<$Res>;
+          _$SelectTaskImpl value, $Res Function(_$SelectTaskImpl) then) =
+      __$$SelectTaskImplCopyWithImpl<$Res>;
   @useResult
   $Res call({ArrivalCollectTask task});
 
@@ -525,21 +524,20 @@ class __$$SelectTaskImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$SelectTaskImpl>
     implements _$$SelectTaskImplCopyWith<$Res> {
   __$$SelectTaskImplCopyWithImpl(
-    _$SelectTaskImpl _value,
-    $Res Function(_$SelectTaskImpl) _then,
-  ) : super(_value, _then);
+      _$SelectTaskImpl _value, $Res Function(_$SelectTaskImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? task = null}) {
-    return _then(
-      _$SelectTaskImpl(
-        null == task
-            ? _value.task
-            : task // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectTask,
-      ),
-    );
+  $Res call({
+    Object? task = null,
+  }) {
+    return _then(_$SelectTaskImpl(
+      null == task
+          ? _value.task
+          : task // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectTask,
+    ));
   }
 
   @override
@@ -596,7 +594,7 @@ class _$SelectTaskImpl implements _SelectTask {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return selectTask(task);
   }
@@ -616,7 +614,7 @@ class _$SelectTaskImpl implements _SelectTask {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return selectTask?.call(task);
   }
@@ -654,7 +652,7 @@ class _$SelectTaskImpl implements _SelectTask {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -719,9 +717,8 @@ abstract class _SelectTask implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$ScanSubmittedImplCopyWith<$Res> {
   factory _$$ScanSubmittedImplCopyWith(
-    _$ScanSubmittedImpl value,
-    $Res Function(_$ScanSubmittedImpl) then,
-  ) = __$$ScanSubmittedImplCopyWithImpl<$Res>;
+          _$ScanSubmittedImpl value, $Res Function(_$ScanSubmittedImpl) then) =
+      __$$ScanSubmittedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String value});
 }
@@ -731,21 +728,20 @@ class __$$ScanSubmittedImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$ScanSubmittedImpl>
     implements _$$ScanSubmittedImplCopyWith<$Res> {
   __$$ScanSubmittedImplCopyWithImpl(
-    _$ScanSubmittedImpl _value,
-    $Res Function(_$ScanSubmittedImpl) _then,
-  ) : super(_value, _then);
+      _$ScanSubmittedImpl _value, $Res Function(_$ScanSubmittedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? value = null}) {
-    return _then(
-      _$ScanSubmittedImpl(
-        null == value
-            ? _value.value
-            : value // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_$ScanSubmittedImpl(
+      null == value
+          ? _value.value
+          : value // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -794,7 +790,7 @@ class _$ScanSubmittedImpl implements _ScanSubmitted {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return scanSubmitted(value);
   }
@@ -814,7 +810,7 @@ class _$ScanSubmittedImpl implements _ScanSubmitted {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return scanSubmitted?.call(value);
   }
@@ -852,7 +848,7 @@ class _$ScanSubmittedImpl implements _ScanSubmitted {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -916,10 +912,9 @@ abstract class _ScanSubmitted implements ArrivalCollectEvent {
 
 /// @nodoc
 abstract class _$$QuantitySubmittedImplCopyWith<$Res> {
-  factory _$$QuantitySubmittedImplCopyWith(
-    _$QuantitySubmittedImpl value,
-    $Res Function(_$QuantitySubmittedImpl) then,
-  ) = __$$QuantitySubmittedImplCopyWithImpl<$Res>;
+  factory _$$QuantitySubmittedImplCopyWith(_$QuantitySubmittedImpl value,
+          $Res Function(_$QuantitySubmittedImpl) then) =
+      __$$QuantitySubmittedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({double quantity});
 }
@@ -928,22 +923,21 @@ abstract class _$$QuantitySubmittedImplCopyWith<$Res> {
 class __$$QuantitySubmittedImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$QuantitySubmittedImpl>
     implements _$$QuantitySubmittedImplCopyWith<$Res> {
-  __$$QuantitySubmittedImplCopyWithImpl(
-    _$QuantitySubmittedImpl _value,
-    $Res Function(_$QuantitySubmittedImpl) _then,
-  ) : super(_value, _then);
+  __$$QuantitySubmittedImplCopyWithImpl(_$QuantitySubmittedImpl _value,
+      $Res Function(_$QuantitySubmittedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? quantity = null}) {
-    return _then(
-      _$QuantitySubmittedImpl(
-        null == quantity
-            ? _value.quantity
-            : quantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-      ),
-    );
+  $Res call({
+    Object? quantity = null,
+  }) {
+    return _then(_$QuantitySubmittedImpl(
+      null == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
   }
 }
 
@@ -977,9 +971,7 @@ class _$QuantitySubmittedImpl implements _QuantitySubmitted {
   @pragma('vm:prefer-inline')
   _$$QuantitySubmittedImplCopyWith<_$QuantitySubmittedImpl> get copyWith =>
       __$$QuantitySubmittedImplCopyWithImpl<_$QuantitySubmittedImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -996,7 +988,7 @@ class _$QuantitySubmittedImpl implements _QuantitySubmitted {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return quantitySubmitted(quantity);
   }
@@ -1016,7 +1008,7 @@ class _$QuantitySubmittedImpl implements _QuantitySubmitted {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return quantitySubmitted?.call(quantity);
   }
@@ -1054,7 +1046,7 @@ class _$QuantitySubmittedImpl implements _QuantitySubmitted {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -1120,9 +1112,8 @@ abstract class _QuantitySubmitted implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$SwitchTabImplCopyWith<$Res> {
   factory _$$SwitchTabImplCopyWith(
-    _$SwitchTabImpl value,
-    $Res Function(_$SwitchTabImpl) then,
-  ) = __$$SwitchTabImplCopyWithImpl<$Res>;
+          _$SwitchTabImpl value, $Res Function(_$SwitchTabImpl) then) =
+      __$$SwitchTabImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int index});
 }
@@ -1132,21 +1123,20 @@ class __$$SwitchTabImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$SwitchTabImpl>
     implements _$$SwitchTabImplCopyWith<$Res> {
   __$$SwitchTabImplCopyWithImpl(
-    _$SwitchTabImpl _value,
-    $Res Function(_$SwitchTabImpl) _then,
-  ) : super(_value, _then);
+      _$SwitchTabImpl _value, $Res Function(_$SwitchTabImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? index = null}) {
-    return _then(
-      _$SwitchTabImpl(
-        null == index
-            ? _value.index
-            : index // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+  $Res call({
+    Object? index = null,
+  }) {
+    return _then(_$SwitchTabImpl(
+      null == index
+          ? _value.index
+          : index // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
@@ -1195,7 +1185,7 @@ class _$SwitchTabImpl implements _SwitchTab {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return switchTab(index);
   }
@@ -1215,7 +1205,7 @@ class _$SwitchTabImpl implements _SwitchTab {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return switchTab?.call(index);
   }
@@ -1253,7 +1243,7 @@ class _$SwitchTabImpl implements _SwitchTab {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -1318,34 +1308,34 @@ abstract class _SwitchTab implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$ToggleCollectSelectionImplCopyWith<$Res> {
   factory _$$ToggleCollectSelectionImplCopyWith(
-    _$ToggleCollectSelectionImpl value,
-    $Res Function(_$ToggleCollectSelectionImpl) then,
-  ) = __$$ToggleCollectSelectionImplCopyWithImpl<$Res>;
+          _$ToggleCollectSelectionImpl value,
+          $Res Function(_$ToggleCollectSelectionImpl) then) =
+      __$$ToggleCollectSelectionImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String id});
 }
 
 /// @nodoc
 class __$$ToggleCollectSelectionImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectEventCopyWithImpl<$Res, _$ToggleCollectSelectionImpl>
+    extends _$ArrivalCollectEventCopyWithImpl<$Res,
+        _$ToggleCollectSelectionImpl>
     implements _$$ToggleCollectSelectionImplCopyWith<$Res> {
   __$$ToggleCollectSelectionImplCopyWithImpl(
-    _$ToggleCollectSelectionImpl _value,
-    $Res Function(_$ToggleCollectSelectionImpl) _then,
-  ) : super(_value, _then);
+      _$ToggleCollectSelectionImpl _value,
+      $Res Function(_$ToggleCollectSelectionImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? id = null}) {
-    return _then(
-      _$ToggleCollectSelectionImpl(
-        null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? id = null,
+  }) {
+    return _then(_$ToggleCollectSelectionImpl(
+      null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -1377,11 +1367,8 @@ class _$ToggleCollectSelectionImpl implements _ToggleCollectSelection {
   @override
   @pragma('vm:prefer-inline')
   _$$ToggleCollectSelectionImplCopyWith<_$ToggleCollectSelectionImpl>
-  get copyWith =>
-      __$$ToggleCollectSelectionImplCopyWithImpl<_$ToggleCollectSelectionImpl>(
-        this,
-        _$identity,
-      );
+      get copyWith => __$$ToggleCollectSelectionImplCopyWithImpl<
+          _$ToggleCollectSelectionImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1398,7 +1385,7 @@ class _$ToggleCollectSelectionImpl implements _ToggleCollectSelection {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return toggleCollectSelection(id);
   }
@@ -1418,7 +1405,7 @@ class _$ToggleCollectSelectionImpl implements _ToggleCollectSelection {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return toggleCollectSelection?.call(id);
   }
@@ -1456,7 +1443,7 @@ class _$ToggleCollectSelectionImpl implements _ToggleCollectSelection {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -1516,15 +1503,14 @@ abstract class _ToggleCollectSelection implements ArrivalCollectEvent {
   String get id;
   @JsonKey(ignore: true)
   _$$ToggleCollectSelectionImplCopyWith<_$ToggleCollectSelectionImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class _$$DeleteSelectedImplCopyWith<$Res> {
-  factory _$$DeleteSelectedImplCopyWith(
-    _$DeleteSelectedImpl value,
-    $Res Function(_$DeleteSelectedImpl) then,
-  ) = __$$DeleteSelectedImplCopyWithImpl<$Res>;
+  factory _$$DeleteSelectedImplCopyWith(_$DeleteSelectedImpl value,
+          $Res Function(_$DeleteSelectedImpl) then) =
+      __$$DeleteSelectedImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -1532,9 +1518,8 @@ class __$$DeleteSelectedImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$DeleteSelectedImpl>
     implements _$$DeleteSelectedImplCopyWith<$Res> {
   __$$DeleteSelectedImplCopyWithImpl(
-    _$DeleteSelectedImpl _value,
-    $Res Function(_$DeleteSelectedImpl) _then,
-  ) : super(_value, _then);
+      _$DeleteSelectedImpl _value, $Res Function(_$DeleteSelectedImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1571,7 +1556,7 @@ class _$DeleteSelectedImpl implements _DeleteSelected {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return deleteSelected();
   }
@@ -1591,7 +1576,7 @@ class _$DeleteSelectedImpl implements _DeleteSelected {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return deleteSelected?.call();
   }
@@ -1629,7 +1614,7 @@ class _$DeleteSelectedImpl implements _DeleteSelected {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -1689,9 +1674,8 @@ abstract class _DeleteSelected implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$SubmitImplCopyWith<$Res> {
   factory _$$SubmitImplCopyWith(
-    _$SubmitImpl value,
-    $Res Function(_$SubmitImpl) then,
-  ) = __$$SubmitImplCopyWithImpl<$Res>;
+          _$SubmitImpl value, $Res Function(_$SubmitImpl) then) =
+      __$$SubmitImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -1699,9 +1683,8 @@ class __$$SubmitImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$SubmitImpl>
     implements _$$SubmitImplCopyWith<$Res> {
   __$$SubmitImplCopyWithImpl(
-    _$SubmitImpl _value,
-    $Res Function(_$SubmitImpl) _then,
-  ) : super(_value, _then);
+      _$SubmitImpl _value, $Res Function(_$SubmitImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1738,7 +1721,7 @@ class _$SubmitImpl implements _Submit {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return submit();
   }
@@ -1758,7 +1741,7 @@ class _$SubmitImpl implements _Submit {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return submit?.call();
   }
@@ -1796,7 +1779,7 @@ class _$SubmitImpl implements _Submit {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -1855,20 +1838,18 @@ abstract class _Submit implements ArrivalCollectEvent {
 
 /// @nodoc
 abstract class _$$RestoreFromCacheImplCopyWith<$Res> {
-  factory _$$RestoreFromCacheImplCopyWith(
-    _$RestoreFromCacheImpl value,
-    $Res Function(_$RestoreFromCacheImpl) then,
-  ) = __$$RestoreFromCacheImplCopyWithImpl<$Res>;
+  factory _$$RestoreFromCacheImplCopyWith(_$RestoreFromCacheImpl value,
+          $Res Function(_$RestoreFromCacheImpl) then) =
+      __$$RestoreFromCacheImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
 class __$$RestoreFromCacheImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$RestoreFromCacheImpl>
     implements _$$RestoreFromCacheImplCopyWith<$Res> {
-  __$$RestoreFromCacheImplCopyWithImpl(
-    _$RestoreFromCacheImpl _value,
-    $Res Function(_$RestoreFromCacheImpl) _then,
-  ) : super(_value, _then);
+  __$$RestoreFromCacheImplCopyWithImpl(_$RestoreFromCacheImpl _value,
+      $Res Function(_$RestoreFromCacheImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1905,7 +1886,7 @@ class _$RestoreFromCacheImpl implements _RestoreFromCache {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return restoreFromCache();
   }
@@ -1925,7 +1906,7 @@ class _$RestoreFromCacheImpl implements _RestoreFromCache {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return restoreFromCache?.call();
   }
@@ -1963,7 +1944,7 @@ class _$RestoreFromCacheImpl implements _RestoreFromCache {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -2023,9 +2004,8 @@ abstract class _RestoreFromCache implements ArrivalCollectEvent {
 /// @nodoc
 abstract class _$$PersistCacheImplCopyWith<$Res> {
   factory _$$PersistCacheImplCopyWith(
-    _$PersistCacheImpl value,
-    $Res Function(_$PersistCacheImpl) then,
-  ) = __$$PersistCacheImplCopyWithImpl<$Res>;
+          _$PersistCacheImpl value, $Res Function(_$PersistCacheImpl) then) =
+      __$$PersistCacheImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -2033,9 +2013,8 @@ class __$$PersistCacheImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$PersistCacheImpl>
     implements _$$PersistCacheImplCopyWith<$Res> {
   __$$PersistCacheImplCopyWithImpl(
-    _$PersistCacheImpl _value,
-    $Res Function(_$PersistCacheImpl) _then,
-  ) : super(_value, _then);
+      _$PersistCacheImpl _value, $Res Function(_$PersistCacheImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -2072,7 +2051,7 @@ class _$PersistCacheImpl implements _PersistCache {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return persistCache();
   }
@@ -2092,7 +2071,7 @@ class _$PersistCacheImpl implements _PersistCache {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return persistCache?.call();
   }
@@ -2130,7 +2109,7 @@ class _$PersistCacheImpl implements _PersistCache {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -2189,10 +2168,9 @@ abstract class _PersistCache implements ArrivalCollectEvent {
 
 /// @nodoc
 abstract class _$$ResultPageClosedImplCopyWith<$Res> {
-  factory _$$ResultPageClosedImplCopyWith(
-    _$ResultPageClosedImpl value,
-    $Res Function(_$ResultPageClosedImpl) then,
-  ) = __$$ResultPageClosedImplCopyWithImpl<$Res>;
+  factory _$$ResultPageClosedImplCopyWith(_$ResultPageClosedImpl value,
+          $Res Function(_$ResultPageClosedImpl) then) =
+      __$$ResultPageClosedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({List<ArrivalCollectProgress> progresses});
 }
@@ -2201,22 +2179,21 @@ abstract class _$$ResultPageClosedImplCopyWith<$Res> {
 class __$$ResultPageClosedImplCopyWithImpl<$Res>
     extends _$ArrivalCollectEventCopyWithImpl<$Res, _$ResultPageClosedImpl>
     implements _$$ResultPageClosedImplCopyWith<$Res> {
-  __$$ResultPageClosedImplCopyWithImpl(
-    _$ResultPageClosedImpl _value,
-    $Res Function(_$ResultPageClosedImpl) _then,
-  ) : super(_value, _then);
+  __$$ResultPageClosedImplCopyWithImpl(_$ResultPageClosedImpl _value,
+      $Res Function(_$ResultPageClosedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? progresses = null}) {
-    return _then(
-      _$ResultPageClosedImpl(
-        null == progresses
-            ? _value._progresses
-            : progresses // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectProgress>,
-      ),
-    );
+  $Res call({
+    Object? progresses = null,
+  }) {
+    return _then(_$ResultPageClosedImpl(
+      null == progresses
+          ? _value._progresses
+          : progresses // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectProgress>,
+    ));
   }
 }
 
@@ -2224,7 +2201,7 @@ class __$$ResultPageClosedImplCopyWithImpl<$Res>
 
 class _$ResultPageClosedImpl implements _ResultPageClosed {
   const _$ResultPageClosedImpl(final List<ArrivalCollectProgress> progresses)
-    : _progresses = progresses;
+      : _progresses = progresses;
 
   final List<ArrivalCollectProgress> _progresses;
   @override
@@ -2244,26 +2221,20 @@ class _$ResultPageClosedImpl implements _ResultPageClosed {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ResultPageClosedImpl &&
-            const DeepCollectionEquality().equals(
-              other._progresses,
-              _progresses,
-            ));
+            const DeepCollectionEquality()
+                .equals(other._progresses, _progresses));
   }
 
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_progresses),
-  );
+      runtimeType, const DeepCollectionEquality().hash(_progresses));
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ResultPageClosedImplCopyWith<_$ResultPageClosedImpl> get copyWith =>
       __$$ResultPageClosedImplCopyWithImpl<_$ResultPageClosedImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -2280,7 +2251,7 @@ class _$ResultPageClosedImpl implements _ResultPageClosed {
     required TResult Function() restoreFromCache,
     required TResult Function() persistCache,
     required TResult Function(List<ArrivalCollectProgress> progresses)
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return resultPageClosed(progresses);
   }
@@ -2300,7 +2271,7 @@ class _$ResultPageClosedImpl implements _ResultPageClosed {
     TResult? Function()? restoreFromCache,
     TResult? Function()? persistCache,
     TResult? Function(List<ArrivalCollectProgress> progresses)?
-    resultPageClosed,
+        resultPageClosed,
   }) {
     return resultPageClosed?.call(progresses);
   }
@@ -2338,7 +2309,7 @@ class _$ResultPageClosedImpl implements _ResultPageClosed {
     required TResult Function(_QuantitySubmitted value) quantitySubmitted,
     required TResult Function(_SwitchTab value) switchTab,
     required TResult Function(_ToggleCollectSelection value)
-    toggleCollectSelection,
+        toggleCollectSelection,
     required TResult Function(_DeleteSelected value) deleteSelected,
     required TResult Function(_Submit value) submit,
     required TResult Function(_RestoreFromCache value) restoreFromCache,
@@ -2393,8 +2364,7 @@ class _$ResultPageClosedImpl implements _ResultPageClosed {
 
 abstract class _ResultPageClosed implements ArrivalCollectEvent {
   const factory _ResultPageClosed(
-    final List<ArrivalCollectProgress> progresses,
-  ) = _$ResultPageClosedImpl;
+      final List<ArrivalCollectProgress> progresses) = _$ResultPageClosedImpl;
 
   List<ArrivalCollectProgress> get progresses;
   @JsonKey(ignore: true)

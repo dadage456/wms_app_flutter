@@ -12,12 +12,10 @@ part of 'arrival_collect_submit_request.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ArrivalCollectSubmitRequest _$ArrivalCollectSubmitRequestFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _ArrivalCollectSubmitRequest.fromJson(json);
 }
 
@@ -35,36 +33,30 @@ mixin _$ArrivalCollectSubmitRequest {
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ArrivalCollectSubmitRequestCopyWith<ArrivalCollectSubmitRequest>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $ArrivalCollectSubmitRequestCopyWith<$Res> {
   factory $ArrivalCollectSubmitRequestCopyWith(
-    ArrivalCollectSubmitRequest value,
-    $Res Function(ArrivalCollectSubmitRequest) then,
-  ) =
-      _$ArrivalCollectSubmitRequestCopyWithImpl<
-        $Res,
-        ArrivalCollectSubmitRequest
-      >;
+          ArrivalCollectSubmitRequest value,
+          $Res Function(ArrivalCollectSubmitRequest) then) =
+      _$ArrivalCollectSubmitRequestCopyWithImpl<$Res,
+          ArrivalCollectSubmitRequest>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'upShelvesInfos')
-    List<ArrivalCollectSubmitItem> upShelvesInfos,
-    @JsonKey(name: 'itemListInfos')
-    List<ArrivalCollectSubmitItem> itemListInfos,
-    @JsonKey(name: 'filter') ArrivalCollectSubmitFilter? filter,
-  });
+  $Res call(
+      {@JsonKey(name: 'upShelvesInfos')
+      List<ArrivalCollectSubmitItem> upShelvesInfos,
+      @JsonKey(name: 'itemListInfos')
+      List<ArrivalCollectSubmitItem> itemListInfos,
+      @JsonKey(name: 'filter') ArrivalCollectSubmitFilter? filter});
 
   $ArrivalCollectSubmitFilterCopyWith<$Res>? get filter;
 }
 
 /// @nodoc
-class _$ArrivalCollectSubmitRequestCopyWithImpl<
-  $Res,
-  $Val extends ArrivalCollectSubmitRequest
->
+class _$ArrivalCollectSubmitRequestCopyWithImpl<$Res,
+        $Val extends ArrivalCollectSubmitRequest>
     implements $ArrivalCollectSubmitRequestCopyWith<$Res> {
   _$ArrivalCollectSubmitRequestCopyWithImpl(this._value, this._then);
 
@@ -80,23 +72,20 @@ class _$ArrivalCollectSubmitRequestCopyWithImpl<
     Object? itemListInfos = null,
     Object? filter = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            upShelvesInfos: null == upShelvesInfos
-                ? _value.upShelvesInfos
-                : upShelvesInfos // ignore: cast_nullable_to_non_nullable
-                      as List<ArrivalCollectSubmitItem>,
-            itemListInfos: null == itemListInfos
-                ? _value.itemListInfos
-                : itemListInfos // ignore: cast_nullable_to_non_nullable
-                      as List<ArrivalCollectSubmitItem>,
-            filter: freezed == filter
-                ? _value.filter
-                : filter // ignore: cast_nullable_to_non_nullable
-                      as ArrivalCollectSubmitFilter?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      upShelvesInfos: null == upShelvesInfos
+          ? _value.upShelvesInfos
+          : upShelvesInfos // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectSubmitItem>,
+      itemListInfos: null == itemListInfos
+          ? _value.itemListInfos
+          : itemListInfos // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectSubmitItem>,
+      filter: freezed == filter
+          ? _value.filter
+          : filter // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectSubmitFilter?,
+    ) as $Val);
   }
 
   @override
@@ -116,18 +105,17 @@ class _$ArrivalCollectSubmitRequestCopyWithImpl<
 abstract class _$$ArrivalCollectSubmitRequestImplCopyWith<$Res>
     implements $ArrivalCollectSubmitRequestCopyWith<$Res> {
   factory _$$ArrivalCollectSubmitRequestImplCopyWith(
-    _$ArrivalCollectSubmitRequestImpl value,
-    $Res Function(_$ArrivalCollectSubmitRequestImpl) then,
-  ) = __$$ArrivalCollectSubmitRequestImplCopyWithImpl<$Res>;
+          _$ArrivalCollectSubmitRequestImpl value,
+          $Res Function(_$ArrivalCollectSubmitRequestImpl) then) =
+      __$$ArrivalCollectSubmitRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'upShelvesInfos')
-    List<ArrivalCollectSubmitItem> upShelvesInfos,
-    @JsonKey(name: 'itemListInfos')
-    List<ArrivalCollectSubmitItem> itemListInfos,
-    @JsonKey(name: 'filter') ArrivalCollectSubmitFilter? filter,
-  });
+  $Res call(
+      {@JsonKey(name: 'upShelvesInfos')
+      List<ArrivalCollectSubmitItem> upShelvesInfos,
+      @JsonKey(name: 'itemListInfos')
+      List<ArrivalCollectSubmitItem> itemListInfos,
+      @JsonKey(name: 'filter') ArrivalCollectSubmitFilter? filter});
 
   @override
   $ArrivalCollectSubmitFilterCopyWith<$Res>? get filter;
@@ -135,16 +123,13 @@ abstract class _$$ArrivalCollectSubmitRequestImplCopyWith<$Res>
 
 /// @nodoc
 class __$$ArrivalCollectSubmitRequestImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectSubmitRequestCopyWithImpl<
-          $Res,
-          _$ArrivalCollectSubmitRequestImpl
-        >
+    extends _$ArrivalCollectSubmitRequestCopyWithImpl<$Res,
+        _$ArrivalCollectSubmitRequestImpl>
     implements _$$ArrivalCollectSubmitRequestImplCopyWith<$Res> {
   __$$ArrivalCollectSubmitRequestImplCopyWithImpl(
-    _$ArrivalCollectSubmitRequestImpl _value,
-    $Res Function(_$ArrivalCollectSubmitRequestImpl) _then,
-  ) : super(_value, _then);
+      _$ArrivalCollectSubmitRequestImpl _value,
+      $Res Function(_$ArrivalCollectSubmitRequestImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -153,22 +138,20 @@ class __$$ArrivalCollectSubmitRequestImplCopyWithImpl<$Res>
     Object? itemListInfos = null,
     Object? filter = freezed,
   }) {
-    return _then(
-      _$ArrivalCollectSubmitRequestImpl(
-        upShelvesInfos: null == upShelvesInfos
-            ? _value._upShelvesInfos
-            : upShelvesInfos // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectSubmitItem>,
-        itemListInfos: null == itemListInfos
-            ? _value._itemListInfos
-            : itemListInfos // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectSubmitItem>,
-        filter: freezed == filter
-            ? _value.filter
-            : filter // ignore: cast_nullable_to_non_nullable
-                  as ArrivalCollectSubmitFilter?,
-      ),
-    );
+    return _then(_$ArrivalCollectSubmitRequestImpl(
+      upShelvesInfos: null == upShelvesInfos
+          ? _value._upShelvesInfos
+          : upShelvesInfos // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectSubmitItem>,
+      itemListInfos: null == itemListInfos
+          ? _value._itemListInfos
+          : itemListInfos // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectSubmitItem>,
+      filter: freezed == filter
+          ? _value.filter
+          : filter // ignore: cast_nullable_to_non_nullable
+              as ArrivalCollectSubmitFilter?,
+    ));
   }
 }
 
@@ -176,20 +159,20 @@ class __$$ArrivalCollectSubmitRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ArrivalCollectSubmitRequestImpl
     implements _ArrivalCollectSubmitRequest {
-  const _$ArrivalCollectSubmitRequestImpl({
-    @JsonKey(name: 'upShelvesInfos')
-    final List<ArrivalCollectSubmitItem> upShelvesInfos =
-        const <ArrivalCollectSubmitItem>[],
-    @JsonKey(name: 'itemListInfos')
-    final List<ArrivalCollectSubmitItem> itemListInfos =
-        const <ArrivalCollectSubmitItem>[],
-    @JsonKey(name: 'filter') this.filter,
-  }) : _upShelvesInfos = upShelvesInfos,
-       _itemListInfos = itemListInfos;
+  const _$ArrivalCollectSubmitRequestImpl(
+      {@JsonKey(name: 'upShelvesInfos')
+      final List<ArrivalCollectSubmitItem> upShelvesInfos =
+          const <ArrivalCollectSubmitItem>[],
+      @JsonKey(name: 'itemListInfos')
+      final List<ArrivalCollectSubmitItem> itemListInfos =
+          const <ArrivalCollectSubmitItem>[],
+      @JsonKey(name: 'filter') this.filter})
+      : _upShelvesInfos = upShelvesInfos,
+        _itemListInfos = itemListInfos;
 
   factory _$ArrivalCollectSubmitRequestImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ArrivalCollectSubmitRequestImplFromJson(json);
+          Map<String, dynamic> json) =>
+      _$$ArrivalCollectSubmitRequestImplFromJson(json);
 
   final List<ArrivalCollectSubmitItem> _upShelvesInfos;
   @override
@@ -223,50 +206,45 @@ class _$ArrivalCollectSubmitRequestImpl
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ArrivalCollectSubmitRequestImpl &&
-            const DeepCollectionEquality().equals(
-              other._upShelvesInfos,
-              _upShelvesInfos,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._itemListInfos,
-              _itemListInfos,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._upShelvesInfos, _upShelvesInfos) &&
+            const DeepCollectionEquality()
+                .equals(other._itemListInfos, _itemListInfos) &&
             (identical(other.filter, filter) || other.filter == filter));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_upShelvesInfos),
-    const DeepCollectionEquality().hash(_itemListInfos),
-    filter,
-  );
+      runtimeType,
+      const DeepCollectionEquality().hash(_upShelvesInfos),
+      const DeepCollectionEquality().hash(_itemListInfos),
+      filter);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectSubmitRequestImplCopyWith<_$ArrivalCollectSubmitRequestImpl>
-  get copyWith =>
-      __$$ArrivalCollectSubmitRequestImplCopyWithImpl<
-        _$ArrivalCollectSubmitRequestImpl
-      >(this, _$identity);
+      get copyWith => __$$ArrivalCollectSubmitRequestImplCopyWithImpl<
+          _$ArrivalCollectSubmitRequestImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectSubmitRequestImplToJson(this);
+    return _$$ArrivalCollectSubmitRequestImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectSubmitRequest
     implements ArrivalCollectSubmitRequest {
-  const factory _ArrivalCollectSubmitRequest({
-    @JsonKey(name: 'upShelvesInfos')
-    final List<ArrivalCollectSubmitItem> upShelvesInfos,
-    @JsonKey(name: 'itemListInfos')
-    final List<ArrivalCollectSubmitItem> itemListInfos,
-    @JsonKey(name: 'filter') final ArrivalCollectSubmitFilter? filter,
-  }) = _$ArrivalCollectSubmitRequestImpl;
+  const factory _ArrivalCollectSubmitRequest(
+          {@JsonKey(name: 'upShelvesInfos')
+          final List<ArrivalCollectSubmitItem> upShelvesInfos,
+          @JsonKey(name: 'itemListInfos')
+          final List<ArrivalCollectSubmitItem> itemListInfos,
+          @JsonKey(name: 'filter') final ArrivalCollectSubmitFilter? filter}) =
+      _$ArrivalCollectSubmitRequestImpl;
 
   factory _ArrivalCollectSubmitRequest.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectSubmitRequestImpl.fromJson;
@@ -283,12 +261,11 @@ abstract class _ArrivalCollectSubmitRequest
   @override
   @JsonKey(ignore: true)
   _$$ArrivalCollectSubmitRequestImplCopyWith<_$ArrivalCollectSubmitRequestImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 ArrivalCollectSubmitItem _$ArrivalCollectSubmitItemFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _ArrivalCollectSubmitItem.fromJson(json);
 }
 
@@ -311,24 +288,20 @@ mixin _$ArrivalCollectSubmitItem {
 
 /// @nodoc
 abstract class $ArrivalCollectSubmitItemCopyWith<$Res> {
-  factory $ArrivalCollectSubmitItemCopyWith(
-    ArrivalCollectSubmitItem value,
-    $Res Function(ArrivalCollectSubmitItem) then,
-  ) = _$ArrivalCollectSubmitItemCopyWithImpl<$Res, ArrivalCollectSubmitItem>;
+  factory $ArrivalCollectSubmitItemCopyWith(ArrivalCollectSubmitItem value,
+          $Res Function(ArrivalCollectSubmitItem) then) =
+      _$ArrivalCollectSubmitItemCopyWithImpl<$Res, ArrivalCollectSubmitItem>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'matcode') String matCode,
-    @JsonKey(name: 'batchno') String? batchNo,
-    @JsonKey(name: 'sn') String? serialNumber,
-    @JsonKey(name: 'qty') double quantity,
-  });
+  $Res call(
+      {@JsonKey(name: 'matcode') String matCode,
+      @JsonKey(name: 'batchno') String? batchNo,
+      @JsonKey(name: 'sn') String? serialNumber,
+      @JsonKey(name: 'qty') double quantity});
 }
 
 /// @nodoc
-class _$ArrivalCollectSubmitItemCopyWithImpl<
-  $Res,
-  $Val extends ArrivalCollectSubmitItem
->
+class _$ArrivalCollectSubmitItemCopyWithImpl<$Res,
+        $Val extends ArrivalCollectSubmitItem>
     implements $ArrivalCollectSubmitItemCopyWith<$Res> {
   _$ArrivalCollectSubmitItemCopyWithImpl(this._value, this._then);
 
@@ -345,27 +318,24 @@ class _$ArrivalCollectSubmitItemCopyWithImpl<
     Object? serialNumber = freezed,
     Object? quantity = null,
   }) {
-    return _then(
-      _value.copyWith(
-            matCode: null == matCode
-                ? _value.matCode
-                : matCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            batchNo: freezed == batchNo
-                ? _value.batchNo
-                : batchNo // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            serialNumber: freezed == serialNumber
-                ? _value.serialNumber
-                : serialNumber // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            quantity: null == quantity
-                ? _value.quantity
-                : quantity // ignore: cast_nullable_to_non_nullable
-                      as double,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      quantity: null == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
   }
 }
 
@@ -373,31 +343,27 @@ class _$ArrivalCollectSubmitItemCopyWithImpl<
 abstract class _$$ArrivalCollectSubmitItemImplCopyWith<$Res>
     implements $ArrivalCollectSubmitItemCopyWith<$Res> {
   factory _$$ArrivalCollectSubmitItemImplCopyWith(
-    _$ArrivalCollectSubmitItemImpl value,
-    $Res Function(_$ArrivalCollectSubmitItemImpl) then,
-  ) = __$$ArrivalCollectSubmitItemImplCopyWithImpl<$Res>;
+          _$ArrivalCollectSubmitItemImpl value,
+          $Res Function(_$ArrivalCollectSubmitItemImpl) then) =
+      __$$ArrivalCollectSubmitItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'matcode') String matCode,
-    @JsonKey(name: 'batchno') String? batchNo,
-    @JsonKey(name: 'sn') String? serialNumber,
-    @JsonKey(name: 'qty') double quantity,
-  });
+  $Res call(
+      {@JsonKey(name: 'matcode') String matCode,
+      @JsonKey(name: 'batchno') String? batchNo,
+      @JsonKey(name: 'sn') String? serialNumber,
+      @JsonKey(name: 'qty') double quantity});
 }
 
 /// @nodoc
 class __$$ArrivalCollectSubmitItemImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectSubmitItemCopyWithImpl<
-          $Res,
-          _$ArrivalCollectSubmitItemImpl
-        >
+    extends _$ArrivalCollectSubmitItemCopyWithImpl<$Res,
+        _$ArrivalCollectSubmitItemImpl>
     implements _$$ArrivalCollectSubmitItemImplCopyWith<$Res> {
   __$$ArrivalCollectSubmitItemImplCopyWithImpl(
-    _$ArrivalCollectSubmitItemImpl _value,
-    $Res Function(_$ArrivalCollectSubmitItemImpl) _then,
-  ) : super(_value, _then);
+      _$ArrivalCollectSubmitItemImpl _value,
+      $Res Function(_$ArrivalCollectSubmitItemImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -407,38 +373,35 @@ class __$$ArrivalCollectSubmitItemImplCopyWithImpl<$Res>
     Object? serialNumber = freezed,
     Object? quantity = null,
   }) {
-    return _then(
-      _$ArrivalCollectSubmitItemImpl(
-        matCode: null == matCode
-            ? _value.matCode
-            : matCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        batchNo: freezed == batchNo
-            ? _value.batchNo
-            : batchNo // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        serialNumber: freezed == serialNumber
-            ? _value.serialNumber
-            : serialNumber // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        quantity: null == quantity
-            ? _value.quantity
-            : quantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-      ),
-    );
+    return _then(_$ArrivalCollectSubmitItemImpl(
+      matCode: null == matCode
+          ? _value.matCode
+          : matCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchNo: freezed == batchNo
+          ? _value.batchNo
+          : batchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      serialNumber: freezed == serialNumber
+          ? _value.serialNumber
+          : serialNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      quantity: null == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ArrivalCollectSubmitItemImpl implements _ArrivalCollectSubmitItem {
-  const _$ArrivalCollectSubmitItemImpl({
-    @JsonKey(name: 'matcode') required this.matCode,
-    @JsonKey(name: 'batchno') this.batchNo,
-    @JsonKey(name: 'sn') this.serialNumber,
-    @JsonKey(name: 'qty') required this.quantity,
-  });
+  const _$ArrivalCollectSubmitItemImpl(
+      {@JsonKey(name: 'matcode') required this.matCode,
+      @JsonKey(name: 'batchno') this.batchNo,
+      @JsonKey(name: 'sn') this.serialNumber,
+      @JsonKey(name: 'qty') required this.quantity});
 
   factory _$ArrivalCollectSubmitItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArrivalCollectSubmitItemImplFromJson(json);
@@ -483,24 +446,24 @@ class _$ArrivalCollectSubmitItemImpl implements _ArrivalCollectSubmitItem {
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectSubmitItemImplCopyWith<_$ArrivalCollectSubmitItemImpl>
-  get copyWith =>
-      __$$ArrivalCollectSubmitItemImplCopyWithImpl<
-        _$ArrivalCollectSubmitItemImpl
-      >(this, _$identity);
+      get copyWith => __$$ArrivalCollectSubmitItemImplCopyWithImpl<
+          _$ArrivalCollectSubmitItemImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectSubmitItemImplToJson(this);
+    return _$$ArrivalCollectSubmitItemImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectSubmitItem implements ArrivalCollectSubmitItem {
-  const factory _ArrivalCollectSubmitItem({
-    @JsonKey(name: 'matcode') required final String matCode,
-    @JsonKey(name: 'batchno') final String? batchNo,
-    @JsonKey(name: 'sn') final String? serialNumber,
-    @JsonKey(name: 'qty') required final double quantity,
-  }) = _$ArrivalCollectSubmitItemImpl;
+  const factory _ArrivalCollectSubmitItem(
+          {@JsonKey(name: 'matcode') required final String matCode,
+          @JsonKey(name: 'batchno') final String? batchNo,
+          @JsonKey(name: 'sn') final String? serialNumber,
+          @JsonKey(name: 'qty') required final double quantity}) =
+      _$ArrivalCollectSubmitItemImpl;
 
   factory _ArrivalCollectSubmitItem.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectSubmitItemImpl.fromJson;
@@ -520,12 +483,11 @@ abstract class _ArrivalCollectSubmitItem implements ArrivalCollectSubmitItem {
   @override
   @JsonKey(ignore: true)
   _$$ArrivalCollectSubmitItemImplCopyWith<_$ArrivalCollectSubmitItemImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 ArrivalCollectSubmitFilter _$ArrivalCollectSubmitFilterFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _ArrivalCollectSubmitFilter.fromJson(json);
 }
 
@@ -539,31 +501,24 @@ mixin _$ArrivalCollectSubmitFilter {
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ArrivalCollectSubmitFilterCopyWith<ArrivalCollectSubmitFilter>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $ArrivalCollectSubmitFilterCopyWith<$Res> {
-  factory $ArrivalCollectSubmitFilterCopyWith(
-    ArrivalCollectSubmitFilter value,
-    $Res Function(ArrivalCollectSubmitFilter) then,
-  ) =
-      _$ArrivalCollectSubmitFilterCopyWithImpl<
-        $Res,
-        ArrivalCollectSubmitFilter
-      >;
+  factory $ArrivalCollectSubmitFilterCopyWith(ArrivalCollectSubmitFilter value,
+          $Res Function(ArrivalCollectSubmitFilter) then) =
+      _$ArrivalCollectSubmitFilterCopyWithImpl<$Res,
+          ArrivalCollectSubmitFilter>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'userCode') String userCode,
-    @JsonKey(name: 'arrivalsBillid') String arrivalsBillId,
-  });
+  $Res call(
+      {@JsonKey(name: 'userCode') String userCode,
+      @JsonKey(name: 'arrivalsBillid') String arrivalsBillId});
 }
 
 /// @nodoc
-class _$ArrivalCollectSubmitFilterCopyWithImpl<
-  $Res,
-  $Val extends ArrivalCollectSubmitFilter
->
+class _$ArrivalCollectSubmitFilterCopyWithImpl<$Res,
+        $Val extends ArrivalCollectSubmitFilter>
     implements $ArrivalCollectSubmitFilterCopyWith<$Res> {
   _$ArrivalCollectSubmitFilterCopyWithImpl(this._value, this._then);
 
@@ -574,20 +529,20 @@ class _$ArrivalCollectSubmitFilterCopyWithImpl<
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? userCode = null, Object? arrivalsBillId = null}) {
-    return _then(
-      _value.copyWith(
-            userCode: null == userCode
-                ? _value.userCode
-                : userCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            arrivalsBillId: null == arrivalsBillId
-                ? _value.arrivalsBillId
-                : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? userCode = null,
+    Object? arrivalsBillId = null,
+  }) {
+    return _then(_value.copyWith(
+      userCode: null == userCode
+          ? _value.userCode
+          : userCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      arrivalsBillId: null == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
@@ -595,59 +550,55 @@ class _$ArrivalCollectSubmitFilterCopyWithImpl<
 abstract class _$$ArrivalCollectSubmitFilterImplCopyWith<$Res>
     implements $ArrivalCollectSubmitFilterCopyWith<$Res> {
   factory _$$ArrivalCollectSubmitFilterImplCopyWith(
-    _$ArrivalCollectSubmitFilterImpl value,
-    $Res Function(_$ArrivalCollectSubmitFilterImpl) then,
-  ) = __$$ArrivalCollectSubmitFilterImplCopyWithImpl<$Res>;
+          _$ArrivalCollectSubmitFilterImpl value,
+          $Res Function(_$ArrivalCollectSubmitFilterImpl) then) =
+      __$$ArrivalCollectSubmitFilterImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'userCode') String userCode,
-    @JsonKey(name: 'arrivalsBillid') String arrivalsBillId,
-  });
+  $Res call(
+      {@JsonKey(name: 'userCode') String userCode,
+      @JsonKey(name: 'arrivalsBillid') String arrivalsBillId});
 }
 
 /// @nodoc
 class __$$ArrivalCollectSubmitFilterImplCopyWithImpl<$Res>
-    extends
-        _$ArrivalCollectSubmitFilterCopyWithImpl<
-          $Res,
-          _$ArrivalCollectSubmitFilterImpl
-        >
+    extends _$ArrivalCollectSubmitFilterCopyWithImpl<$Res,
+        _$ArrivalCollectSubmitFilterImpl>
     implements _$$ArrivalCollectSubmitFilterImplCopyWith<$Res> {
   __$$ArrivalCollectSubmitFilterImplCopyWithImpl(
-    _$ArrivalCollectSubmitFilterImpl _value,
-    $Res Function(_$ArrivalCollectSubmitFilterImpl) _then,
-  ) : super(_value, _then);
+      _$ArrivalCollectSubmitFilterImpl _value,
+      $Res Function(_$ArrivalCollectSubmitFilterImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? userCode = null, Object? arrivalsBillId = null}) {
-    return _then(
-      _$ArrivalCollectSubmitFilterImpl(
-        userCode: null == userCode
-            ? _value.userCode
-            : userCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        arrivalsBillId: null == arrivalsBillId
-            ? _value.arrivalsBillId
-            : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? userCode = null,
+    Object? arrivalsBillId = null,
+  }) {
+    return _then(_$ArrivalCollectSubmitFilterImpl(
+      userCode: null == userCode
+          ? _value.userCode
+          : userCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      arrivalsBillId: null == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ArrivalCollectSubmitFilterImpl implements _ArrivalCollectSubmitFilter {
-  const _$ArrivalCollectSubmitFilterImpl({
-    @JsonKey(name: 'userCode') required this.userCode,
-    @JsonKey(name: 'arrivalsBillid') required this.arrivalsBillId,
-  });
+  const _$ArrivalCollectSubmitFilterImpl(
+      {@JsonKey(name: 'userCode') required this.userCode,
+      @JsonKey(name: 'arrivalsBillid') required this.arrivalsBillId});
 
   factory _$ArrivalCollectSubmitFilterImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ArrivalCollectSubmitFilterImplFromJson(json);
+          Map<String, dynamic> json) =>
+      _$$ArrivalCollectSubmitFilterImplFromJson(json);
 
   @override
   @JsonKey(name: 'userCode')
@@ -680,23 +631,23 @@ class _$ArrivalCollectSubmitFilterImpl implements _ArrivalCollectSubmitFilter {
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectSubmitFilterImplCopyWith<_$ArrivalCollectSubmitFilterImpl>
-  get copyWith =>
-      __$$ArrivalCollectSubmitFilterImplCopyWithImpl<
-        _$ArrivalCollectSubmitFilterImpl
-      >(this, _$identity);
+      get copyWith => __$$ArrivalCollectSubmitFilterImplCopyWithImpl<
+          _$ArrivalCollectSubmitFilterImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectSubmitFilterImplToJson(this);
+    return _$$ArrivalCollectSubmitFilterImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectSubmitFilter
     implements ArrivalCollectSubmitFilter {
-  const factory _ArrivalCollectSubmitFilter({
-    @JsonKey(name: 'userCode') required final String userCode,
-    @JsonKey(name: 'arrivalsBillid') required final String arrivalsBillId,
-  }) = _$ArrivalCollectSubmitFilterImpl;
+  const factory _ArrivalCollectSubmitFilter(
+      {@JsonKey(name: 'userCode') required final String userCode,
+      @JsonKey(name: 'arrivalsBillid')
+      required final String arrivalsBillId}) = _$ArrivalCollectSubmitFilterImpl;
 
   factory _ArrivalCollectSubmitFilter.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectSubmitFilterImpl.fromJson;
@@ -710,5 +661,5 @@ abstract class _ArrivalCollectSubmitFilter
   @override
   @JsonKey(ignore: true)
   _$$ArrivalCollectSubmitFilterImplCopyWith<_$ArrivalCollectSubmitFilterImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }

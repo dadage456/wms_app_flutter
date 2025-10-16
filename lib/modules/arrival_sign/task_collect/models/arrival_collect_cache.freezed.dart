@@ -12,8 +12,7 @@ part of 'arrival_collect_cache.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ArrivalCollectCache _$ArrivalCollectCacheFromJson(Map<String, dynamic> json) {
   return _ArrivalCollectCache.fromJson(json);
@@ -35,15 +34,13 @@ mixin _$ArrivalCollectCache {
 /// @nodoc
 abstract class $ArrivalCollectCacheCopyWith<$Res> {
   factory $ArrivalCollectCacheCopyWith(
-    ArrivalCollectCache value,
-    $Res Function(ArrivalCollectCache) then,
-  ) = _$ArrivalCollectCacheCopyWithImpl<$Res, ArrivalCollectCache>;
+          ArrivalCollectCache value, $Res Function(ArrivalCollectCache) then) =
+      _$ArrivalCollectCacheCopyWithImpl<$Res, ArrivalCollectCache>;
   @useResult
-  $Res call({
-    List<ArrivalCollectProgress> progresses,
-    bool hasPendingSubmit,
-    String? arrivalsBillId,
-  });
+  $Res call(
+      {List<ArrivalCollectProgress> progresses,
+      bool hasPendingSubmit,
+      String? arrivalsBillId});
 }
 
 /// @nodoc
@@ -63,50 +60,44 @@ class _$ArrivalCollectCacheCopyWithImpl<$Res, $Val extends ArrivalCollectCache>
     Object? hasPendingSubmit = null,
     Object? arrivalsBillId = freezed,
   }) {
-    return _then(
-      _value.copyWith(
-            progresses: null == progresses
-                ? _value.progresses
-                : progresses // ignore: cast_nullable_to_non_nullable
-                      as List<ArrivalCollectProgress>,
-            hasPendingSubmit: null == hasPendingSubmit
-                ? _value.hasPendingSubmit
-                : hasPendingSubmit // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            arrivalsBillId: freezed == arrivalsBillId
-                ? _value.arrivalsBillId
-                : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      progresses: null == progresses
+          ? _value.progresses
+          : progresses // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectProgress>,
+      hasPendingSubmit: null == hasPendingSubmit
+          ? _value.hasPendingSubmit
+          : hasPendingSubmit // ignore: cast_nullable_to_non_nullable
+              as bool,
+      arrivalsBillId: freezed == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$ArrivalCollectCacheImplCopyWith<$Res>
     implements $ArrivalCollectCacheCopyWith<$Res> {
-  factory _$$ArrivalCollectCacheImplCopyWith(
-    _$ArrivalCollectCacheImpl value,
-    $Res Function(_$ArrivalCollectCacheImpl) then,
-  ) = __$$ArrivalCollectCacheImplCopyWithImpl<$Res>;
+  factory _$$ArrivalCollectCacheImplCopyWith(_$ArrivalCollectCacheImpl value,
+          $Res Function(_$ArrivalCollectCacheImpl) then) =
+      __$$ArrivalCollectCacheImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    List<ArrivalCollectProgress> progresses,
-    bool hasPendingSubmit,
-    String? arrivalsBillId,
-  });
+  $Res call(
+      {List<ArrivalCollectProgress> progresses,
+      bool hasPendingSubmit,
+      String? arrivalsBillId});
 }
 
 /// @nodoc
 class __$$ArrivalCollectCacheImplCopyWithImpl<$Res>
     extends _$ArrivalCollectCacheCopyWithImpl<$Res, _$ArrivalCollectCacheImpl>
     implements _$$ArrivalCollectCacheImplCopyWith<$Res> {
-  __$$ArrivalCollectCacheImplCopyWithImpl(
-    _$ArrivalCollectCacheImpl _value,
-    $Res Function(_$ArrivalCollectCacheImpl) _then,
-  ) : super(_value, _then);
+  __$$ArrivalCollectCacheImplCopyWithImpl(_$ArrivalCollectCacheImpl _value,
+      $Res Function(_$ArrivalCollectCacheImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -115,22 +106,20 @@ class __$$ArrivalCollectCacheImplCopyWithImpl<$Res>
     Object? hasPendingSubmit = null,
     Object? arrivalsBillId = freezed,
   }) {
-    return _then(
-      _$ArrivalCollectCacheImpl(
-        progresses: null == progresses
-            ? _value._progresses
-            : progresses // ignore: cast_nullable_to_non_nullable
-                  as List<ArrivalCollectProgress>,
-        hasPendingSubmit: null == hasPendingSubmit
-            ? _value.hasPendingSubmit
-            : hasPendingSubmit // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        arrivalsBillId: freezed == arrivalsBillId
-            ? _value.arrivalsBillId
-            : arrivalsBillId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
+    return _then(_$ArrivalCollectCacheImpl(
+      progresses: null == progresses
+          ? _value._progresses
+          : progresses // ignore: cast_nullable_to_non_nullable
+              as List<ArrivalCollectProgress>,
+      hasPendingSubmit: null == hasPendingSubmit
+          ? _value.hasPendingSubmit
+          : hasPendingSubmit // ignore: cast_nullable_to_non_nullable
+              as bool,
+      arrivalsBillId: freezed == arrivalsBillId
+          ? _value.arrivalsBillId
+          : arrivalsBillId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
   }
 }
 
@@ -138,12 +127,12 @@ class __$$ArrivalCollectCacheImplCopyWithImpl<$Res>
 
 @JsonSerializable(explicitToJson: true)
 class _$ArrivalCollectCacheImpl implements _ArrivalCollectCache {
-  const _$ArrivalCollectCacheImpl({
-    final List<ArrivalCollectProgress> progresses =
-        const <ArrivalCollectProgress>[],
-    this.hasPendingSubmit = false,
-    this.arrivalsBillId,
-  }) : _progresses = progresses;
+  const _$ArrivalCollectCacheImpl(
+      {final List<ArrivalCollectProgress> progresses =
+          const <ArrivalCollectProgress>[],
+      this.hasPendingSubmit = false,
+      this.arrivalsBillId})
+      : _progresses = progresses;
 
   factory _$ArrivalCollectCacheImpl.fromJson(Map<String, dynamic> json) =>
       _$$ArrivalCollectCacheImplFromJson(json);
@@ -173,10 +162,8 @@ class _$ArrivalCollectCacheImpl implements _ArrivalCollectCache {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ArrivalCollectCacheImpl &&
-            const DeepCollectionEquality().equals(
-              other._progresses,
-              _progresses,
-            ) &&
+            const DeepCollectionEquality()
+                .equals(other._progresses, _progresses) &&
             (identical(other.hasPendingSubmit, hasPendingSubmit) ||
                 other.hasPendingSubmit == hasPendingSubmit) &&
             (identical(other.arrivalsBillId, arrivalsBillId) ||
@@ -186,33 +173,31 @@ class _$ArrivalCollectCacheImpl implements _ArrivalCollectCache {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_progresses),
-    hasPendingSubmit,
-    arrivalsBillId,
-  );
+      runtimeType,
+      const DeepCollectionEquality().hash(_progresses),
+      hasPendingSubmit,
+      arrivalsBillId);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$ArrivalCollectCacheImplCopyWith<_$ArrivalCollectCacheImpl> get copyWith =>
       __$$ArrivalCollectCacheImplCopyWithImpl<_$ArrivalCollectCacheImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ArrivalCollectCacheImplToJson(this);
+    return _$$ArrivalCollectCacheImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _ArrivalCollectCache implements ArrivalCollectCache {
-  const factory _ArrivalCollectCache({
-    final List<ArrivalCollectProgress> progresses,
-    final bool hasPendingSubmit,
-    final String? arrivalsBillId,
-  }) = _$ArrivalCollectCacheImpl;
+  const factory _ArrivalCollectCache(
+      {final List<ArrivalCollectProgress> progresses,
+      final bool hasPendingSubmit,
+      final String? arrivalsBillId}) = _$ArrivalCollectCacheImpl;
 
   factory _ArrivalCollectCache.fromJson(Map<String, dynamic> json) =
       _$ArrivalCollectCacheImpl.fromJson;
