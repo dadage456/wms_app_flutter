@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
+import 'package:wms_app/common_widgets/common_grid/selection_action_bar.dart';
+import 'package:wms_app/modules/aswh_down/collection_task/config/online_pick_collection_result_grid_config.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
 
 class OnlinePickCollectionResultPage extends StatefulWidget {
@@ -20,6 +23,7 @@ class _OnlinePickCollectionResultPageState
   late final String _trayNo;
   late final String _location;
   bool _modified = false;
+  List<int> _selectedRows = const [];
 
   @override
   void initState() {
@@ -28,6 +32,9 @@ class _OnlinePickCollectionResultPageState
     _trayNo = widget.initialArgs['trayNo']?.toString() ?? '';
     _location = widget.initialArgs['location']?.toString() ?? '';
   }
+
+  bool get _allSelected =>
+      _stocks.isNotEmpty && _selectedRows.length == _stocks.length;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +51,14 @@ class _OnlinePickCollectionResultPageState
           actions: [
             if (_stocks.isNotEmpty)
               IconButton(
+                tooltip: _allSelected ? '取消全选' : '全选',
+                icon: Icon(
+                  _allSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                ),
+                onPressed: _toggleSelectAll,
+              ),
+            if (_stocks.isNotEmpty)
+              IconButton(
                 tooltip: '同步采集页',
                 icon: const Icon(Icons.check_circle_outline),
                 onPressed: _returnWithResult,
@@ -57,52 +72,27 @@ class _OnlinePickCollectionResultPageState
             Expanded(
               child: _stocks.isEmpty
                   ? const Center(child: Text('当前暂无采集记录'))
-                  : ListView.separated(
-                      itemCount: _stocks.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final stock = _stocks[index];
-                        return Dismissible(
-                          key: ValueKey('${stock.stockId}-$index'),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            color: Colors.redAccent,
-                            child: const Icon(Icons.delete_outline, color: Colors.white),
-                          ),
-                          confirmDismiss: (_) => _confirmRemove(context, stock),
-                          onDismissed: (_) => _removeStock(index, stock),
-                          child: ListTile(
-                            title: Text(
-                              stock.materialCode,
-                              style: theme.textTheme.titleMedium,
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (stock.batchNo?.isNotEmpty ?? false)
-                                  Text('批次：${stock.batchNo}')
-                                else if (stock.serialNumber?.isNotEmpty ?? false)
-                                  Text('序列：${stock.serialNumber}'),
-                                Text('库位：${stock.storeSite ?? '-'}'),
-                                if (stock.trayNo?.isNotEmpty ?? false)
-                                  Text('托盘：${stock.trayNo}'),
-                                if (stock.erpStore?.isNotEmpty ?? false)
-                                  Text('子库：${stock.erpStore}'),
-                              ],
-                            ),
-                            trailing: Text(
-                              stock.collectQty.toString(),
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        );
+                  : CommonDataGrid<OnlinePickCollectionStock>(
+                      columns:
+                          OnlinePickCollectionResultGridConfig.columns(),
+                      datas: _stocks,
+                      allowPager: false,
+                      allowSelect: true,
+                      selectedRows: _selectedRows,
+                      onSelectionChanged: (rows) {
+                        setState(() {
+                          _selectedRows = rows;
+                        });
                       },
+                      onLoadData: (_) async {},
                     ),
+            ),
+            SelectionActionBar(
+              selectedCount: _selectedRows.length,
+              totalCount: _stocks.length,
+              confirmLabel: '删除',
+              onConfirm: _confirmDelete,
+              onClear: () => setState(() => _selectedRows = const []),
             ),
           ],
         ),
@@ -176,15 +166,19 @@ class _OnlinePickCollectionResultPageState
         .toList();
   }
 
-  Future<bool> _confirmRemove(
-    BuildContext context,
-    OnlinePickCollectionStock stock,
-  ) async {
-    return await showDialog<bool>(
+  Future<void> _confirmDelete() async {
+    if (_selectedRows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请先选择需要删除的记录')),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('删除记录'),
-            content: Text('确定移除物料【${stock.materialCode}】的采集记录吗？'),
+            title: const Text('删除采集记录'),
+            content: Text('确定要删除选中的 ${_selectedRows.length} 条记录吗？'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -198,27 +192,44 @@ class _OnlinePickCollectionResultPageState
           ),
         ) ??
         false;
+
+    if (!confirmed) return;
+    _performDelete();
   }
 
-  void _removeStock(int index, OnlinePickCollectionStock stock) {
+  void _performDelete() {
+    final set = _selectedRows.toSet();
+    final removedCount = set.length;
+    final remaining = _stocks
+        .asMap()
+        .entries
+        .where((entry) => !set.contains(entry.key))
+        .map((entry) => entry.value)
+        .toList();
+
     setState(() {
-      _stocks.removeAt(index);
+      _stocks = remaining;
+      _selectedRows = const [];
       _modified = true;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('已删除 ${stock.materialCode} 的采集记录'),
-        action: SnackBarAction(
-          label: '撤销',
-          onPressed: () {
-            setState(() {
-              _stocks.insert(index, stock);
-            });
-          },
-        ),
+        content: Text('已删除 $removedCount 条采集记录'),
+        duration: const Duration(seconds: 1),
       ),
     );
+  }
+
+  void _toggleSelectAll() {
+    setState(() {
+      if (_allSelected) {
+        _selectedRows = const [];
+      } else {
+        _selectedRows =
+            List<int>.generate(_stocks.length, (index) => index);
+      }
+    });
   }
 
   void _returnWithResult() {
