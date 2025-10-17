@@ -1,11 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
 
 part of 'inventory_pallet_item.dart';
 
-_$_InventoryPalletItem _$$_InventoryPalletItemFromJson(
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$InventoryPalletItemImpl _$$InventoryPalletItemImplFromJson(
         Map<String, dynamic> json) =>
-    _$_InventoryPalletItem(
+    _$InventoryPalletItemImpl(
       palletNo: json['palletNo'] as String?,
       materialCode: json['matcode'] as String?,
       materialName: json['matname'] as String?,
@@ -18,8 +21,8 @@ _$_InventoryPalletItem _$$_InventoryPalletItemFromJson(
       storeRoom: json['storeroomno'] as String?,
     );
 
-Map<String, dynamic> _$$_InventoryPalletItemToJson(
-        _$_InventoryPalletItem instance) =>
+Map<String, dynamic> _$$InventoryPalletItemImplToJson(
+        _$InventoryPalletItemImpl instance) =>
     <String, dynamic>{
       'palletNo': instance.palletNo,
       'matcode': instance.materialCode,

@@ -7,6 +7,7 @@ Flutter 版本的仓储管理系统应用，替换原有 UniApp 平库作业。�
 - `/goods-up`：平库上架（任务列表、明细、采集、接收）。
   - `/goods-up/receive`：上架接收任务列表。
   - `/goods-up/receive/detail/:inTaskId`：接收任务明细，支持多选批量接收。
+- `/mtl-senter`：拉式发料采集（库位/物料扫码、数量采集、批量提交）。
 
 首页功能卡片会跳转到上述模块；在上架任务列表页面的右上角「接收」入口会直达接收任务列表。
 
@@ -24,7 +25,7 @@ Flutter 版本的仓储管理系统应用，替换原有 UniApp 平库作业。�
    flutter test
    ```
 
-本仓库在 `test/modules/goods_up` 下提供了服务与接收 BLoC 的基础用例，可在本地验证 API 参数映射与状态流转。
+本仓库在 `test/modules/goods_up` 与 `test/modules/mtl_senter` 下提供服务与采集流程的测试用例，可在本地验证 API 参数映射与状态流转。
 
 ## 相关文档
 - `docs/goods_up_todo.md`：平库上架重构任务清单及完成标记。

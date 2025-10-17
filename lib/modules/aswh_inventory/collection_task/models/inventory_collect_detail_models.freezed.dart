@@ -1,10 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package,
-// use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null,
-// invalid_override_different_default_values_named, prefer_expression_function_bodies,
-// annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'inventory_collect_detail_models.dart';
 
@@ -80,19 +77,18 @@ abstract class $InventoryCollectedItemCopyWith<$Res> {
           $Res Function(InventoryCollectedItem) then) =
       _$InventoryCollectedItemCopyWithImpl<$Res, InventoryCollectedItem>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'stockid') String stockId,
-    @JsonKey(name: 'InvTaskItemid') String invTaskItemId,
-    @JsonKey(name: 'InventoryQty') double sourceQty,
-    @JsonKey(name: 'matcode') String materialCode,
-    @JsonKey(name: 'matname') String? materialName,
-    @JsonKey(name: 'batchno') String? batchNo,
-    @JsonKey(name: 'sn') String? serialNo,
-    @JsonKey(name: 'storeRoom') String storeRoomNo,
-    @JsonKey(name: 'storeSite') String storeSiteNo,
-    @JsonKey(name: 'TrayNo') String? trayNo,
-    @JsonKey(name: 'MatId') String? materialId,
-  });
+  $Res call(
+      {@JsonKey(name: 'stockid') String stockId,
+      @JsonKey(name: 'InvTaskItemid') String invTaskItemId,
+      @JsonKey(name: 'InventoryQty') double sourceQty,
+      @JsonKey(name: 'matcode') String materialCode,
+      @JsonKey(name: 'matname') String? materialName,
+      @JsonKey(name: 'batchno') String? batchNo,
+      @JsonKey(name: 'sn') String? serialNo,
+      @JsonKey(name: 'storeRoom') String storeRoomNo,
+      @JsonKey(name: 'storeSite') String storeSiteNo,
+      @JsonKey(name: 'TrayNo') String? trayNo,
+      @JsonKey(name: 'MatId') String? materialId});
 }
 
 /// @nodoc
@@ -101,7 +97,9 @@ class _$InventoryCollectedItemCopyWithImpl<$Res,
     implements $InventoryCollectedItemCopyWith<$Res> {
   _$InventoryCollectedItemCopyWithImpl(this._value, this._then);
 
+  // ignore: unused_field
   final $Val _value;
+  // ignore: unused_field
   final $Res Function($Val) _then;
 
   @pragma('vm:prefer-inline')
@@ -177,19 +175,18 @@ abstract class _$$InventoryCollectedItemImplCopyWith<$Res>
       __$$InventoryCollectedItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'stockid') String stockId,
-    @JsonKey(name: 'InvTaskItemid') String invTaskItemId,
-    @JsonKey(name: 'InventoryQty') double sourceQty,
-    @JsonKey(name: 'matcode') String materialCode,
-    @JsonKey(name: 'matname') String? materialName,
-    @JsonKey(name: 'batchno') String? batchNo,
-    @JsonKey(name: 'sn') String? serialNo,
-    @JsonKey(name: 'storeRoom') String storeRoomNo,
-    @JsonKey(name: 'storeSite') String storeSiteNo,
-    @JsonKey(name: 'TrayNo') String? trayNo,
-    @JsonKey(name: 'MatId') String? materialId,
-  });
+  $Res call(
+      {@JsonKey(name: 'stockid') String stockId,
+      @JsonKey(name: 'InvTaskItemid') String invTaskItemId,
+      @JsonKey(name: 'InventoryQty') double sourceQty,
+      @JsonKey(name: 'matcode') String materialCode,
+      @JsonKey(name: 'matname') String? materialName,
+      @JsonKey(name: 'batchno') String? batchNo,
+      @JsonKey(name: 'sn') String? serialNo,
+      @JsonKey(name: 'storeRoom') String storeRoomNo,
+      @JsonKey(name: 'storeSite') String storeSiteNo,
+      @JsonKey(name: 'TrayNo') String? trayNo,
+      @JsonKey(name: 'MatId') String? materialId});
 }
 
 /// @nodoc
@@ -269,53 +266,73 @@ class __$$InventoryCollectedItemImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$InventoryCollectedItemImpl implements _InventoryCollectedItem {
-  const _$InventoryCollectedItemImpl({
-    @JsonKey(name: 'stockid') required this.stockId,
-    @JsonKey(name: 'InvTaskItemid') required this.invTaskItemId,
-    @JsonKey(name: 'InventoryQty') this.sourceQty = 0,
-    @JsonKey(name: 'matcode') required this.materialCode,
-    @JsonKey(name: 'matname') this.materialName,
-    @JsonKey(name: 'batchno') this.batchNo,
-    @JsonKey(name: 'sn') this.serialNo,
-    @JsonKey(name: 'storeRoom') required this.storeRoomNo,
-    @JsonKey(name: 'storeSite') required this.storeSiteNo,
-    @JsonKey(name: 'TrayNo') this.trayNo,
-    @JsonKey(name: 'MatId') this.materialId,
-  });
+  const _$InventoryCollectedItemImpl(
+      {@JsonKey(name: 'stockid') required this.stockId,
+      @JsonKey(name: 'InvTaskItemid') required this.invTaskItemId,
+      @JsonKey(name: 'InventoryQty') this.sourceQty = 0,
+      @JsonKey(name: 'matcode') required this.materialCode,
+      @JsonKey(name: 'matname') this.materialName,
+      @JsonKey(name: 'batchno') this.batchNo,
+      @JsonKey(name: 'sn') this.serialNo,
+      @JsonKey(name: 'storeRoom') required this.storeRoomNo,
+      @JsonKey(name: 'storeSite') required this.storeSiteNo,
+      @JsonKey(name: 'TrayNo') this.trayNo,
+      @JsonKey(name: 'MatId') this.materialId});
 
   factory _$InventoryCollectedItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryCollectedItemImplFromJson(json);
 
+  /// 本地缓存记录ID
   @override
   @JsonKey(name: 'stockid')
   final String stockId;
+
+  /// 对应的盘点任务明细ID
   @override
   @JsonKey(name: 'InvTaskItemid')
   final String invTaskItemId;
+
+  /// 采集数量（源数量）
   @override
   @JsonKey(name: 'InventoryQty')
   final double sourceQty;
+
+  /// 物料编码
   @override
   @JsonKey(name: 'matcode')
   final String materialCode;
+
+  /// 物料名称
   @override
   @JsonKey(name: 'matname')
   final String? materialName;
+
+  /// 批次号
   @override
   @JsonKey(name: 'batchno')
   final String? batchNo;
+
+  /// 序列号
   @override
   @JsonKey(name: 'sn')
   final String? serialNo;
+
+  /// 库房编码
   @override
   @JsonKey(name: 'storeRoom')
   final String storeRoomNo;
+
+  /// 库位编码
   @override
   @JsonKey(name: 'storeSite')
   final String storeSiteNo;
+
+  /// 托盘号
   @override
   @JsonKey(name: 'TrayNo')
   final String? trayNo;
+
+  /// 物料主数据ID
   @override
   @JsonKey(name: 'MatId')
   final String? materialId;
@@ -354,19 +371,18 @@ class _$InventoryCollectedItemImpl implements _InventoryCollectedItem {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-        runtimeType,
-        stockId,
-        invTaskItemId,
-        sourceQty,
-        materialCode,
-        materialName,
-        batchNo,
-        serialNo,
-        storeRoomNo,
-        storeSiteNo,
-        trayNo,
-        materialId,
-      );
+      runtimeType,
+      stockId,
+      invTaskItemId,
+      sourceQty,
+      materialCode,
+      materialName,
+      batchNo,
+      serialNo,
+      storeRoomNo,
+      storeSiteNo,
+      trayNo,
+      materialId);
 
   @JsonKey(ignore: true)
   @override
@@ -383,56 +399,77 @@ class _$InventoryCollectedItemImpl implements _InventoryCollectedItem {
   }
 }
 
-/// @nodoc
 abstract class _InventoryCollectedItem implements InventoryCollectedItem {
-  const factory _InventoryCollectedItem({
-    @JsonKey(name: 'stockid') required final String stockId,
-    @JsonKey(name: 'InvTaskItemid') required final String invTaskItemId,
-    @JsonKey(name: 'InventoryQty') final double sourceQty,
-    @JsonKey(name: 'matcode') required final String materialCode,
-    @JsonKey(name: 'matname') final String? materialName,
-    @JsonKey(name: 'batchno') final String? batchNo,
-    @JsonKey(name: 'sn') final String? serialNo,
-    @JsonKey(name: 'storeRoom') required final String storeRoomNo,
-    @JsonKey(name: 'storeSite') required final String storeSiteNo,
-    @JsonKey(name: 'TrayNo') final String? trayNo,
-    @JsonKey(name: 'MatId') final String? materialId,
-  }) = _$InventoryCollectedItemImpl;
+  const factory _InventoryCollectedItem(
+          {@JsonKey(name: 'stockid') required final String stockId,
+          @JsonKey(name: 'InvTaskItemid') required final String invTaskItemId,
+          @JsonKey(name: 'InventoryQty') final double sourceQty,
+          @JsonKey(name: 'matcode') required final String materialCode,
+          @JsonKey(name: 'matname') final String? materialName,
+          @JsonKey(name: 'batchno') final String? batchNo,
+          @JsonKey(name: 'sn') final String? serialNo,
+          @JsonKey(name: 'storeRoom') required final String storeRoomNo,
+          @JsonKey(name: 'storeSite') required final String storeSiteNo,
+          @JsonKey(name: 'TrayNo') final String? trayNo,
+          @JsonKey(name: 'MatId') final String? materialId}) =
+      _$InventoryCollectedItemImpl;
 
   factory _InventoryCollectedItem.fromJson(Map<String, dynamic> json) =
       _$InventoryCollectedItemImpl.fromJson;
 
   @override
+
+  /// 本地缓存记录ID
   @JsonKey(name: 'stockid')
   String get stockId;
   @override
+
+  /// 对应的盘点任务明细ID
   @JsonKey(name: 'InvTaskItemid')
   String get invTaskItemId;
   @override
+
+  /// 采集数量（源数量）
   @JsonKey(name: 'InventoryQty')
   double get sourceQty;
   @override
+
+  /// 物料编码
   @JsonKey(name: 'matcode')
   String get materialCode;
   @override
+
+  /// 物料名称
   @JsonKey(name: 'matname')
   String? get materialName;
   @override
+
+  /// 批次号
   @JsonKey(name: 'batchno')
   String? get batchNo;
   @override
+
+  /// 序列号
   @JsonKey(name: 'sn')
   String? get serialNo;
   @override
+
+  /// 库房编码
   @JsonKey(name: 'storeRoom')
   String get storeRoomNo;
   @override
+
+  /// 库位编码
   @JsonKey(name: 'storeSite')
   String get storeSiteNo;
   @override
+
+  /// 托盘号
   @JsonKey(name: 'TrayNo')
   String? get trayNo;
   @override
+
+  /// 物料主数据ID
   @JsonKey(name: 'MatId')
   String? get materialId;
   @override

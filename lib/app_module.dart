@@ -11,6 +11,7 @@ import 'modules/goods_up/goods_up_module.dart';
 import 'modules/arrival_sign/arrival_sign_module.dart';
 import 'modules/aswh_inventory/aswh_inventory_module.dart';
 import 'modules/inventory_task/inventory_task_module.dart';
+import 'modules/mtl_senter/mtl_senter_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -56,5 +57,8 @@ class AppModule extends Module {
 
     // 平库盘点模块
     r.module('/inventory', module: InventoryTaskModule());
+
+    // 拉式发料模块
+    r.module('/mtl-senter', module: MtlSenterModule());
   }
 }
