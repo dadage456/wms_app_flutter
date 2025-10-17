@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../inventory_query/inventory_query_routes.dart';
+
 /* ---------------- 入口 ---------------- */
 class WMSHomePage extends StatelessWidget {
   const WMSHomePage({super.key});
@@ -293,6 +295,8 @@ class _FunctionGrid extends StatelessWidget {
             Modular.to.pushNamed('/goods-up');
           } else if (f.title == '拉式发料') {
             Modular.to.pushNamed('/mtl-senter');
+          } else if (f.title == '库存查询') {
+            Modular.to.pushNamed(InventoryQueryRoutes.module);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
