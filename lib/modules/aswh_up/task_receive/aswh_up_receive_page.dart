@@ -32,7 +32,6 @@ class _AswhUpReceivePageState extends State<AswhUpReceivePage> {
     super.initState();
     _bloc = BlocProvider.of<AswhUpReceiveBloc>(context);
     _gridBloc = _bloc.gridBloc;
-    _gridBloc.add(LoadDataEvent<AswhUpTask>(0));
   }
 
   @override
@@ -126,7 +125,7 @@ class _AswhUpReceivePageState extends State<AswhUpReceivePage> {
   void _openDetail(AswhUpTask task) {
     Modular.to.pushNamed(
       '/aswh-up/receive/detail/${task.inTaskId}',
-      arguments: {'task': task},
+      arguments: {'task': task, 'workStation': task.workStation},
     );
   }
 }

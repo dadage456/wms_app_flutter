@@ -8,10 +8,7 @@ abstract class AswhUpTaskDetailEvent extends Equatable {
 }
 
 class AswhUpTaskDetailInitialized extends AswhUpTaskDetailEvent {
-  const AswhUpTaskDetailInitialized({
-    required this.taskId,
-    this.workStation,
-  });
+  const AswhUpTaskDetailInitialized({required this.taskId, this.workStation});
 
   final int taskId;
   final String? workStation;
@@ -29,19 +26,6 @@ class AswhUpTaskDetailSearchRequested extends AswhUpTaskDetailEvent {
   List<Object?> get props => [searchKey];
 }
 
-class AswhUpTaskDetailScanSubmitted extends AswhUpTaskDetailEvent {
-  const AswhUpTaskDetailScanSubmitted({required this.content});
-
-  final String content;
-
-  @override
-  List<Object?> get props => [content];
-}
-
-class AswhUpTaskDetailToggleSelection extends AswhUpTaskDetailEvent {
-  const AswhUpTaskDetailToggleSelection();
-}
-
 class AswhUpTaskDetailDeleteSelected extends AswhUpTaskDetailEvent {
   const AswhUpTaskDetailDeleteSelected({required this.selectedRows});
 
@@ -54,22 +38,3 @@ class AswhUpTaskDetailDeleteSelected extends AswhUpTaskDetailEvent {
 class AswhUpTaskDetailRefreshRequested extends AswhUpTaskDetailEvent {
   const AswhUpTaskDetailRefreshRequested();
 }
-
-class AswhUpTaskDetailClearMessage extends AswhUpTaskDetailEvent {
-  const AswhUpTaskDetailClearMessage();
-}
-
-class AswhUpTaskDetailShowMessage extends AswhUpTaskDetailEvent {
-  const AswhUpTaskDetailShowMessage({
-    required this.message,
-    this.type = AswhUpTaskDetailMessageType.info,
-  });
-
-  final String message;
-  final AswhUpTaskDetailMessageType type;
-
-  @override
-  List<Object?> get props => [message, type];
-}
-
-enum AswhUpTaskDetailMessageType { info, warning, error, success }

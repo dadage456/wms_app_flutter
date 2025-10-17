@@ -7,9 +7,16 @@ abstract class AswhUpReceiveDetailEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class InitializeAswhUpReceiveDetailEvent
-    extends AswhUpReceiveDetailEvent {
-  const InitializeAswhUpReceiveDetailEvent();
+class InitializeAswhUpReceiveDetailEvent extends AswhUpReceiveDetailEvent {
+  final int taskId;
+  final String? workStation;
+  const InitializeAswhUpReceiveDetailEvent({
+    required this.taskId,
+    this.workStation,
+  });
+
+  @override
+  List<Object?> get props => [taskId, workStation];
 }
 
 class SearchAswhUpReceiveDetailEvent extends AswhUpReceiveDetailEvent {
@@ -33,4 +40,3 @@ class ReceiveSelectedAswhUpItemsEvent extends AswhUpReceiveDetailEvent {
 class RefreshAswhUpReceiveDetailEvent extends AswhUpReceiveDetailEvent {
   const RefreshAswhUpReceiveDetailEvent();
 }
-

@@ -20,9 +20,14 @@ import 'bloc/aswh_up_receive_detail_event.dart';
 import 'bloc/aswh_up_receive_detail_state.dart';
 
 class AswhUpReceiveDetailPage extends StatefulWidget {
-  const AswhUpReceiveDetailPage({super.key, required this.task});
+  const AswhUpReceiveDetailPage({
+    super.key,
+    required this.taskId,
+    this.workStation,
+  });
 
-  final AswhUpTask task;
+  final int taskId;
+  final String? workStation;
 
   @override
   State<AswhUpReceiveDetailPage> createState() =>
@@ -41,7 +46,13 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
     _bloc = BlocProvider.of<AswhUpReceiveDetailBloc>(context);
     _gridBloc = _bloc.gridBloc;
     _service = Modular.get<AswhUpTaskService>();
-    _bloc.initialize(widget.task);
+
+    _bloc.add(
+      InitializeAswhUpReceiveDetailEvent(
+        taskId: widget.taskId,
+        workStation: widget.workStation,
+      ),
+    );
   }
 
   @override
@@ -89,44 +100,12 @@ class _AswhUpReceiveDetailPageState extends State<AswhUpReceiveDetailPage> {
       config: config,
       controller: _scannerController,
       onScanResult: (value) async {
-        await _handleScanValue(value);
+        _bloc.add(SearchAswhUpReceiveDetailEvent(value));
       },
       onError: (message) {
         LoadingDialogManager.instance.showErrorDialog(context, message);
       },
     );
-  }
-
-  Future<void> _handleScanValue(String value) async {
-    if (value.isEmpty) {
-      LoadingDialogManager.instance.showErrorDialog(context, '采集内容为空，请重新采集');
-      return;
-    }
-
-    try {
-      if (value.contains('MC')) {
-        LoadingDialogManager.instance.showLoadingDialog(context);
-        final info = await _service.getMaterialInfoByQR(value);
-        LoadingDialogManager.instance.hideLoadingDialog(context);
-        if (info.materialCode == null || info.materialCode!.isEmpty) {
-          LoadingDialogManager.instance.showErrorDialog(context, '未识别到物料编码');
-          return;
-        }
-        _bloc.add(SearchAswhUpReceiveDetailEvent(info.materialCode!));
-      } else if (value.contains(r'$KW$')) {
-        final parts = value.split('\$');
-        if (parts.length >= 3) {
-          _bloc.add(SearchAswhUpReceiveDetailEvent(parts[2]));
-        } else {
-          LoadingDialogManager.instance.showErrorDialog(context, '库位条码格式不正确');
-        }
-      } else {
-        LoadingDialogManager.instance.showErrorDialog(context, '采集内容不合法');
-      }
-    } catch (error) {
-      LoadingDialogManager.instance.hideLoadingDialog(context);
-      LoadingDialogManager.instance.showErrorDialog(context, error.toString());
-    }
   }
 
   Widget _buildTable() {

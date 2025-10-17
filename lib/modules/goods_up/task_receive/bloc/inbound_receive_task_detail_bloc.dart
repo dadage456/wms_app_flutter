@@ -53,8 +53,6 @@ class InboundReceiveTaskDetailBloc
       pageIndex: 1,
       pageSize: 100,
     );
-
-    gridBloc.add(LoadDataEvent<GoodsUpTaskItem>(0));
   }
 
   DataGridLoader<GoodsUpTaskItem> _createLoader() {

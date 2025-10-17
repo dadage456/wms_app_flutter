@@ -11,6 +11,7 @@ import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
 import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
 
 import 'package:wms_app/modules/aswh_up/task_details/models/aswh_up_task_detail_item.dart';
+import 'package:wms_app/modules/outbound/task_details/widgets/outbound_batch_action_bar.dart';
 
 import 'bloc/aswh_up_task_detail_bloc.dart';
 import 'bloc/aswh_up_task_detail_event.dart';
@@ -63,14 +64,6 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
       value: _gridBloc,
       child: MultiBlocListener(
         listeners: [
-          BlocListener<AswhUpTaskDetailBloc, AswhUpTaskDetailState>(
-            listener: (context, state) {
-              if (state.message != null) {
-                _showMessage(state);
-                _bloc.add(const AswhUpTaskDetailClearMessage());
-              }
-            },
-          ),
           BlocListener<
             CommonDataGridBloc<AswhUpTaskDetailItem>,
             CommonDataGridState<AswhUpTaskDetailItem>
@@ -131,7 +124,7 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
       config: config,
       controller: _scannerController,
       onScanResult: (value) {
-        _bloc.add(AswhUpTaskDetailScanSubmitted(content: value));
+        _bloc.add(AswhUpTaskDetailSearchRequested(searchKey: value));
       },
       onError: (message) {
         LoadingDialogManager.instance.showErrorDialog(context, message);
@@ -168,107 +161,42 @@ class _AswhUpTaskDetailPageState extends State<AswhUpTaskDetailPage> {
                 dataPagerController: _dataPagerController,
               ),
             ),
-            _buildActionBar(gridState),
+            _buildBatchActionBar(),
           ],
         );
       },
     );
   }
 
-  Widget _buildActionBar(CommonDataGridState<AswhUpTaskDetailItem> gridState) {
-    final selectedCount = gridState.selectedRows.length;
-    final total = gridState.data.length;
+  /// 构建批量操作栏
+  Widget _buildBatchActionBar() {
+    final selectedCount = _gridBloc.state.selectedRows.length;
+    final totalCount = _gridBloc.state.data.length;
+
     if (selectedCount == 0) {
       return const SizedBox.shrink();
     }
 
-    final isAllSelected = selectedCount == total && total > 0;
-
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                '已选择 $selectedCount / $total 项',
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-            TextButton(
-              onPressed: total > 0
-                  ? () => _bloc.add(const AswhUpTaskDetailToggleSelection())
-                  : null,
-              child: Text(isAllSelected ? '取消全选' : '全选'),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton.icon(
-              onPressed: selectedCount > 0
-                  ? () => _confirmDelete(gridState.selectedRows)
-                  : null,
-              icon: const Icon(Icons.delete_outline),
-              label: const Text('删除'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedCount > 0
-                    ? Colors.red
-                    : Colors.grey.shade300,
-                foregroundColor: selectedCount > 0
-                    ? Colors.white
-                    : Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      height: 54,
+      child: OutboundBatchActionBar(
+        selectedCount: selectedCount,
+        totalCount: totalCount,
+        onSelectAll: () {},
+        onDeselectAll: () {},
+        onCancelSelected: () {
+          final selected = _gridBloc.state.selectedRows;
+          if (selected.isEmpty) {
+            LoadingDialogManager.instance.showErrorDialog(
+              context,
+              '请先选择需要撤销的明细',
+            );
+            return;
+          }
+          _bloc.add(AswhUpTaskDetailDeleteSelected(selectedRows: selected));
+        },
+        onClearSelection: () {},
       ),
     );
-  }
-
-  Future<void> _confirmDelete(List<int> selectedRows) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('撤销确认'),
-          content: const Text('确定要撤销选中的明细吗？此操作不可恢复。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('取消'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('确认撤销'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      _bloc.add(AswhUpTaskDetailDeleteSelected(selectedRows: selectedRows));
-    }
-  }
-
-  void _showMessage(AswhUpTaskDetailState state) {
-    final message = state.message;
-    if (message == null) return;
-
-    switch (state.messageType) {
-      case AswhUpTaskDetailMessageType.error:
-        LoadingDialogManager.instance.showSnackErrorMsg(context, message);
-        break;
-      case AswhUpTaskDetailMessageType.warning:
-        LoadingDialogManager.instance.showSnackWarningMsg(context, message);
-        break;
-      case AswhUpTaskDetailMessageType.success:
-        LoadingDialogManager.instance.showSnackSuccessMsg(context, message);
-        break;
-      case AswhUpTaskDetailMessageType.info:
-        LoadingDialogManager.instance.showSnackSuccessMsg(context, message);
-        break;
-    }
   }
 }

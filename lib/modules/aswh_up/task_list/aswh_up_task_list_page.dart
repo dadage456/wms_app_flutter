@@ -50,21 +50,11 @@ class _AswhUpTaskListPageState extends State<AswhUpTaskListPage> {
           ),
         ],
       ).appBar,
-      body: BlocListener<AswhUpTaskBloc, AswhUpTaskState>(
-        listener: (context, state) {
-          if (state.toastMessage != null) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.toastMessage!,
-            );
-          }
-        },
-        child: Column(
-          children: [
-            _buildScanner(),
-            Expanded(child: _buildTable()),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildScanner(),
+          Expanded(child: _buildTable()),
+        ],
       ),
     );
   }

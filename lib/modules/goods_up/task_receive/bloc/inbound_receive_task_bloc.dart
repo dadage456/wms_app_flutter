@@ -72,9 +72,7 @@ class InboundReceiveTaskBloc
       pageIndex: 1,
     );
 
-    final completer = Completer<DataGridResponseData<GoodsUpTask>>();
-    gridBloc.add(LoadDataEvent<GoodsUpTask>(0, completer: completer));
-    await completer.future;
+    gridBloc.add(LoadDataEvent<GoodsUpTask>(currentQuery.pageIndex));
   }
 
   Future<void> _onRefresh(

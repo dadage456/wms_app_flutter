@@ -68,14 +68,13 @@ class AswhUpTaskBloc extends Bloc<AswhUpTaskEvent, AswhUpTaskState> {
       searchKey: event.searchKey,
       pageIndex: 1,
     );
-    emit(state.copyWith(searchKey: event.searchKey));
-    gridBloc.add(const LoadDataEvent<AswhUpTask>(0));
+    gridBloc.add(LoadDataEvent<AswhUpTask>(currentQuery.pageIndex));
   }
 
   Future<void> _onRefresh(
     RefreshAswhUpTasksEvent event,
     Emitter<AswhUpTaskState> emit,
   ) async {
-    gridBloc.add(LoadDataEvent<AswhUpTask>(state.currentPage));
+    gridBloc.add(LoadDataEvent<AswhUpTask>(currentQuery.pageIndex));
   }
 }

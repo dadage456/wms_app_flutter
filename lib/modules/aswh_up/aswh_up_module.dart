@@ -139,14 +139,16 @@ class AswhUpModule extends Module {
     r.child(
       '/receive/detail/:taskId',
       child: (_) {
+        final params = Modular.args.params;
+        final taskId = int.tryParse(params['taskId'] ?? '') ?? 0;
         final data = Modular.args.data as Map? ?? {};
-        final task = data['task'] as AswhUpTask?;
-        if (task == null) {
-          return const TodoPlaceholderPage(title: '缺少任务信息');
-        }
+        final workStation = data['workStation'] as String?;
         return BlocProvider(
           create: (_) => Modular.get<AswhUpReceiveDetailBloc>(),
-          child: AswhUpReceiveDetailPage(task: task),
+          child: AswhUpReceiveDetailPage(
+            taskId: taskId,
+            workStation: workStation,
+          ),
         );
       },
     );

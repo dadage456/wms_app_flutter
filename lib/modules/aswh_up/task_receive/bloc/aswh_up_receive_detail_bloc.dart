@@ -20,17 +20,17 @@ class AswhUpReceiveDetailBloc
     this._service,
     this._userManager, {
     UserInfoModel? userInfoOverride,
-  })  : _userInfoOverride = userInfoOverride,
-        super(const AswhUpReceiveDetailState()) {
-    gridBloc = CommonDataGridBloc<AswhUpTaskDetailItem>(
-      dataLoader: _createLoader(),
-      dataDeleter: _createDeleter(),
-    );
-
+  }) : _userInfoOverride = userInfoOverride,
+       super(const AswhUpReceiveDetailState()) {
     on<InitializeAswhUpReceiveDetailEvent>(_onInitialize);
     on<SearchAswhUpReceiveDetailEvent>(_onSearch);
     on<ReceiveSelectedAswhUpItemsEvent>(_onReceiveSelected);
     on<RefreshAswhUpReceiveDetailEvent>(_onRefresh);
+
+    gridBloc = CommonDataGridBloc<AswhUpTaskDetailItem>(
+      dataLoader: _createLoader(),
+      dataDeleter: _createDeleter(),
+    );
   }
 
   final AswhUpTaskService _service;
@@ -40,11 +40,6 @@ class AswhUpReceiveDetailBloc
   late final CommonDataGridBloc<AswhUpTaskDetailItem> gridBloc;
   AswhUpTaskDetailQuery? _currentQuery;
   AswhUpTask? _task;
-
-  void initialize(AswhUpTask task) {
-    _task = task;
-    add(const InitializeAswhUpReceiveDetailEvent());
-  }
 
   DataGridLoader<AswhUpTaskDetailItem> _createLoader() {
     return (pageIndex) async {
@@ -78,9 +73,9 @@ class AswhUpReceiveDetailBloc
         isCancel: false,
       );
 
-      gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(
-        gridBloc.state.currentPage,
-      ));
+      gridBloc.add(
+        LoadDataEvent<AswhUpTaskDetailItem>(gridBloc.state.currentPage),
+      );
     };
   }
 
@@ -88,26 +83,19 @@ class AswhUpReceiveDetailBloc
     InitializeAswhUpReceiveDetailEvent event,
     Emitter<AswhUpReceiveDetailState> emit,
   ) async {
-    final task = _task;
     final userInfo = _userInfoOverride ?? _userManager.userInfo;
-    if (task == null || userInfo == null) {
-      emit(
-        state.copyWith(
-          errorMessage: '缺少任务或用户信息，无法加载明细',
-        ),
-      );
+    if (userInfo == null) {
+      addError(StateError('未获取到用户信息，无法加载入库接收明细'));
       return;
     }
 
     _currentQuery = AswhUpTaskDetailQuery(
-      inTaskId: task.inTaskId,
+      inTaskId: event.taskId,
       userId: 'ALL',
-      workStation: task.workStation,
+      workStation: event.workStation,
       pageIndex: 1,
       pageSize: 100,
     );
-
-    gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(0));
   }
 
   Future<void> _onSearch(
@@ -121,9 +109,7 @@ class AswhUpReceiveDetailBloc
       pageIndex: 1,
     );
 
-    final completer = Completer<DataGridResponseData<AswhUpTaskDetailItem>>();
-    gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(0, completer: completer));
-    await completer.future;
+    gridBloc.add(LoadDataEvent<AswhUpTaskDetailItem>(_currentQuery!.pageIndex));
   }
 
   Future<void> _onReceiveSelected(
@@ -135,9 +121,9 @@ class AswhUpReceiveDetailBloc
       return;
     }
 
-    gridBloc.add(DeleteSelectedRowsEvent<AswhUpTaskDetailItem>(
-      event.selectedRows,
-    ));
+    gridBloc.add(
+      DeleteSelectedRowsEvent<AswhUpTaskDetailItem>(event.selectedRows),
+    );
   }
 
   Future<void> _onRefresh(
