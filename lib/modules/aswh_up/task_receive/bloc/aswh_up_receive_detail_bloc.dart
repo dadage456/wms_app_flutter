@@ -39,7 +39,6 @@ class AswhUpReceiveDetailBloc
 
   late final CommonDataGridBloc<AswhUpTaskDetailItem> gridBloc;
   AswhUpTaskDetailQuery? _currentQuery;
-  AswhUpTask? _task;
 
   DataGridLoader<AswhUpTaskDetailItem> _createLoader() {
     return (pageIndex) async {

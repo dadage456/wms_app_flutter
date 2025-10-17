@@ -217,11 +217,13 @@ class AswhUpCollectionBloc
             box.get('trayCapacity', defaultValue: '0').toString(),
           ) ??
           0;
-      final trayMaxWeight = double.tryParse(
+      final trayMaxWeight =
+          double.tryParse(
             box.get('trayMaxWeight', defaultValue: '0').toString(),
           ) ??
           0;
-      final storedWeight = double.tryParse(
+      final storedWeight =
+          double.tryParse(
             box.get('trayCurrentWeight', defaultValue: '0').toString(),
           ) ??
           0;
@@ -245,8 +247,9 @@ class AswhUpCollectionBloc
         trayCurrentWeight = storedWeight;
       }
 
-      final trayMaterialKeyRaw =
-          box.get('trayMaterialKey', defaultValue: '').toString();
+      final trayMaterialKeyRaw = box
+          .get('trayMaterialKey', defaultValue: '')
+          .toString();
       final trayMaterialKey = trayMaterialKeyRaw.isEmpty
           ? _resolveTrayMaterialKeyFromStocks(
               cachedStocks,
@@ -336,15 +339,11 @@ class AswhUpCollectionBloc
     );
     await box.put(
       'capacityUsage',
-      newState.capacityUsageByStock.map(
-        (key, value) => MapEntry(key, value),
-      ),
+      newState.capacityUsageByStock.map((key, value) => MapEntry(key, value)),
     );
     await box.put(
       'weightUsage',
-      newState.weightUsageByStock.map(
-        (key, value) => MapEntry(key, value),
-      ),
+      newState.weightUsageByStock.map((key, value) => MapEntry(key, value)),
     );
     await box.put('trayMaterialKey', newState.trayMaterialKey ?? '');
   }
@@ -434,11 +433,13 @@ class AswhUpCollectionBloc
         taskType: 'ASWHUP',
       );
 
-      final capacity = _parseDouble(trayInfo['capacity']) ??
+      final capacity =
+          _parseDouble(trayInfo['capacity']) ??
           _parseDouble(trayInfo['trayMaxCapacity']) ??
           _parseDouble(trayInfo['trayCapacity']) ??
           state.trayCapacity;
-      final trayMaxWeight = _parseDouble(trayInfo['trayMaxWeight']) ??
+      final trayMaxWeight =
+          _parseDouble(trayInfo['trayMaxWeight']) ??
           _parseDouble(trayInfo['maxWeight']) ??
           _parseDouble(trayInfo['maxweight']) ??
           state.trayMaxWeight;
@@ -461,7 +462,10 @@ class AswhUpCollectionBloc
           if (delta <= 0) {
             return detail;
           }
-          final reverted = (detail.collectedQty - delta).clamp(0, detail.planQty);
+          final double reverted = (detail.collectedQty - delta).clamp(
+            0,
+            detail.planQty,
+          );
           return _cloneDetail(detail, collectedQty: reverted);
         }).toList();
         visibleDetails = _filterDetails(detailList, state.storeSite);
@@ -491,7 +495,8 @@ class AswhUpCollectionBloc
         dicMtlQty: dicMtlQty,
         capacityUsageByStock: capacityUsage,
         weightUsageByStock: weightUsage,
-        trayMaterialKey: trayMaterialKey ??
+        trayMaterialKey:
+            trayMaterialKey ??
             _resolveTrayMaterialKeyFromStocks(
               stocks,
               state.restrictMaterialMixing,
@@ -547,12 +552,7 @@ class AswhUpCollectionBloc
   ) async {
     final pendingTray = state.pendingTrayNo;
     if (pendingTray == null) {
-      emit(
-        state.copyWith(
-          showTrayChangeDialog: false,
-          focus: true,
-        ),
-      );
+      emit(state.copyWith(showTrayChangeDialog: false, focus: true));
       return;
     }
 
@@ -591,7 +591,8 @@ class AswhUpCollectionBloc
 
       final candidates = state.detailList.where((item) {
         final codeMatch =
-            item.materialCode == materialCode || (item.oldMaterialCode ?? '') == materialCode;
+            item.materialCode == materialCode ||
+            (item.oldMaterialCode ?? '') == materialCode;
         if (!codeMatch) {
           return false;
         }
@@ -610,11 +611,12 @@ class AswhUpCollectionBloc
 
       final matControlRaw = await _service.getMatControl(materialCode);
       final matControl = _parseMatControlInfo(matControlRaw);
-      final seqCtrlFlag = (matControl['seqctrl'] ??
-              matControl['seqCtrl'] ??
-              barcode.seqCtrl ??
-              '')
-          .toString();
+      final seqCtrlFlag =
+          (matControl['seqctrl'] ??
+                  matControl['seqCtrl'] ??
+                  barcode.seqCtrl ??
+                  '')
+              .toString();
       final bool serialControl = _isSerialControlled(seqCtrlFlag);
       final serialNo = barcode.serialNo?.trim() ?? '';
 
@@ -642,16 +644,14 @@ class AswhUpCollectionBloc
       }).toList();
 
       if (filteredCandidates.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('任务明细中物料批次不匹配'),
-          ),
-        );
+        emit(state.copyWith(status: CollectionStatus.error('任务明细中物料批次不匹配')));
         return;
       }
 
-      final candidate =
-          _selectCandidate(filteredCandidates, state.visibleDetails);
+      final candidate = _selectCandidate(
+        filteredCandidates,
+        state.visibleDetails,
+      );
       if (state.shouldCheckBatch && resolvedBatch.isEmpty) {
         resolvedBatch = (candidate.batchNo ?? '').trim();
       }
@@ -661,11 +661,7 @@ class AswhUpCollectionBloc
           (detail) => (detail.batchNo ?? '').trim() == resolvedBatch,
         );
         if (!hasBatch && resolvedBatch.isNotEmpty) {
-          emit(
-            state.copyWith(
-              status: CollectionStatus.error('扫描批次与任务明细不匹配'),
-            ),
-          );
+          emit(state.copyWith(status: CollectionStatus.error('扫描批次与任务明细不匹配')));
           return;
         }
       }
@@ -677,11 +673,7 @@ class AswhUpCollectionBloc
         if (supplierName.isNotEmpty &&
             detailSupplier.isNotEmpty &&
             supplierName != detailSupplier) {
-          emit(
-            state.copyWith(
-              status: CollectionStatus.error('供应商信息不匹配'),
-            ),
-          );
+          emit(state.copyWith(status: CollectionStatus.error('供应商信息不匹配')));
           return;
         }
       }
@@ -794,8 +786,9 @@ class AswhUpCollectionBloc
       return;
     }
 
-    final resolvedBatch =
-        barcode.batchNo?.isNotEmpty == true ? barcode.batchNo! : (item.batchNo ?? '');
+    final resolvedBatch = barcode.batchNo?.isNotEmpty == true
+        ? barcode.batchNo!
+        : (item.batchNo ?? '');
     final mixingKey = _buildTrayMaterialKey(
       item.materialCode,
       state.shouldCheckBatch ? resolvedBatch : null,
@@ -817,15 +810,14 @@ class AswhUpCollectionBloc
 
     final unitCapacity = state.currentMaterialCapacity;
     final unitWeight = state.currentMaterialWeight;
-    final capacityUsage =
-        unitCapacity > 0 ? unitCapacity * quantity : quantity;
+    final capacityUsage = unitCapacity > 0 ? unitCapacity * quantity : quantity;
     final newTrayUsed = state.trayUsed + capacityUsage;
     if (state.trayCapacity > 0 && newTrayUsed - state.trayCapacity > 1e-6) {
       emit(state.copyWith(message: '物料容量超出托盘最大容量'));
       return;
     }
 
-    final weightUsage = unitWeight > 0 ? unitWeight * quantity : 0;
+    final double weightUsage = unitWeight > 0 ? unitWeight * quantity : 0;
     final newTrayWeight = state.trayCurrentWeight + weightUsage;
     if (state.trayMaxWeight > 0 && newTrayWeight - state.trayMaxWeight > 1e-6) {
       emit(state.copyWith(message: '物料重量超出托盘承重'));
@@ -876,15 +868,18 @@ class AswhUpCollectionBloc
     final existingEntry = updatedDicMtlQty[item.inTaskItemId];
     final originalCollected = existingEntry == null
         ? detailBeforeUpdate.collectedQty
-        : (existingEntry[0] as num?)?.toDouble() ?? detailBeforeUpdate.collectedQty;
+        : (existingEntry[0] as num?)?.toDouble() ??
+              detailBeforeUpdate.collectedQty;
     final previousNewValue = existingEntry == null
         ? detailBeforeUpdate.collectedQty
         : (existingEntry.length > 1
-                ? (existingEntry[1] as num?)?.toDouble()
-                : null) ??
-            detailBeforeUpdate.collectedQty;
-    final newCollectedValue =
-        (previousNewValue + quantity).clamp(0, detailBeforeUpdate.planQty);
+                  ? (existingEntry[1] as num?)?.toDouble()
+                  : null) ??
+              detailBeforeUpdate.collectedQty;
+    final double newCollectedValue = (previousNewValue + quantity).clamp(
+      0,
+      detailBeforeUpdate.planQty,
+    );
     updatedDicMtlQty[item.inTaskItemId] = <dynamic>[
       originalCollected,
       newCollectedValue,
@@ -897,18 +892,15 @@ class AswhUpCollectionBloc
       if (detail.inTaskItemId != item.inTaskItemId) {
         return detail;
       }
-      return _cloneDetail(
-        detail,
-        collectedQty: newCollectedValue,
-      );
+      return _cloneDetail(detail, collectedQty: newCollectedValue);
     }).toList();
 
     final updatedVisible = _filterDetails(updatedDetailList, state.storeSite);
 
     final newTrayKey = state.restrictMaterialMixing
         ? ((state.trayMaterialKey != null && state.trayMaterialKey!.isNotEmpty)
-            ? state.trayMaterialKey
-            : mixingKey)
+              ? state.trayMaterialKey
+              : mixingKey)
         : state.trayMaterialKey;
 
     final newState = state.copyWith(
@@ -987,20 +979,21 @@ class AswhUpCollectionBloc
 
       final itemListInfosSource = state.dicMtlQty.isNotEmpty
           ? state.dicMtlQty.entries
-          : state.collectedByItem.map(
-              (key, value) => MapEntry(key, <dynamic>[
-                state.detailList
-                        .firstWhere(
-                          (element) => element.inTaskItemId == key,
-                          orElse: () => AswhUpTaskDetailItem(
-                            inTaskItemId: key,
-                            inTaskId: _task.inTaskId,
-                            materialCode: '',
-                          ),
-                        )
-                        .collectedQty -
-                    value,
-                state.detailList
+          : state.collectedByItem
+                .map(
+                  (key, value) => MapEntry(key, <dynamic>[
+                    state.detailList
+                            .firstWhere(
+                              (element) => element.inTaskItemId == key,
+                              orElse: () => AswhUpTaskDetailItem(
+                                inTaskItemId: key,
+                                inTaskId: _task.inTaskId,
+                                materialCode: '',
+                              ),
+                            )
+                            .collectedQty -
+                        value,
+                    state.detailList
                         .firstWhere(
                           (element) => element.inTaskItemId == key,
                           orElse: () => AswhUpTaskDetailItem(
@@ -1010,18 +1003,19 @@ class AswhUpCollectionBloc
                           ),
                         )
                         .collectedQty,
-                state.detailList
-                    .firstWhere(
-                      (element) => element.inTaskItemId == key,
-                      orElse: () => AswhUpTaskDetailItem(
-                        inTaskItemId: key,
-                        inTaskId: _task.inTaskId,
-                        materialCode: '',
-                      ),
-                    )
-                    .materialCode,
-              ]),
-            ).entries;
+                    state.detailList
+                        .firstWhere(
+                          (element) => element.inTaskItemId == key,
+                          orElse: () => AswhUpTaskDetailItem(
+                            inTaskItemId: key,
+                            inTaskId: _task.inTaskId,
+                            materialCode: '',
+                          ),
+                        )
+                        .materialCode,
+                  ]),
+                )
+                .entries;
 
       final itemListInfos = itemListInfosSource.map((entry) {
         final itemId = entry.key;
@@ -1188,10 +1182,8 @@ class AswhUpCollectionBloc
         return;
       }
       final oldVal = (entry[0] as num?)?.toDouble() ?? 0;
-      final previousNew = (entry.length > 1
-              ? (entry[1] as num?)?.toDouble()
-              : null) ??
-          oldVal;
+      final previousNew =
+          (entry.length > 1 ? (entry[1] as num?)?.toDouble() : null) ?? oldVal;
       final newVal = (previousNew - removedQty).clamp(oldVal, double.infinity);
       if (newVal <= oldVal + 1e-6) {
         updatedDicMtlQty.remove(itemId);
@@ -1209,8 +1201,10 @@ class AswhUpCollectionBloc
       if (reduce <= 0) {
         return detail;
       }
-      final newCollected =
-          (detail.collectedQty - reduce).clamp(0, detail.planQty);
+      final double newCollected = (detail.collectedQty - reduce).clamp(
+        0,
+        detail.planQty,
+      );
       return _cloneDetail(detail, collectedQty: newCollected);
     }).toList();
 
