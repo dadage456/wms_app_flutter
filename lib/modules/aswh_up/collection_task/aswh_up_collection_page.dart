@@ -59,11 +59,34 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F6F6),
         appBar: AppBar(
-          title: Text('立库组盘采集 - ${task.inTaskNo}'),
+          backgroundColor: const Color(0xFF1976D2),
           centerTitle: true,
+          elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () => _handleBackPress(context),
+          ),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '立库组盘采集',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (task.inTaskNo.isNotEmpty)
+                Text(
+                  '任务号：${task.inTaskNo}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    height: 1.2,
+                  ),
+                ),
+            ],
           ),
         ),
         body: BlocConsumer<AswhUpCollectionBloc, AswhUpCollectionState>(
@@ -140,7 +163,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 _buildInfoCard(state),
                 Container(
                   height: 44,
-                  color: Colors.white,
+                  decoration: const BoxDecoration(color: Colors.white),
                   child: TabBar(
                     controller: _tabController,
                     dividerHeight: 0,
@@ -154,7 +177,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                     ),
                     tabs: const [
                       Tab(text: '任务列表'),
-                      Tab(text: '采集记录'),
+                      Tab(text: '正在采集'),
                     ],
                     onTap: (index) => _bloc.add(AswhUpChangeTabEvent(index)),
                   ),
@@ -189,8 +212,91 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildInfoCard(AswhUpCollectionState state) {
+    final barcode = state.currentBarcode;
+    final item = state.currentItem;
+    final materialCode = barcode?.materialCode ?? item?.materialCode ?? '';
+    final materialName = barcode?.materialName ?? item?.materialName ?? '';
+    final batch = barcode?.batchNo ?? item?.batchNo ?? '';
+    final serial = barcode?.serialNo ?? item?.serialNo ?? '';
+    final subInventory = item?.subInventoryCode ?? '';
+    final storeRoom = item?.storeRoomNo ?? state.task.storeRoomNo ?? '';
+    final erpStore = barcode?.erpStore ?? item?.erpStore ?? '';
+
+    double? collectedQty;
+    final itemId = item?.inTaskItemId;
+    if (itemId != null) {
+      collectedQty = state.collectedByItem[itemId] ?? item?.collectedQty;
+    }
+    final collectedText =
+        (collectedQty == null || collectedQty == 0) ? '' : collectedQty.toFormatString();
+
+    final unitCapacityText = state.currentMaterialCapacity <= 0
+        ? ''
+        : state.currentMaterialCapacity.toFormatString();
+    final unitWeightText = state.currentMaterialWeight <= 0
+        ? ''
+        : state.currentMaterialWeight.toFormatString();
+
+    final batchLabel = serial.isNotEmpty ? '序列：' : '批次：';
+    final batchValue = serial.isNotEmpty ? serial : batch;
+
+    final trayNo = state.trayNo.isEmpty ? '-' : state.trayNo;
+    final storeSite = state.storeSite.isEmpty ? '-' : state.storeSite;
+    final capacityText =
+        '${state.trayUsed.toFormatString()} / ${state.trayCapacity.toFormatString()}';
+    final weightText = state.trayMaxWeight > 0
+        ? '${state.trayCurrentWeight.toFormatString()} / ${state.trayMaxWeight.toFormatString()}'
+        : state.trayCurrentWeight.toFormatString();
+
+    final sections = <Widget>[];
+    void addSectionIf(
+      bool condition,
+      String label1,
+      String value1,
+      String label2,
+      String value2,
+    ) {
+      if (!condition) return;
+      if (sections.isNotEmpty) {
+        sections.add(_buildDottedDivider());
+      }
+      sections.add(_buildInfoRow(label1, value1, label2, value2));
+    }
+
+    addSectionIf(true, '托盘：', trayNo, '库位：', storeSite);
+    addSectionIf(true, '容量：', capacityText, '重量：', weightText);
+    addSectionIf(true, '物料：', materialCode, '名称：', materialName);
+    addSectionIf(
+      collectedText.isNotEmpty || subInventory.isNotEmpty,
+      '采集数量：',
+      collectedText,
+      '子库：',
+      subInventory,
+    );
+    addSectionIf(
+      batchValue.isNotEmpty || storeRoom.isNotEmpty,
+      batchLabel,
+      batchValue,
+      '库房：',
+      storeRoom,
+    );
+    addSectionIf(
+      erpStore.isNotEmpty || unitCapacityText.isNotEmpty,
+      'ERP库：',
+      erpStore,
+      '单位容量：',
+      unitCapacityText,
+    );
+    addSectionIf(
+      unitWeightText.isNotEmpty,
+      '单位重量：',
+      unitWeightText,
+      '',
+      '',
+    );
+
     return Container(
-      margin: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -203,30 +309,82 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildInfoRow('托盘号', state.trayNo.isEmpty ? '-' : state.trayNo),
-          const SizedBox(height: 8),
-          _buildInfoRow('库位', state.storeSite.isEmpty ? '-' : state.storeSite),
-          const SizedBox(height: 8),
-          _buildInfoRow(
-            '容量',
-            '${state.trayUsed.toFormatString()} / ${state.trayCapacity.toFormatString()}',
+      child: Column(children: sections),
+    );
+  }
+
+  Widget _buildDottedDivider() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.constrainWidth();
+        const dashWidth = 5.0;
+        const dashSpace = 3.0;
+        final dashCount = (width / (dashWidth + dashSpace)).floor();
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(dashCount, (_) {
+              return const SizedBox(
+                width: dashWidth,
+                height: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: Color(0xFF1976D2)),
+                ),
+              );
+            }),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(
+    String label1,
+    String value1,
+    String label2,
+    String value2,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(child: _buildInfoCell(label1, value1)),
+          if (label2.isNotEmpty || value2.isNotEmpty)
+            Expanded(child: _buildInfoCell(label2, value2)),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoCell(String label, String value) {
+    const labelStyle = TextStyle(fontSize: 13, color: Color(0xFF666666));
+    const valueStyle = TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: Color(0xFF333333),
+    );
+    final displayValue = value.isEmpty ? '-' : value;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        Container(
+          width: 4,
+          height: 12,
+          margin: const EdgeInsets.only(right: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1976D2),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        Text(label, style: labelStyle),
+        Expanded(
+          child: Text(
+            displayValue,
+            style: valueStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -320,6 +478,21 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         valueGetter: (row) => row.materialName ?? '',
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'storeSite',
+        headerText: '库位',
+        valueGetter: (row) => row.storeSiteNo ?? '',
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'subInventory',
+        headerText: '子库',
+        valueGetter: (row) => row.subInventoryCode ?? '',
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'storeRoom',
+        headerText: '库房',
+        valueGetter: (row) => row.storeRoomNo ?? '',
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'taskQty',
         headerText: '任务数量',
         valueGetter: (row) => row.planQty.toFormatString(),
@@ -332,9 +505,10 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         textAlign: TextAlign.right,
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'storeSite',
-        headerText: '库位',
-        valueGetter: (row) => row.storeSiteNo ?? '',
+        name: 'repQty',
+        headerText: '库存数量',
+        valueGetter: (row) => row.repertoryQty.toFormatString(),
+        textAlign: TextAlign.right,
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'batch',
@@ -345,6 +519,11 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         name: 'sn',
         headerText: '序列号',
         valueGetter: (row) => row.serialNo ?? '',
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'inboundOrder',
+        headerText: '入库单号',
+        valueGetter: (row) => row.inboundOrderNo ?? '',
       ),
     ];
   }
@@ -360,6 +539,11 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         name: 'matCode',
         headerText: '物料编码',
         valueGetter: (row) => row.materialCode,
+      ),
+      GridColumnConfig<AswhUpCollectionStock>(
+        name: 'matName',
+        headerText: '物料名称',
+        valueGetter: (row) => row.materialName ?? '',
       ),
       GridColumnConfig<AswhUpCollectionStock>(
         name: 'collectQty',
@@ -381,6 +565,21 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         name: 'storeSite',
         headerText: '库位',
         valueGetter: (row) => row.storeSite ?? '',
+      ),
+      GridColumnConfig<AswhUpCollectionStock>(
+        name: 'storeRoom',
+        headerText: '库房',
+        valueGetter: (row) => row.storeRoom ?? '',
+      ),
+      GridColumnConfig<AswhUpCollectionStock>(
+        name: 'erpStore',
+        headerText: 'ERP库',
+        valueGetter: (row) => row.erpStore ?? '',
+      ),
+      GridColumnConfig<AswhUpCollectionStock>(
+        name: 'supplier',
+        headerText: '供应商',
+        valueGetter: (row) => row.supplierName ?? '',
       ),
     ];
   }
@@ -432,6 +631,16 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('查询提交'),
                 onTap: () {
                   Navigator.pop(sheetContext);
+                  if (_bloc.state.stocks.isNotEmpty) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      const SnackBar(
+                        content: Text('采集数据未提交,不允许托盘上架！'),
+                      ),
+                    );
+                    return;
+                  }
                   final trayNo = _bloc.state.trayNo;
                   if (trayNo.isEmpty) {
                     ScaffoldMessenger.of(
@@ -450,12 +659,22 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('查询指令'),
                 onTap: () {
                   Navigator.pop(sheetContext);
+                  if (_bloc.state.stocks.isNotEmpty) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      const SnackBar(
+                        content: Text('采集数据未提交,不允许查看指令！'),
+                      ),
+                    );
+                    return;
+                  }
                   Modular.to.pushNamed(
                     '/aswh-up/wcs-instruction',
                     arguments: {
                       'taskId': _bloc.state.task.inTaskId,
                       'taskComment': _bloc.state.task.taskComment,
-                      'taskType': 'ASWHUP',
+                      'taskType': '00',
                     },
                   );
                 },
@@ -465,9 +684,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('托盘上架'),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('请先完成组盘提交后再上架')));
+                  _bloc.add(const AswhUpRaiseTrayEvent());
                 },
               ),
               ListTile(

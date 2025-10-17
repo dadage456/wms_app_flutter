@@ -36,6 +36,7 @@ class AswhUpCollectionBloc
     on<AswhUpUpdateFromResultEvent>(_onUpdateFromResult);
     on<AswhUpClearCacheEvent>(_onClearCacheFlag);
     on<AswhUpConfirmTrayChangeEvent>(_onConfirmTrayChange);
+    on<AswhUpRaiseTrayEvent>(_onRaiseTray);
   }
 
   final AswhUpTask _task;
@@ -430,7 +431,9 @@ class AswhUpCollectionBloc
       await _service.checkBindingTrayByTask(
         taskId: _task.inTaskId,
         trayNo: trayNo,
-        taskType: 'ASWHUP',
+        // UniApp 实现传递的 taskType 固定为 '00'，后台以此判定立库托盘绑定
+        // 校验场景，这里保持一致以避免接口校验失败。
+        taskType: '00',
       );
 
       final capacity =
@@ -1096,6 +1099,47 @@ class AswhUpCollectionBloc
     final box = _cacheBox;
     if (box == null) return;
     await box.clear();
+  }
+
+  Future<void> _onRaiseTray(
+    AswhUpRaiseTrayEvent event,
+    Emitter<AswhUpCollectionState> emit,
+  ) async {
+    if (state.stocks.isNotEmpty) {
+      emit(state.copyWith(message: '采集数据未提交,不允许托盘上架！'));
+      return;
+    }
+
+    if (state.trayNo.isEmpty) {
+      emit(state.copyWith(message: '请先扫描托盘条码'));
+      return;
+    }
+
+    if (_task.inTaskNo.isEmpty) {
+      emit(state.copyWith(message: '任务信息缺失，无法提交托盘上架'));
+      return;
+    }
+
+    try {
+      emit(state.copyWith(status: CollectionStatus.loading()));
+      await _service.commitUpWmsToWcs(
+        taskId: _task.inTaskId,
+        taskNo: _task.inTaskNo,
+        trayNo: state.trayNo,
+      );
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('托盘上架提交成功'),
+          focus: true,
+        ),
+      );
+    } catch (error) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(ErrorHandler.handleError(error)),
+        ),
+      );
+    }
   }
 
   void _onResetStatus(
