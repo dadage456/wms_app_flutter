@@ -140,6 +140,9 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     _controller.text = text;
   }
 
+  /// 当前输入框内容
+  String get text => _controller.text;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -238,6 +241,9 @@ class ScannerController {
   void setText(String text) {
     _state?.setText(text);
   }
+
+  /// 获取当前文本内容
+  String get text => _state?.text ?? '';
 
   /// 检查是否已附加到组件
   bool get isAttached => _state != null;
