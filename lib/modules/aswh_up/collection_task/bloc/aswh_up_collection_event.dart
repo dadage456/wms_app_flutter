@@ -87,3 +87,12 @@ class AswhUpUpdateFromResultEvent extends AswhUpCollectionEvent {
 class AswhUpClearCacheEvent extends AswhUpCollectionEvent {
   const AswhUpClearCacheEvent();
 }
+
+class AswhUpConfirmTrayChangeEvent extends AswhUpCollectionEvent {
+  const AswhUpConfirmTrayChangeEvent({required this.confirmed});
+
+  final bool confirmed;
+
+  @override
+  List<Object?> get props => [confirmed];
+}

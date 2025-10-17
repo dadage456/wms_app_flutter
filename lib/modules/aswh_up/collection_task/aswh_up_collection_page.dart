@@ -103,6 +103,34 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
               _bloc.add(const AswhUpRequestFocusEvent(false));
             }
 
+            if (state.showTrayChangeDialog && state.pendingTrayNo != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) {
+                        return AlertDialog(
+                          title: const Text('更换托盘确认'),
+                          content: Text(
+                              '更换托盘将清空当前采集记录，是否切换至托盘 ${state.pendingTrayNo}?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(dialogContext).pop(false),
+                              child: const Text('取消'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(dialogContext).pop(true),
+                              child: const Text('确认'),
+                            ),
+                          ],
+                        );
+                      },
+                    ) ??
+                    false;
+
+                _bloc.add(AswhUpConfirmTrayChangeEvent(confirmed: confirmed));
+              });
+            }
+
             _scannerController.clear();
           },
           builder: (context, state) {
