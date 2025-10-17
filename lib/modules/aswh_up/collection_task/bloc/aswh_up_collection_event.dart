@@ -96,3 +96,7 @@ class AswhUpConfirmTrayChangeEvent extends AswhUpCollectionEvent {
   @override
   List<Object?> get props => [confirmed];
 }
+
+class AswhUpRaiseTrayEvent extends AswhUpCollectionEvent {
+  const AswhUpRaiseTrayEvent();
+}
