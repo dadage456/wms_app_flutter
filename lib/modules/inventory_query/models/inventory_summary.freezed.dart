@@ -12,8 +12,7 @@ part of 'inventory_summary.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 InventorySummary _$InventorySummaryFromJson(Map<String, dynamic> json) {
   return _InventorySummary.fromJson(json);
@@ -36,17 +35,15 @@ mixin _$InventorySummary {
 /// @nodoc
 abstract class $InventorySummaryCopyWith<$Res> {
   factory $InventorySummaryCopyWith(
-    InventorySummary value,
-    $Res Function(InventorySummary) then,
-  ) = _$InventorySummaryCopyWithImpl<$Res, InventorySummary>;
+          InventorySummary value, $Res Function(InventorySummary) then) =
+      _$InventorySummaryCopyWithImpl<$Res, InventorySummary>;
   @useResult
-  $Res call({
-    String materialCode,
-    String materialName,
-    String storeSite,
-    String trayNo,
-    double totalQuantity,
-  });
+  $Res call(
+      {String materialCode,
+      String materialName,
+      String storeSite,
+      String trayNo,
+      double totalQuantity});
 }
 
 /// @nodoc
@@ -68,60 +65,54 @@ class _$InventorySummaryCopyWithImpl<$Res, $Val extends InventorySummary>
     Object? trayNo = null,
     Object? totalQuantity = null,
   }) {
-    return _then(
-      _value.copyWith(
-            materialCode: null == materialCode
-                ? _value.materialCode
-                : materialCode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            materialName: null == materialName
-                ? _value.materialName
-                : materialName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            storeSite: null == storeSite
-                ? _value.storeSite
-                : storeSite // ignore: cast_nullable_to_non_nullable
-                      as String,
-            trayNo: null == trayNo
-                ? _value.trayNo
-                : trayNo // ignore: cast_nullable_to_non_nullable
-                      as String,
-            totalQuantity: null == totalQuantity
-                ? _value.totalQuantity
-                : totalQuantity // ignore: cast_nullable_to_non_nullable
-                      as double,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: null == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeSite: null == storeSite
+          ? _value.storeSite
+          : storeSite // ignore: cast_nullable_to_non_nullable
+              as String,
+      trayNo: null == trayNo
+          ? _value.trayNo
+          : trayNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalQuantity: null == totalQuantity
+          ? _value.totalQuantity
+          : totalQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$InventorySummaryImplCopyWith<$Res>
     implements $InventorySummaryCopyWith<$Res> {
-  factory _$$InventorySummaryImplCopyWith(
-    _$InventorySummaryImpl value,
-    $Res Function(_$InventorySummaryImpl) then,
-  ) = __$$InventorySummaryImplCopyWithImpl<$Res>;
+  factory _$$InventorySummaryImplCopyWith(_$InventorySummaryImpl value,
+          $Res Function(_$InventorySummaryImpl) then) =
+      __$$InventorySummaryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String materialCode,
-    String materialName,
-    String storeSite,
-    String trayNo,
-    double totalQuantity,
-  });
+  $Res call(
+      {String materialCode,
+      String materialName,
+      String storeSite,
+      String trayNo,
+      double totalQuantity});
 }
 
 /// @nodoc
 class __$$InventorySummaryImplCopyWithImpl<$Res>
     extends _$InventorySummaryCopyWithImpl<$Res, _$InventorySummaryImpl>
     implements _$$InventorySummaryImplCopyWith<$Res> {
-  __$$InventorySummaryImplCopyWithImpl(
-    _$InventorySummaryImpl _value,
-    $Res Function(_$InventorySummaryImpl) _then,
-  ) : super(_value, _then);
+  __$$InventorySummaryImplCopyWithImpl(_$InventorySummaryImpl _value,
+      $Res Function(_$InventorySummaryImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -132,43 +123,40 @@ class __$$InventorySummaryImplCopyWithImpl<$Res>
     Object? trayNo = null,
     Object? totalQuantity = null,
   }) {
-    return _then(
-      _$InventorySummaryImpl(
-        materialCode: null == materialCode
-            ? _value.materialCode
-            : materialCode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        materialName: null == materialName
-            ? _value.materialName
-            : materialName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        storeSite: null == storeSite
-            ? _value.storeSite
-            : storeSite // ignore: cast_nullable_to_non_nullable
-                  as String,
-        trayNo: null == trayNo
-            ? _value.trayNo
-            : trayNo // ignore: cast_nullable_to_non_nullable
-                  as String,
-        totalQuantity: null == totalQuantity
-            ? _value.totalQuantity
-            : totalQuantity // ignore: cast_nullable_to_non_nullable
-                  as double,
-      ),
-    );
+    return _then(_$InventorySummaryImpl(
+      materialCode: null == materialCode
+          ? _value.materialCode
+          : materialCode // ignore: cast_nullable_to_non_nullable
+              as String,
+      materialName: null == materialName
+          ? _value.materialName
+          : materialName // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeSite: null == storeSite
+          ? _value.storeSite
+          : storeSite // ignore: cast_nullable_to_non_nullable
+              as String,
+      trayNo: null == trayNo
+          ? _value.trayNo
+          : trayNo // ignore: cast_nullable_to_non_nullable
+              as String,
+      totalQuantity: null == totalQuantity
+          ? _value.totalQuantity
+          : totalQuantity // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$InventorySummaryImpl implements _InventorySummary {
-  const _$InventorySummaryImpl({
-    this.materialCode = '',
-    this.materialName = '',
-    this.storeSite = '',
-    this.trayNo = '',
-    this.totalQuantity = 0.0,
-  });
+  const _$InventorySummaryImpl(
+      {this.materialCode = '',
+      this.materialName = '',
+      this.storeSite = '',
+      this.trayNo = '',
+      this.totalQuantity = 0.0});
 
   factory _$InventorySummaryImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventorySummaryImplFromJson(json);
@@ -212,38 +200,31 @@ class _$InventorySummaryImpl implements _InventorySummary {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    materialCode,
-    materialName,
-    storeSite,
-    trayNo,
-    totalQuantity,
-  );
+  int get hashCode => Object.hash(runtimeType, materialCode, materialName,
+      storeSite, trayNo, totalQuantity);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InventorySummaryImplCopyWith<_$InventorySummaryImpl> get copyWith =>
       __$$InventorySummaryImplCopyWithImpl<_$InventorySummaryImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventorySummaryImplToJson(this);
+    return _$$InventorySummaryImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _InventorySummary implements InventorySummary {
-  const factory _InventorySummary({
-    final String materialCode,
-    final String materialName,
-    final String storeSite,
-    final String trayNo,
-    final double totalQuantity,
-  }) = _$InventorySummaryImpl;
+  const factory _InventorySummary(
+      {final String materialCode,
+      final String materialName,
+      final String storeSite,
+      final String trayNo,
+      final double totalQuantity}) = _$InventorySummaryImpl;
 
   factory _InventorySummary.fromJson(Map<String, dynamic> json) =
       _$InventorySummaryImpl.fromJson;
