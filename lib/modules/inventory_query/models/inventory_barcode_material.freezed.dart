@@ -12,12 +12,10 @@ part of 'inventory_barcode_material.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 InventoryBarcodeMaterial _$InventoryBarcodeMaterialFromJson(
-  Map<String, dynamic> json,
-) {
+    Map<String, dynamic> json) {
   return _InventoryBarcodeMaterial.fromJson(json);
 }
 
@@ -42,29 +40,25 @@ mixin _$InventoryBarcodeMaterial {
 
 /// @nodoc
 abstract class $InventoryBarcodeMaterialCopyWith<$Res> {
-  factory $InventoryBarcodeMaterialCopyWith(
-    InventoryBarcodeMaterial value,
-    $Res Function(InventoryBarcodeMaterial) then,
-  ) = _$InventoryBarcodeMaterialCopyWithImpl<$Res, InventoryBarcodeMaterial>;
+  factory $InventoryBarcodeMaterialCopyWith(InventoryBarcodeMaterial value,
+          $Res Function(InventoryBarcodeMaterial) then) =
+      _$InventoryBarcodeMaterialCopyWithImpl<$Res, InventoryBarcodeMaterial>;
   @useResult
-  $Res call({
-    String matcode,
-    String matname,
-    String qty,
-    String batchno,
-    String sn,
-    String pdate,
-    String vdays,
-    String seqctrl,
-    @JsonKey(name: 'id_old') String idOld,
-  });
+  $Res call(
+      {String matcode,
+      String matname,
+      String qty,
+      String batchno,
+      String sn,
+      String pdate,
+      String vdays,
+      String seqctrl,
+      @JsonKey(name: 'id_old') String idOld});
 }
 
 /// @nodoc
-class _$InventoryBarcodeMaterialCopyWithImpl<
-  $Res,
-  $Val extends InventoryBarcodeMaterial
->
+class _$InventoryBarcodeMaterialCopyWithImpl<$Res,
+        $Val extends InventoryBarcodeMaterial>
     implements $InventoryBarcodeMaterialCopyWith<$Res> {
   _$InventoryBarcodeMaterialCopyWithImpl(this._value, this._then);
 
@@ -86,47 +80,44 @@ class _$InventoryBarcodeMaterialCopyWithImpl<
     Object? seqctrl = null,
     Object? idOld = null,
   }) {
-    return _then(
-      _value.copyWith(
-            matcode: null == matcode
-                ? _value.matcode
-                : matcode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            matname: null == matname
-                ? _value.matname
-                : matname // ignore: cast_nullable_to_non_nullable
-                      as String,
-            qty: null == qty
-                ? _value.qty
-                : qty // ignore: cast_nullable_to_non_nullable
-                      as String,
-            batchno: null == batchno
-                ? _value.batchno
-                : batchno // ignore: cast_nullable_to_non_nullable
-                      as String,
-            sn: null == sn
-                ? _value.sn
-                : sn // ignore: cast_nullable_to_non_nullable
-                      as String,
-            pdate: null == pdate
-                ? _value.pdate
-                : pdate // ignore: cast_nullable_to_non_nullable
-                      as String,
-            vdays: null == vdays
-                ? _value.vdays
-                : vdays // ignore: cast_nullable_to_non_nullable
-                      as String,
-            seqctrl: null == seqctrl
-                ? _value.seqctrl
-                : seqctrl // ignore: cast_nullable_to_non_nullable
-                      as String,
-            idOld: null == idOld
-                ? _value.idOld
-                : idOld // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      matcode: null == matcode
+          ? _value.matcode
+          : matcode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matname: null == matname
+          ? _value.matname
+          : matname // ignore: cast_nullable_to_non_nullable
+              as String,
+      qty: null == qty
+          ? _value.qty
+          : qty // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchno: null == batchno
+          ? _value.batchno
+          : batchno // ignore: cast_nullable_to_non_nullable
+              as String,
+      sn: null == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String,
+      pdate: null == pdate
+          ? _value.pdate
+          : pdate // ignore: cast_nullable_to_non_nullable
+              as String,
+      vdays: null == vdays
+          ? _value.vdays
+          : vdays // ignore: cast_nullable_to_non_nullable
+              as String,
+      seqctrl: null == seqctrl
+          ? _value.seqctrl
+          : seqctrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      idOld: null == idOld
+          ? _value.idOld
+          : idOld // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
   }
 }
 
@@ -134,36 +125,32 @@ class _$InventoryBarcodeMaterialCopyWithImpl<
 abstract class _$$InventoryBarcodeMaterialImplCopyWith<$Res>
     implements $InventoryBarcodeMaterialCopyWith<$Res> {
   factory _$$InventoryBarcodeMaterialImplCopyWith(
-    _$InventoryBarcodeMaterialImpl value,
-    $Res Function(_$InventoryBarcodeMaterialImpl) then,
-  ) = __$$InventoryBarcodeMaterialImplCopyWithImpl<$Res>;
+          _$InventoryBarcodeMaterialImpl value,
+          $Res Function(_$InventoryBarcodeMaterialImpl) then) =
+      __$$InventoryBarcodeMaterialImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String matcode,
-    String matname,
-    String qty,
-    String batchno,
-    String sn,
-    String pdate,
-    String vdays,
-    String seqctrl,
-    @JsonKey(name: 'id_old') String idOld,
-  });
+  $Res call(
+      {String matcode,
+      String matname,
+      String qty,
+      String batchno,
+      String sn,
+      String pdate,
+      String vdays,
+      String seqctrl,
+      @JsonKey(name: 'id_old') String idOld});
 }
 
 /// @nodoc
 class __$$InventoryBarcodeMaterialImplCopyWithImpl<$Res>
-    extends
-        _$InventoryBarcodeMaterialCopyWithImpl<
-          $Res,
-          _$InventoryBarcodeMaterialImpl
-        >
+    extends _$InventoryBarcodeMaterialCopyWithImpl<$Res,
+        _$InventoryBarcodeMaterialImpl>
     implements _$$InventoryBarcodeMaterialImplCopyWith<$Res> {
   __$$InventoryBarcodeMaterialImplCopyWithImpl(
-    _$InventoryBarcodeMaterialImpl _value,
-    $Res Function(_$InventoryBarcodeMaterialImpl) _then,
-  ) : super(_value, _then);
+      _$InventoryBarcodeMaterialImpl _value,
+      $Res Function(_$InventoryBarcodeMaterialImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -178,63 +165,60 @@ class __$$InventoryBarcodeMaterialImplCopyWithImpl<$Res>
     Object? seqctrl = null,
     Object? idOld = null,
   }) {
-    return _then(
-      _$InventoryBarcodeMaterialImpl(
-        matcode: null == matcode
-            ? _value.matcode
-            : matcode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        matname: null == matname
-            ? _value.matname
-            : matname // ignore: cast_nullable_to_non_nullable
-                  as String,
-        qty: null == qty
-            ? _value.qty
-            : qty // ignore: cast_nullable_to_non_nullable
-                  as String,
-        batchno: null == batchno
-            ? _value.batchno
-            : batchno // ignore: cast_nullable_to_non_nullable
-                  as String,
-        sn: null == sn
-            ? _value.sn
-            : sn // ignore: cast_nullable_to_non_nullable
-                  as String,
-        pdate: null == pdate
-            ? _value.pdate
-            : pdate // ignore: cast_nullable_to_non_nullable
-                  as String,
-        vdays: null == vdays
-            ? _value.vdays
-            : vdays // ignore: cast_nullable_to_non_nullable
-                  as String,
-        seqctrl: null == seqctrl
-            ? _value.seqctrl
-            : seqctrl // ignore: cast_nullable_to_non_nullable
-                  as String,
-        idOld: null == idOld
-            ? _value.idOld
-            : idOld // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+    return _then(_$InventoryBarcodeMaterialImpl(
+      matcode: null == matcode
+          ? _value.matcode
+          : matcode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matname: null == matname
+          ? _value.matname
+          : matname // ignore: cast_nullable_to_non_nullable
+              as String,
+      qty: null == qty
+          ? _value.qty
+          : qty // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchno: null == batchno
+          ? _value.batchno
+          : batchno // ignore: cast_nullable_to_non_nullable
+              as String,
+      sn: null == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String,
+      pdate: null == pdate
+          ? _value.pdate
+          : pdate // ignore: cast_nullable_to_non_nullable
+              as String,
+      vdays: null == vdays
+          ? _value.vdays
+          : vdays // ignore: cast_nullable_to_non_nullable
+              as String,
+      seqctrl: null == seqctrl
+          ? _value.seqctrl
+          : seqctrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      idOld: null == idOld
+          ? _value.idOld
+          : idOld // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$InventoryBarcodeMaterialImpl implements _InventoryBarcodeMaterial {
-  const _$InventoryBarcodeMaterialImpl({
-    this.matcode = '',
-    this.matname = '',
-    this.qty = '',
-    this.batchno = '',
-    this.sn = '',
-    this.pdate = '',
-    this.vdays = '',
-    this.seqctrl = '',
-    @JsonKey(name: 'id_old') this.idOld = '',
-  });
+  const _$InventoryBarcodeMaterialImpl(
+      {this.matcode = '',
+      this.matname = '',
+      this.qty = '',
+      this.batchno = '',
+      this.sn = '',
+      this.pdate = '',
+      this.vdays = '',
+      this.seqctrl = '',
+      @JsonKey(name: 'id_old') this.idOld = ''});
 
   factory _$InventoryBarcodeMaterialImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryBarcodeMaterialImplFromJson(json);
@@ -290,46 +274,36 @@ class _$InventoryBarcodeMaterialImpl implements _InventoryBarcodeMaterial {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    matcode,
-    matname,
-    qty,
-    batchno,
-    sn,
-    pdate,
-    vdays,
-    seqctrl,
-    idOld,
-  );
+  int get hashCode => Object.hash(runtimeType, matcode, matname, qty, batchno,
+      sn, pdate, vdays, seqctrl, idOld);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InventoryBarcodeMaterialImplCopyWith<_$InventoryBarcodeMaterialImpl>
-  get copyWith =>
-      __$$InventoryBarcodeMaterialImplCopyWithImpl<
-        _$InventoryBarcodeMaterialImpl
-      >(this, _$identity);
+      get copyWith => __$$InventoryBarcodeMaterialImplCopyWithImpl<
+          _$InventoryBarcodeMaterialImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventoryBarcodeMaterialImplToJson(this);
+    return _$$InventoryBarcodeMaterialImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _InventoryBarcodeMaterial implements InventoryBarcodeMaterial {
-  const factory _InventoryBarcodeMaterial({
-    final String matcode,
-    final String matname,
-    final String qty,
-    final String batchno,
-    final String sn,
-    final String pdate,
-    final String vdays,
-    final String seqctrl,
-    @JsonKey(name: 'id_old') final String idOld,
-  }) = _$InventoryBarcodeMaterialImpl;
+  const factory _InventoryBarcodeMaterial(
+          {final String matcode,
+          final String matname,
+          final String qty,
+          final String batchno,
+          final String sn,
+          final String pdate,
+          final String vdays,
+          final String seqctrl,
+          @JsonKey(name: 'id_old') final String idOld}) =
+      _$InventoryBarcodeMaterialImpl;
 
   factory _InventoryBarcodeMaterial.fromJson(Map<String, dynamic> json) =
       _$InventoryBarcodeMaterialImpl.fromJson;
@@ -356,5 +330,5 @@ abstract class _InventoryBarcodeMaterial implements InventoryBarcodeMaterial {
   @override
   @JsonKey(ignore: true)
   _$$InventoryBarcodeMaterialImplCopyWith<_$InventoryBarcodeMaterialImpl>
-  get copyWith => throw _privateConstructorUsedError;
+      get copyWith => throw _privateConstructorUsedError;
 }
