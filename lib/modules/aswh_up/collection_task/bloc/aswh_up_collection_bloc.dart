@@ -827,6 +827,70 @@ class AswhUpCollectionBloc
       return;
     }
 
+    final erpStore = (barcode.erpStore ?? item.erpStore ?? '').trim();
+    final taskStore = (item.storeRoomNo ?? _task.storeRoomNo ?? '').trim();
+    if (erpStore.isNotEmpty &&
+        taskStore.isNotEmpty &&
+        !_equalsIgnoreCase(erpStore, taskStore)) {
+      emit(state.copyWith(message: '库房【$erpStore】与任务库房【$taskStore】不一致'));
+      return;
+    }
+
+    final storeSite = (item.storeSiteNo ?? state.storeSite).trim();
+    if (storeSite.isNotEmpty) {
+      try {
+        final repertoryList = await _service.getMtlRepertoryByStoresiteNo(
+          storeSite: storeSite,
+          materialCode: item.materialCode,
+        );
+
+        if (repertoryList.isNotEmpty) {
+          final inventory = repertoryList.first;
+          final inventoryStore = _readString(inventory, 'erpStoreroom');
+          final targetSubInventory = (item.subInventoryCode ?? '').trim();
+          final storeRoom = (item.storeRoomNo ?? _task.storeRoomNo ?? '').trim();
+          final shouldSkipSubInventoryCheck = state.shouldCheckSupplier &&
+              _equalsIgnoreCase(storeRoom, 'XN-BL');
+
+          if (!shouldSkipSubInventoryCheck &&
+              targetSubInventory.isNotEmpty &&
+              inventoryStore.isNotEmpty &&
+              !_equalsIgnoreCase(inventoryStore, targetSubInventory)) {
+            emit(
+              state.copyWith(
+                message: '此物料在当前货位存在其他物权属性的库存，请选择其他上架库位',
+              ),
+            );
+            return;
+          }
+
+          if (state.shouldCheckSupplier &&
+              _equalsIgnoreCase(storeRoom, 'XN-BL')) {
+            final inventoryOwner = _readString(inventory, 'parno');
+            final expectedOwner = _resolveExpectedOwner(barcode, item);
+            if (inventoryOwner.isNotEmpty &&
+                expectedOwner.isNotEmpty &&
+                !_equalsIgnoreCase(inventoryOwner, expectedOwner)) {
+              emit(
+                state.copyWith(
+                  message:
+                      '物料对应的拥有方【$expectedOwner】与库位物料拥有方【$inventoryOwner】不一致，请确认',
+                ),
+              );
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error(ErrorHandler.handleError(error)),
+          ),
+        );
+        return;
+      }
+    }
+
     final newStock = AswhUpCollectionStock(
       stockId: _uuid.v4(),
       trayNo: state.trayNo,
@@ -955,6 +1019,18 @@ class AswhUpCollectionBloc
     }
     if (state.trayNo.isEmpty) {
       emit(state.copyWith(message: '请先扫描托盘条码'));
+      return;
+    }
+
+    final taskNo = _task.inTaskNo.trim();
+    if (taskNo.isEmpty) {
+      emit(state.copyWith(message: '任务号为空，请确认'));
+      return;
+    }
+
+    final voucherNo = (_task.taskComment ?? '').trim();
+    if (voucherNo.isEmpty) {
+      emit(state.copyWith(message: '凭证号为空，请确认'));
       return;
     }
 
@@ -1418,6 +1494,34 @@ class AswhUpCollectionBloc
       };
     }
     return <String, dynamic>{};
+  }
+
+  bool _equalsIgnoreCase(String a, String b) =>
+      a.toUpperCase() == b.toUpperCase();
+
+  String _readString(Map<String, dynamic> source, String key) {
+    final lowerKey = key.toLowerCase();
+    final entry = source.entries.firstWhere(
+      (element) => element.key.toString().toLowerCase() == lowerKey,
+      orElse: () => const MapEntry<String, dynamic>('', ''),
+    );
+    final value = entry.value;
+    if (value == null) {
+      return '';
+    }
+    return value.toString().trim();
+  }
+
+  String _resolveExpectedOwner(
+    AswhUpBarcodeContent barcode,
+    AswhUpTaskDetailItem item,
+  ) {
+    final barcodeOwner =
+        (barcode.supplierCode ?? barcode.supplierName ?? '').trim();
+    if (barcodeOwner.isNotEmpty) {
+      return barcodeOwner;
+    }
+    return (item.supplierName ?? '').trim();
   }
 
   double? _extractMaterialCapacity(Map<String, dynamic> info) {
