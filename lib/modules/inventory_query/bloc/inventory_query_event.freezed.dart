@@ -12,8 +12,7 @@ part of 'inventory_query_event.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$InventoryQueryEvent {
@@ -25,7 +24,8 @@ mixin _$InventoryQueryEvent {
     required TResult Function(int pageIndex) pageChanged,
     required TResult Function() resetRequested,
     required TResult Function(InventoryQueryMode mode) modeChanged,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initialized,
@@ -34,7 +34,8 @@ mixin _$InventoryQueryEvent {
     TResult? Function(int pageIndex)? pageChanged,
     TResult? Function()? resetRequested,
     TResult? Function(InventoryQueryMode mode)? modeChanged,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initialized,
@@ -44,7 +45,8 @@ mixin _$InventoryQueryEvent {
     TResult Function()? resetRequested,
     TResult Function(InventoryQueryMode mode)? modeChanged,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Initialized value) initialized,
@@ -53,7 +55,8 @@ mixin _$InventoryQueryEvent {
     required TResult Function(_PageChanged value) pageChanged,
     required TResult Function(_ResetRequested value) resetRequested,
     required TResult Function(_ModeChanged value) modeChanged,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Initialized value)? initialized,
@@ -62,7 +65,8 @@ mixin _$InventoryQueryEvent {
     TResult? Function(_PageChanged value)? pageChanged,
     TResult? Function(_ResetRequested value)? resetRequested,
     TResult? Function(_ModeChanged value)? modeChanged,
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Initialized value)? initialized,
@@ -72,15 +76,15 @@ mixin _$InventoryQueryEvent {
     TResult Function(_ResetRequested value)? resetRequested,
     TResult Function(_ModeChanged value)? modeChanged,
     required TResult orElse(),
-  }) => throw _privateConstructorUsedError;
+  }) =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $InventoryQueryEventCopyWith<$Res> {
   factory $InventoryQueryEventCopyWith(
-    InventoryQueryEvent value,
-    $Res Function(InventoryQueryEvent) then,
-  ) = _$InventoryQueryEventCopyWithImpl<$Res, InventoryQueryEvent>;
+          InventoryQueryEvent value, $Res Function(InventoryQueryEvent) then) =
+      _$InventoryQueryEventCopyWithImpl<$Res, InventoryQueryEvent>;
 }
 
 /// @nodoc
@@ -97,9 +101,8 @@ class _$InventoryQueryEventCopyWithImpl<$Res, $Val extends InventoryQueryEvent>
 /// @nodoc
 abstract class _$$InitializedImplCopyWith<$Res> {
   factory _$$InitializedImplCopyWith(
-    _$InitializedImpl value,
-    $Res Function(_$InitializedImpl) then,
-  ) = __$$InitializedImplCopyWithImpl<$Res>;
+          _$InitializedImpl value, $Res Function(_$InitializedImpl) then) =
+      __$$InitializedImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -107,9 +110,8 @@ class __$$InitializedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$InitializedImpl>
     implements _$$InitializedImplCopyWith<$Res> {
   __$$InitializedImplCopyWithImpl(
-    _$InitializedImpl _value,
-    $Res Function(_$InitializedImpl) _then,
-  ) : super(_value, _then);
+      _$InitializedImpl _value, $Res Function(_$InitializedImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -224,10 +226,9 @@ abstract class _Initialized implements InventoryQueryEvent {
 
 /// @nodoc
 abstract class _$$BarcodeScannedImplCopyWith<$Res> {
-  factory _$$BarcodeScannedImplCopyWith(
-    _$BarcodeScannedImpl value,
-    $Res Function(_$BarcodeScannedImpl) then,
-  ) = __$$BarcodeScannedImplCopyWithImpl<$Res>;
+  factory _$$BarcodeScannedImplCopyWith(_$BarcodeScannedImpl value,
+          $Res Function(_$BarcodeScannedImpl) then) =
+      __$$BarcodeScannedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String raw});
 }
@@ -237,21 +238,20 @@ class __$$BarcodeScannedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$BarcodeScannedImpl>
     implements _$$BarcodeScannedImplCopyWith<$Res> {
   __$$BarcodeScannedImplCopyWithImpl(
-    _$BarcodeScannedImpl _value,
-    $Res Function(_$BarcodeScannedImpl) _then,
-  ) : super(_value, _then);
+      _$BarcodeScannedImpl _value, $Res Function(_$BarcodeScannedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? raw = null}) {
-    return _then(
-      _$BarcodeScannedImpl(
-        null == raw
-            ? _value.raw
-            : raw // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? raw = null,
+  }) {
+    return _then(_$BarcodeScannedImpl(
+      null == raw
+          ? _value.raw
+          : raw // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -284,9 +284,7 @@ class _$BarcodeScannedImpl implements _BarcodeScanned {
   @pragma('vm:prefer-inline')
   _$$BarcodeScannedImplCopyWith<_$BarcodeScannedImpl> get copyWith =>
       __$$BarcodeScannedImplCopyWithImpl<_$BarcodeScannedImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -386,10 +384,9 @@ abstract class _BarcodeScanned implements InventoryQueryEvent {
 
 /// @nodoc
 abstract class _$$ManualSubmittedImplCopyWith<$Res> {
-  factory _$$ManualSubmittedImplCopyWith(
-    _$ManualSubmittedImpl value,
-    $Res Function(_$ManualSubmittedImpl) then,
-  ) = __$$ManualSubmittedImplCopyWithImpl<$Res>;
+  factory _$$ManualSubmittedImplCopyWith(_$ManualSubmittedImpl value,
+          $Res Function(_$ManualSubmittedImpl) then) =
+      __$$ManualSubmittedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({String input});
 }
@@ -399,21 +396,20 @@ class __$$ManualSubmittedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$ManualSubmittedImpl>
     implements _$$ManualSubmittedImplCopyWith<$Res> {
   __$$ManualSubmittedImplCopyWithImpl(
-    _$ManualSubmittedImpl _value,
-    $Res Function(_$ManualSubmittedImpl) _then,
-  ) : super(_value, _then);
+      _$ManualSubmittedImpl _value, $Res Function(_$ManualSubmittedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? input = null}) {
-    return _then(
-      _$ManualSubmittedImpl(
-        input: null == input
-            ? _value.input
-            : input // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
+  $Res call({
+    Object? input = null,
+  }) {
+    return _then(_$ManualSubmittedImpl(
+      input: null == input
+          ? _value.input
+          : input // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
   }
 }
 
@@ -446,9 +442,7 @@ class _$ManualSubmittedImpl implements _ManualSubmitted {
   @pragma('vm:prefer-inline')
   _$$ManualSubmittedImplCopyWith<_$ManualSubmittedImpl> get copyWith =>
       __$$ManualSubmittedImplCopyWithImpl<_$ManualSubmittedImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -550,9 +544,8 @@ abstract class _ManualSubmitted implements InventoryQueryEvent {
 /// @nodoc
 abstract class _$$PageChangedImplCopyWith<$Res> {
   factory _$$PageChangedImplCopyWith(
-    _$PageChangedImpl value,
-    $Res Function(_$PageChangedImpl) then,
-  ) = __$$PageChangedImplCopyWithImpl<$Res>;
+          _$PageChangedImpl value, $Res Function(_$PageChangedImpl) then) =
+      __$$PageChangedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({int pageIndex});
 }
@@ -562,21 +555,20 @@ class __$$PageChangedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$PageChangedImpl>
     implements _$$PageChangedImplCopyWith<$Res> {
   __$$PageChangedImplCopyWithImpl(
-    _$PageChangedImpl _value,
-    $Res Function(_$PageChangedImpl) _then,
-  ) : super(_value, _then);
+      _$PageChangedImpl _value, $Res Function(_$PageChangedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? pageIndex = null}) {
-    return _then(
-      _$PageChangedImpl(
-        null == pageIndex
-            ? _value.pageIndex
-            : pageIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+  $Res call({
+    Object? pageIndex = null,
+  }) {
+    return _then(_$PageChangedImpl(
+      null == pageIndex
+          ? _value.pageIndex
+          : pageIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
@@ -709,10 +701,9 @@ abstract class _PageChanged implements InventoryQueryEvent {
 
 /// @nodoc
 abstract class _$$ResetRequestedImplCopyWith<$Res> {
-  factory _$$ResetRequestedImplCopyWith(
-    _$ResetRequestedImpl value,
-    $Res Function(_$ResetRequestedImpl) then,
-  ) = __$$ResetRequestedImplCopyWithImpl<$Res>;
+  factory _$$ResetRequestedImplCopyWith(_$ResetRequestedImpl value,
+          $Res Function(_$ResetRequestedImpl) then) =
+      __$$ResetRequestedImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
@@ -720,9 +711,8 @@ class __$$ResetRequestedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$ResetRequestedImpl>
     implements _$$ResetRequestedImplCopyWith<$Res> {
   __$$ResetRequestedImplCopyWithImpl(
-    _$ResetRequestedImpl _value,
-    $Res Function(_$ResetRequestedImpl) _then,
-  ) : super(_value, _then);
+      _$ResetRequestedImpl _value, $Res Function(_$ResetRequestedImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -838,9 +828,8 @@ abstract class _ResetRequested implements InventoryQueryEvent {
 /// @nodoc
 abstract class _$$ModeChangedImplCopyWith<$Res> {
   factory _$$ModeChangedImplCopyWith(
-    _$ModeChangedImpl value,
-    $Res Function(_$ModeChangedImpl) then,
-  ) = __$$ModeChangedImplCopyWithImpl<$Res>;
+          _$ModeChangedImpl value, $Res Function(_$ModeChangedImpl) then) =
+      __$$ModeChangedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({InventoryQueryMode mode});
 }
@@ -850,21 +839,20 @@ class __$$ModeChangedImplCopyWithImpl<$Res>
     extends _$InventoryQueryEventCopyWithImpl<$Res, _$ModeChangedImpl>
     implements _$$ModeChangedImplCopyWith<$Res> {
   __$$ModeChangedImplCopyWithImpl(
-    _$ModeChangedImpl _value,
-    $Res Function(_$ModeChangedImpl) _then,
-  ) : super(_value, _then);
+      _$ModeChangedImpl _value, $Res Function(_$ModeChangedImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? mode = null}) {
-    return _then(
-      _$ModeChangedImpl(
-        null == mode
-            ? _value.mode
-            : mode // ignore: cast_nullable_to_non_nullable
-                  as InventoryQueryMode,
-      ),
-    );
+  $Res call({
+    Object? mode = null,
+  }) {
+    return _then(_$ModeChangedImpl(
+      null == mode
+          ? _value.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as InventoryQueryMode,
+    ));
   }
 }
 

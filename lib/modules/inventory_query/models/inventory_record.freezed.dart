@@ -12,8 +12,7 @@ part of 'inventory_record.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 InventoryRecord _$InventoryRecordFromJson(Map<String, dynamic> json) {
   return _InventoryRecord.fromJson(json);
@@ -41,21 +40,19 @@ mixin _$InventoryRecord {
 /// @nodoc
 abstract class $InventoryRecordCopyWith<$Res> {
   factory $InventoryRecordCopyWith(
-    InventoryRecord value,
-    $Res Function(InventoryRecord) then,
-  ) = _$InventoryRecordCopyWithImpl<$Res, InventoryRecord>;
+          InventoryRecord value, $Res Function(InventoryRecord) then) =
+      _$InventoryRecordCopyWithImpl<$Res, InventoryRecord>;
   @useResult
-  $Res call({
-    String matcode,
-    String matname,
-    String batchno,
-    String sn,
-    String storesiteno,
-    @JsonKey(name: 'erpStoreroom') String erpStoreroom,
-    String storeroomno,
-    String storeroomname,
-    double repqty,
-  });
+  $Res call(
+      {String matcode,
+      String matname,
+      String batchno,
+      String sn,
+      String storesiteno,
+      @JsonKey(name: 'erpStoreroom') String erpStoreroom,
+      String storeroomno,
+      String storeroomname,
+      double repqty});
 }
 
 /// @nodoc
@@ -81,70 +78,65 @@ class _$InventoryRecordCopyWithImpl<$Res, $Val extends InventoryRecord>
     Object? storeroomname = null,
     Object? repqty = null,
   }) {
-    return _then(
-      _value.copyWith(
-            matcode: null == matcode
-                ? _value.matcode
-                : matcode // ignore: cast_nullable_to_non_nullable
-                      as String,
-            matname: null == matname
-                ? _value.matname
-                : matname // ignore: cast_nullable_to_non_nullable
-                      as String,
-            batchno: null == batchno
-                ? _value.batchno
-                : batchno // ignore: cast_nullable_to_non_nullable
-                      as String,
-            sn: null == sn
-                ? _value.sn
-                : sn // ignore: cast_nullable_to_non_nullable
-                      as String,
-            storesiteno: null == storesiteno
-                ? _value.storesiteno
-                : storesiteno // ignore: cast_nullable_to_non_nullable
-                      as String,
-            erpStoreroom: null == erpStoreroom
-                ? _value.erpStoreroom
-                : erpStoreroom // ignore: cast_nullable_to_non_nullable
-                      as String,
-            storeroomno: null == storeroomno
-                ? _value.storeroomno
-                : storeroomno // ignore: cast_nullable_to_non_nullable
-                      as String,
-            storeroomname: null == storeroomname
-                ? _value.storeroomname
-                : storeroomname // ignore: cast_nullable_to_non_nullable
-                      as String,
-            repqty: null == repqty
-                ? _value.repqty
-                : repqty // ignore: cast_nullable_to_non_nullable
-                      as double,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      matcode: null == matcode
+          ? _value.matcode
+          : matcode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matname: null == matname
+          ? _value.matname
+          : matname // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchno: null == batchno
+          ? _value.batchno
+          : batchno // ignore: cast_nullable_to_non_nullable
+              as String,
+      sn: null == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String,
+      storesiteno: null == storesiteno
+          ? _value.storesiteno
+          : storesiteno // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpStoreroom: null == erpStoreroom
+          ? _value.erpStoreroom
+          : erpStoreroom // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeroomno: null == storeroomno
+          ? _value.storeroomno
+          : storeroomno // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeroomname: null == storeroomname
+          ? _value.storeroomname
+          : storeroomname // ignore: cast_nullable_to_non_nullable
+              as String,
+      repqty: null == repqty
+          ? _value.repqty
+          : repqty // ignore: cast_nullable_to_non_nullable
+              as double,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$InventoryRecordImplCopyWith<$Res>
     implements $InventoryRecordCopyWith<$Res> {
-  factory _$$InventoryRecordImplCopyWith(
-    _$InventoryRecordImpl value,
-    $Res Function(_$InventoryRecordImpl) then,
-  ) = __$$InventoryRecordImplCopyWithImpl<$Res>;
+  factory _$$InventoryRecordImplCopyWith(_$InventoryRecordImpl value,
+          $Res Function(_$InventoryRecordImpl) then) =
+      __$$InventoryRecordImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String matcode,
-    String matname,
-    String batchno,
-    String sn,
-    String storesiteno,
-    @JsonKey(name: 'erpStoreroom') String erpStoreroom,
-    String storeroomno,
-    String storeroomname,
-    double repqty,
-  });
+  $Res call(
+      {String matcode,
+      String matname,
+      String batchno,
+      String sn,
+      String storesiteno,
+      @JsonKey(name: 'erpStoreroom') String erpStoreroom,
+      String storeroomno,
+      String storeroomname,
+      double repqty});
 }
 
 /// @nodoc
@@ -152,9 +144,8 @@ class __$$InventoryRecordImplCopyWithImpl<$Res>
     extends _$InventoryRecordCopyWithImpl<$Res, _$InventoryRecordImpl>
     implements _$$InventoryRecordImplCopyWith<$Res> {
   __$$InventoryRecordImplCopyWithImpl(
-    _$InventoryRecordImpl _value,
-    $Res Function(_$InventoryRecordImpl) _then,
-  ) : super(_value, _then);
+      _$InventoryRecordImpl _value, $Res Function(_$InventoryRecordImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -169,63 +160,60 @@ class __$$InventoryRecordImplCopyWithImpl<$Res>
     Object? storeroomname = null,
     Object? repqty = null,
   }) {
-    return _then(
-      _$InventoryRecordImpl(
-        matcode: null == matcode
-            ? _value.matcode
-            : matcode // ignore: cast_nullable_to_non_nullable
-                  as String,
-        matname: null == matname
-            ? _value.matname
-            : matname // ignore: cast_nullable_to_non_nullable
-                  as String,
-        batchno: null == batchno
-            ? _value.batchno
-            : batchno // ignore: cast_nullable_to_non_nullable
-                  as String,
-        sn: null == sn
-            ? _value.sn
-            : sn // ignore: cast_nullable_to_non_nullable
-                  as String,
-        storesiteno: null == storesiteno
-            ? _value.storesiteno
-            : storesiteno // ignore: cast_nullable_to_non_nullable
-                  as String,
-        erpStoreroom: null == erpStoreroom
-            ? _value.erpStoreroom
-            : erpStoreroom // ignore: cast_nullable_to_non_nullable
-                  as String,
-        storeroomno: null == storeroomno
-            ? _value.storeroomno
-            : storeroomno // ignore: cast_nullable_to_non_nullable
-                  as String,
-        storeroomname: null == storeroomname
-            ? _value.storeroomname
-            : storeroomname // ignore: cast_nullable_to_non_nullable
-                  as String,
-        repqty: null == repqty
-            ? _value.repqty
-            : repqty // ignore: cast_nullable_to_non_nullable
-                  as double,
-      ),
-    );
+    return _then(_$InventoryRecordImpl(
+      matcode: null == matcode
+          ? _value.matcode
+          : matcode // ignore: cast_nullable_to_non_nullable
+              as String,
+      matname: null == matname
+          ? _value.matname
+          : matname // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchno: null == batchno
+          ? _value.batchno
+          : batchno // ignore: cast_nullable_to_non_nullable
+              as String,
+      sn: null == sn
+          ? _value.sn
+          : sn // ignore: cast_nullable_to_non_nullable
+              as String,
+      storesiteno: null == storesiteno
+          ? _value.storesiteno
+          : storesiteno // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpStoreroom: null == erpStoreroom
+          ? _value.erpStoreroom
+          : erpStoreroom // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeroomno: null == storeroomno
+          ? _value.storeroomno
+          : storeroomno // ignore: cast_nullable_to_non_nullable
+              as String,
+      storeroomname: null == storeroomname
+          ? _value.storeroomname
+          : storeroomname // ignore: cast_nullable_to_non_nullable
+              as String,
+      repqty: null == repqty
+          ? _value.repqty
+          : repqty // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$InventoryRecordImpl implements _InventoryRecord {
-  const _$InventoryRecordImpl({
-    this.matcode = '',
-    this.matname = '',
-    this.batchno = '',
-    this.sn = '',
-    this.storesiteno = '',
-    @JsonKey(name: 'erpStoreroom') this.erpStoreroom = '',
-    this.storeroomno = '',
-    this.storeroomname = '',
-    this.repqty = 0.0,
-  });
+  const _$InventoryRecordImpl(
+      {this.matcode = '',
+      this.matname = '',
+      this.batchno = '',
+      this.sn = '',
+      this.storesiteno = '',
+      @JsonKey(name: 'erpStoreroom') this.erpStoreroom = '',
+      this.storeroomno = '',
+      this.storeroomname = '',
+      this.repqty = 0.0});
 
   factory _$InventoryRecordImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryRecordImplFromJson(json);
@@ -285,46 +273,35 @@ class _$InventoryRecordImpl implements _InventoryRecord {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    matcode,
-    matname,
-    batchno,
-    sn,
-    storesiteno,
-    erpStoreroom,
-    storeroomno,
-    storeroomname,
-    repqty,
-  );
+  int get hashCode => Object.hash(runtimeType, matcode, matname, batchno, sn,
+      storesiteno, erpStoreroom, storeroomno, storeroomname, repqty);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InventoryRecordImplCopyWith<_$InventoryRecordImpl> get copyWith =>
       __$$InventoryRecordImplCopyWithImpl<_$InventoryRecordImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventoryRecordImplToJson(this);
+    return _$$InventoryRecordImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _InventoryRecord implements InventoryRecord {
-  const factory _InventoryRecord({
-    final String matcode,
-    final String matname,
-    final String batchno,
-    final String sn,
-    final String storesiteno,
-    @JsonKey(name: 'erpStoreroom') final String erpStoreroom,
-    final String storeroomno,
-    final String storeroomname,
-    final double repqty,
-  }) = _$InventoryRecordImpl;
+  const factory _InventoryRecord(
+      {final String matcode,
+      final String matname,
+      final String batchno,
+      final String sn,
+      final String storesiteno,
+      @JsonKey(name: 'erpStoreroom') final String erpStoreroom,
+      final String storeroomno,
+      final String storeroomname,
+      final double repqty}) = _$InventoryRecordImpl;
 
   factory _InventoryRecord.fromJson(Map<String, dynamic> json) =
       _$InventoryRecordImpl.fromJson;
@@ -372,9 +349,8 @@ mixin _$InventoryRecordPage {
 /// @nodoc
 abstract class $InventoryRecordPageCopyWith<$Res> {
   factory $InventoryRecordPageCopyWith(
-    InventoryRecordPage value,
-    $Res Function(InventoryRecordPage) then,
-  ) = _$InventoryRecordPageCopyWithImpl<$Res, InventoryRecordPage>;
+          InventoryRecordPage value, $Res Function(InventoryRecordPage) then) =
+      _$InventoryRecordPageCopyWithImpl<$Res, InventoryRecordPage>;
   @useResult
   $Res call({List<InventoryRecord> rows, int total});
 }
@@ -391,30 +367,29 @@ class _$InventoryRecordPageCopyWithImpl<$Res, $Val extends InventoryRecordPage>
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? rows = null, Object? total = null}) {
-    return _then(
-      _value.copyWith(
-            rows: null == rows
-                ? _value.rows
-                : rows // ignore: cast_nullable_to_non_nullable
-                      as List<InventoryRecord>,
-            total: null == total
-                ? _value.total
-                : total // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
+  $Res call({
+    Object? rows = null,
+    Object? total = null,
+  }) {
+    return _then(_value.copyWith(
+      rows: null == rows
+          ? _value.rows
+          : rows // ignore: cast_nullable_to_non_nullable
+              as List<InventoryRecord>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
   }
 }
 
 /// @nodoc
 abstract class _$$InventoryRecordPageImplCopyWith<$Res>
     implements $InventoryRecordPageCopyWith<$Res> {
-  factory _$$InventoryRecordPageImplCopyWith(
-    _$InventoryRecordPageImpl value,
-    $Res Function(_$InventoryRecordPageImpl) then,
-  ) = __$$InventoryRecordPageImplCopyWithImpl<$Res>;
+  factory _$$InventoryRecordPageImplCopyWith(_$InventoryRecordPageImpl value,
+          $Res Function(_$InventoryRecordPageImpl) then) =
+      __$$InventoryRecordPageImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<InventoryRecord> rows, int total});
@@ -424,36 +399,36 @@ abstract class _$$InventoryRecordPageImplCopyWith<$Res>
 class __$$InventoryRecordPageImplCopyWithImpl<$Res>
     extends _$InventoryRecordPageCopyWithImpl<$Res, _$InventoryRecordPageImpl>
     implements _$$InventoryRecordPageImplCopyWith<$Res> {
-  __$$InventoryRecordPageImplCopyWithImpl(
-    _$InventoryRecordPageImpl _value,
-    $Res Function(_$InventoryRecordPageImpl) _then,
-  ) : super(_value, _then);
+  __$$InventoryRecordPageImplCopyWithImpl(_$InventoryRecordPageImpl _value,
+      $Res Function(_$InventoryRecordPageImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? rows = null, Object? total = null}) {
-    return _then(
-      _$InventoryRecordPageImpl(
-        rows: null == rows
-            ? _value._rows
-            : rows // ignore: cast_nullable_to_non_nullable
-                  as List<InventoryRecord>,
-        total: null == total
-            ? _value.total
-            : total // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+  $Res call({
+    Object? rows = null,
+    Object? total = null,
+  }) {
+    return _then(_$InventoryRecordPageImpl(
+      rows: null == rows
+          ? _value._rows
+          : rows // ignore: cast_nullable_to_non_nullable
+              as List<InventoryRecord>,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$InventoryRecordPageImpl implements _InventoryRecordPage {
-  const _$InventoryRecordPageImpl({
-    final List<InventoryRecord> rows = const <InventoryRecord>[],
-    this.total = 0,
-  }) : _rows = rows;
+  const _$InventoryRecordPageImpl(
+      {final List<InventoryRecord> rows = const <InventoryRecord>[],
+      this.total = 0})
+      : _rows = rows;
 
   factory _$InventoryRecordPageImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryRecordPageImplFromJson(json);
@@ -488,31 +463,27 @@ class _$InventoryRecordPageImpl implements _InventoryRecordPage {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    const DeepCollectionEquality().hash(_rows),
-    total,
-  );
+      runtimeType, const DeepCollectionEquality().hash(_rows), total);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InventoryRecordPageImplCopyWith<_$InventoryRecordPageImpl> get copyWith =>
       __$$InventoryRecordPageImplCopyWithImpl<_$InventoryRecordPageImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventoryRecordPageImplToJson(this);
+    return _$$InventoryRecordPageImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _InventoryRecordPage implements InventoryRecordPage {
-  const factory _InventoryRecordPage({
-    final List<InventoryRecord> rows,
-    final int total,
-  }) = _$InventoryRecordPageImpl;
+  const factory _InventoryRecordPage(
+      {final List<InventoryRecord> rows,
+      final int total}) = _$InventoryRecordPageImpl;
 
   factory _InventoryRecordPage.fromJson(Map<String, dynamic> json) =
       _$InventoryRecordPageImpl.fromJson;

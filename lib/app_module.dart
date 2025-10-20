@@ -14,6 +14,7 @@ import 'modules/inventory_task/inventory_task_module.dart';
 import 'modules/inventory_query/inventory_query_module.dart';
 import 'modules/inventory_query/inventory_query_routes.dart';
 import 'modules/mtl_senter/mtl_senter_module.dart';
+import 'modules/transfer/transfer_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -65,5 +66,8 @@ class AppModule extends Module {
 
     // 拉式发料模块
     r.module('/mtl-senter', module: MtlSenterModule());
+
+    // 平库移库模块
+    r.module('/transfer', module: TransferModule());
   }
 }

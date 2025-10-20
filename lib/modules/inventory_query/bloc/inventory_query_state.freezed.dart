@@ -12,8 +12,7 @@ part of 'inventory_query_state.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 InventoryQueryState _$InventoryQueryStateFromJson(Map<String, dynamic> json) {
   return _InventoryQueryState.fromJson(json);
@@ -43,23 +42,21 @@ mixin _$InventoryQueryState {
 /// @nodoc
 abstract class $InventoryQueryStateCopyWith<$Res> {
   factory $InventoryQueryStateCopyWith(
-    InventoryQueryState value,
-    $Res Function(InventoryQueryState) then,
-  ) = _$InventoryQueryStateCopyWithImpl<$Res, InventoryQueryState>;
+          InventoryQueryState value, $Res Function(InventoryQueryState) then) =
+      _$InventoryQueryStateCopyWithImpl<$Res, InventoryQueryState>;
   @useResult
-  $Res call({
-    PageStatus status,
-    InventoryBarcodeMaterial? barcodeMaterial,
-    InventorySummary summary,
-    List<InventoryRecord> records,
-    InventoryQueryMode selectedMode,
-    String? queryValue,
-    int currentPage,
-    int pageSize,
-    int total,
-    String? errorMessage,
-    int focusTick,
-  });
+  $Res call(
+      {PageStatus status,
+      InventoryBarcodeMaterial? barcodeMaterial,
+      InventorySummary summary,
+      List<InventoryRecord> records,
+      InventoryQueryMode selectedMode,
+      String? queryValue,
+      int currentPage,
+      int pageSize,
+      int total,
+      String? errorMessage,
+      int focusTick});
 
   $InventoryBarcodeMaterialCopyWith<$Res>? get barcodeMaterial;
   $InventorySummaryCopyWith<$Res> get summary;
@@ -90,55 +87,52 @@ class _$InventoryQueryStateCopyWithImpl<$Res, $Val extends InventoryQueryState>
     Object? errorMessage = freezed,
     Object? focusTick = null,
   }) {
-    return _then(
-      _value.copyWith(
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as PageStatus,
-            barcodeMaterial: freezed == barcodeMaterial
-                ? _value.barcodeMaterial
-                : barcodeMaterial // ignore: cast_nullable_to_non_nullable
-                      as InventoryBarcodeMaterial?,
-            summary: null == summary
-                ? _value.summary
-                : summary // ignore: cast_nullable_to_non_nullable
-                      as InventorySummary,
-            records: null == records
-                ? _value.records
-                : records // ignore: cast_nullable_to_non_nullable
-                      as List<InventoryRecord>,
-            selectedMode: null == selectedMode
-                ? _value.selectedMode
-                : selectedMode // ignore: cast_nullable_to_non_nullable
-                      as InventoryQueryMode,
-            queryValue: freezed == queryValue
-                ? _value.queryValue
-                : queryValue // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            currentPage: null == currentPage
-                ? _value.currentPage
-                : currentPage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            pageSize: null == pageSize
-                ? _value.pageSize
-                : pageSize // ignore: cast_nullable_to_non_nullable
-                      as int,
-            total: null == total
-                ? _value.total
-                : total // ignore: cast_nullable_to_non_nullable
-                      as int,
-            errorMessage: freezed == errorMessage
-                ? _value.errorMessage
-                : errorMessage // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            focusTick: null == focusTick
-                ? _value.focusTick
-                : focusTick // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
+    return _then(_value.copyWith(
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as PageStatus,
+      barcodeMaterial: freezed == barcodeMaterial
+          ? _value.barcodeMaterial
+          : barcodeMaterial // ignore: cast_nullable_to_non_nullable
+              as InventoryBarcodeMaterial?,
+      summary: null == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
+              as InventorySummary,
+      records: null == records
+          ? _value.records
+          : records // ignore: cast_nullable_to_non_nullable
+              as List<InventoryRecord>,
+      selectedMode: null == selectedMode
+          ? _value.selectedMode
+          : selectedMode // ignore: cast_nullable_to_non_nullable
+              as InventoryQueryMode,
+      queryValue: freezed == queryValue
+          ? _value.queryValue
+          : queryValue // ignore: cast_nullable_to_non_nullable
+              as String?,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      focusTick: null == focusTick
+          ? _value.focusTick
+          : focusTick // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
   }
 
   @override
@@ -148,9 +142,8 @@ class _$InventoryQueryStateCopyWithImpl<$Res, $Val extends InventoryQueryState>
       return null;
     }
 
-    return $InventoryBarcodeMaterialCopyWith<$Res>(_value.barcodeMaterial!, (
-      value,
-    ) {
+    return $InventoryBarcodeMaterialCopyWith<$Res>(_value.barcodeMaterial!,
+        (value) {
       return _then(_value.copyWith(barcodeMaterial: value) as $Val);
     });
   }
@@ -167,25 +160,23 @@ class _$InventoryQueryStateCopyWithImpl<$Res, $Val extends InventoryQueryState>
 /// @nodoc
 abstract class _$$InventoryQueryStateImplCopyWith<$Res>
     implements $InventoryQueryStateCopyWith<$Res> {
-  factory _$$InventoryQueryStateImplCopyWith(
-    _$InventoryQueryStateImpl value,
-    $Res Function(_$InventoryQueryStateImpl) then,
-  ) = __$$InventoryQueryStateImplCopyWithImpl<$Res>;
+  factory _$$InventoryQueryStateImplCopyWith(_$InventoryQueryStateImpl value,
+          $Res Function(_$InventoryQueryStateImpl) then) =
+      __$$InventoryQueryStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    PageStatus status,
-    InventoryBarcodeMaterial? barcodeMaterial,
-    InventorySummary summary,
-    List<InventoryRecord> records,
-    InventoryQueryMode selectedMode,
-    String? queryValue,
-    int currentPage,
-    int pageSize,
-    int total,
-    String? errorMessage,
-    int focusTick,
-  });
+  $Res call(
+      {PageStatus status,
+      InventoryBarcodeMaterial? barcodeMaterial,
+      InventorySummary summary,
+      List<InventoryRecord> records,
+      InventoryQueryMode selectedMode,
+      String? queryValue,
+      int currentPage,
+      int pageSize,
+      int total,
+      String? errorMessage,
+      int focusTick});
 
   @override
   $InventoryBarcodeMaterialCopyWith<$Res>? get barcodeMaterial;
@@ -197,10 +188,9 @@ abstract class _$$InventoryQueryStateImplCopyWith<$Res>
 class __$$InventoryQueryStateImplCopyWithImpl<$Res>
     extends _$InventoryQueryStateCopyWithImpl<$Res, _$InventoryQueryStateImpl>
     implements _$$InventoryQueryStateImplCopyWith<$Res> {
-  __$$InventoryQueryStateImplCopyWithImpl(
-    _$InventoryQueryStateImpl _value,
-    $Res Function(_$InventoryQueryStateImpl) _then,
-  ) : super(_value, _then);
+  __$$InventoryQueryStateImplCopyWithImpl(_$InventoryQueryStateImpl _value,
+      $Res Function(_$InventoryQueryStateImpl) _then)
+      : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -217,74 +207,72 @@ class __$$InventoryQueryStateImplCopyWithImpl<$Res>
     Object? errorMessage = freezed,
     Object? focusTick = null,
   }) {
-    return _then(
-      _$InventoryQueryStateImpl(
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as PageStatus,
-        barcodeMaterial: freezed == barcodeMaterial
-            ? _value.barcodeMaterial
-            : barcodeMaterial // ignore: cast_nullable_to_non_nullable
-                  as InventoryBarcodeMaterial?,
-        summary: null == summary
-            ? _value.summary
-            : summary // ignore: cast_nullable_to_non_nullable
-                  as InventorySummary,
-        records: null == records
-            ? _value._records
-            : records // ignore: cast_nullable_to_non_nullable
-                  as List<InventoryRecord>,
-        selectedMode: null == selectedMode
-            ? _value.selectedMode
-            : selectedMode // ignore: cast_nullable_to_non_nullable
-                  as InventoryQueryMode,
-        queryValue: freezed == queryValue
-            ? _value.queryValue
-            : queryValue // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        currentPage: null == currentPage
-            ? _value.currentPage
-            : currentPage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        pageSize: null == pageSize
-            ? _value.pageSize
-            : pageSize // ignore: cast_nullable_to_non_nullable
-                  as int,
-        total: null == total
-            ? _value.total
-            : total // ignore: cast_nullable_to_non_nullable
-                  as int,
-        errorMessage: freezed == errorMessage
-            ? _value.errorMessage
-            : errorMessage // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        focusTick: null == focusTick
-            ? _value.focusTick
-            : focusTick // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
+    return _then(_$InventoryQueryStateImpl(
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as PageStatus,
+      barcodeMaterial: freezed == barcodeMaterial
+          ? _value.barcodeMaterial
+          : barcodeMaterial // ignore: cast_nullable_to_non_nullable
+              as InventoryBarcodeMaterial?,
+      summary: null == summary
+          ? _value.summary
+          : summary // ignore: cast_nullable_to_non_nullable
+              as InventorySummary,
+      records: null == records
+          ? _value._records
+          : records // ignore: cast_nullable_to_non_nullable
+              as List<InventoryRecord>,
+      selectedMode: null == selectedMode
+          ? _value.selectedMode
+          : selectedMode // ignore: cast_nullable_to_non_nullable
+              as InventoryQueryMode,
+      queryValue: freezed == queryValue
+          ? _value.queryValue
+          : queryValue // ignore: cast_nullable_to_non_nullable
+              as String?,
+      currentPage: null == currentPage
+          ? _value.currentPage
+          : currentPage // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _value.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
+      total: null == total
+          ? _value.total
+          : total // ignore: cast_nullable_to_non_nullable
+              as int,
+      errorMessage: freezed == errorMessage
+          ? _value.errorMessage
+          : errorMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
+      focusTick: null == focusTick
+          ? _value.focusTick
+          : focusTick // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$InventoryQueryStateImpl extends _InventoryQueryState {
-  const _$InventoryQueryStateImpl({
-    this.status = PageStatus.initial,
-    this.barcodeMaterial,
-    this.summary = const InventorySummary(),
-    final List<InventoryRecord> records = const <InventoryRecord>[],
-    this.selectedMode = InventoryQueryMode.material,
-    this.queryValue,
-    this.currentPage = 1,
-    this.pageSize = 10000,
-    this.total = 0,
-    this.errorMessage,
-    this.focusTick = 0,
-  }) : _records = records,
-       super._();
+  const _$InventoryQueryStateImpl(
+      {this.status = PageStatus.initial,
+      this.barcodeMaterial,
+      this.summary = const InventorySummary(),
+      final List<InventoryRecord> records = const <InventoryRecord>[],
+      this.selectedMode = InventoryQueryMode.material,
+      this.queryValue,
+      this.currentPage = 1,
+      this.pageSize = 10000,
+      this.total = 0,
+      this.errorMessage,
+      this.focusTick = 0})
+      : _records = records,
+        super._();
 
   factory _$InventoryQueryStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$InventoryQueryStateImplFromJson(json);
@@ -359,49 +347,47 @@ class _$InventoryQueryStateImpl extends _InventoryQueryState {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-    runtimeType,
-    status,
-    barcodeMaterial,
-    summary,
-    const DeepCollectionEquality().hash(_records),
-    selectedMode,
-    queryValue,
-    currentPage,
-    pageSize,
-    total,
-    errorMessage,
-    focusTick,
-  );
+      runtimeType,
+      status,
+      barcodeMaterial,
+      summary,
+      const DeepCollectionEquality().hash(_records),
+      selectedMode,
+      queryValue,
+      currentPage,
+      pageSize,
+      total,
+      errorMessage,
+      focusTick);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$InventoryQueryStateImplCopyWith<_$InventoryQueryStateImpl> get copyWith =>
       __$$InventoryQueryStateImplCopyWithImpl<_$InventoryQueryStateImpl>(
-        this,
-        _$identity,
-      );
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$InventoryQueryStateImplToJson(this);
+    return _$$InventoryQueryStateImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _InventoryQueryState extends InventoryQueryState {
-  const factory _InventoryQueryState({
-    final PageStatus status,
-    final InventoryBarcodeMaterial? barcodeMaterial,
-    final InventorySummary summary,
-    final List<InventoryRecord> records,
-    final InventoryQueryMode selectedMode,
-    final String? queryValue,
-    final int currentPage,
-    final int pageSize,
-    final int total,
-    final String? errorMessage,
-    final int focusTick,
-  }) = _$InventoryQueryStateImpl;
+  const factory _InventoryQueryState(
+      {final PageStatus status,
+      final InventoryBarcodeMaterial? barcodeMaterial,
+      final InventorySummary summary,
+      final List<InventoryRecord> records,
+      final InventoryQueryMode selectedMode,
+      final String? queryValue,
+      final int currentPage,
+      final int pageSize,
+      final int total,
+      final String? errorMessage,
+      final int focusTick}) = _$InventoryQueryStateImpl;
   const _InventoryQueryState._() : super._();
 
   factory _InventoryQueryState.fromJson(Map<String, dynamic> json) =
