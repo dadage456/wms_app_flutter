@@ -66,28 +66,23 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () => _handleBackPress(context),
           ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '立库组盘采集',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              // if (task.inTaskNo.isNotEmpty)
-              //   Text(
-              //     '任务号：${task.inTaskNo}',
-              //     style: const TextStyle(
-              //       color: Colors.white70,
-              //       fontSize: 12,
-              //       height: 1.2,
-              //     ),
-              //   ),
-            ],
+          title: const Text(
+            '立库组盘采集',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => _showMoreOptions(context),
+              child: const Text(
+                '更多',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
         ),
         body: BlocConsumer<AswhUpCollectionBloc, AswhUpCollectionState>(
           listener: (context, state) {
@@ -166,8 +161,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 _buildScanInput(state.placeholder),
                 _buildInfoCard(state),
                 Container(
-                  height: 44,
                   decoration: const BoxDecoration(color: Colors.white),
+                  height: 44,
                   child: TabBar(
                     controller: _tabController,
                     dividerHeight: 0,
@@ -205,11 +200,21 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildScanInput(String placeholder) {
+    final config = ScannerConfig().copyWith(
+      placeholder: placeholder,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      height: 48,
+      keyboardType: TextInputType.number,
+    );
+
     return ScannerWidget(
+      config: config,
       controller: _scannerController,
-      config: ScannerConfig(placeholder: placeholder),
-      onScanResult: (String value) {
-        _bloc.add(AswhUpPerformScanEvent(value));
+      onScanResult: (code) {
+        _bloc.add(AswhUpPerformScanEvent(code));
+      },
+      onError: (message) {
+        LoadingDialogManager.instance.showErrorDialog(context, message);
       },
     );
   }
@@ -263,10 +268,13 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     addSectionIf(true, '托盘：', trayNo, '剩余容量：', capacityText);
     addSectionIf(true, '物料：', materialCode ?? '', '采集数量：', collectedText);
     addSectionIf(true, '名称：', materialName ?? '', '批次：', batch ?? '');
-    addSectionIf(false, '序列：', serial ?? '', '', '');
+    addSectionIf(true, '序列：', serial ?? '', '', '');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(color: Colors.white),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+      ),
       child: Column(children: sections),
     );
   }
@@ -278,20 +286,17 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         const dashWidth = 5.0;
         const dashSpace = 3.0;
         final dashCount = (width / (dashWidth + dashSpace)).floor();
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(dashCount, (_) {
-              return const SizedBox(
-                width: dashWidth,
-                height: 1,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(color: Color(0xFF1976D2)),
-                ),
-              );
-            }),
-          ),
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(dashCount, (_) {
+            return const SizedBox(
+              width: dashWidth,
+              height: 1,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: Color(0xFF0067FC)),
+              ),
+            );
+          }),
         );
       },
     );
@@ -391,30 +396,38 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   Widget _buildBottomBar(BuildContext context) {
     final state = BlocProvider.of<AswhUpCollectionBloc>(context).state;
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: const BoxDecoration(color: Colors.white),
+      height: 56,
       child: Row(
         children: [
           Expanded(
-            child: ElevatedButton.icon(
-              label: const Text('采集结果'),
+            child: OutlinedButton(
               onPressed: state.stocks.isEmpty ? null : _openResultPage,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF1976D2),
+                side: const BorderSide(color: Color(0xFF1976D2)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('采集结果'),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: ElevatedButton.icon(
-              label: const Text('组盘提交'),
+            child: ElevatedButton(
               onPressed: state.stocks.isEmpty
                   ? null
                   : () => _bloc.add(const AswhUpSubmitEvent()),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              label: const Text('更多'),
-              onPressed: () => _showMoreOptions(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1976D2),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('组盘提交'),
             ),
           ),
         ],
@@ -509,6 +522,79 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     }
   }
 
+  void _handleException() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('异常处理暂未开放')));
+  }
+
+  void _handleQuerySubmit() {
+    if (_bloc.state.stocks.isNotEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('采集数据未提交,不允许托盘上架！')));
+      return;
+    }
+    final trayNo = _bloc.state.trayNo;
+    if (trayNo.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('请先扫描托盘号')));
+      return;
+    }
+    Modular.to.pushNamed(
+      '/aswh-up/pallet-item',
+      arguments: {'trayNo': trayNo, 'task': _bloc.state.task},
+    );
+  }
+
+  void _handleQueryInstruction() {
+    if (_bloc.state.stocks.isNotEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('采集数据未提交,不允许查看指令！')));
+      return;
+    }
+    Modular.to.pushNamed(
+      '/aswh-up/wcs-instruction',
+      arguments: {
+        'taskId': _bloc.state.task.inTaskId,
+        'taskComment': _bloc.state.task.taskComment,
+        'taskType': '00',
+      },
+    );
+  }
+
+  void _handleBackPress(BuildContext context) {
+    if (_bloc.state.stocks.isEmpty) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('提示'),
+          content: const Text('当前采集记录尚未提交，确定要退出吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                Navigator.of(context).maybePop();
+              },
+              child: const Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showMoreOptions(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
@@ -580,46 +666,16 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                   _bloc.add(const AswhUpRaiseTrayEvent());
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.delete_sweep_outlined),
-                title: const Text('清除缓存'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  _bloc.add(const AswhUpClearCacheEvent());
-                },
-              ),
+              // ListTile(
+              //   leading: const Icon(Icons.delete_sweep_outlined),
+              //   title: const Text('清除缓存'),
+              //   onTap: () {
+              //     Navigator.pop(sheetContext);
+              //     _bloc.add(const AswhUpClearCacheEvent());
+              //   },
+              // ),
             ],
           ),
-        );
-      },
-    );
-  }
-
-  void _handleBackPress(BuildContext context) {
-    if (_bloc.state.stocks.isEmpty) {
-      Navigator.of(context).maybePop();
-      return;
-    }
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('提示'),
-          content: const Text('当前采集记录尚未提交，确定要退出吗？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                Navigator.of(context).maybePop();
-              },
-              child: const Text('确定'),
-            ),
-          ],
         );
       },
     );
