@@ -17,7 +17,7 @@ class AswhUpBarcodeContent extends HiveObject with _$AswhUpBarcodeContent {
     @JsonKey(name: 'seqctrl') @HiveField(4) String? seqCtrl,
     @JsonKey(name: 'id_old') @HiveField(5) String? idOld,
     @JsonKey(name: 'qty') @HiveField(6) @Default(0.0) double quantity,
-    @JsonKey(name: 'vdays') @HiveField(7) int? expireDays,
+    @JsonKey(name: 'vdays') @HiveField(7) String? expireDays,
     @JsonKey(name: 'pdate') @HiveField(8) String? productionDate,
     @JsonKey(name: 'dgFlg') @HiveField(9) String? dangerousFlag,
     @JsonKey(name: 'suppliercode') @HiveField(10) String? supplierCode,

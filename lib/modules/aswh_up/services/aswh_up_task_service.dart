@@ -127,7 +127,7 @@ class AswhUpTaskService {
   }
 
   /// 校验托盘基础信息
-  Future<Map<String, dynamic>> checkBindingTray(String trayNo) async {
+  Future<double> checkBindingTray(String trayNo) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/checkTray',
       queryParameters: {'trayNo': trayNo},
@@ -135,12 +135,12 @@ class AswhUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => Map<String, dynamic>.from(data as Map),
+      dataExtractor: (data) => (data as num?)?.toDouble() ?? 0.0,
     );
   }
 
   /// 校验托盘与任务绑定关系
-  Future<Map<String, dynamic>> checkBindingTrayByTask({
+  Future<String> checkBindingTrayByTask({
     required int taskId,
     required String trayNo,
     required String taskType,
@@ -156,15 +156,16 @@ class AswhUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => Map<String, dynamic>.from(data as Map),
+      dataField: 'msg',
+      dataExtractor: (data) => data,
     );
   }
 
   /// 解析物料二维码，获取物料基础信息
   Future<AswhUpBarcodeContent> getMaterialInfoByQR(String qrContent) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/getPmMaterialInfoByQR',
-      data: {'qrContent': qrContent},
+    final response = await _dio.get(
+      '/system/terminal/materialInfo',
+      queryParameters: {'QRstring': qrContent},
     );
 
     return ApiResponseHandler.handleResponse(
@@ -183,7 +184,8 @@ class AswhUpTaskService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => Map<String, dynamic>.from(data as Map),
+      dataField: 'msg',
+      dataExtractor: (data) => {'msg': data},
     );
   }
 

@@ -427,25 +427,12 @@ class AswhUpCollectionBloc
   }) async {
     try {
       emit(state.copyWith(status: CollectionStatus.loading()));
-      final trayInfo = await _service.checkBindingTray(trayNo);
+      final trayCapacity = await _service.checkBindingTray(trayNo);
       await _service.checkBindingTrayByTask(
         taskId: _task.inTaskId,
         trayNo: trayNo,
-        // UniApp 实现传递的 taskType 固定为 '00'，后台以此判定立库托盘绑定
-        // 校验场景，这里保持一致以避免接口校验失败。
         taskType: '00',
       );
-
-      final capacity =
-          _parseDouble(trayInfo['capacity']) ??
-          _parseDouble(trayInfo['trayMaxCapacity']) ??
-          _parseDouble(trayInfo['trayCapacity']) ??
-          state.trayCapacity;
-      final trayMaxWeight =
-          _parseDouble(trayInfo['trayMaxWeight']) ??
-          _parseDouble(trayInfo['maxWeight']) ??
-          _parseDouble(trayInfo['maxweight']) ??
-          state.trayMaxWeight;
 
       List<AswhUpTaskDetailItem> detailList = state.detailList;
       List<AswhUpTaskDetailItem> visibleDetails = state.visibleDetails;
@@ -486,8 +473,8 @@ class AswhUpCollectionBloc
       final newState = state.copyWith(
         status: CollectionStatus.success('托盘校验通过'),
         trayNo: trayNo,
-        trayCapacity: capacity,
-        trayMaxWeight: trayMaxWeight,
+        trayCapacity: trayCapacity,
+        trayMaxWeight: 0,
         trayUsed: trayUsed,
         trayCurrentWeight: trayCurrentWeight,
         detailList: detailList,
@@ -624,7 +611,7 @@ class AswhUpCollectionBloc
       final serialNo = barcode.serialNo?.trim() ?? '';
 
       if (serialControl && serialNo.isEmpty) {
-        emit(state.copyWith(status: CollectionStatus.error('序列管控物料必须扫描序列号')));
+        emit(state.copyWith(status: CollectionStatus.error('序列号不能为空')));
         return;
       }
 
@@ -848,19 +835,17 @@ class AswhUpCollectionBloc
           final inventory = repertoryList.first;
           final inventoryStore = _readString(inventory, 'erpStoreroom');
           final targetSubInventory = (item.subInventoryCode ?? '').trim();
-          final storeRoom = (item.storeRoomNo ?? _task.storeRoomNo ?? '').trim();
-          final shouldSkipSubInventoryCheck = state.shouldCheckSupplier &&
+          final storeRoom = (item.storeRoomNo ?? _task.storeRoomNo ?? '')
+              .trim();
+          final shouldSkipSubInventoryCheck =
+              state.shouldCheckSupplier &&
               _equalsIgnoreCase(storeRoom, 'XN-BL');
 
           if (!shouldSkipSubInventoryCheck &&
               targetSubInventory.isNotEmpty &&
               inventoryStore.isNotEmpty &&
               !_equalsIgnoreCase(inventoryStore, targetSubInventory)) {
-            emit(
-              state.copyWith(
-                message: '此物料在当前货位存在其他物权属性的库存，请选择其他上架库位',
-              ),
-            );
+            emit(state.copyWith(message: '此物料在当前货位存在其他物权属性的库存，请选择其他上架库位'));
             return;
           }
 
@@ -982,8 +967,8 @@ class AswhUpCollectionBloc
       capacityUsageByStock: updatedCapacityUsage,
       weightUsageByStock: updatedWeightUsage,
       trayMaterialKey: newTrayKey,
-      currentBarcode: null,
-      currentItem: null,
+      currentBarcode: AswhUpBarcodeContent.fromJson({}),
+      currentItem: AswhUpTaskDetailItem.fromJson({}),
       currentMaterialCapacity: 0,
       currentMaterialWeight: 0,
       scanStep: AswhUpCollectionScanStep.material,
@@ -1516,8 +1501,8 @@ class AswhUpCollectionBloc
     AswhUpBarcodeContent barcode,
     AswhUpTaskDetailItem item,
   ) {
-    final barcodeOwner =
-        (barcode.supplierCode ?? barcode.supplierName ?? '').trim();
+    final barcodeOwner = (barcode.supplierCode ?? barcode.supplierName ?? '')
+        .trim();
     if (barcodeOwner.isNotEmpty) {
       return barcodeOwner;
     }

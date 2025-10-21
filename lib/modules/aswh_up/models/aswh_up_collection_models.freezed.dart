@@ -43,7 +43,7 @@ mixin _$AswhUpBarcodeContent {
   double get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'vdays')
   @HiveField(7)
-  int? get expireDays => throw _privateConstructorUsedError;
+  String? get expireDays => throw _privateConstructorUsedError;
   @JsonKey(name: 'pdate')
   @HiveField(8)
   String? get productionDate => throw _privateConstructorUsedError;
@@ -80,7 +80,7 @@ abstract class $AswhUpBarcodeContentCopyWith<$Res> {
       @JsonKey(name: 'seqctrl') @HiveField(4) String? seqCtrl,
       @JsonKey(name: 'id_old') @HiveField(5) String? idOld,
       @JsonKey(name: 'qty') @HiveField(6) double quantity,
-      @JsonKey(name: 'vdays') @HiveField(7) int? expireDays,
+      @JsonKey(name: 'vdays') @HiveField(7) String? expireDays,
       @JsonKey(name: 'pdate') @HiveField(8) String? productionDate,
       @JsonKey(name: 'dgFlg') @HiveField(9) String? dangerousFlag,
       @JsonKey(name: 'suppliercode') @HiveField(10) String? supplierCode,
@@ -148,7 +148,7 @@ class _$AswhUpBarcodeContentCopyWithImpl<$Res,
       expireDays: freezed == expireDays
           ? _value.expireDays
           : expireDays // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       productionDate: freezed == productionDate
           ? _value.productionDate
           : productionDate // ignore: cast_nullable_to_non_nullable
@@ -189,7 +189,7 @@ abstract class _$$AswhUpBarcodeContentImplCopyWith<$Res>
       @JsonKey(name: 'seqctrl') @HiveField(4) String? seqCtrl,
       @JsonKey(name: 'id_old') @HiveField(5) String? idOld,
       @JsonKey(name: 'qty') @HiveField(6) double quantity,
-      @JsonKey(name: 'vdays') @HiveField(7) int? expireDays,
+      @JsonKey(name: 'vdays') @HiveField(7) String? expireDays,
       @JsonKey(name: 'pdate') @HiveField(8) String? productionDate,
       @JsonKey(name: 'dgFlg') @HiveField(9) String? dangerousFlag,
       @JsonKey(name: 'suppliercode') @HiveField(10) String? supplierCode,
@@ -254,7 +254,7 @@ class __$$AswhUpBarcodeContentImplCopyWithImpl<$Res>
       expireDays: freezed == expireDays
           ? _value.expireDays
           : expireDays // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as String?,
       productionDate: freezed == productionDate
           ? _value.productionDate
           : productionDate // ignore: cast_nullable_to_non_nullable
@@ -332,7 +332,7 @@ class _$AswhUpBarcodeContentImpl extends _AswhUpBarcodeContent {
   @override
   @JsonKey(name: 'vdays')
   @HiveField(7)
-  final int? expireDays;
+  final String? expireDays;
   @override
   @JsonKey(name: 'pdate')
   @HiveField(8)
@@ -432,7 +432,7 @@ abstract class _AswhUpBarcodeContent extends AswhUpBarcodeContent {
       @JsonKey(name: 'seqctrl') @HiveField(4) final String? seqCtrl,
       @JsonKey(name: 'id_old') @HiveField(5) final String? idOld,
       @JsonKey(name: 'qty') @HiveField(6) final double quantity,
-      @JsonKey(name: 'vdays') @HiveField(7) final int? expireDays,
+      @JsonKey(name: 'vdays') @HiveField(7) final String? expireDays,
       @JsonKey(name: 'pdate') @HiveField(8) final String? productionDate,
       @JsonKey(name: 'dgFlg') @HiveField(9) final String? dangerousFlag,
       @JsonKey(name: 'suppliercode') @HiveField(10) final String? supplierCode,
@@ -476,7 +476,7 @@ abstract class _AswhUpBarcodeContent extends AswhUpBarcodeContent {
   @override
   @JsonKey(name: 'vdays')
   @HiveField(7)
-  int? get expireDays;
+  String? get expireDays;
   @override
   @JsonKey(name: 'pdate')
   @HiveField(8)

@@ -77,15 +77,15 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (task.inTaskNo.isNotEmpty)
-                Text(
-                  '任务号：${task.inTaskNo}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    height: 1.2,
-                  ),
-                ),
+              // if (task.inTaskNo.isNotEmpty)
+              //   Text(
+              //     '任务号：${task.inTaskNo}',
+              //     style: const TextStyle(
+              //       color: Colors.white70,
+              //       fontSize: 12,
+              //       height: 1.2,
+              //     ),
+              //   ),
             ],
           ),
         ),
@@ -128,20 +128,24 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
 
             if (state.showTrayChangeDialog && state.pendingTrayNo != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) async {
-                final confirmed = await showDialog<bool>(
+                final confirmed =
+                    await showDialog<bool>(
                       context: context,
                       builder: (dialogContext) {
                         return AlertDialog(
                           title: const Text('更换托盘确认'),
                           content: Text(
-                              '更换托盘将清空当前采集记录，是否切换至托盘 ${state.pendingTrayNo}?'),
+                            '更换托盘将清空当前采集记录，是否切换至托盘 ${state.pendingTrayNo}?',
+                          ),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.of(dialogContext).pop(false),
+                              onPressed: () =>
+                                  Navigator.of(dialogContext).pop(false),
                               child: const Text('取消'),
                             ),
                             ElevatedButton(
-                              onPressed: () => Navigator.of(dialogContext).pop(true),
+                              onPressed: () =>
+                                  Navigator.of(dialogContext).pop(true),
                               child: const Text('确认'),
                             ),
                           ],
@@ -185,7 +189,10 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: [_buildDetailGrid(state), _buildStockGrid(state)],
+                    children: [
+                      _buildDetailGrid(state),
+                      _buildFiltedGrid(state),
+                    ],
                   ),
                 ),
               ],
@@ -198,37 +205,31 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildScanInput(String placeholder) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.white,
-      child: ScannerWidget(
-        controller: _scannerController,
-        config: ScannerConfig(placeholder: placeholder),
-        onScanResult: (String value) {
-          _bloc.add(AswhUpPerformScanEvent(value));
-        },
-      ),
+    return ScannerWidget(
+      controller: _scannerController,
+      config: ScannerConfig(placeholder: placeholder),
+      onScanResult: (String value) {
+        _bloc.add(AswhUpPerformScanEvent(value));
+      },
     );
   }
 
   Widget _buildInfoCard(AswhUpCollectionState state) {
     final barcode = state.currentBarcode;
-    final item = state.currentItem;
-    final materialCode = barcode?.materialCode ?? item?.materialCode ?? '';
-    final materialName = barcode?.materialName ?? item?.materialName ?? '';
-    final batch = barcode?.batchNo ?? item?.batchNo ?? '';
-    final serial = barcode?.serialNo ?? item?.serialNo ?? '';
-    final subInventory = item?.subInventoryCode ?? '';
-    final storeRoom = item?.storeRoomNo ?? state.task.storeRoomNo ?? '';
-    final erpStore = barcode?.erpStore ?? item?.erpStore ?? '';
+    final materialCode = barcode?.materialCode;
+    final materialName = barcode?.materialName;
+    final batch = barcode?.batchNo;
+    final serial = barcode?.serialNo;
 
     double? collectedQty;
+    final item = state.currentItem;
     final itemId = item?.inTaskItemId;
     if (itemId != null) {
       collectedQty = state.collectedByItem[itemId] ?? item?.collectedQty;
     }
-    final collectedText =
-        (collectedQty == null || collectedQty == 0) ? '' : collectedQty.toFormatString();
+    final collectedText = (collectedQty == null || collectedQty == 0)
+        ? ''
+        : collectedQty.toFormatString();
 
     final unitCapacityText = state.currentMaterialCapacity <= 0
         ? ''
@@ -237,13 +238,9 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         ? ''
         : state.currentMaterialWeight.toFormatString();
 
-    final batchLabel = serial.isNotEmpty ? '序列：' : '批次：';
-    final batchValue = serial.isNotEmpty ? serial : batch;
-
     final trayNo = state.trayNo.isEmpty ? '-' : state.trayNo;
-    final storeSite = state.storeSite.isEmpty ? '-' : state.storeSite;
-    final capacityText =
-        '${state.trayUsed.toFormatString()} / ${state.trayCapacity.toFormatString()}';
+    final capacityText = (state.trayCapacity - state.trayUsed).toFormatString();
+
     final weightText = state.trayMaxWeight > 0
         ? '${state.trayCurrentWeight.toFormatString()} / ${state.trayMaxWeight.toFormatString()}'
         : state.trayCurrentWeight.toFormatString();
@@ -263,52 +260,13 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
       sections.add(_buildInfoRow(label1, value1, label2, value2));
     }
 
-    addSectionIf(true, '托盘：', trayNo, '库位：', storeSite);
-    addSectionIf(true, '容量：', capacityText, '重量：', weightText);
-    addSectionIf(true, '物料：', materialCode, '名称：', materialName);
-    addSectionIf(
-      collectedText.isNotEmpty || subInventory.isNotEmpty,
-      '采集数量：',
-      collectedText,
-      '子库：',
-      subInventory,
-    );
-    addSectionIf(
-      batchValue.isNotEmpty || storeRoom.isNotEmpty,
-      batchLabel,
-      batchValue,
-      '库房：',
-      storeRoom,
-    );
-    addSectionIf(
-      erpStore.isNotEmpty || unitCapacityText.isNotEmpty,
-      'ERP库：',
-      erpStore,
-      '单位容量：',
-      unitCapacityText,
-    );
-    addSectionIf(
-      unitWeightText.isNotEmpty,
-      '单位重量：',
-      unitWeightText,
-      '',
-      '',
-    );
-
+    addSectionIf(true, '托盘：', trayNo, '剩余容量：', capacityText);
+    addSectionIf(true, '物料：', materialCode ?? '', '采集数量：', collectedText);
+    addSectionIf(true, '名称：', materialName ?? '', '批次：', batch ?? '');
+    addSectionIf(false, '序列：', serial ?? '', '', '');
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x11000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(color: Colors.white),
       child: Column(children: sections),
     );
   }
@@ -345,61 +303,61 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     String label2,
     String value2,
   ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+    const infoStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
+    return SizedBox(
+      height: 32,
       child: Row(
         children: [
-          Expanded(child: _buildInfoCell(label1, value1)),
-          if (label2.isNotEmpty || value2.isNotEmpty)
-            Expanded(child: _buildInfoCell(label2, value2)),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 10,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(label1, style: infoStyle),
+                Text(value1, style: infoStyle),
+              ],
+            ),
+          ),
+          if (label2.isNotEmpty)
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 10,
+                    margin: const EdgeInsets.only(right: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Text(label2, style: infoStyle),
+                  Text(value2, style: infoStyle),
+                ],
+              ),
+            ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoCell(String label, String value) {
-    const labelStyle = TextStyle(fontSize: 13, color: Color(0xFF666666));
-    const valueStyle = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
-      color: Color(0xFF333333),
-    );
-    final displayValue = value.isEmpty ? '-' : value;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 4,
-          height: 12,
-          margin: const EdgeInsets.only(right: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1976D2),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        Text(label, style: labelStyle),
-        Expanded(
-          child: Text(
-            displayValue,
-            style: valueStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 
   Widget _buildDetailGrid(AswhUpCollectionState state) {
     final columns = _detailColumns();
     final selected = _selectedIndicesFor(
-      state.visibleDetails,
+      state.detailList,
       state.selectedDetailIds,
     );
 
     return CommonDataGrid<AswhUpTaskDetailItem>(
       columns: columns,
-      datas: state.visibleDetails,
+      datas: state.detailList,
       allowPager: false,
       allowSelect: true,
       currentPage: 1,
@@ -416,10 +374,12 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     );
   }
 
-  Widget _buildStockGrid(AswhUpCollectionState state) {
-    return CommonDataGrid<AswhUpCollectionStock>(
-      columns: _stockColumns(),
-      datas: state.stocks,
+  Widget _buildFiltedGrid(AswhUpCollectionState state) {
+    final columns = _detailColumns();
+
+    return CommonDataGrid<AswhUpTaskDetailItem>(
+      columns: columns,
+      datas: state.visibleDetails,
       allowPager: false,
       allowSelect: false,
       currentPage: 1,
@@ -437,7 +397,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.list_alt),
               label: const Text('采集结果'),
               onPressed: state.stocks.isEmpty ? null : _openResultPage,
             ),
@@ -445,7 +404,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.cloud_upload_outlined),
               label: const Text('组盘提交'),
               onPressed: state.stocks.isEmpty
                   ? null
@@ -455,7 +413,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.more_horiz),
               label: const Text('更多'),
               onPressed: () => _showMoreOptions(context),
             ),
@@ -528,62 +485,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     ];
   }
 
-  List<GridColumnConfig<AswhUpCollectionStock>> _stockColumns() {
-    return [
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'trayNo',
-        headerText: '托盘号',
-        valueGetter: (row) => row.trayNo,
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'matCode',
-        headerText: '物料编码',
-        valueGetter: (row) => row.materialCode,
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'matName',
-        headerText: '物料名称',
-        valueGetter: (row) => row.materialName ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'collectQty',
-        headerText: '采集数量',
-        valueGetter: (row) => row.collectQty.toFormatString(),
-        textAlign: TextAlign.right,
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'batch',
-        headerText: '批次',
-        valueGetter: (row) => row.batchNo ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'serial',
-        headerText: '序列号',
-        valueGetter: (row) => row.serialNo ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'storeSite',
-        headerText: '库位',
-        valueGetter: (row) => row.storeSite ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'storeRoom',
-        headerText: '库房',
-        valueGetter: (row) => row.storeRoom ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'erpStore',
-        headerText: 'ERP库',
-        valueGetter: (row) => row.erpStore ?? '',
-      ),
-      GridColumnConfig<AswhUpCollectionStock>(
-        name: 'supplier',
-        headerText: '供应商',
-        valueGetter: (row) => row.supplierName ?? '',
-      ),
-    ];
-  }
-
   List<int> _selectedIndicesFor(
     List<AswhUpTaskDetailItem> items,
     List<int> selectedIds,
@@ -632,12 +533,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 onTap: () {
                   Navigator.pop(sheetContext);
                   if (_bloc.state.stocks.isNotEmpty) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(
-                      const SnackBar(
-                        content: Text('采集数据未提交,不允许托盘上架！'),
-                      ),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('采集数据未提交,不允许托盘上架！')),
                     );
                     return;
                   }
@@ -660,12 +557,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 onTap: () {
                   Navigator.pop(sheetContext);
                   if (_bloc.state.stocks.isNotEmpty) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(
-                      const SnackBar(
-                        content: Text('采集数据未提交,不允许查看指令！'),
-                      ),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('采集数据未提交,不允许查看指令！')),
                     );
                     return;
                   }
