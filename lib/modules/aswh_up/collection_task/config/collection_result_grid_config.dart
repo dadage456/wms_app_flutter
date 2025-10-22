@@ -11,11 +11,6 @@ class CollectionResultGridConfig {
         valueGetter: (row) => row.materialCode,
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'storesiteno',
-        headerText: '库位',
-        valueGetter: (row) => row.storeSiteNo ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'qty',
         headerText: '任务数量',
         valueGetter: (row) => row.planQty,
@@ -55,8 +50,19 @@ class CollectionResultGridConfig {
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'orderno',
-        headerText: '凭证号',
+        headerText: '入库单号',
         valueGetter: (row) => row.inboundOrderNo ?? '',
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'oldMaterialCode',
+        headerText: '物料旧编码',
+        valueGetter: (item) => item.oldMaterialCode ?? '-',
+        textAlign: TextAlign.center,
+      ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'taskComment',
+        headerText: '凭证号',
+        valueGetter: (row) => row.taskComment ?? '',
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'intaskno',
@@ -64,9 +70,9 @@ class CollectionResultGridConfig {
         valueGetter: (row) => row.inTaskNo ?? '',
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'inTaskItemId',
+        name: 'inTaskId',
         headerText: '任务id',
-        valueGetter: (row) => row.inTaskItemId ?? '',
+        valueGetter: (row) => row.inTaskId ?? '',
       ),
     ];
   }

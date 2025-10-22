@@ -16,8 +16,7 @@ class AswhUpWcsInstructionPage extends StatefulWidget {
       _AswhUpWcsInstructionPageState();
 }
 
-class _AswhUpWcsInstructionPageState
-    extends State<AswhUpWcsInstructionPage> {
+class _AswhUpWcsInstructionPageState extends State<AswhUpWcsInstructionPage> {
   late final AswhUpWcsInstructionCubit _cubit;
   final TextEditingController _searchController = TextEditingController();
 
@@ -47,20 +46,21 @@ class _AswhUpWcsInstructionPageState
         }
 
         if (state.errorMessage != null) {
-          LoadingDialogManager.instance
-              .showErrorDialog(context, state.errorMessage!);
+          LoadingDialogManager.instance.showErrorDialog(
+            context,
+            state.errorMessage!,
+          );
         }
       },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: const Color(0xFFF6F6F6),
           appBar: CustomAppBar(
-            title: 'WMS→WCS 指令',
+            title: '组盘上架出入库指令',
             onBackPressed: () => Modular.to.pop(),
           ).appBar,
           body: Column(
             children: [
-              _buildToolbar(state),
               Expanded(child: _buildGrid(state)),
               _buildBottomBar(),
             ],
@@ -114,8 +114,6 @@ class _AswhUpWcsInstructionPageState
         allowSelect: false,
         selectedRows: const [],
         onLoadData: (_) async {},
-        rowHeight: 48,
-        headerHeight: 44,
       ),
     );
   }
@@ -148,9 +146,8 @@ class _AswhUpWcsInstructionPageState
             const SizedBox(width: 12),
             Expanded(
               child: FilledButton.icon(
-                onPressed: () => _cubit.load(
-                  queryStr: _searchController.text.trim(),
-                ),
+                onPressed: () =>
+                    _cubit.load(queryStr: _searchController.text.trim()),
                 icon: const Icon(Icons.refresh),
                 label: const Text('刷新'),
               ),

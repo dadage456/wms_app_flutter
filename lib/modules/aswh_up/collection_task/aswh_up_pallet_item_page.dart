@@ -48,7 +48,7 @@ class _AswhUpPalletItemPageState extends State<AswhUpPalletItemPage> {
         return Scaffold(
           backgroundColor: const Color(0xFFF6F6F6),
           appBar: CustomAppBar(
-            title: '托盘提交记录',
+            title: '组盘上架提交结果',
             onBackPressed: () => Modular.to.pop(),
           ).appBar,
           body: Padding(
@@ -115,8 +115,6 @@ class _AswhUpPalletItemPageState extends State<AswhUpPalletItemPage> {
       allowPager: false,
       allowSelect: false,
       selectedRows: const [],
-      rowHeight: 48,
-      headerHeight: 44,
       onLoadData: (_) async {},
     );
   }

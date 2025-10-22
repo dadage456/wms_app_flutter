@@ -456,9 +456,9 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
                 title: const Text('异常处理'),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('异常处理暂未开放')));
+                  // ScaffoldMessenger.of(
+                  //   context,
+                  // ).showSnackBar(const SnackBar(content: Text('异常处理暂未开放')));
                 },
               ),
               ListTile(
