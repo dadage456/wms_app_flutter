@@ -12,12 +12,12 @@ class AswhUpTaskDetailGridConfig {
         valueGetter: (item) => item.materialCode ?? '-',
         textAlign: TextAlign.center,
       ),
-      // GridColumnConfig<AswhUpTaskDetailItem>(
-      //   name: 'storeSiteNo',
-      //   headerText: '库位',
-      //   valueGetter: (item) => item.storeSiteNo ?? '-',
-      //   textAlign: TextAlign.center,
-      // ),
+      GridColumnConfig<AswhUpTaskDetailItem>(
+        name: 'storeSiteNo',
+        headerText: '库位',
+        valueGetter: (item) => item.storeSiteNo ?? '-',
+        textAlign: TextAlign.center,
+      ),
       GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'quantity',
         headerText: '任务数量',
@@ -57,6 +57,7 @@ class AswhUpTaskDetailGridConfig {
         headerText: '物料名称',
         valueGetter: (item) => item.materialName ?? '-',
         textAlign: TextAlign.center,
+        width: 150,
       ),
       GridColumnConfig<AswhUpTaskDetailItem>(
         name: 'inboundOrderNo',

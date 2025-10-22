@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wms_app/utils/custom_extension.dart';
 
 import '../../../../models/page_status.dart';
 import '../../../../utils/error_handler.dart';
@@ -53,6 +54,8 @@ class AswhUpCollectionBloc
     _userId = event.userId;
     await _openCacheBox();
     await _loadDetailList(emit, restoreCache: true);
+
+    await _clearCache();
   }
 
   Future<void> _openCacheBox() async {
@@ -67,7 +70,7 @@ class AswhUpCollectionBloc
       userId: (_userId ?? 0).toString(),
       workStation: _task.workStation,
       roomTag: '1',
-      pageSize: 500,
+      pageSize: 10000,
     );
   }
 
@@ -88,7 +91,7 @@ class AswhUpCollectionBloc
         state.copyWith(
           status: CollectionStatus.success(),
           detailList: items,
-          visibleDetails: _filterDetails(items, state.storeSite),
+          visibleDetails: [],
           placeholder: state.placeholder,
           shouldCheckBatch: shouldCheckBatch,
           shouldCheckSupplier: shouldCheckSupplier,
@@ -110,14 +113,14 @@ class AswhUpCollectionBloc
 
   List<AswhUpTaskDetailItem> _filterDetails(
     List<AswhUpTaskDetailItem> source,
-    String storeSite,
+    String materialCode,
   ) {
-    if (storeSite.isEmpty) {
-      return source;
+    if (materialCode.isEmpty) {
+      return [];
     }
-    final trimmed = storeSite.trim();
+    final trimmed = materialCode.trim();
     return source
-        .where((item) => (item.storeSiteNo ?? '').trim() == trimmed)
+        .where((item) => (item.materialCode).trim() == trimmed)
         .toList();
   }
 
@@ -289,14 +292,9 @@ class AswhUpCollectionBloc
           scanStep: AswhUpCollectionScanStep.values.elementAt(
             math.min(scanStepIndex, 2),
           ),
-          placeholder: _placeholderForStep(
-            AswhUpCollectionScanStep.values.elementAt(
-              math.min(scanStepIndex, 2),
-            ),
-          ),
+          placeholder: _getPlaceMessage(),
           trayMaterialKey: trayMaterialKey,
-          message: cachedStocks.isEmpty ? null : '已恢复上次采集记录',
-          focus: true,
+          status: CollectionStatus.success('已恢复上次采集记录'),
         ),
       );
     } catch (error) {
@@ -309,6 +307,7 @@ class AswhUpCollectionBloc
   }
 
   Future<void> _persistCache(AswhUpCollectionState newState) async {
+    return;
     final box = _cacheBox;
     if (box == null) return;
 
@@ -355,32 +354,52 @@ class AswhUpCollectionBloc
   ) async {
     final payload = event.payload.trim();
     if (payload.isEmpty) {
-      emit(state.copyWith(message: '扫描内容为空'));
+      emit(state.copyWith(status: CollectionStatus.error('扫描内容为空')));
       return;
     }
 
     if (payload.contains('\$TP\$')) {
       await _handleTrayScan(payload, emit);
-      return;
-    }
-
-    if (payload.contains('\$KW\$')) {
-      _handleStoreSiteScan(payload, emit);
+      await _handleScanEnd(emit);
       return;
     }
 
     if (payload.contains('MC')) {
       await _handleMaterialScan(payload, emit);
+      await _handleScanEnd(emit);
       return;
     }
 
-    if (state.scanStep == AswhUpCollectionScanStep.quantity ||
-        _isNumeric(payload)) {
+    if (_isNumeric(payload)) {
       await _handleQuantityInput(payload, emit);
+      await _handleScanEnd(emit);
       return;
     }
 
-    emit(state.copyWith(message: '无法识别的条码：$payload'));
+    emit(state.copyWith(status: CollectionStatus.error('无法识别的条码：$payload')));
+  }
+
+  Future<void> _handleScanEnd(Emitter<AswhUpCollectionState> emit) async {
+    var placeholder = _getPlaceMessage();
+
+    if (placeholder.isEmpty) {
+      final qty = state.collectQty ?? 0;
+      if (qty > 0) {
+        await addStockRecord(qty, emit);
+      }
+    }
+
+    placeholder = _getPlaceMessage();
+
+    if (placeholder.isNotEmpty) {
+      emit(
+        state.copyWith(
+          placeholder: placeholder,
+          focus: placeholder == '请输入采集数量',
+          status: CollectionStatus.normal(),
+        ),
+      );
+    }
   }
 
   Future<void> _handleTrayScan(
@@ -389,7 +408,7 @@ class AswhUpCollectionBloc
   ) async {
     final trayNo = payload.replaceAll('\$TP\$', '').trim();
     if (trayNo.isEmpty) {
-      emit(state.copyWith(message: '托盘条码格式不正确'));
+      emit(state.copyWith(status: CollectionStatus.error('托盘条码格式不正确')));
       return;
     }
 
@@ -402,14 +421,7 @@ class AswhUpCollectionBloc
     }
 
     if (hasExistingData && state.trayNo.isNotEmpty && state.trayNo != trayNo) {
-      emit(
-        state.copyWith(
-          pendingTrayNo: trayNo,
-          showTrayChangeDialog: true,
-          message: '更换托盘前将清空当前采集记录，是否继续？',
-          focus: false,
-        ),
-      );
+      emit(state.copyWith(pendingTrayNo: trayNo, showTrayChangeDialog: true));
       return;
     }
 
@@ -458,7 +470,10 @@ class AswhUpCollectionBloc
           );
           return _cloneDetail(detail, collectedQty: reverted);
         }).toList();
-        visibleDetails = _filterDetails(detailList, state.storeSite);
+        visibleDetails = _filterDetails(
+          detailList,
+          state.currentBarcode?.materialCode ?? '',
+        );
         stocks = const [];
         collected = const {};
         serialRecord = const {};
@@ -471,7 +486,7 @@ class AswhUpCollectionBloc
       }
 
       final newState = state.copyWith(
-        status: CollectionStatus.success('托盘校验通过'),
+        status: CollectionStatus.success(),
         trayNo: trayNo,
         trayCapacity: trayCapacity,
         trayMaxWeight: 0,
@@ -493,11 +508,11 @@ class AswhUpCollectionBloc
               state.shouldCheckBatch,
             ),
         scanStep: AswhUpCollectionScanStep.material,
-        placeholder: '请扫描物料二维码',
-        focus: true,
         pendingTrayNo: null,
         showTrayChangeDialog: false,
-        message: '托盘 $trayNo 校验通过',
+        collectQty: 0,
+        currentBarcode: AswhUpBarcodeContent.fromJson({}),
+        currentItem: AswhUpTaskDetailItem.fromJson({}),
       );
       emit(newState);
       await _persistCache(newState);
@@ -510,51 +525,19 @@ class AswhUpCollectionBloc
     }
   }
 
-  void _handleStoreSiteScan(
-    String payload,
-    Emitter<AswhUpCollectionState> emit,
-  ) {
-    final site = payload.replaceAll('\$KW\$', '').trim();
-    if (site.isEmpty) {
-      emit(state.copyWith(message: '库位条码格式不正确'));
-      return;
-    }
-
-    final filtered = _filterDetails(state.detailList, site);
-    if (filtered.isEmpty) {
-      emit(state.copyWith(message: '当前库位无待采集任务'));
-      return;
-    }
-
-    final newState = state.copyWith(
-      storeSite: site,
-      visibleDetails: filtered,
-      message: '已切换库位 $site',
-      focus: true,
-    );
-    emit(newState);
-    _persistCache(newState);
-  }
-
   Future<void> _onConfirmTrayChange(
     AswhUpConfirmTrayChangeEvent event,
     Emitter<AswhUpCollectionState> emit,
   ) async {
+    emit(state.copyWith(showTrayChangeDialog: false));
+
     final pendingTray = state.pendingTrayNo;
     if (pendingTray == null) {
-      emit(state.copyWith(showTrayChangeDialog: false, focus: true));
       return;
     }
 
     if (!event.confirmed) {
-      emit(
-        state.copyWith(
-          pendingTrayNo: null,
-          showTrayChangeDialog: false,
-          focus: true,
-          message: '已取消托盘更换',
-        ),
-      );
+      emit(state.copyWith(pendingTrayNo: null));
       return;
     }
 
@@ -566,7 +549,7 @@ class AswhUpCollectionBloc
     Emitter<AswhUpCollectionState> emit,
   ) async {
     if (state.trayNo.isEmpty) {
-      emit(state.copyWith(message: '请先扫描托盘条码'));
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描托盘条码')));
       return;
     }
 
@@ -668,7 +651,7 @@ class AswhUpCollectionBloc
         }
       }
 
-      if (serialNo.isNotEmpty) {
+      if (serialControl) {
         final serialSet = state.serialRecord[candidate.inTaskItemId];
         if (serialSet != null && serialSet.contains(serialNo)) {
           emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复扫描')));
@@ -707,20 +690,16 @@ class AswhUpCollectionBloc
       emit(
         state.copyWith(
           status: CollectionStatus.success(),
+          visibleDetails: candidates,
           currentBarcode: normalizedBarcode,
           currentItem: candidate,
           currentMaterialCapacity: materialCapacity,
           currentMaterialWeight: materialWeight,
-          placeholder: '请输入采集数量',
           scanStep: AswhUpCollectionScanStep.quantity,
-          focus: !serialControl,
-          message: '扫描到物料 $materialCode',
+          currentTab: 1,
+          collectQty: serialControl ? 1 : state.collectQty,
         ),
       );
-
-      if (serialControl) {
-        await _handleQuantityInput('1', emit);
-      }
     } catch (error) {
       emit(
         state.copyWith(
@@ -730,37 +709,34 @@ class AswhUpCollectionBloc
     }
   }
 
-  Future<void> _handleQuantityInput(
-    String payload,
+  /// 添加采集记录
+  Future<void> addStockRecord(
+    double quantity,
     Emitter<AswhUpCollectionState> emit,
   ) async {
-    final quantity = double.tryParse(payload);
-    if (quantity == null || quantity <= 0) {
-      emit(state.copyWith(message: '请输入合法的采集数量'));
-      return;
-    }
-
     if (state.trayNo.isEmpty) {
-      emit(state.copyWith(message: '请先扫描托盘条码'));
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描托盘条码')));
       return;
     }
 
     final item = state.currentItem;
     final barcode = state.currentBarcode;
-    if (item == null || barcode == null) {
-      emit(state.copyWith(message: '请先扫描物料二维码'));
+    if (item == null ||
+        barcode == null ||
+        (barcode.materialCode ?? '').isEmpty) {
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描物料二维码')));
       return;
     }
 
     final serialNo = barcode.serialNo ?? '';
     if (serialNo.isNotEmpty) {
       if ((quantity - 1).abs() > 1e-6) {
-        emit(state.copyWith(message: '序列管控物料采集数量必须为1'));
+        emit(state.copyWith(status: CollectionStatus.error('序列管控物料采集数量必须为1')));
         return;
       }
       final serialSet = state.serialRecord[item.inTaskItemId];
       if (serialSet != null && serialSet.contains(serialNo)) {
-        emit(state.copyWith(message: '序列号已采集，请勿重复提交'));
+        emit(state.copyWith(status: CollectionStatus.error('序列号已采集，请勿重复提交')));
         return;
       }
     }
@@ -772,7 +748,7 @@ class AswhUpCollectionBloc
 
     final remain = detailBeforeUpdate.planQty - detailBeforeUpdate.collectedQty;
     if (quantity > remain + 1e-6) {
-      emit(state.copyWith(message: '采集数量超出任务剩余数量'));
+      emit(state.copyWith(status: CollectionStatus.error('采集数量超出任务剩余数量')));
       return;
     }
 
@@ -794,7 +770,7 @@ class AswhUpCollectionBloc
       final msg = state.shouldCheckBatch
           ? '扫描物料【${item.materialCode}】批次【$resolvedBatch】与当前托盘不一致'
           : '扫描物料【${item.materialCode}】与当前托盘不一致';
-      emit(state.copyWith(message: msg));
+      emit(state.copyWith(status: CollectionStatus.error(msg)));
       return;
     }
 
@@ -803,14 +779,14 @@ class AswhUpCollectionBloc
     final capacityUsage = unitCapacity > 0 ? unitCapacity * quantity : quantity;
     final newTrayUsed = state.trayUsed + capacityUsage;
     if (state.trayCapacity > 0 && newTrayUsed - state.trayCapacity > 1e-6) {
-      emit(state.copyWith(message: '物料容量超出托盘最大容量'));
+      emit(state.copyWith(status: CollectionStatus.error('物料容量超出托盘最大容量')));
       return;
     }
 
     final double weightUsage = unitWeight > 0 ? unitWeight * quantity : 0;
     final newTrayWeight = state.trayCurrentWeight + weightUsage;
     if (state.trayMaxWeight > 0 && newTrayWeight - state.trayMaxWeight > 1e-6) {
-      emit(state.copyWith(message: '物料重量超出托盘承重'));
+      emit(state.copyWith(status: CollectionStatus.error('物料重量超出托盘承重')));
       return;
     }
 
@@ -819,7 +795,11 @@ class AswhUpCollectionBloc
     if (erpStore.isNotEmpty &&
         taskStore.isNotEmpty &&
         !_equalsIgnoreCase(erpStore, taskStore)) {
-      emit(state.copyWith(message: '库房【$erpStore】与任务库房【$taskStore】不一致'));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('库房【$erpStore】与任务库房【$taskStore】不一致'),
+        ),
+      );
       return;
     }
 
@@ -845,7 +825,11 @@ class AswhUpCollectionBloc
               targetSubInventory.isNotEmpty &&
               inventoryStore.isNotEmpty &&
               !_equalsIgnoreCase(inventoryStore, targetSubInventory)) {
-            emit(state.copyWith(message: '此物料在当前货位存在其他物权属性的库存，请选择其他上架库位'));
+            emit(
+              state.copyWith(
+                status: CollectionStatus.error('此物料在当前货位存在其他物权属性的库存，请选择其他上架库位'),
+              ),
+            );
             return;
           }
 
@@ -858,8 +842,9 @@ class AswhUpCollectionBloc
                 !_equalsIgnoreCase(inventoryOwner, expectedOwner)) {
               emit(
                 state.copyWith(
-                  message:
-                      '物料对应的拥有方【$expectedOwner】与库位物料拥有方【$inventoryOwner】不一致，请确认',
+                  status: CollectionStatus.error(
+                    '物料对应的拥有方【$expectedOwner】与库位物料拥有方【$inventoryOwner】不一致，请确认',
+                  ),
                 ),
               );
               return;
@@ -947,7 +932,10 @@ class AswhUpCollectionBloc
       return _cloneDetail(detail, collectedQty: newCollectedValue);
     }).toList();
 
-    final updatedVisible = _filterDetails(updatedDetailList, state.storeSite);
+    final updatedVisible = _filterDetails(
+      updatedDetailList,
+      barcode.materialCode ?? '',
+    );
 
     final newTrayKey = state.restrictMaterialMixing
         ? ((state.trayMaterialKey != null && state.trayMaterialKey!.isNotEmpty)
@@ -969,15 +957,29 @@ class AswhUpCollectionBloc
       trayMaterialKey: newTrayKey,
       currentBarcode: AswhUpBarcodeContent.fromJson({}),
       currentItem: AswhUpTaskDetailItem.fromJson({}),
+      collectQty: 0,
       currentMaterialCapacity: 0,
       currentMaterialWeight: 0,
       scanStep: AswhUpCollectionScanStep.material,
-      placeholder: '请扫描物料二维码',
-      focus: true,
-      message: '采集成功，数量 ${quantity.toStringAsFixed(2)}',
+      status: CollectionStatus.success(
+        '采集成功，数量 ${quantity.toStringAsFixed(2)}',
+      ),
     );
     emit(newState);
     await _persistCache(newState);
+  }
+
+  Future<void> _handleQuantityInput(
+    String payload,
+    Emitter<AswhUpCollectionState> emit,
+  ) async {
+    final quantity = double.tryParse(payload);
+    if (quantity == null || quantity <= 0) {
+      emit(state.copyWith(status: CollectionStatus.error('请输入合法的采集数量')));
+      return;
+    }
+
+    emit(state.copyWith(collectQty: quantity));
   }
 
   void _onChangeTab(
@@ -999,23 +1001,17 @@ class AswhUpCollectionBloc
     Emitter<AswhUpCollectionState> emit,
   ) async {
     if (state.stocks.isEmpty) {
-      emit(state.copyWith(message: '没有采集数据可提交'));
+      emit(state.copyWith(status: CollectionStatus.error('没有采集数据可提交')));
       return;
     }
     if (state.trayNo.isEmpty) {
-      emit(state.copyWith(message: '请先扫描托盘条码'));
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描托盘条码')));
       return;
     }
 
     final taskNo = _task.inTaskNo.trim();
     if (taskNo.isEmpty) {
-      emit(state.copyWith(message: '任务号为空，请确认'));
-      return;
-    }
-
-    final voucherNo = (_task.taskComment ?? '').trim();
-    if (voucherNo.isEmpty) {
-      emit(state.copyWith(message: '凭证号为空，请确认'));
+      emit(state.copyWith(status: CollectionStatus.error('任务号为空，请确认')));
       return;
     }
 
@@ -1084,10 +1080,10 @@ class AswhUpCollectionBloc
       final itemListInfos = itemListInfosSource.map((entry) {
         final itemId = entry.key;
         final values = entry.value;
-        final oldQty = values.isNotEmpty
+        final double oldQty = values.isNotEmpty
             ? (values[0] as num?)?.toDouble() ?? 0
             : 0;
-        final newQty = values.length > 1
+        final double newQty = values.length > 1
             ? (values[1] as num?)?.toDouble() ?? oldQty
             : oldQty;
         String matCode = values.length > 2 ? values[2].toString() : '';
@@ -1105,7 +1101,7 @@ class AswhUpCollectionBloc
 
         return {
           'inTaskItemid': itemId,
-          'mtlQty': [oldQty, newQty],
+          'mtlQty': [oldQty.toFormatString(), newQty.toFormatString()],
           'matCode': matCode,
         };
       }).toList();
@@ -1118,6 +1114,8 @@ class AswhUpCollectionBloc
       await _service.commitUpShelves(
         upShelvesInfos: upShelvesInfos,
         itemListInfos: itemListInfos,
+        taskNo: _task.inTaskNo,
+        trayNo: state.trayNo,
         filter: serialFilter,
         weight: event.weight ?? state.trayCurrentWeight.toString(),
         capacity: event.capacity ?? state.trayUsed.toString(),
@@ -1143,8 +1141,7 @@ class AswhUpCollectionBloc
           trayUsed: 0,
           trayCurrentWeight: 0,
           trayMaterialKey: null,
-          message: '组盘提交成功',
-          focus: true,
+          placeholder: _getPlaceMessage(),
         ),
       );
     } catch (error) {
@@ -1167,17 +1164,17 @@ class AswhUpCollectionBloc
     Emitter<AswhUpCollectionState> emit,
   ) async {
     if (state.stocks.isNotEmpty) {
-      emit(state.copyWith(message: '采集数据未提交,不允许托盘上架！'));
+      emit(state.copyWith(status: CollectionStatus.error('采集数据未提交,不允许托盘上架！')));
       return;
     }
 
     if (state.trayNo.isEmpty) {
-      emit(state.copyWith(message: '请先扫描托盘条码'));
+      emit(state.copyWith(status: CollectionStatus.error('请先扫描托盘条码')));
       return;
     }
 
     if (_task.inTaskNo.isEmpty) {
-      emit(state.copyWith(message: '任务信息缺失，无法提交托盘上架'));
+      emit(state.copyWith(status: CollectionStatus.error('任务信息缺失，无法提交托盘上架')));
       return;
     }
 
@@ -1188,12 +1185,7 @@ class AswhUpCollectionBloc
         taskNo: _task.inTaskNo,
         trayNo: state.trayNo,
       );
-      emit(
-        state.copyWith(
-          status: CollectionStatus.success('托盘上架提交成功'),
-          focus: true,
-        ),
-      );
+      emit(state.copyWith(status: CollectionStatus.success('托盘上架提交成功')));
     } catch (error) {
       emit(
         state.copyWith(
@@ -1332,7 +1324,10 @@ class AswhUpCollectionBloc
 
     final newState = state.copyWith(
       detailList: updatedDetailList,
-      visibleDetails: _filterDetails(updatedDetailList, state.storeSite),
+      visibleDetails: _filterDetails(
+        updatedDetailList,
+        state.currentBarcode?.materialCode ?? '',
+      ),
       stocks: remaining,
       collectedByItem: updatedCollected,
       serialRecord: updatedSerial,
@@ -1342,7 +1337,6 @@ class AswhUpCollectionBloc
       trayUsed: recalculatedTrayUsed,
       trayCurrentWeight: recalculatedTrayWeight,
       trayMaterialKey: newTrayKey,
-      message: '已删除 ${removed.length} 条采集记录',
     );
     emit(newState);
     await _persistCache(newState);
@@ -1365,18 +1359,6 @@ class AswhUpCollectionBloc
     Emitter<AswhUpCollectionState> emit,
   ) async {
     await _clearCache();
-    emit(state.copyWith(message: '已清空缓存', focus: true));
-  }
-
-  String _placeholderForStep(AswhUpCollectionScanStep step) {
-    switch (step) {
-      case AswhUpCollectionScanStep.tray:
-        return '请扫描托盘条码';
-      case AswhUpCollectionScanStep.material:
-        return '请扫描物料二维码';
-      case AswhUpCollectionScanStep.quantity:
-        return '请输入采集数量';
-    }
   }
 
   AswhUpTaskDetailItem _cloneDetail(
@@ -1569,6 +1551,24 @@ class AswhUpCollectionBloc
 
   bool _isSerialControlled(String flag) {
     final normalized = flag.trim().toUpperCase();
-    return normalized == 'Y' || normalized == '0' || normalized == 'SN';
+    return normalized == '0';
+  }
+
+  String _getPlaceMessage() {
+    if (state.trayNo.isEmpty) {
+      return '请扫描托盘条码';
+    }
+    if (state.currentBarcode?.isEmpty ?? true) {
+      return '请扫描物料二维码';
+    }
+
+    bool isSerialControlled = _isSerialControlled(
+      state.currentBarcode?.seqCtrl ?? '',
+    );
+
+    if ((!isSerialControlled) && state.collectQty == 0) {
+      return '请输入采集数量';
+    }
+    return '';
   }
 }

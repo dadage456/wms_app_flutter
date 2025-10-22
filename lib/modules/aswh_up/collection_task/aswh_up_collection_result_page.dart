@@ -36,12 +36,24 @@ class _AswhUpCollectionResultPageState
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('采集结果'),
+          backgroundColor: const Color(0xFF1976D2),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.of(context).pop(_deleted),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pop(_deleted);
+            },
+          ),
+          centerTitle: true,
+          title: const Text(
+            '采集结果',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
+        backgroundColor: const Color(0xFFF6F6F6),
         body: _stocks.isEmpty
             ? const Center(child: Text('暂无采集结果'))
             : CommonDataGrid<AswhUpCollectionStock>(
@@ -59,13 +71,16 @@ class _AswhUpCollectionResultPageState
             ? null
             : Container(
                 color: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('删除选中'),
-                  onPressed:
-                      _selectedIds.isEmpty ? null : () => _deleteSelected(context),
+                  onPressed: _selectedIds.isEmpty
+                      ? null
+                      : () => _deleteSelected(context),
                 ),
               ),
       ),
@@ -144,8 +159,8 @@ class _AswhUpCollectionResultPageState
       _selectedIds.clear();
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已删除 ${toRemove.length} 条采集记录')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('已删除 ${toRemove.length} 条采集记录')));
   }
 }

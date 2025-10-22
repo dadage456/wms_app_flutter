@@ -1329,6 +1329,10 @@ class InboundCollectionBloc
       expireDays: source.expireDays,
       productionDate: source.productionDate,
       proType: source.proType,
+      orderno: source.orderno,
+      matinnercode: source.matinnercode,
+      intaskno: source.intaskno,
+      taskcommend: source.taskcommend,
     );
   }
 }

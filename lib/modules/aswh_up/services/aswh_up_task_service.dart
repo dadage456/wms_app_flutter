@@ -68,21 +68,25 @@ class AswhUpTaskService {
   Future<void> commitUpShelves({
     required List<Map<String, dynamic>> upShelvesInfos,
     required List<Map<String, dynamic>> itemListInfos,
+    required String trayNo,
+    required String taskNo,
     required String filter,
     required String weight,
     required String capacity,
   }) async {
     await _dio.post<Map<String, dynamic>>(
-      '/system/terminal/commitASWHUpShelves',
+      '/system/terminal/commitUpTray',
       options: Options(
         headers: {'content-type': 'application/json;charset=UTF-8'},
       ),
       data: {
         'upShelvesInfos': upShelvesInfos,
         'itemListInfos': itemListInfos,
+        'trayNo': trayNo,
+        'taskNo': taskNo,
         'filter': filter,
-        'weight': weight,
-        'capacity': capacity,
+        'currentWeight': weight,
+        'currentCapacity': capacity,
       },
     );
   }

@@ -35,7 +35,7 @@ class AswhUpCollectionState extends Equatable {
     this.pendingTrayNo,
     this.showTrayChangeDialog = false,
     this.focus = false,
-    this.message,
+    this.collectQty = 0,
   });
 
   factory AswhUpCollectionState.initial(AswhUpTask task) {
@@ -73,7 +73,7 @@ class AswhUpCollectionState extends Equatable {
   final String? pendingTrayNo;
   final bool showTrayChangeDialog;
   final bool focus;
-  final String? message;
+  final double? collectQty;
 
   AswhUpCollectionState copyWith({
     CollectionStatus? status,
@@ -106,7 +106,7 @@ class AswhUpCollectionState extends Equatable {
     String? pendingTrayNo,
     bool? showTrayChangeDialog,
     bool? focus,
-    String? message,
+    double? collectQty,
   }) {
     return AswhUpCollectionState(
       task: task,
@@ -133,7 +133,8 @@ class AswhUpCollectionState extends Equatable {
       weightUsageByStock: weightUsageByStock ?? this.weightUsageByStock,
       currentMaterialCapacity:
           currentMaterialCapacity ?? this.currentMaterialCapacity,
-      currentMaterialWeight: currentMaterialWeight ?? this.currentMaterialWeight,
+      currentMaterialWeight:
+          currentMaterialWeight ?? this.currentMaterialWeight,
       shouldCheckBatch: shouldCheckBatch ?? this.shouldCheckBatch,
       shouldCheckSupplier: shouldCheckSupplier ?? this.shouldCheckSupplier,
       restrictMaterialMixing:
@@ -142,43 +143,43 @@ class AswhUpCollectionState extends Equatable {
       pendingTrayNo: pendingTrayNo ?? this.pendingTrayNo,
       showTrayChangeDialog: showTrayChangeDialog ?? this.showTrayChangeDialog,
       focus: focus ?? this.focus,
-      message: message,
+      collectQty: collectQty ?? this.collectQty,
     );
   }
 
   @override
   List<Object?> get props => [
-        task,
-        status,
-        detailList,
-        visibleDetails,
-        stocks,
-        currentBarcode,
-        currentItem,
-        trayNo,
-        storeSite,
-        trayCapacity,
-        trayUsed,
-        trayMaxWeight,
-        trayCurrentWeight,
-        placeholder,
-        scanStep,
-        currentTab,
-        selectedDetailIds,
-        collectedByItem,
-        serialRecord,
-        dicMtlQty,
-        capacityUsageByStock,
-        weightUsageByStock,
-        currentMaterialCapacity,
-        currentMaterialWeight,
-        shouldCheckBatch,
-        shouldCheckSupplier,
-        restrictMaterialMixing,
-        trayMaterialKey,
-        pendingTrayNo,
-        showTrayChangeDialog,
-        focus,
-        message,
-      ];
+    task,
+    status,
+    detailList,
+    visibleDetails,
+    stocks,
+    currentBarcode,
+    currentItem,
+    trayNo,
+    storeSite,
+    trayCapacity,
+    trayUsed,
+    trayMaxWeight,
+    trayCurrentWeight,
+    placeholder,
+    scanStep,
+    currentTab,
+    selectedDetailIds,
+    collectedByItem,
+    serialRecord,
+    dicMtlQty,
+    capacityUsageByStock,
+    weightUsageByStock,
+    currentMaterialCapacity,
+    currentMaterialWeight,
+    shouldCheckBatch,
+    shouldCheckSupplier,
+    restrictMaterialMixing,
+    trayMaterialKey,
+    pendingTrayNo,
+    showTrayChangeDialog,
+    focus,
+    collectQty,
+  ];
 }

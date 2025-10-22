@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wms_app/modules/aswh_up/collection_task/config/collection_result_grid_config.dart';
 import 'package:wms_app/modules/aswh_up/task_details/models/aswh_up_task_detail_item.dart';
 
 import '../../../common_widgets/common_grid/common_data_grid.dart';
@@ -106,12 +107,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
               _bloc.add(const AswhUpResetStatusEvent());
             }
 
-            if (state.message?.isNotEmpty == true) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.message!)));
-            }
-
             if (state.currentTab != _tabController.index) {
               _tabController.index = state.currentTab;
             }
@@ -194,7 +189,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
             );
           },
         ),
-        bottomNavigationBar: _buildBottomBar(context),
+        bottomNavigationBar: _buildBottomButtons(context),
       ),
     );
   }
@@ -230,11 +225,12 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     final item = state.currentItem;
     final itemId = item?.inTaskItemId;
     if (itemId != null) {
-      collectedQty = state.collectedByItem[itemId] ?? item?.collectedQty;
+      collectedQty = state.collectedByItem[itemId];
     }
-    final collectedText = (collectedQty == null || collectedQty == 0)
+
+    final collectedText = (state.collectQty == null || state.collectQty == 0)
         ? ''
-        : collectedQty.toFormatString();
+        : state.collectQty!.toFormatString();
 
     final unitCapacityText = state.currentMaterialCapacity <= 0
         ? ''
@@ -267,8 +263,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
 
     addSectionIf(true, '托盘：', trayNo, '剩余容量：', capacityText);
     addSectionIf(true, '物料：', materialCode ?? '', '采集数量：', collectedText);
-    addSectionIf(true, '名称：', materialName ?? '', '批次：', batch ?? '');
-    addSectionIf(true, '序列：', serial ?? '', '', '');
+    addSectionIf(true, '序列：', serial ?? '', '批次：', batch ?? '');
+    addSectionIf(true, '名称：', materialName ?? '', '', '');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: const BoxDecoration(
@@ -354,7 +350,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildDetailGrid(AswhUpCollectionState state) {
-    final columns = _detailColumns();
+    final columns = CollectionResultGridConfig.getColumns();
     final selected = _selectedIndicesFor(
       state.detailList,
       state.selectedDetailIds,
@@ -380,7 +376,7 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
   }
 
   Widget _buildFiltedGrid(AswhUpCollectionState state) {
-    final columns = _detailColumns();
+    final columns = CollectionResultGridConfig.getColumns();
 
     return CommonDataGrid<AswhUpTaskDetailItem>(
       columns: columns,
@@ -391,111 +387,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
       totalPages: 1,
       onLoadData: (_) async {},
     );
-  }
-
-  Widget _buildBottomBar(BuildContext context) {
-    final state = BlocProvider.of<AswhUpCollectionBloc>(context).state;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: const BoxDecoration(color: Colors.white),
-      height: 56,
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: state.stocks.isEmpty ? null : _openResultPage,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF1976D2),
-                side: const BorderSide(color: Color(0xFF1976D2)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('采集结果'),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: state.stocks.isEmpty
-                  ? null
-                  : () => _bloc.add(const AswhUpSubmitEvent()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1976D2),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('组盘提交'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<GridColumnConfig<AswhUpTaskDetailItem>> _detailColumns() {
-    return [
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'matCode',
-        headerText: '物料编码',
-        valueGetter: (row) => row.materialCode,
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'matName',
-        headerText: '物料名称',
-        valueGetter: (row) => row.materialName ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'storeSite',
-        headerText: '库位',
-        valueGetter: (row) => row.storeSiteNo ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'subInventory',
-        headerText: '子库',
-        valueGetter: (row) => row.subInventoryCode ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'storeRoom',
-        headerText: '库房',
-        valueGetter: (row) => row.storeRoomNo ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'taskQty',
-        headerText: '任务数量',
-        valueGetter: (row) => row.planQty.toFormatString(),
-        textAlign: TextAlign.right,
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'collectedQty',
-        headerText: '已采集',
-        valueGetter: (row) => row.collectedQty.toFormatString(),
-        textAlign: TextAlign.right,
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'repQty',
-        headerText: '库存数量',
-        valueGetter: (row) => row.repertoryQty.toFormatString(),
-        textAlign: TextAlign.right,
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'batch',
-        headerText: '批次',
-        valueGetter: (row) => row.batchNo ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'sn',
-        headerText: '序列号',
-        valueGetter: (row) => row.serialNo ?? '',
-      ),
-      GridColumnConfig<AswhUpTaskDetailItem>(
-        name: 'inboundOrder',
-        headerText: '入库单号',
-        valueGetter: (row) => row.inboundOrderNo ?? '',
-      ),
-    ];
   }
 
   List<int> _selectedIndicesFor(
@@ -522,49 +413,6 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
     }
   }
 
-  void _handleException() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('异常处理暂未开放')));
-  }
-
-  void _handleQuerySubmit() {
-    if (_bloc.state.stocks.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('采集数据未提交,不允许托盘上架！')));
-      return;
-    }
-    final trayNo = _bloc.state.trayNo;
-    if (trayNo.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('请先扫描托盘号')));
-      return;
-    }
-    Modular.to.pushNamed(
-      '/aswh-up/pallet-item',
-      arguments: {'trayNo': trayNo, 'task': _bloc.state.task},
-    );
-  }
-
-  void _handleQueryInstruction() {
-    if (_bloc.state.stocks.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('采集数据未提交,不允许查看指令！')));
-      return;
-    }
-    Modular.to.pushNamed(
-      '/aswh-up/wcs-instruction',
-      arguments: {
-        'taskId': _bloc.state.task.inTaskId,
-        'taskComment': _bloc.state.task.taskComment,
-        'taskType': '00',
-      },
-    );
-  }
-
   void _handleBackPress(BuildContext context) {
     if (_bloc.state.stocks.isEmpty) {
       Navigator.of(context).maybePop();
@@ -584,8 +432,8 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext);
-                Navigator.of(context).maybePop();
+                Navigator.of(dialogContext).pop();
+                Navigator.of(context).pop();
               },
               child: const Text('确定'),
             ),
@@ -678,6 +526,89 @@ class _AswhUpCollectionPageState extends State<AswhUpCollectionPage>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBottomButtons(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: const BoxDecoration(color: Colors.white),
+      height: 56,
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () async {
+                final stocks = _bloc.state.stocks;
+                if (stocks.isEmpty) {
+                  LoadingDialogManager.instance.showErrorDialog(
+                    context,
+                    '暂无采集记录',
+                  );
+                  return;
+                }
+                _openResultPage();
+              },
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF1976D2),
+                side: const BorderSide(color: Color(0xFF1976D2)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('采集结果'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _showCommitConfirmation(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1976D2),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('组盘提交'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCommitConfirmation(BuildContext context) {
+    final state = _bloc.state;
+    if (state.stocks.isEmpty) {
+      LoadingDialogManager.instance.showErrorDialog(context, '暂无采集数据');
+      return;
+    }
+
+    if (state.stocks.isEmpty) {
+      LoadingDialogManager.instance.showErrorDialog(context, '暂无采集数据');
+      return;
+    }
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('提交确认'),
+        content: Text('是否确认提交当前采集数据？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _bloc.add(const AswhUpSubmitEvent());
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
     );
   }
 }

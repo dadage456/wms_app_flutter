@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:wms_app/modules/goods_up/collection_task/config/collection_result_grid_config.dart';
 
 import '../../../common_widgets/common_grid/common_data_grid.dart';
 import '../../../common_widgets/loading_dialog_manager.dart';
@@ -157,7 +158,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
                     controller: _tabController,
                     children: [
                       CommonDataGrid<InboundCollectTaskItem>(
-                        columns: _collectionColumns(),
+                        columns: CollectionResultGridConfig.getColumns(),
                         datas: state.detailList,
                         allowPager: false,
                         allowSelect: true,
@@ -172,7 +173,7 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
                             _onGridSelectionChanged(indices, state.detailList),
                       ),
                       CommonDataGrid<InboundCollectTaskItem>(
-                        columns: _collectionColumns(),
+                        columns: CollectionResultGridConfig.getColumns(),
                         datas: state.collectionList,
                         allowPager: false,
                         allowSelect: false,
@@ -508,66 +509,6 @@ class _GoodsUpCollectionPageState extends State<GoodsUpCollectionPage>
       textValue = textValue.substring(0, textValue.length - 1);
     }
     return textValue;
-  }
-
-  List<GridColumnConfig<InboundCollectTaskItem>> _collectionColumns() {
-    return [
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'matcode',
-        headerText: '物料编码',
-        valueGetter: (row) => row.materialCode,
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'storesiteno',
-        headerText: '库位',
-        valueGetter: (row) => row.storeSiteNo ?? '',
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'qty',
-        headerText: '任务数量',
-        valueGetter: (row) => row.planQty,
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'collectedqty',
-        headerText: '已采集',
-        valueGetter: (row) => row.collectedQty,
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'repqty',
-        headerText: '库存数量',
-        valueGetter: (row) => row.repertoryQty,
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'batchno',
-        headerText: '批次',
-        valueGetter: (row) => row.batchNo ?? '',
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'sn',
-        headerText: '序列',
-        valueGetter: (row) => row.serialNo ?? '',
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'subinventoryCode',
-        headerText: '子库',
-        valueGetter: (row) => row.subInventoryCode ?? '',
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'unit',
-        headerText: '单位',
-        valueGetter: (row) => row.unit ?? '',
-      ),
-      GridColumnConfig<InboundCollectTaskItem>(
-        name: 'index',
-        headerText: '序号',
-        valueGetter: (row) {
-          final index = _bloc.state.detailList.indexWhere(
-            (element) => element.inTaskItemId == row.inTaskItemId,
-          );
-          return index + 1;
-        },
-      ),
-    ];
   }
 
   List<int> _selectedIndicesFor(
