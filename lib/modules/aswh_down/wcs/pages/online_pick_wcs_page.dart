@@ -36,7 +36,7 @@ class _OnlinePickWcsPageState extends State<OnlinePickWcsPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<OnlinePickWcsBloc>();
+    _bloc = BlocProvider.of<OnlinePickWcsBloc>(context);
     _gridBloc = _bloc.gridBloc;
     _bloc.add(OnlinePickWcsStarted(widget.initialArgs));
   }

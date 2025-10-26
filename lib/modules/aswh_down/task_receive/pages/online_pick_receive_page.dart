@@ -34,7 +34,7 @@ class _OnlinePickReceivePageState extends State<OnlinePickReceivePage> {
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<OnlinePickReceiveBloc>();
+    _bloc = BlocProvider.of<OnlinePickReceiveBloc>(context);
     _gridBloc = _bloc.gridBloc;
     _bloc.add(const OnlinePickReceiveStarted());
   }

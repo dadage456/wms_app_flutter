@@ -44,7 +44,7 @@ class _OnlinePickReceiveDetailPageState
   @override
   void initState() {
     super.initState();
-    _bloc = context.read<OnlinePickReceiveDetailBloc>();
+    _bloc = BlocProvider.of<OnlinePickReceiveDetailBloc>(context);
     _gridBloc = _bloc.gridBloc;
 
     final payloadTask = widget.taskData['task'];
