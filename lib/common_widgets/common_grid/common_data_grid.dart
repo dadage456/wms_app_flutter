@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -164,6 +165,19 @@ class _CommonDataGridState<T> extends State<CommonDataGrid<T>> {
       debugPrint(
         '----- table didUpdateWidget currentPage: ${widget.currentPage}',
       );
+    }
+
+    if (!listEquals(oldWidget.selectedRows, widget.selectedRows)) {
+      _selectedIndexInPage
+        ..clear()
+        ..addAll(widget.selectedRows);
+
+      final rows = widget.selectedRows
+          .where((index) => index >= 0 && index < _source.rows.length)
+          .map((index) => _source.rows[index])
+          .toList();
+
+      _controller.selectedRows = rows;
     }
   }
 

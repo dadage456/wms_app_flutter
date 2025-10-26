@@ -1,39 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:wms_app/common_widgets/common_grid/common_data_grid.dart';
-import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
-import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
-import 'package:wms_app/common_widgets/common_grid/grid_state.dart';
-import 'package:wms_app/common_widgets/custom_app_bar.dart';
-import 'package:wms_app/common_widgets/loading_dialog_manager.dart';
-import 'package:wms_app/common_widgets/scanner_widget/scanner_config.dart';
-import 'package:wms_app/common_widgets/scanner_widget/scanner_widget.dart';
-import 'package:wms_app/services/user_manager.dart';
 
-import 'bloc/goods_up_task_bloc.dart';
-import 'bloc/goods_up_task_event.dart';
-import 'config/goods_up_task_grid_config.dart';
-import 'models/goods_up_task.dart';
-import '../task_list/widgets/goods_up_task_filter_dialog.dart';
+import '../../../common_widgets/common_grid/common_data_grid.dart';
+import '../../../common_widgets/common_grid/grid_bloc.dart';
+import '../../../common_widgets/common_grid/grid_event.dart';
+import '../../../common_widgets/common_grid/grid_state.dart';
+import '../../../common_widgets/custom_app_bar.dart';
+import '../../../common_widgets/loading_dialog_manager.dart';
+import '../../../common_widgets/scanner_widget/scanner_config.dart';
+import '../../../common_widgets/scanner_widget/scanner_widget.dart';
+import '../../../services/user_manager.dart';
+import '../models/aswh_up_task.dart';
+import 'bloc/aswh_up_task_bloc.dart';
+import 'bloc/aswh_up_task_event.dart';
+import 'bloc/aswh_up_task_state.dart';
+import 'config/aswh_up_task_grid_config.dart';
 
-class GoodsUpTaskListPage extends StatefulWidget {
-  const GoodsUpTaskListPage({super.key});
+class AswhUpTaskListPage extends StatefulWidget {
+  const AswhUpTaskListPage({super.key});
 
   @override
-  State<GoodsUpTaskListPage> createState() => _GoodsUpTaskListPageState();
+  State<AswhUpTaskListPage> createState() => _AswhUpTaskListPageState();
 }
 
-class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
-  late final GoodsUpTaskBloc _bloc;
-  late final CommonDataGridBloc<GoodsUpTask> _gridBloc;
+class _AswhUpTaskListPageState extends State<AswhUpTaskListPage> {
+  late final AswhUpTaskBloc _bloc;
+  late final CommonDataGridBloc<AswhUpTask> _gridBloc;
   final ScannerController _scannerController = ScannerController();
 
   @override
   void initState() {
     super.initState();
-    _bloc = BlocProvider.of<GoodsUpTaskBloc>(context);
+    _bloc = BlocProvider.of<AswhUpTaskBloc>(context);
     _gridBloc = _bloc.gridBloc;
   }
 
@@ -42,11 +41,11 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       appBar: CustomAppBar(
-        title: '平库上架任务',
+        title: '立库组盘任务',
         onBackPressed: () => Navigator.of(context).pop(),
         actions: [
           IconButton(
-            onPressed: () => Modular.to.pushNamed('/goods-up/receive'),
+            onPressed: () => Modular.to.pushNamed('/aswh-up/receive'),
             icon: const Icon(Icons.add, color: Colors.white, size: 28),
           ),
         ],
@@ -69,7 +68,7 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     return ScannerWidget(
       config: config,
       controller: _scannerController,
-      onScanResult: (value) => _bloc.add(SearchGoodsUpTasksEvent(value)),
+      onScanResult: (value) => _bloc.add(SearchAswhUpTasksEvent(value)),
       onError: (message) =>
           LoadingDialogManager.instance.showErrorDialog(context, message),
     );
@@ -80,8 +79,8 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
       value: _gridBloc,
       child:
           BlocConsumer<
-            CommonDataGridBloc<GoodsUpTask>,
-            CommonDataGridState<GoodsUpTask>
+            CommonDataGridBloc<AswhUpTask>,
+            CommonDataGridState<AswhUpTask>
           >(
             listener: (context, state) {
               if (state.status == GridStatus.loading) {
@@ -98,8 +97,8 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
               }
             },
             builder: (context, state) {
-              return CommonDataGrid<GoodsUpTask>(
-                columns: GoodsUpTaskGridConfig.columns((task, type) {
+              return CommonDataGrid<AswhUpTask>(
+                columns: AswhUpTaskGridConfig.columns((task, type) {
                   if (type == 0) {
                     _navigateToCollect(task);
                   } else {
@@ -109,11 +108,11 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
                 currentPage: state.currentPage,
                 totalPages: state.totalPages,
                 onLoadData: (index) async {
-                  _gridBloc.add(LoadDataEvent<GoodsUpTask>(index));
+                  _gridBloc.add(LoadDataEvent<AswhUpTask>(index));
                 },
                 selectedRows: state.selectedRows,
                 onSelectionChanged: (rows) =>
-                    _gridBloc.add(ChangeSelectedRowsEvent<GoodsUpTask>(rows)),
+                    _gridBloc.add(ChangeSelectedRowsEvent<AswhUpTask>(rows)),
                 datas: state.data,
                 allowPager: true,
                 allowSelect: false,
@@ -125,14 +124,14 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     );
   }
 
-  void _navigateToCollect(GoodsUpTask task) {
+  void _navigateToCollect(AswhUpTask task) {
     Modular.to.pushNamed(
-      '/goods-up/collect/${task.inTaskNo}',
+      '/aswh-up/collect/${task.inTaskNo}',
       arguments: {'task': task},
     );
   }
 
-  void _navigateToDetail(GoodsUpTask task) {
+  void _navigateToDetail(AswhUpTask task) {
     final userManager = Modular.get<UserManager>();
     final userInfo = userManager.userInfo;
     if (userInfo == null) {
@@ -141,7 +140,7 @@ class _GoodsUpTaskListPageState extends State<GoodsUpTaskListPage> {
     }
 
     Modular.to.pushNamed(
-      '/goods-up/detail/${task.inTaskId}',
+      '/aswh-up/detail/${task.inTaskId}',
       arguments: {
         'task': task,
         'workStation': task.workStation,

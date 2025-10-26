@@ -9,6 +9,7 @@ import 'package:wms_app/services/api_service.dart';
 import 'modules/outbound/outbound_module.dart';
 import 'modules/goods_up/goods_up_module.dart';
 import 'modules/aswh_down/aswh_down_module.dart';
+import 'modules/aswh_up/aswh_up_module.dart';
 
 /// 应用主模块
 class AppModule extends Module {
@@ -48,5 +49,7 @@ class AppModule extends Module {
 
     // 自动化仓库出库模块
     r.module('/aswh-down', module: AswhDownModule());
+    // 立库组盘模块
+    r.module('/aswh-up', module: AswhUpModule());
   }
 }

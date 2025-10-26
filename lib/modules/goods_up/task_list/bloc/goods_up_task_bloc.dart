@@ -48,6 +48,7 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
     return GoodsUpTaskQuery(
       userId: '${userInfo.userId}',
       roleOrUserId: '${userInfo.userId}',
+
       pageSize: 100,
       pageIndex: 1,
     );
@@ -61,14 +62,14 @@ class GoodsUpTaskBloc extends Bloc<GoodsUpTaskEvent, GoodsUpTaskState> {
       searchKey: event.searchKey,
       pageIndex: 1,
     );
-    gridBloc.add(LoadDataEvent<GoodsUpTask>(0));
+    gridBloc.add(LoadDataEvent<GoodsUpTask>(currentQuery.pageIndex));
   }
 
   Future<void> _onRefresh(
     RefreshGoodsUpTasksEvent event,
     Emitter<GoodsUpTaskState> emit,
   ) async {
-    gridBloc.add(LoadDataEvent<GoodsUpTask>(0));
+    gridBloc.add(LoadDataEvent<GoodsUpTask>(currentQuery.pageIndex));
   }
 
   @override

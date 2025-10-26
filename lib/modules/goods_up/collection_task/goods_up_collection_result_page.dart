@@ -109,8 +109,7 @@ class _GoodsUpCollectionResultPageState
           Text('已选 $selected / $total', style: const TextStyle(fontSize: 14)),
           const Spacer(),
           ElevatedButton.icon(
-            onPressed:
-                selected == 0 ? null : () => _confirmDelete(context),
+            onPressed: selected == 0 ? null : () => _confirmDelete(context),
             icon: const Icon(Icons.delete_outline),
             label: const Text('删除'),
             style: ElevatedButton.styleFrom(
@@ -134,8 +133,7 @@ class _GoodsUpCollectionResultPageState
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('确认删除'),
-        content:
-            Text('确定要删除选中的 ${_selectedIndices.length} 条采集记录吗？'),
+        content: Text('确定要删除选中的 ${_selectedIndices.length} 条采集记录吗？'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -185,9 +183,9 @@ class _GoodsUpCollectionResultPageState
 
   void _finishWithPayload() {
     Navigator.of(context).pop(
-      InboundDeletedStocksPayload(List<InboundCollectionStock>.from(
-        _deletedBuffer,
-      )),
+      InboundDeletedStocksPayload(
+        List<InboundCollectionStock>.from(_deletedBuffer),
+      ),
     );
   }
 
@@ -234,6 +232,11 @@ class _GoodsUpCollectionResultPageState
         valueGetter: (row) => row.storeRoom ?? '',
       ),
       GridColumnConfig<InboundCollectionStock>(
+        name: 'inTaskId',
+        headerText: '任务号',
+        valueGetter: (row) => row.inTaskId ?? '',
+      ),
+      GridColumnConfig<InboundCollectionStock>(
         name: 'pdate',
         headerText: '生产日期',
         valueGetter: (row) => row.productionDate ?? '',
@@ -242,6 +245,11 @@ class _GoodsUpCollectionResultPageState
         name: 'vdays',
         headerText: '有效期',
         valueGetter: (row) => row.expireDays ?? '',
+      ),
+      GridColumnConfig<InboundCollectionStock>(
+        name: 'inTaskItemId',
+        headerText: '采集数据id',
+        valueGetter: (row) => row.stockId ?? '',
       ),
     ];
   }

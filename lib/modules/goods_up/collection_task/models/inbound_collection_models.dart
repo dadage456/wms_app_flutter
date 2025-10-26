@@ -20,6 +20,10 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
     this.expireDays,
     this.productionDate,
     this.proType,
+    this.orderno,
+    this.matinnercode,
+    this.intaskno,
+    this.taskcommend,
   });
 
   factory InboundCollectTaskItem.fromJson(Map<String, dynamic> json) {
@@ -40,6 +44,10 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       expireDays: _parseIntNullable(json['vdays']),
       productionDate: json['pdate']?.toString(),
       proType: json['protype']?.toString(),
+      orderno: json['orderno']?.toString(),
+      matinnercode: json['matinnercode']?.toString(),
+      intaskno: json['intaskno']?.toString(),
+      taskcommend: json['taskcommend']?.toString(),
     );
   }
 
@@ -59,6 +67,10 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
   final int? expireDays;
   final String? productionDate;
   final String? proType;
+  final String? orderno;
+  final String? matinnercode;
+  final String? intaskno;
+  final String? taskcommend;
 
   Map<String, dynamic> toJson() {
     return {
@@ -78,6 +90,10 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
       'vdays': expireDays,
       'pdate': productionDate,
       'protype': proType,
+      'orderno': orderno,
+      'matinnercode': matinnercode,
+      'intaskno': intaskno,
+      'taskcommend': taskcommend,
     };
   }
 
@@ -99,6 +115,10 @@ class InboundCollectTaskItem extends HiveObject with EquatableMixin {
     expireDays,
     productionDate,
     proType,
+    orderno,
+    matinnercode,
+    intaskno,
+    taskcommend,
   ];
 }
 

@@ -178,7 +178,7 @@ class GoodsUpTaskQuery extends Equatable {
       'searchKey': searchKey,
       'userId': userId,
       'roleoRuserId': roleOrUserId,
-      'roomtag': roomTag,
+      'roomTag': roomTag,
       'batchflag': batchFlag,
       'transferType': transferType,
       'beatflag': beatFlag,
