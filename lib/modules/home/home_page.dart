@@ -293,6 +293,8 @@ class _FunctionGrid extends StatelessWidget {
             Modular.to.pushNamed('/goods-up');
           } else if (f.title == '立库组盘') {
             Modular.to.pushNamed('/aswh-up');
+          } else if (f.title == '在线拣选') {
+            Modular.to.pushNamed('/aswh-down');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

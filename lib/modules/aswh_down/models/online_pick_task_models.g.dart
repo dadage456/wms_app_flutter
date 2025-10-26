@@ -99,8 +99,6 @@ _$OnlinePickTaskQueryImpl _$$OnlinePickTaskQueryImplFromJson(
 Map<String, dynamic> _$$OnlinePickTaskQueryImplToJson(
         _$OnlinePickTaskQueryImpl instance) =>
     <String, dynamic>{
-      'sortType': instance.sortType,
-      'sortColumn': instance.sortColumn,
       'searchKey': instance.searchKey,
       'userId': instance.userId,
       'roleoRuserId': instance.roleOrUserId,

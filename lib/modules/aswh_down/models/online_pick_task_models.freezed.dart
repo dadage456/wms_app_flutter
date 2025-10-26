@@ -995,9 +995,9 @@ OnlinePickTaskQuery _$OnlinePickTaskQueryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OnlinePickTaskQuery {
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   String get sortType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   String get sortColumn => throw _privateConstructorUsedError;
   @JsonKey(name: 'searchKey')
   String get searchKey => throw _privateConstructorUsedError;
@@ -1033,8 +1033,8 @@ abstract class $OnlinePickTaskQueryCopyWith<$Res> {
       _$OnlinePickTaskQueryCopyWithImpl<$Res, OnlinePickTaskQuery>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'sortType') String sortType,
-      @JsonKey(name: 'sortColumn') String sortColumn,
+      {@JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       @JsonKey(name: 'searchKey') String searchKey,
       @JsonKey(name: 'userId') String userId,
       @JsonKey(name: 'roleoRuserId') String roleOrUserId,
@@ -1135,8 +1135,8 @@ abstract class _$$OnlinePickTaskQueryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'sortType') String sortType,
-      @JsonKey(name: 'sortColumn') String sortColumn,
+      {@JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       @JsonKey(name: 'searchKey') String searchKey,
       @JsonKey(name: 'userId') String userId,
       @JsonKey(name: 'roleoRuserId') String roleOrUserId,
@@ -1230,8 +1230,8 @@ class __$$OnlinePickTaskQueryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$OnlinePickTaskQueryImpl implements _OnlinePickTaskQuery {
   const _$OnlinePickTaskQueryImpl(
-      {@JsonKey(name: 'sortType') this.sortType = '',
-      @JsonKey(name: 'sortColumn') this.sortColumn = '',
+      {@JsonKey(includeToJson: false) this.sortType = '',
+      @JsonKey(includeToJson: false) this.sortColumn = '',
       @JsonKey(name: 'searchKey') this.searchKey = '',
       @JsonKey(name: 'userId') required this.userId,
       @JsonKey(name: 'roleoRuserId') required this.roleOrUserId,
@@ -1247,10 +1247,10 @@ class _$OnlinePickTaskQueryImpl implements _OnlinePickTaskQuery {
       _$$OnlinePickTaskQueryImplFromJson(json);
 
   @override
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   final String sortType;
   @override
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   final String sortColumn;
   @override
   @JsonKey(name: 'searchKey')
@@ -1351,8 +1351,8 @@ class _$OnlinePickTaskQueryImpl implements _OnlinePickTaskQuery {
 
 abstract class _OnlinePickTaskQuery implements OnlinePickTaskQuery {
   const factory _OnlinePickTaskQuery(
-          {@JsonKey(name: 'sortType') final String sortType,
-          @JsonKey(name: 'sortColumn') final String sortColumn,
+          {@JsonKey(includeToJson: false) final String sortType,
+          @JsonKey(includeToJson: false) final String sortColumn,
           @JsonKey(name: 'searchKey') final String searchKey,
           @JsonKey(name: 'userId') required final String userId,
           @JsonKey(name: 'roleoRuserId') required final String roleOrUserId,
@@ -1369,10 +1369,10 @@ abstract class _OnlinePickTaskQuery implements OnlinePickTaskQuery {
       _$OnlinePickTaskQueryImpl.fromJson;
 
   @override
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   String get sortType;
   @override
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   String get sortColumn;
   @override
   @JsonKey(name: 'searchKey')

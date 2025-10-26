@@ -101,8 +101,6 @@ Map<String, dynamic> _$$OnlinePickTaskItemQueryImplToJson(
       'roomTag': instance.roomTag,
       'roleoRuserId': instance.roleOrUserId,
       'userId': instance.userId,
-      'sortType': instance.sortType,
-      'sortColumn': instance.sortColumn,
       'searchKey': instance.searchKey,
       'PageIndex': instance.pageIndex,
       'PageSize': instance.pageSize,

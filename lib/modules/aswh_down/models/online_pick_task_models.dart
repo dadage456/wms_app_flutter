@@ -86,8 +86,8 @@ class OnlinePickTaskListResponse with _$OnlinePickTaskListResponse {
 @freezed
 class OnlinePickTaskQuery with _$OnlinePickTaskQuery {
   const factory OnlinePickTaskQuery({
-    @Default('') @JsonKey(name: 'sortType') String sortType,
-    @Default('') @JsonKey(name: 'sortColumn') String sortColumn,
+    @Default('') @JsonKey(includeToJson: false) String sortType,
+    @Default('') @JsonKey(includeToJson: false) String sortColumn,
     @Default('') @JsonKey(name: 'searchKey') String searchKey,
     @JsonKey(name: 'userId') required String userId,
     @JsonKey(name: 'roleoRuserId') required String roleOrUserId,

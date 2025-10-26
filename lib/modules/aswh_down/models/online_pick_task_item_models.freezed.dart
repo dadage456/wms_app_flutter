@@ -813,9 +813,9 @@ mixin _$OnlinePickTaskItemQuery {
   String get roleOrUserId => throw _privateConstructorUsedError;
   @JsonKey(name: 'userId')
   String get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   String get sortType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   String get sortColumn => throw _privateConstructorUsedError;
   @JsonKey(name: 'searchKey')
   String get searchKey => throw _privateConstructorUsedError;
@@ -851,8 +851,8 @@ abstract class $OnlinePickTaskItemQueryCopyWith<$Res> {
       @JsonKey(name: 'roomTag') String roomTag,
       @JsonKey(name: 'roleoRuserId') String roleOrUserId,
       @JsonKey(name: 'userId') String userId,
-      @JsonKey(name: 'sortType') String sortType,
-      @JsonKey(name: 'sortColumn') String sortColumn,
+      @JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       @JsonKey(name: 'searchKey') String searchKey,
       @JsonKey(name: 'PageIndex') int pageIndex,
       @JsonKey(name: 'PageSize') int pageSize,
@@ -973,8 +973,8 @@ abstract class _$$OnlinePickTaskItemQueryImplCopyWith<$Res>
       @JsonKey(name: 'roomTag') String roomTag,
       @JsonKey(name: 'roleoRuserId') String roleOrUserId,
       @JsonKey(name: 'userId') String userId,
-      @JsonKey(name: 'sortType') String sortType,
-      @JsonKey(name: 'sortColumn') String sortColumn,
+      @JsonKey(includeToJson: false) String sortType,
+      @JsonKey(includeToJson: false) String sortColumn,
       @JsonKey(name: 'searchKey') String searchKey,
       @JsonKey(name: 'PageIndex') int pageIndex,
       @JsonKey(name: 'PageSize') int pageSize,
@@ -1088,8 +1088,8 @@ class _$OnlinePickTaskItemQueryImpl implements _OnlinePickTaskItemQuery {
       @JsonKey(name: 'roomTag') this.roomTag = '1',
       @JsonKey(name: 'roleoRuserId') required this.roleOrUserId,
       @JsonKey(name: 'userId') required this.userId,
-      @JsonKey(name: 'sortType') this.sortType = '',
-      @JsonKey(name: 'sortColumn') this.sortColumn = '',
+      @JsonKey(includeToJson: false) this.sortType = '',
+      @JsonKey(includeToJson: false) this.sortColumn = '',
       @JsonKey(name: 'searchKey') this.searchKey = '',
       @JsonKey(name: 'PageIndex') this.pageIndex = 1,
       @JsonKey(name: 'PageSize') this.pageSize = 100,
@@ -1120,10 +1120,10 @@ class _$OnlinePickTaskItemQueryImpl implements _OnlinePickTaskItemQuery {
   @JsonKey(name: 'userId')
   final String userId;
   @override
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   final String sortType;
   @override
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   final String sortColumn;
   @override
   @JsonKey(name: 'searchKey')
@@ -1230,8 +1230,8 @@ abstract class _OnlinePickTaskItemQuery implements OnlinePickTaskItemQuery {
           @JsonKey(name: 'roomTag') final String roomTag,
           @JsonKey(name: 'roleoRuserId') required final String roleOrUserId,
           @JsonKey(name: 'userId') required final String userId,
-          @JsonKey(name: 'sortType') final String sortType,
-          @JsonKey(name: 'sortColumn') final String sortColumn,
+          @JsonKey(includeToJson: false) final String sortType,
+          @JsonKey(includeToJson: false) final String sortColumn,
           @JsonKey(name: 'searchKey') final String searchKey,
           @JsonKey(name: 'PageIndex') final int pageIndex,
           @JsonKey(name: 'PageSize') final int pageSize,
@@ -1263,10 +1263,10 @@ abstract class _OnlinePickTaskItemQuery implements OnlinePickTaskItemQuery {
   @JsonKey(name: 'userId')
   String get userId;
   @override
-  @JsonKey(name: 'sortType')
+  @JsonKey(includeToJson: false)
   String get sortType;
   @override
-  @JsonKey(name: 'sortColumn')
+  @JsonKey(includeToJson: false)
   String get sortColumn;
   @override
   @JsonKey(name: 'searchKey')
