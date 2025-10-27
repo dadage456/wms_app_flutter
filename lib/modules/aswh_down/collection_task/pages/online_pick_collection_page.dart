@@ -35,8 +35,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   late TabController _tabController;
   late OnlinePickCollectionBloc _bloc;
   final ScannerController _scannerController = ScannerController();
-  final TextEditingController _trayCountController =
-      TextEditingController(text: '1');
+  final TextEditingController _trayCountController = TextEditingController(
+    text: '1',
+  );
 
   @override
   void initState() {
@@ -102,10 +103,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
   }
 
-  void _listenState(
-    BuildContext context,
-    OnlinePickCollectionState state,
-  ) {
+  void _listenState(BuildContext context, OnlinePickCollectionState state) {
     if (state.status.isLoading) {
       LoadingDialogManager.instance.showLoadingDialog(context);
     } else {
@@ -142,10 +140,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       actions: [
         TextButton(
           onPressed: () => _showMoreOptions(state),
-          child: const Text(
-            '更多',
-            style: TextStyle(color: Colors.white),
-          ),
+          child: const Text('更多', style: TextStyle(color: Colors.white)),
         ),
       ],
     );
@@ -158,9 +153,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       child: ScannerWidget(
         controller: _scannerController,
         config: const ScannerConfig(),
-        autofocus: true,
-        hintText: state.placeholder,
-        onSubmitted: (code) => _bloc.add(PerformScanEvent(code)),
+        onScanResult: (value) {
+          _bloc.add(PerformScanEvent(value));
+        },
       ),
     );
   }
@@ -188,10 +183,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
         children: [
           Text(
             '任务号：${task.outTaskNo}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -326,9 +318,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   Future<void> _openResultPage(OnlinePickCollectionState state) async {
     final deletedIds = await Modular.to.pushNamed<List<String>>(
       '/aswh-down/collect/result',
-      arguments: {
-        'bloc': _bloc,
-      },
+      arguments: {'bloc': _bloc},
     );
 
     if (deletedIds != null && deletedIds.isNotEmpty) {
@@ -385,7 +375,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
             children: [
               const Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('选择拣选口', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  '选择拣选口',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               ...state.locationOptions.map(
                 (option) => ListTile(
@@ -574,12 +567,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   }
 
   void _showMessage(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   List<int> _selectedIndicesFor(

@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
@@ -10,6 +9,7 @@ import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_colle
 import 'package:wms_app/modules/aswh_down/collection_task/services/collection_cache_manager.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_task_item_models.dart';
+import 'package:wms_app/modules/aswh_down/models/online_pick_task_models.dart';
 import 'package:wms_app/modules/aswh_down/services/aswh_down_collection_service.dart';
 import 'package:wms_app/services/user_manager.dart';
 
@@ -19,10 +19,10 @@ class OnlinePickCollectionBloc
     required AswhDownCollectionService collectionService,
     required UserManager userManager,
     required OnlinePickCollectionCacheManager cacheManager,
-  })  : _collectionService = collectionService,
-        _userManager = userManager,
-        _cacheManager = cacheManager,
-        super(const OnlinePickCollectionState()) {
+  }) : _collectionService = collectionService,
+       _userManager = userManager,
+       _cacheManager = cacheManager,
+       super(const OnlinePickCollectionState()) {
     on<InitializeCollectionEvent>(_onInitializeCollection);
     on<PerformScanEvent>(_onPerformScan);
     on<ChangeCollectionTabEvent>(_onChangeTab);
@@ -50,29 +50,32 @@ class OnlinePickCollectionBloc
     InitializeCollectionEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    emit(state.copyWith(
-      status: CollectionStatus.loading(),
-      task: event.task,
-      placeholder: '请扫描库位',
-      step: OnlinePickCollectionStep.location,
-      currentTrayCode: '',
-      currentTab: 0,
-      selectedItemIds: [],
-      currentTrayItems: const [],
-      pendingCheckItems: const [],
-      collectedStocks: const [],
-      selectedLocation: event.task.taskComment ?? '',
-      dicSeq: const {},
-      dicMtlQty: const {},
-      dicInvMtlQty: const {},
-      issuedTrayNos: const [],
-      mode: OnlinePickCollectionModeType.outbound,
-      currentBarcode: null,
-    ));
+    emit(
+      state.copyWith(
+        status: CollectionStatus.loading(),
+        task: event.task,
+        placeholder: '请扫描库位',
+        step: OnlinePickCollectionStep.location,
+        currentTrayCode: '',
+        currentTab: 0,
+        selectedItemIds: [],
+        currentTrayItems: const [],
+        pendingCheckItems: const [],
+        collectedStocks: const [],
+        selectedLocation: event.task.taskComment ?? '',
+        dicSeq: const {},
+        dicMtlQty: const {},
+        dicInvMtlQty: const {},
+        issuedTrayNos: const [],
+        mode: OnlinePickCollectionModeType.outbound,
+        currentBarcode: null,
+      ),
+    );
 
     try {
-      final collectorId =
-          event.userId == 0 ? _userManager.userInfo?.userId ?? 0 : event.userId;
+      final collectorId = event.userId == 0
+          ? _userManager.userInfo?.userId ?? 0
+          : event.userId;
 
       final query = OnlinePickCollectionQuery(
         outTaskNo: event.task.outTaskNo,
@@ -84,35 +87,42 @@ class OnlinePickCollectionBloc
         collector: collectorId,
       );
 
-      final items =
-          await _collectionService.fetchCollectionTaskItems(query: query);
+      final items = await _collectionService.fetchCollectionTaskItems(
+        query: query,
+      );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('任务明细已加载'),
-        taskItems: items,
-        pendingCheckItems: _buildPendingItems(items),
-        currentTrayItems: const [],
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('任务明细已加载'),
+          taskItems: items,
+          pendingCheckItems: _buildPendingItems(items),
+          currentTrayItems: const [],
+          focus: true,
+        ),
+      );
 
       await _restoreCache(event.task, collectorId, emit);
       add(const LoadPickLocationsEvent());
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '加载任务明细失败'),
-        taskItems: const [],
-        currentTrayItems: const [],
-        pendingCheckItems: const [],
-        selectedItemIds: const [],
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '加载任务明细失败'),
+          taskItems: const [],
+          currentTrayItems: const [],
+          pendingCheckItems: const [],
+          selectedItemIds: const [],
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('加载任务明细失败：${error.toString()}'),
-        taskItems: const [],
-        currentTrayItems: const [],
-        pendingCheckItems: const [],
-        selectedItemIds: const [],
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('加载任务明细失败：${error.toString()}'),
+          taskItems: const [],
+          currentTrayItems: const [],
+          pendingCheckItems: const [],
+          selectedItemIds: const [],
+        ),
+      );
     }
   }
 
@@ -128,13 +138,15 @@ class OnlinePickCollectionBloc
     // 识别库位条码
     if (code.contains(r'\$KW\$')) {
       final location = code.replaceAll(r'\$KW\$', '').toUpperCase();
-      emit(state.copyWith(
-        status: CollectionStatus.success('库位 $location 已扫描'),
-        placeholder: '请扫描托盘条码',
-        step: OnlinePickCollectionStep.tray,
-        focus: true,
-        currentTrayCode: state.currentTrayCode,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('库位 $location 已扫描'),
+          placeholder: '请扫描托盘条码',
+          step: OnlinePickCollectionStep.tray,
+          focus: true,
+          currentTrayCode: state.currentTrayCode,
+        ),
+      );
       await _persistCacheSnapshot();
       return;
     }
@@ -143,17 +155,19 @@ class OnlinePickCollectionBloc
     if (code.contains(r'\$TP\$')) {
       final tray = code.replaceAll(r'\$TP\$', '').toUpperCase();
       final trayItems = _filterItemsByTray(state.taskItems, tray);
-      emit(state.copyWith(
-        status: CollectionStatus.success('托盘 $tray 已扫描'),
-        placeholder: '请扫描物料二维码',
-        step: OnlinePickCollectionStep.material,
-        currentTrayCode: tray,
-        currentTrayItems: trayItems,
-        focus: true,
-        issuedTrayNos: state.issuedTrayNos.contains(tray)
-            ? state.issuedTrayNos
-            : [...state.issuedTrayNos, tray],
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('托盘 $tray 已扫描'),
+          placeholder: '请扫描物料二维码',
+          step: OnlinePickCollectionStep.material,
+          currentTrayCode: tray,
+          currentTrayItems: trayItems,
+          focus: true,
+          issuedTrayNos: state.issuedTrayNos.contains(tray)
+              ? state.issuedTrayNos
+              : [...state.issuedTrayNos, tray],
+        ),
+      );
       await _persistCacheSnapshot();
       return;
     }
@@ -163,18 +177,22 @@ class OnlinePickCollectionBloc
     if (quantity != null && state.currentBarcode != null) {
       if (state.mode == OnlinePickCollectionModeType.inventory &&
           state.currentTrayCode.isEmpty) {
-        emit(state.copyWith(
-          status: CollectionStatus.error('请先扫描托盘后再录入数量'),
-          focus: true,
-        ));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('请先扫描托盘后再录入数量'),
+            focus: true,
+          ),
+        );
         return;
       }
 
       if (state.selectedItemIds.isEmpty) {
-        emit(state.copyWith(
-          status: CollectionStatus.error('请先在任务列表中选择要采集的任务行'),
-          focus: true,
-        ));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('请先在任务列表中选择要采集的任务行'),
+            focus: true,
+          ),
+        );
         return;
       }
 
@@ -183,10 +201,12 @@ class OnlinePickCollectionBloc
       );
 
       if (selectedItem == null) {
-        emit(state.copyWith(
-          status: CollectionStatus.error('未找到匹配的任务明细'),
-          focus: true,
-        ));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('未找到匹配的任务明细'),
+            focus: true,
+          ),
+        );
         return;
       }
 
@@ -211,18 +231,19 @@ class OnlinePickCollectionBloc
       if (serialNumber.isNotEmpty) {
         final seqKey = '${stock.materialCode}@$serialNumber';
         if (state.dicSeq.containsKey(seqKey)) {
-          emit(state.copyWith(
-            status: CollectionStatus.error('序列号已采集，请勿重复扫描'),
-            focus: true,
-          ));
+          emit(
+            state.copyWith(
+              status: CollectionStatus.error('序列号已采集，请勿重复扫描'),
+              focus: true,
+            ),
+          );
           return;
         }
       }
 
       final updatedStocks = List<OnlinePickCollectionStock>.from(
         state.collectedStocks,
-      )
-        ..add(stock);
+      )..add(stock);
 
       final updatedDicSeq = Map<String, String>.from(state.dicSeq);
       if (serialNumber.isNotEmpty) {
@@ -232,7 +253,8 @@ class OnlinePickCollectionBloc
       final updatedDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
       final itemKey = selectedItem.outTaskItemId.toString();
       final baseQty = selectedItem.taskQty.toDouble();
-      final currentQty = updatedDicMtlQty[itemKey]?.elementAtOrNull(1) ??
+      final currentQty =
+          updatedDicMtlQty[itemKey]?.elementAtOrNull(1) ??
           selectedItem.collectedQty.toDouble();
       updatedDicMtlQty[itemKey] = [baseQty, currentQty + quantity];
 
@@ -245,31 +267,31 @@ class OnlinePickCollectionBloc
       final updatedItems = state.taskItems
           .map(
             (item) => item.outTaskItemId == selectedItem.outTaskItemId
-                ? item.copyWith(
-                    collectedQty: (item.collectedQty) + quantity,
-                  )
+                ? item.copyWith(collectedQty: (item.collectedQty) + quantity)
                 : item,
           )
           .toList();
 
-      emit(state.copyWith(
-        collectedStocks: updatedStocks,
-        taskItems: updatedItems,
-        pendingCheckItems: _buildPendingItems(updatedItems),
-        currentTrayItems: _filterItemsByTray(
-          updatedItems,
-          state.currentTrayCode,
+      emit(
+        state.copyWith(
+          collectedStocks: updatedStocks,
+          taskItems: updatedItems,
+          pendingCheckItems: _buildPendingItems(updatedItems),
+          currentTrayItems: _filterItemsByTray(
+            updatedItems,
+            state.currentTrayCode,
+          ),
+          status: CollectionStatus.success('已采集数量 $quantity'),
+          placeholder: '请扫描库位',
+          step: OnlinePickCollectionStep.location,
+          selectedItemIds: state.selectedItemIds,
+          focus: true,
+          resetBarcode: true,
+          dicSeq: updatedDicSeq,
+          dicMtlQty: updatedDicMtlQty,
+          dicInvMtlQty: updatedDicInvMtlQty,
         ),
-        status: CollectionStatus.success('已采集数量 $quantity'),
-        placeholder: '请扫描库位',
-        step: OnlinePickCollectionStep.location,
-        selectedItemIds: state.selectedItemIds,
-        focus: true,
-        resetBarcode: true,
-        dicSeq: updatedDicSeq,
-        dicMtlQty: updatedDicMtlQty,
-        dicInvMtlQty: updatedDicInvMtlQty,
-      ));
+      );
       await _persistCacheSnapshot();
       return;
     }
@@ -277,35 +299,44 @@ class OnlinePickCollectionBloc
     emit(state.copyWith(status: CollectionStatus.loading()));
 
     try {
-      final barcodeContent =
-          await _collectionService.getMaterialInfoByQr(code);
+      final barcodeContent = await _collectionService.getMaterialInfoByQr(code);
 
       if (barcodeContent.isEmpty) {
-        emit(state.copyWith(
-          status: CollectionStatus.error('未解析到有效的物料信息'),
-          focus: true,
-        ));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('未解析到有效的物料信息'),
+            focus: true,
+          ),
+        );
         return;
       }
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('物料 ${barcodeContent.materialCode ?? ''} 已解析'),
-        currentBarcode: barcodeContent,
-        placeholder: '请录入采集数量',
-        step: OnlinePickCollectionStep.quantity,
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success(
+            '物料 ${barcodeContent.materialCode ?? ''} 已解析',
+          ),
+          currentBarcode: barcodeContent,
+          placeholder: '请录入采集数量',
+          step: OnlinePickCollectionStep.quantity,
+          focus: true,
+        ),
+      );
       await _persistCacheSnapshot();
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '解析条码失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '解析条码失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('解析条码失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('解析条码失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -360,8 +391,9 @@ class OnlinePickCollectionBloc
 
     final updatedItems = state.taskItems.map((item) {
       final removedQty = removedStocks
-          .where((stock) =>
-              int.tryParse(stock.outTaskItemId) == item.outTaskItemId)
+          .where(
+            (stock) => int.tryParse(stock.outTaskItemId) == item.outTaskItemId,
+          )
           .fold<num>(0, (sum, stock) => sum + stock.collectQty);
       if (removedQty == 0) {
         return item;
@@ -397,20 +429,22 @@ class OnlinePickCollectionBloc
       }
     }
 
-    emit(state.copyWith(
-      collectedStocks: filtered,
-      taskItems: updatedItems,
-      pendingCheckItems: _buildPendingItems(updatedItems),
-      currentTrayItems: _filterItemsByTray(
-        updatedItems,
-        state.currentTrayCode,
+    emit(
+      state.copyWith(
+        collectedStocks: filtered,
+        taskItems: updatedItems,
+        pendingCheckItems: _buildPendingItems(updatedItems),
+        currentTrayItems: _filterItemsByTray(
+          updatedItems,
+          state.currentTrayCode,
+        ),
+        status: CollectionStatus.success('已删除 ${event.stockIds.length} 条采集记录'),
+        focus: true,
+        dicSeq: updatedDicSeq,
+        dicMtlQty: updatedDicMtlQty,
+        dicInvMtlQty: updatedDicInv,
       ),
-      status: CollectionStatus.success('已删除 ${event.stockIds.length} 条采集记录'),
-      focus: true,
-      dicSeq: updatedDicSeq,
-      dicMtlQty: updatedDicMtlQty,
-      dicInvMtlQty: updatedDicInv,
-    ));
+    );
     add(const PersistCollectionCacheEvent());
   }
 
@@ -419,19 +453,23 @@ class OnlinePickCollectionBloc
     Emitter<OnlinePickCollectionState> emit,
   ) async {
     if (state.collectedStocks.isEmpty) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('暂无采集数据，无需提交'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('暂无采集数据，无需提交'),
+          focus: true,
+        ),
+      );
       return;
     }
 
     final task = state.task;
     if (task == null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('缺少任务信息，无法提交'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('缺少任务信息，无法提交'),
+          focus: true,
+        ),
+      );
       return;
     }
 
@@ -464,14 +502,13 @@ class OnlinePickCollectionBloc
           return;
         }
         final baseQty = value.isNotEmpty ? value[0] : matchedItem.taskQty;
-        final collected = value.length > 1 ? value[1] : matchedItem.collectedQty;
+        final collected = value.length > 1
+            ? value[1]
+            : matchedItem.collectedQty;
         itemListInfos.add({
           'outTaskItemid': key,
           'mtlCode': matchedItem.materialCode ?? '',
-          'mtlQty': [
-            baseQty,
-            collected,
-          ],
+          'mtlQty': [baseQty, collected],
         });
       });
 
@@ -510,34 +547,40 @@ class OnlinePickCollectionBloc
         ),
       );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('提交成功'),
-        collectedStocks: const [],
-        taskItems: refreshedItems,
-        pendingCheckItems: _buildPendingItems(refreshedItems),
-        currentTrayItems: const [],
-        selectedItemIds: const [],
-        dicSeq: const {},
-        dicMtlQty: const {},
-        dicInvMtlQty: const {},
-        currentTrayCode: '',
-        currentBarcode: null,
-        placeholder: '请扫描库位',
-        step: OnlinePickCollectionStep.location,
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('提交成功'),
+          collectedStocks: const [],
+          taskItems: refreshedItems,
+          pendingCheckItems: _buildPendingItems(refreshedItems),
+          currentTrayItems: const [],
+          selectedItemIds: const [],
+          dicSeq: const {},
+          dicMtlQty: const {},
+          dicInvMtlQty: const {},
+          currentTrayCode: '',
+          currentBarcode: null,
+          placeholder: '请扫描库位',
+          step: OnlinePickCollectionStep.location,
+          focus: true,
+        ),
+      );
 
       await _cacheManager.clearSnapshot(task.outTaskId.toString());
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '提交失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '提交失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('提交失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('提交失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -564,23 +607,29 @@ class OnlinePickCollectionBloc
           ? state.selectedLocation
           : (options.isNotEmpty ? options.first.value : state.selectedLocation);
 
-      emit(state.copyWith(
-        loadingLocations: false,
-        locationOptions: options,
-        selectedLocation: selected,
-      ));
+      emit(
+        state.copyWith(
+          loadingLocations: false,
+          locationOptions: options,
+          selectedLocation: selected,
+        ),
+      );
 
       await _persistCacheSnapshot();
     } on DioException catch (error) {
-      emit(state.copyWith(
-        loadingLocations: false,
-        status: CollectionStatus.error(error.message ?? '加载拣选口失败'),
-      ));
+      emit(
+        state.copyWith(
+          loadingLocations: false,
+          status: CollectionStatus.error(error.message ?? '加载拣选口失败'),
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        loadingLocations: false,
-        status: CollectionStatus.error('加载拣选口失败：${error.toString()}'),
-      ));
+      emit(
+        state.copyWith(
+          loadingLocations: false,
+          status: CollectionStatus.error('加载拣选口失败：${error.toString()}'),
+        ),
+      );
     }
   }
 
@@ -589,11 +638,13 @@ class OnlinePickCollectionBloc
     Emitter<OnlinePickCollectionState> emit,
   ) {
     final label = event.location.label;
-    emit(state.copyWith(
-      selectedLocation: event.location.value,
-      status: CollectionStatus.success('已选择拣选口 $label'),
-      focus: true,
-    ));
+    emit(
+      state.copyWith(
+        selectedLocation: event.location.value,
+        status: CollectionStatus.success('已选择拣选口 $label'),
+        focus: true,
+      ),
+    );
     add(const PersistCollectionCacheEvent());
   }
 
@@ -604,11 +655,13 @@ class OnlinePickCollectionBloc
     final target = state.availableModes.firstWhereOrNull(
       (mode) => mode.type == event.mode,
     );
-    emit(state.copyWith(
-      mode: event.mode,
-      status: CollectionStatus.success('已切换至${target?.label ?? ''}'),
-      focus: true,
-    ));
+    emit(
+      state.copyWith(
+        mode: event.mode,
+        status: CollectionStatus.success('已切换至${target?.label ?? ''}'),
+        focus: true,
+      ),
+    );
     add(const PersistCollectionCacheEvent());
   }
 
@@ -616,12 +669,14 @@ class OnlinePickCollectionBloc
     RequestEmptyTrayOutEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    final validation = _validateCommand(requireTray: true, requireLocation: true);
+    final validation = _validateCommand(
+      requireTray: true,
+      requireLocation: true,
+    );
     if (validation != null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(validation),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error(validation), focus: true),
+      );
       return;
     }
 
@@ -638,20 +693,26 @@ class OnlinePickCollectionBloc
         singleFlag: '1',
       );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('空托盘出库指令已下发'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('空托盘出库指令已下发'),
+          focus: true,
+        ),
+      );
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '空托盘出库失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '空托盘出库失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('空托盘出库失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('空托盘出库失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -659,12 +720,14 @@ class OnlinePickCollectionBloc
     RequestEmptyTrayInEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    final validation = _validateCommand(requireTray: true, requireLocation: true);
+    final validation = _validateCommand(
+      requireTray: true,
+      requireLocation: true,
+    );
     if (validation != null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(validation),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error(validation), focus: true),
+      );
       return;
     }
 
@@ -681,20 +744,26 @@ class OnlinePickCollectionBloc
         singleFlag: '1',
       );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('空托盘入库指令已下发'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('空托盘入库指令已下发'),
+          focus: true,
+        ),
+      );
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '空托盘入库失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '空托盘入库失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('空托盘入库失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('空托盘入库失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -702,25 +771,30 @@ class OnlinePickCollectionBloc
     RequestSingleTrayEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    final validation = _validateCommand(requireTray: false, requireLocation: true);
+    final validation = _validateCommand(
+      requireTray: false,
+      requireLocation: true,
+    );
     if (validation != null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(validation),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error(validation), focus: true),
+      );
       return;
     }
 
     if (state.selectedItemIds.isEmpty) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('请至少选择一行记录'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请至少选择一行记录'),
+          focus: true,
+        ),
+      );
       return;
     }
 
     final targetId = state.selectedItemIds.first;
-    final targetItem = state.pendingCheckItems.firstWhereOrNull(
+    final targetItem =
+        state.pendingCheckItems.firstWhereOrNull(
           (item) => item.outTaskItemId == targetId,
         ) ??
         state.taskItems.firstWhereOrNull(
@@ -728,28 +802,34 @@ class OnlinePickCollectionBloc
         );
 
     if (targetItem == null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('未找到选中的任务行'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('未找到选中的任务行'),
+          focus: true,
+        ),
+      );
       return;
     }
 
     final trayNo = (targetItem.palletNo ?? '').toUpperCase();
     if (trayNo.isEmpty) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('选中行缺少托盘号，无法下发指令'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('选中行缺少托盘号，无法下发指令'),
+          focus: true,
+        ),
+      );
       return;
     }
 
     final startAddr = targetItem.storeSiteNo ?? '';
     if (startAddr.isEmpty) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('选中行缺少库位信息'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('选中行缺少库位信息'),
+          focus: true,
+        ),
+      );
       return;
     }
 
@@ -766,20 +846,26 @@ class OnlinePickCollectionBloc
         singleFlag: '1',
       );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('托盘 $trayNo 指令已下发'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('托盘 $trayNo 指令已下发'),
+          focus: true,
+        ),
+      );
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '托盘指令下发失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '托盘指令下发失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('托盘指令下发失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('托盘指令下发失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -787,12 +873,14 @@ class OnlinePickCollectionBloc
     RequestReturnTrayEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    final validation = _validateCommand(requireTray: true, requireLocation: true);
+    final validation = _validateCommand(
+      requireTray: true,
+      requireLocation: true,
+    );
     if (validation != null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(validation),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error(validation), focus: true),
+      );
       return;
     }
 
@@ -804,10 +892,12 @@ class OnlinePickCollectionBloc
 
     final endAddr = targetItem?.storeSiteNo ?? '';
     if (endAddr.isEmpty) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('未找到托盘对应的库位，无法回库'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('未找到托盘对应的库位，无法回库'),
+          focus: true,
+        ),
+      );
       return;
     }
 
@@ -822,20 +912,26 @@ class OnlinePickCollectionBloc
         endAddr: endAddr,
       );
 
-      emit(state.copyWith(
-        status: CollectionStatus.success('托盘回库指令已下发'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.success('托盘回库指令已下发'),
+          focus: true,
+        ),
+      );
     } on DioException catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(error.message ?? '托盘回库失败'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(error.message ?? '托盘回库失败'),
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('托盘回库失败：${error.toString()}'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('托盘回库失败：${error.toString()}'),
+          focus: true,
+        ),
+      );
     }
   }
 
@@ -844,19 +940,23 @@ class OnlinePickCollectionBloc
     Emitter<OnlinePickCollectionState> emit,
   ) async {
     if (event.count <= 0) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('托盘数量必须大于0'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('托盘数量必须大于0'),
+          focus: true,
+        ),
+      );
       return;
     }
 
-    final validation = _validateCommand(requireTray: false, requireLocation: true);
+    final validation = _validateCommand(
+      requireTray: false,
+      requireLocation: true,
+    );
     if (validation != null) {
-      emit(state.copyWith(
-        status: CollectionStatus.error(validation),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error(validation), focus: true),
+      );
       return;
     }
 
@@ -893,18 +993,19 @@ class OnlinePickCollectionBloc
     }
 
     if (success == 0 && failure == 0) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('暂无可下发的托盘'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(status: CollectionStatus.error('暂无可下发的托盘'), focus: true),
+      );
       return;
     }
 
     if (success == 0 && failure > 0) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('托盘指令下发失败，请重试'),
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('托盘指令下发失败，请重试'),
+          focus: true,
+        ),
+      );
       return;
     }
 
@@ -912,10 +1013,9 @@ class OnlinePickCollectionBloc
         ? '已下发 $success 个托盘指令'
         : '已下发 $success 个托盘指令，$failure 个失败';
 
-    emit(state.copyWith(
-      status: CollectionStatus.success(message),
-      focus: true,
-    ));
+    emit(
+      state.copyWith(status: CollectionStatus.success(message), focus: true),
+    );
   }
 
   Future<void> _onPersistCache(
@@ -931,8 +1031,9 @@ class OnlinePickCollectionBloc
     Emitter<OnlinePickCollectionState> emit,
   ) async {
     try {
-      final snapshot =
-          await _cacheManager.loadSnapshot(task.outTaskId.toString());
+      final snapshot = await _cacheManager.loadSnapshot(
+        task.outTaskId.toString(),
+      );
       if (snapshot == null || snapshot.userId != userId) {
         return;
       }
@@ -951,7 +1052,8 @@ class OnlinePickCollectionBloc
               (item) => collectedMap.containsKey(item.outTaskItemId)
                   ? item.copyWith(
                       collectedQty:
-                          (item.collectedQty) + collectedMap[item.outTaskItemId]!,
+                          (item.collectedQty) +
+                          collectedMap[item.outTaskItemId]!,
                     )
                   : item,
             )
@@ -965,30 +1067,34 @@ class OnlinePickCollectionBloc
           .toSet()
           .toList();
 
-      emit(state.copyWith(
-        collectedStocks: snapshot.stocks,
-        taskItems: updatedItems,
-        pendingCheckItems: _buildPendingItems(updatedItems),
-        currentTrayItems: _filterItemsByTray(updatedItems, trayNo),
-        dicSeq: snapshot.dicSeq,
-        dicMtlQty: snapshot.dicMtlQty,
-        dicInvMtlQty: snapshot.dicInvMtlQty,
-        currentTrayCode: trayNo,
-        currentBarcode: snapshot.lastBarcode,
-        selectedLocation: snapshot.location.isNotEmpty
-            ? snapshot.location
-            : state.selectedLocation,
-        mode: _mapMode(snapshot.mode),
-        issuedTrayNos: issued,
-        status: snapshot.stocks.isNotEmpty
-            ? CollectionStatus.success('已恢复未提交的采集记录')
-            : state.status,
-        focus: true,
-      ));
+      emit(
+        state.copyWith(
+          collectedStocks: snapshot.stocks,
+          taskItems: updatedItems,
+          pendingCheckItems: _buildPendingItems(updatedItems),
+          currentTrayItems: _filterItemsByTray(updatedItems, trayNo),
+          dicSeq: snapshot.dicSeq,
+          dicMtlQty: snapshot.dicMtlQty,
+          dicInvMtlQty: snapshot.dicInvMtlQty,
+          currentTrayCode: trayNo,
+          currentBarcode: snapshot.lastBarcode,
+          selectedLocation: snapshot.location.isNotEmpty
+              ? snapshot.location
+              : state.selectedLocation,
+          mode: _mapMode(snapshot.mode),
+          issuedTrayNos: issued,
+          status: snapshot.stocks.isNotEmpty
+              ? CollectionStatus.success('已恢复未提交的采集记录')
+              : state.status,
+          focus: true,
+        ),
+      );
     } catch (error) {
-      emit(state.copyWith(
-        status: CollectionStatus.error('恢复缓存失败：${error.toString()}'),
-      ));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('恢复缓存失败：${error.toString()}'),
+        ),
+      );
     }
   }
 
@@ -1023,10 +1129,7 @@ class OnlinePickCollectionBloc
         mode: state.mode.name,
       );
 
-      await _cacheManager.saveSnapshot(
-        task.outTaskId.toString(),
-        snapshot,
-      );
+      await _cacheManager.saveSnapshot(task.outTaskId.toString(), snapshot);
     } catch (_) {
       // ignore cache errors to避免影响主流程
     }
@@ -1051,12 +1154,8 @@ class OnlinePickCollectionBloc
     return null;
   }
 
-  List<OnlinePickTaskItem> _buildPendingItems(
-    List<OnlinePickTaskItem> items,
-  ) {
-    return items
-        .where((item) => (item.collectedQty) < (item.taskQty))
-        .toList();
+  List<OnlinePickTaskItem> _buildPendingItems(List<OnlinePickTaskItem> items) {
+    return items.where((item) => (item.collectedQty) < (item.taskQty)).toList();
   }
 
   List<OnlinePickTaskItem> _filterItemsByTray(
