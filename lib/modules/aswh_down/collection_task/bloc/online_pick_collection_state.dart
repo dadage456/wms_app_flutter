@@ -20,7 +20,7 @@ class OnlinePickCollectionState {
   final OnlinePickCollectionModeType mode;
   final List<OnlinePickCollectionMode> availableModes;
   final String selectedLocation;
-  final List<OnlinePickLocationOption> locationOptions;
+  final List<String> locationOptions;
   final bool loadingLocations;
   final Map<String, String> dicSeq;
   final Map<String, List<double>> dicMtlQty;
@@ -86,7 +86,7 @@ class OnlinePickCollectionState {
     OnlinePickCollectionModeType? mode,
     List<OnlinePickCollectionMode>? availableModes,
     String? selectedLocation,
-    List<OnlinePickLocationOption>? locationOptions,
+    List<String>? locationOptions,
     bool? loadingLocations,
     Map<String, String>? dicSeq,
     Map<String, List<double>>? dicMtlQty,
@@ -100,7 +100,9 @@ class OnlinePickCollectionState {
       currentTrayItems: currentTrayItems ?? this.currentTrayItems,
       pendingCheckItems: pendingCheckItems ?? this.pendingCheckItems,
       collectedStocks: collectedStocks ?? this.collectedStocks,
-      currentBarcode: resetBarcode ? null : currentBarcode ?? this.currentBarcode,
+      currentBarcode: resetBarcode
+          ? null
+          : currentBarcode ?? this.currentBarcode,
       step: step ?? this.step,
       placeholder: placeholder ?? this.placeholder,
       currentTrayCode: currentTrayCode ?? this.currentTrayCode,

@@ -22,8 +22,9 @@ class AswhDownCollectionService {
     return ApiResponseHandler.handleResponse(
       response: response,
       dataExtractor: (data) => (data as List<dynamic>)
-          .map((item) =>
-              OnlinePickTaskItem.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) => OnlinePickTaskItem.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
     );
   }
@@ -75,10 +76,7 @@ class AswhDownCollectionService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getRepertoryByStoresiteNo',
-      queryParameters: {
-        'storesiteno': storeSiteNo,
-        'matcode': materialCode,
-      },
+      queryParameters: {'storesiteno': storeSiteNo, 'matcode': materialCode},
     );
 
     return ApiResponseHandler.handleResponse(
@@ -119,10 +117,7 @@ class AswhDownCollectionService {
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getRepertoryByStoresiteNoErp',
-      queryParameters: {
-        'storesiteno': storeSiteNo,
-        'matcode': materialCode,
-      },
+      queryParameters: {'storesiteno': storeSiteNo, 'matcode': materialCode},
     );
 
     return ApiResponseHandler.handleResponse(
@@ -322,8 +317,10 @@ class AswhDownCollectionService {
     return ApiResponseHandler.handleResponse(
       response: response,
       dataExtractor: (data) => (data as List<dynamic>)
-          .map((item) =>
-              OnlinePickWcsCommand.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) =>
+                OnlinePickWcsCommand.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
       dataField: 'data',
     );
@@ -348,7 +345,7 @@ class AswhDownCollectionService {
   }
 
   /// 获取出入库位置（对应 `getInOutLocation`）。
-  Future<List<OnlinePickLocationOption>> fetchInOutLocations({
+  Future<List<String>> fetchInOutLocations({
     required String locationType,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
@@ -358,12 +355,7 @@ class AswhDownCollectionService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => (data as List<dynamic>)
-          .map(
-            (item) =>
-                OnlinePickLocationOption.fromJson(item as Map<String, dynamic>),
-          )
-          .toList(),
+      dataExtractor: (data) => data as List<String>,
     );
   }
 }

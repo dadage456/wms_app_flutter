@@ -1,8 +1,10 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 import 'package:wms_app/models/page_status.dart';
 import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_collection_event.dart';
 import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_collection_state.dart';
@@ -45,6 +47,8 @@ class OnlinePickCollectionBloc
   final AswhDownCollectionService _collectionService;
   final UserManager _userManager;
   final OnlinePickCollectionCacheManager _cacheManager;
+
+  final Uuid _uuid = const Uuid();
 
   Future<void> _onInitializeCollection(
     InitializeCollectionEvent event,
@@ -114,6 +118,7 @@ class OnlinePickCollectionBloc
         ),
       );
     } catch (error) {
+      log('加载任务明细失败：${error.toString()}');
       emit(
         state.copyWith(
           status: CollectionStatus.error('加载任务明细失败：${error.toString()}'),
@@ -211,7 +216,7 @@ class OnlinePickCollectionBloc
       }
 
       final stock = OnlinePickCollectionStock(
-        stockId: _generateStockId(),
+        stockId: _uuid.v4(),
         materialCode: state.currentBarcode!.materialCode ?? '',
         batchNo: state.currentBarcode!.batchNo,
         serialNumber: state.currentBarcode!.serialNumber,
@@ -605,7 +610,7 @@ class OnlinePickCollectionBloc
 
       final selected = state.selectedLocation.isNotEmpty
           ? state.selectedLocation
-          : (options.isNotEmpty ? options.first.value : state.selectedLocation);
+          : (options.isNotEmpty ? options.first : state.selectedLocation);
 
       emit(
         state.copyWith(
@@ -637,10 +642,10 @@ class OnlinePickCollectionBloc
     SelectPickLocationEvent event,
     Emitter<OnlinePickCollectionState> emit,
   ) {
-    final label = event.location.label;
+    final label = event.location;
     emit(
       state.copyWith(
-        selectedLocation: event.location.value,
+        selectedLocation: event.location,
         status: CollectionStatus.success('已选择拣选口 $label'),
         focus: true,
       ),
@@ -1168,10 +1173,5 @@ class OnlinePickCollectionBloc
     return items
         .where((item) => (item.palletNo ?? '').toUpperCase() == trayNo)
         .toList();
-  }
-
-  String _generateStockId() {
-    final random = Random();
-    return '${DateTime.now().microsecondsSinceEpoch}${random.nextInt(9999)}';
   }
 }

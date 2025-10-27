@@ -10,7 +10,7 @@ _$OnlinePickTaskItemImpl _$$OnlinePickTaskItemImplFromJson(
         Map<String, dynamic> json) =>
     _$OnlinePickTaskItemImpl(
       outTaskItemId: (json['outtaskitemid'] as num).toInt(),
-      outTaskId: (json['outtaskid'] as num).toInt(),
+      outTaskId: (json['outtaskid'] as num?)?.toInt(),
       outTaskNo: json['outtaskno'] as String?,
       materialCode: json['matcode'] as String?,
       materialName: json['matname'] as String?,

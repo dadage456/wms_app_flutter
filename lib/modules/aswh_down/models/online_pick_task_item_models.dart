@@ -8,7 +8,7 @@ part 'online_pick_task_item_models.g.dart';
 class OnlinePickTaskItem with _$OnlinePickTaskItem {
   const factory OnlinePickTaskItem({
     @JsonKey(name: 'outtaskitemid') required int outTaskItemId,
-    @JsonKey(name: 'outtaskid') required int outTaskId,
+    @JsonKey(name: 'outtaskid') int? outTaskId,
     @JsonKey(name: 'outtaskno') String? outTaskNo,
     @JsonKey(name: 'matcode') String? materialCode,
     @JsonKey(name: 'matname') String? materialName,

@@ -23,7 +23,7 @@ mixin _$OnlinePickTaskItem {
   @JsonKey(name: 'outtaskitemid')
   int get outTaskItemId => throw _privateConstructorUsedError;
   @JsonKey(name: 'outtaskid')
-  int get outTaskId => throw _privateConstructorUsedError;
+  int? get outTaskId => throw _privateConstructorUsedError;
   @JsonKey(name: 'outtaskno')
   String? get outTaskNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'matcode')
@@ -73,7 +73,7 @@ abstract class $OnlinePickTaskItemCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'outtaskitemid') int outTaskItemId,
-      @JsonKey(name: 'outtaskid') int outTaskId,
+      @JsonKey(name: 'outtaskid') int? outTaskId,
       @JsonKey(name: 'outtaskno') String? outTaskNo,
       @JsonKey(name: 'matcode') String? materialCode,
       @JsonKey(name: 'matname') String? materialName,
@@ -107,7 +107,7 @@ class _$OnlinePickTaskItemCopyWithImpl<$Res, $Val extends OnlinePickTaskItem>
   @override
   $Res call({
     Object? outTaskItemId = null,
-    Object? outTaskId = null,
+    Object? outTaskId = freezed,
     Object? outTaskNo = freezed,
     Object? materialCode = freezed,
     Object? materialName = freezed,
@@ -131,10 +131,10 @@ class _$OnlinePickTaskItemCopyWithImpl<$Res, $Val extends OnlinePickTaskItem>
           ? _value.outTaskItemId
           : outTaskItemId // ignore: cast_nullable_to_non_nullable
               as int,
-      outTaskId: null == outTaskId
+      outTaskId: freezed == outTaskId
           ? _value.outTaskId
           : outTaskId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       outTaskNo: freezed == outTaskNo
           ? _value.outTaskNo
           : outTaskNo // ignore: cast_nullable_to_non_nullable
@@ -217,7 +217,7 @@ abstract class _$$OnlinePickTaskItemImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'outtaskitemid') int outTaskItemId,
-      @JsonKey(name: 'outtaskid') int outTaskId,
+      @JsonKey(name: 'outtaskid') int? outTaskId,
       @JsonKey(name: 'outtaskno') String? outTaskNo,
       @JsonKey(name: 'matcode') String? materialCode,
       @JsonKey(name: 'matname') String? materialName,
@@ -249,7 +249,7 @@ class __$$OnlinePickTaskItemImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? outTaskItemId = null,
-    Object? outTaskId = null,
+    Object? outTaskId = freezed,
     Object? outTaskNo = freezed,
     Object? materialCode = freezed,
     Object? materialName = freezed,
@@ -273,10 +273,10 @@ class __$$OnlinePickTaskItemImplCopyWithImpl<$Res>
           ? _value.outTaskItemId
           : outTaskItemId // ignore: cast_nullable_to_non_nullable
               as int,
-      outTaskId: null == outTaskId
+      outTaskId: freezed == outTaskId
           ? _value.outTaskId
           : outTaskId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       outTaskNo: freezed == outTaskNo
           ? _value.outTaskNo
           : outTaskNo // ignore: cast_nullable_to_non_nullable
@@ -354,7 +354,7 @@ class __$$OnlinePickTaskItemImplCopyWithImpl<$Res>
 class _$OnlinePickTaskItemImpl implements _OnlinePickTaskItem {
   const _$OnlinePickTaskItemImpl(
       {@JsonKey(name: 'outtaskitemid') required this.outTaskItemId,
-      @JsonKey(name: 'outtaskid') required this.outTaskId,
+      @JsonKey(name: 'outtaskid') this.outTaskId,
       @JsonKey(name: 'outtaskno') this.outTaskNo,
       @JsonKey(name: 'matcode') this.materialCode,
       @JsonKey(name: 'matname') this.materialName,
@@ -381,7 +381,7 @@ class _$OnlinePickTaskItemImpl implements _OnlinePickTaskItem {
   final int outTaskItemId;
   @override
   @JsonKey(name: 'outtaskid')
-  final int outTaskId;
+  final int? outTaskId;
   @override
   @JsonKey(name: 'outtaskno')
   final String? outTaskNo;
@@ -524,7 +524,7 @@ class _$OnlinePickTaskItemImpl implements _OnlinePickTaskItem {
 abstract class _OnlinePickTaskItem implements OnlinePickTaskItem {
   const factory _OnlinePickTaskItem(
           {@JsonKey(name: 'outtaskitemid') required final int outTaskItemId,
-          @JsonKey(name: 'outtaskid') required final int outTaskId,
+          @JsonKey(name: 'outtaskid') final int? outTaskId,
           @JsonKey(name: 'outtaskno') final String? outTaskNo,
           @JsonKey(name: 'matcode') final String? materialCode,
           @JsonKey(name: 'matname') final String? materialName,
@@ -552,7 +552,7 @@ abstract class _OnlinePickTaskItem implements OnlinePickTaskItem {
   int get outTaskItemId;
   @override
   @JsonKey(name: 'outtaskid')
-  int get outTaskId;
+  int? get outTaskId;
   @override
   @JsonKey(name: 'outtaskno')
   String? get outTaskNo;

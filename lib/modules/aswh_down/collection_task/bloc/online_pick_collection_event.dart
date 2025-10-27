@@ -13,10 +13,7 @@ class InitializeCollectionEvent extends OnlinePickCollectionEvent {
   final OnlinePickTask task;
   final int userId;
 
-  const InitializeCollectionEvent({
-    required this.task,
-    required this.userId,
-  });
+  const InitializeCollectionEvent({required this.task, required this.userId});
 
   @override
   List<Object?> get props => [task, userId];
@@ -80,7 +77,7 @@ class LoadPickLocationsEvent extends OnlinePickCollectionEvent {
 }
 
 class SelectPickLocationEvent extends OnlinePickCollectionEvent {
-  final OnlinePickLocationOption location;
+  final String location;
 
   const SelectPickLocationEvent(this.location);
 

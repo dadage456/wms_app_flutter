@@ -382,8 +382,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
               ),
               ...state.locationOptions.map(
                 (option) => ListTile(
-                  title: Text(option.label),
-                  trailing: option.value == state.selectedLocation
+                  title: Text(option),
+                  trailing: option == state.selectedLocation
                       ? const Icon(Icons.check, color: Color(0xFF1976D2))
                       : null,
                   onTap: () {
