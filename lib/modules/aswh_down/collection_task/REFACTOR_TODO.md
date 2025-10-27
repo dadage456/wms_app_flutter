@@ -11,3 +11,7 @@
 - [x] 实现托盘/指令相关操作：提交采集、托盘获取、空盘出入库、回库、WCS 指令查询等流程，调用服务层 `commitASWHDownShelves`、`commitDownWmsToWcs`、`commitEmptyTrayWmsToWcs`、`commitResetWmsToWcs` 等接口，并适配现有 WCS Bloc 页面。
 - [x] 搭建 `AswhDownCollectionResultPage`，复刻 NVUE 采集结果列表（含多选删除、统计提示），并与主页面通过 `Navigator` 传递、回收删除记录。
 - [x] 设计采集缓存持久化：替换 NVUE 中的 `uni.setStorageSync` 方案，使用 Hive 存储 `OnlinePickCollectionCacheSnapshot`，支持离线恢复与退出提醒。
+
+- [x] 补齐扫码物料校验流程：串联管控标识、库位与 ERP 子库库存校验，防止无效条码进入数量录入。
+- [x] 优化数量采集：按任务剩余量与库存上限分摊采集数量，并同步多行任务的计划/采集映射。
+- [x] 恢复库存核对模式：记录结余数据至库存核对列表，随提交一起上传并在界面单独展示。

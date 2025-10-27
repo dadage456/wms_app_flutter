@@ -95,6 +95,8 @@ class OnlinePickCollectionBloc
         query: query,
       );
 
+      final roomMatControl = await _loadRoomMatControl(event.task);
+
       emit(
         state.copyWith(
           status: CollectionStatus.success('任务明细已加载'),
@@ -102,6 +104,7 @@ class OnlinePickCollectionBloc
           pendingCheckItems: _buildPendingItems(items),
           currentTrayItems: const [],
           focus: true,
+          roomMatControl: roomMatControl,
         ),
       );
 
@@ -140,164 +143,119 @@ class OnlinePickCollectionBloc
       return;
     }
 
-    // 识别库位条码
     if (code.contains(r'\$KW\$')) {
-      final location = code.replaceAll(r'\$KW\$', '').toUpperCase();
-      emit(
-        state.copyWith(
-          status: CollectionStatus.success('库位 $location 已扫描'),
-          placeholder: '请扫描托盘条码',
-          step: OnlinePickCollectionStep.tray,
-          focus: true,
-          currentTrayCode: state.currentTrayCode,
-        ),
-      );
-      await _persistCacheSnapshot();
+      await _handleLocationScan(code, emit);
       return;
     }
 
-    // 识别托盘条码
     if (code.contains(r'\$TP\$')) {
-      final tray = code.replaceAll(r'\$TP\$', '').toUpperCase();
-      final trayItems = _filterItemsByTray(state.taskItems, tray);
-      emit(
-        state.copyWith(
-          status: CollectionStatus.success('托盘 $tray 已扫描'),
-          placeholder: '请扫描物料二维码',
-          step: OnlinePickCollectionStep.material,
-          currentTrayCode: tray,
-          currentTrayItems: trayItems,
-          focus: true,
-          issuedTrayNos: state.issuedTrayNos.contains(tray)
-              ? state.issuedTrayNos
-              : [...state.issuedTrayNos, tray],
-        ),
-      );
-      await _persistCacheSnapshot();
+      await _handleTrayScan(code, emit);
       return;
     }
 
     final quantity = double.tryParse(code);
+    if (quantity != null) {
+      await _handleQuantityScan(quantity, emit);
+      return;
+    }
 
-    if (quantity != null && state.currentBarcode != null) {
-      if (state.mode == OnlinePickCollectionModeType.inventory &&
-          state.currentTrayCode.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('请先扫描托盘后再录入数量'),
-            focus: true,
-          ),
-        );
-        return;
-      }
+    await _handleMaterialScan(code, emit);
+  }
 
-      if (state.selectedItemIds.isEmpty) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('请先在任务列表中选择要采集的任务行'),
-            focus: true,
-          ),
-        );
-        return;
-      }
-
-      final selectedItem = state.taskItems.firstWhereOrNull(
-        (item) => state.selectedItemIds.contains(item.outTaskItemId),
-      );
-
-      if (selectedItem == null) {
-        emit(
-          state.copyWith(
-            status: CollectionStatus.error('未找到匹配的任务明细'),
-            focus: true,
-          ),
-        );
-        return;
-      }
-
-      final stock = OnlinePickCollectionStock(
-        stockId: _uuid.v4(),
-        materialCode: state.currentBarcode!.materialCode ?? '',
-        batchNo: state.currentBarcode!.batchNo,
-        serialNumber: state.currentBarcode!.serialNumber,
-        taskQty: selectedItem.taskQty,
-        collectQty: quantity,
-        outTaskItemId: selectedItem.outTaskItemId.toString(),
-        taskId: state.task?.outTaskId.toString() ?? '',
-        storeRoom: selectedItem.storeRoomNo,
-        storeSite: selectedItem.storeSiteNo,
-        erpStore: selectedItem.subInventoryCode,
-        trayNo: state.currentTrayCode.isEmpty
-            ? selectedItem.palletNo
-            : state.currentTrayCode,
-      );
-
-      final serialNumber = stock.serialNumber ?? '';
-      if (serialNumber.isNotEmpty) {
-        final seqKey = '${stock.materialCode}@$serialNumber';
-        if (state.dicSeq.containsKey(seqKey)) {
-          emit(
-            state.copyWith(
-              status: CollectionStatus.error('序列号已采集，请勿重复扫描'),
-              focus: true,
-            ),
-          );
-          return;
-        }
-      }
-
-      final updatedStocks = List<OnlinePickCollectionStock>.from(
-        state.collectedStocks,
-      )..add(stock);
-
-      final updatedDicSeq = Map<String, String>.from(state.dicSeq);
-      if (serialNumber.isNotEmpty) {
-        updatedDicSeq['${stock.materialCode}@$serialNumber'] = stock.stockId;
-      }
-
-      final updatedDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
-      final itemKey = selectedItem.outTaskItemId.toString();
-      final baseQty = selectedItem.taskQty.toDouble();
-      final currentQty =
-          updatedDicMtlQty[itemKey]?.elementAtOrNull(1) ??
-          selectedItem.collectedQty.toDouble();
-      updatedDicMtlQty[itemKey] = [baseQty, currentQty + quantity];
-
-      final updatedDicInvMtlQty = Map<String, double>.from(state.dicInvMtlQty);
-      if (state.mode == OnlinePickCollectionModeType.inventory) {
-        updatedDicInvMtlQty[itemKey] =
-            (updatedDicInvMtlQty[itemKey] ?? 0) + quantity;
-      }
-
-      final updatedItems = state.taskItems
-          .map(
-            (item) => item.outTaskItemId == selectedItem.outTaskItemId
-                ? item.copyWith(collectedQty: (item.collectedQty) + quantity)
-                : item,
-          )
-          .toList();
-
+  Future<void> _handleLocationScan(
+    String rawCode,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    final location = rawCode.replaceAll(r'\$KW\$', '').toUpperCase();
+    if (location.isEmpty) {
       emit(
         state.copyWith(
-          collectedStocks: updatedStocks,
-          taskItems: updatedItems,
-          pendingCheckItems: _buildPendingItems(updatedItems),
-          currentTrayItems: _filterItemsByTray(
-            updatedItems,
-            state.currentTrayCode,
-          ),
-          status: CollectionStatus.success('已采集数量 $quantity'),
-          placeholder: '请扫描库位',
-          step: OnlinePickCollectionStep.location,
-          selectedItemIds: state.selectedItemIds,
+          status: CollectionStatus.error('库位格式不正确，请重新扫描'),
           focus: true,
-          resetBarcode: true,
-          dicSeq: updatedDicSeq,
-          dicMtlQty: updatedDicMtlQty,
-          dicInvMtlQty: updatedDicInvMtlQty,
         ),
       );
-      await _persistCacheSnapshot();
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        status: CollectionStatus.success('库位 $location 已扫描'),
+        placeholder: '请扫描托盘条码',
+        step: OnlinePickCollectionStep.tray,
+        focus: true,
+        currentStoreSite: location,
+      ),
+    );
+    await _persistCacheSnapshot();
+  }
+
+  Future<void> _handleTrayScan(
+    String rawCode,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    final tray = rawCode.replaceAll(r'\$TP\$', '').toUpperCase();
+    if (tray.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('托盘条码格式不正确，请重新扫描'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final trayItems = _filterItemsByTray(state.taskItems, tray);
+    final issued = state.issuedTrayNos.contains(tray)
+        ? state.issuedTrayNos
+        : [...state.issuedTrayNos, tray];
+
+    emit(
+      state.copyWith(
+        status: CollectionStatus.success('托盘 $tray 已扫描'),
+        placeholder: '请扫描物料二维码',
+        step: OnlinePickCollectionStep.material,
+        currentTrayCode: tray,
+        currentTrayItems: trayItems,
+        focus: true,
+        issuedTrayNos: issued,
+      ),
+    );
+    await _persistCacheSnapshot();
+  }
+
+  Future<void> _handleQuantityScan(
+    double quantity,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    if (state.currentBarcode == null) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描物料二维码'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    if (state.mode == OnlinePickCollectionModeType.inventory) {
+      await _collectInventoryRecord(quantity, emit);
+      return;
+    }
+
+    await _collectOutboundQuantity(quantity, emit);
+  }
+
+  Future<void> _handleMaterialScan(
+    String code,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    if (state.currentStoreSite.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描库位后再扫描物料'),
+          focus: true,
+        ),
+      );
       return;
     }
 
@@ -316,17 +274,120 @@ class OnlinePickCollectionBloc
         return;
       }
 
+      final normalized = _normalizeBarcodeContent(barcodeContent);
+      final materialCode = normalized.materialCode ?? '';
+      if (materialCode.isEmpty) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('物料编码为空，无法采集'),
+            focus: true,
+          ),
+        );
+        return;
+      }
+
+      final matControl = normalized.sequenceControl?.trim() ?? '';
+      String matSendControl = '0';
+      try {
+        final controlMessage =
+            await _collectionService.getMatControl(materialCode);
+        final parts = controlMessage.split('!');
+        if (parts.length > 4 && parts[4].isNotEmpty) {
+          matSendControl = parts[4];
+        }
+      } catch (_) {
+        // ignore and keep default
+      }
+
+      final batchNo = (normalized.batchNo ?? '').toUpperCase();
+      final serialNumber = (normalized.serialNumber ?? '').toUpperCase();
+      if ((matControl == '0') && serialNumber.isEmpty) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('物料【$materialCode】序列号不能为空'),
+            focus: true,
+          ),
+        );
+        return;
+      }
+      if ((matControl == '1' || matControl == '2') && batchNo.isEmpty) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('物料【$materialCode】批次号不能为空'),
+            focus: true,
+          ),
+        );
+        return;
+      }
+
+      if (serialNumber.isNotEmpty) {
+        final seqKey = '${materialCode.toUpperCase()}@$serialNumber';
+        if (state.dicSeq.containsKey(seqKey)) {
+          emit(
+            state.copyWith(
+              status: CollectionStatus.error('序列号已采集，请勿重复扫描'),
+              focus: true,
+            ),
+          );
+          return;
+        }
+      }
+
+      final erpRoom = _resolveErpRoom(
+        materialCode: materialCode,
+        batchNo: batchNo,
+        storeSite: state.currentStoreSite,
+      );
+
+      final candidates = _matchTaskItems(
+        materialCode: materialCode,
+        batchNo: batchNo,
+        serialNumber: serialNumber,
+        storeSite: state.currentStoreSite,
+      );
+
+      if (candidates.isEmpty) {
+        emit(
+          state.copyWith(
+            status: CollectionStatus.error('在任务明细中未找到匹配的采集行'),
+            focus: true,
+          ),
+        );
+        return;
+      }
+
+      final inventoryResult = await _loadInventoryForBarcode(
+        storeSite: state.currentStoreSite,
+        materialCode: materialCode,
+        batchNo: batchNo,
+        serialNumber: serialNumber,
+        matControl: matControl,
+        erpRoom: erpRoom,
+      );
+
       emit(
         state.copyWith(
-          status: CollectionStatus.success(
-            '物料 ${barcodeContent.materialCode ?? ''} 已解析',
-          ),
-          currentBarcode: barcodeContent,
-          placeholder: '请录入采集数量',
+          status: CollectionStatus.success('物料 $materialCode 已解析'),
+          currentBarcode: normalized,
+          placeholder: state.mode == OnlinePickCollectionModeType.inventory
+              ? '请输入该物料在当前库位的结余数量'
+              : '请录入采集数量',
           step: OnlinePickCollectionStep.quantity,
           focus: true,
+          matControlFlag: matControl,
+          matSendControl: matSendControl,
+          erpRoom: erpRoom,
+          erpStoreInv: inventoryResult.erpStore,
+          availableInventory: inventoryResult.quantity,
         ),
       );
+
+      if (matControl == '0' &&
+          state.mode == OnlinePickCollectionModeType.outbound) {
+        await _collectOutboundQuantity(1, emit);
+        return;
+      }
+
       await _persistCacheSnapshot();
     } on DioException catch (error) {
       emit(
@@ -343,6 +404,575 @@ class OnlinePickCollectionBloc
         ),
       );
     }
+  }
+
+  Future<void> _collectOutboundQuantity(
+    double quantity,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    if (quantity <= 0) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('采集数量必须大于 0'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final barcode = state.currentBarcode;
+    if (barcode == null || (barcode.materialCode ?? '').isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描物料二维码'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    if (state.currentTrayCode.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描托盘条码'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final materialCode = (barcode.materialCode ?? '').toUpperCase();
+    final batchNo = (barcode.batchNo ?? '').toUpperCase();
+    final serialNumber = (barcode.serialNumber ?? '').toUpperCase();
+    final storeSite = state.currentStoreSite;
+
+    final candidates = _matchTaskItems(
+      materialCode: materialCode,
+      batchNo: batchNo,
+      serialNumber: serialNumber,
+      storeSite: storeSite,
+    );
+
+    if (candidates.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('在任务明细中未找到可分配的采集行'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final totalRemaining = candidates.fold<double>(
+      0,
+      (sum, item) =>
+          sum + math.max(0, (item.taskQty - item.collectedQty).toDouble()),
+    );
+    if (quantity - totalRemaining > 1e-6) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '本次采集数量【$quantity】大于剩余可采集数量【${totalRemaining.toStringAsFixed(3)}】',
+          ),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final inventoryKey = _buildInventoryKey(
+      storeSite: storeSite,
+      materialCode: materialCode,
+      batchOrSn: serialNumber.isNotEmpty ? serialNumber : batchNo,
+    );
+
+    final consumedInventory = state.dicInvMtlQty[inventoryKey] ?? 0;
+    if (state.availableInventory > 0 &&
+        consumedInventory + quantity - state.availableInventory > 1e-6) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error(
+            '库位【$storeSite】物料【$materialCode】的可用库存不足',
+          ),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    var remaining = quantity;
+    final allocations = <int, double>{};
+    for (final item in candidates) {
+      if (remaining <= 0) break;
+      final available =
+          math.max(0, (item.taskQty - item.collectedQty).toDouble());
+      if (available <= 0) continue;
+      final allocated = math.min(remaining, available);
+      allocations[item.outTaskItemId] = allocated;
+      remaining -= allocated;
+    }
+
+    if (remaining > 1e-6) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('采集数量分配失败，请检查任务剩余量'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final updatedItems = <OnlinePickTaskItem>[];
+    final updatedStocks = List<OnlinePickCollectionStock>.from(
+      state.collectedStocks,
+    );
+    final updatedDicSeq = Map<String, String>.from(state.dicSeq);
+    final updatedDicMtlQty = Map<String, List<double>>.from(state.dicMtlQty);
+    final updatedDicInv = Map<String, double>.from(state.dicInvMtlQty);
+
+    for (final item in state.taskItems) {
+      final allocation = allocations[item.outTaskItemId];
+      if (allocation == null) {
+        updatedItems.add(item);
+        continue;
+      }
+
+      final newCollected = (item.collectedQty) + allocation;
+      final updatedItem = item.copyWith(collectedQty: newCollected);
+      updatedItems.add(updatedItem);
+
+      final entryKey = item.outTaskItemId.toString();
+      final baseQty = item.taskQty.toDouble();
+      final existingEntry = updatedDicMtlQty[entryKey];
+      final previousCollected = existingEntry != null && existingEntry.length > 1
+          ? existingEntry[1]
+          : item.collectedQty.toDouble();
+      updatedDicMtlQty[entryKey] = [
+        baseQty,
+        previousCollected + allocation,
+      ];
+
+      final stock = OnlinePickCollectionStock(
+        stockId: _uuid.v4(),
+        materialCode: materialCode,
+        batchNo: batchNo.isEmpty ? null : batchNo,
+        serialNumber: serialNumber.isEmpty ? null : serialNumber,
+        taskQty: baseQty,
+        collectQty: allocation,
+        outTaskItemId: entryKey,
+        taskId: state.task?.outTaskId.toString() ?? '',
+        storeRoom: item.storeRoomNo,
+        storeSite: storeSite,
+        erpStore:
+            state.erpRoom.isNotEmpty ? state.erpRoom : item.subInventoryCode,
+        trayNo:
+            state.currentTrayCode.isEmpty ? item.palletNo : state.currentTrayCode,
+      );
+      updatedStocks.add(stock);
+
+      if (serialNumber.isNotEmpty) {
+        updatedDicSeq['$materialCode@$serialNumber'] = stock.stockId;
+      }
+    }
+
+    updatedDicInv[inventoryKey] =
+        (updatedDicInv[inventoryKey] ?? 0) + quantity;
+
+    emit(
+      state.copyWith(
+        collectedStocks: updatedStocks,
+        taskItems: updatedItems,
+        pendingCheckItems: _buildPendingItems(updatedItems),
+        currentTrayItems:
+            _filterItemsByTray(updatedItems, state.currentTrayCode),
+        status: CollectionStatus.success('已采集数量 $quantity'),
+        placeholder: '请扫描库位',
+        step: OnlinePickCollectionStep.location,
+        focus: true,
+        resetBarcode: true,
+        dicSeq: updatedDicSeq,
+        dicMtlQty: updatedDicMtlQty,
+        dicInvMtlQty: updatedDicInv,
+        availableInventory: state.availableInventory <= 0
+            ? state.availableInventory
+            : state.availableInventory - quantity,
+      ),
+    );
+
+    await _persistCacheSnapshot();
+  }
+
+  Future<void> _collectInventoryRecord(
+    double quantity,
+    Emitter<OnlinePickCollectionState> emit,
+  ) async {
+    if (quantity <= 0) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请输入大于 0 的结余数量'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final barcode = state.currentBarcode;
+    if (barcode == null || (barcode.materialCode ?? '').isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描需要核对的物料'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    if (state.currentTrayCode.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请先扫描托盘条码'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    final materialCode = (barcode.materialCode ?? '').toUpperCase();
+    final trayNo = state.currentTrayCode.toUpperCase();
+    final storeSite = state.currentStoreSite.toUpperCase();
+
+    var found = false;
+    final updatedRecords = state.inventoryCheckRecords
+        .map(
+          (record) => record.materialCode.toUpperCase() == materialCode &&
+                  record.trayNo.toUpperCase() == trayNo &&
+                  record.storeSite.toUpperCase() == storeSite
+              ? (found = true,
+                  record.copyWith(quantity: record.quantity + quantity))
+              : record,
+        )
+        .toList();
+
+    if (!found) {
+      updatedRecords.add(
+        OnlinePickInventoryCheckRecord(
+          recordId: _uuid.v4(),
+          materialCode: materialCode,
+          trayNo: trayNo,
+          storeSite: storeSite,
+          quantity: quantity,
+        ),
+      );
+    }
+
+    emit(
+      state.copyWith(
+        inventoryCheckRecords: updatedRecords,
+        status: CollectionStatus.success('已记录库存结余 $quantity'),
+        placeholder: '请扫描库位',
+        step: OnlinePickCollectionStep.location,
+        focus: true,
+        resetBarcode: true,
+        currentTab: 2,
+      ),
+    );
+
+    await _persistCacheSnapshot();
+  }
+
+  List<OnlinePickTaskItem> _matchTaskItems({
+    required String materialCode,
+    required String batchNo,
+    required String serialNumber,
+    required String storeSite,
+  }) {
+    final material = materialCode.toUpperCase();
+    final batch = batchNo.toUpperCase();
+    final serial = serialNumber.toUpperCase();
+    final tray = state.currentTrayCode.toUpperCase();
+
+    return state.taskItems.where((item) {
+      if (state.selectedItemIds.isNotEmpty &&
+          !state.selectedItemIds.contains(item.outTaskItemId)) {
+        return false;
+      }
+
+      if ((item.materialCode ?? '').toUpperCase() != material) {
+        return false;
+      }
+
+      if (tray.isNotEmpty && (item.palletNo ?? '').toUpperCase() != tray) {
+        return false;
+      }
+
+      if (storeSite.isNotEmpty &&
+          (item.storeSiteNo ?? '').toUpperCase() != storeSite) {
+        return false;
+      }
+
+      if (state.matControlFlag == '0') {
+        final itemSn = (item.serialNumber ?? '').toUpperCase();
+        if (serial.isNotEmpty && itemSn.isNotEmpty && itemSn != serial) {
+          return false;
+        }
+      } else if (state.matControlFlag == '1' || state.matControlFlag == '2') {
+        final itemBatch =
+            (item.hintBatchNo ?? item.batchNo ?? '').toUpperCase();
+        if (batch.isNotEmpty && itemBatch != batch) {
+          return false;
+        }
+      }
+
+      return true;
+    }).toList();
+  }
+
+  String _resolveErpRoom({
+    required String materialCode,
+    required String batchNo,
+    required String storeSite,
+  }) {
+    final material = materialCode.toUpperCase();
+    final batch = batchNo.toUpperCase();
+    final site = storeSite.toUpperCase();
+
+    for (final item in state.taskItems) {
+      if ((item.materialCode ?? '').toUpperCase() == material &&
+          (item.storeSiteNo ?? '').toUpperCase() == site &&
+          (item.hintBatchNo ?? item.batchNo ?? '').toUpperCase() == batch) {
+        return (item.subInventoryCode ?? '').toUpperCase();
+      }
+    }
+
+    for (final item in state.taskItems) {
+      if ((item.materialCode ?? '').toUpperCase() == material &&
+          (item.storeSiteNo ?? '').toUpperCase() == site) {
+        return (item.subInventoryCode ?? '').toUpperCase();
+      }
+    }
+
+    for (final item in state.taskItems) {
+      if ((item.materialCode ?? '').toUpperCase() == material) {
+        return (item.subInventoryCode ?? '').toUpperCase();
+      }
+    }
+
+    return '';
+  }
+
+  Future<String> _loadRoomMatControl(OnlinePickTask task) async {
+    try {
+      final response =
+          await _collectionService.getRoomMatControl(task.outTaskId.toString());
+      final parts = response.split('!');
+      if (parts.length > 4 && parts[4].isNotEmpty) {
+        return parts[4];
+      }
+    } catch (_) {
+      // ignore and fallback to default
+    }
+    return '0';
+  }
+
+  Future<_InventoryLoadResult> _loadInventoryForBarcode({
+    required String storeSite,
+    required String materialCode,
+    required String batchNo,
+    required String serialNumber,
+    required String matControl,
+    required String erpRoom,
+  }) async {
+    double availableQty = 0;
+    String erpStore = state.erpStoreInv;
+
+    double _parseQty(dynamic value) {
+      return double.tryParse(value?.toString() ?? '0') ?? 0;
+    }
+
+    if (matControl == '1' || matControl == '2') {
+      final response = await _collectionService.getRepertoryByStoreSite(
+        storeSiteNo: storeSite,
+        materialCode: materialCode,
+      );
+
+      final code = response['code'] as int?;
+      if (code != 200) {
+        throw Exception(response['msg']?.toString() ?? '库存校验失败');
+      }
+
+      final data = response['data'];
+      if (data is! List) {
+        throw Exception('库存数据格式错误');
+      }
+
+      final list = data.cast<dynamic>();
+      if (list.isEmpty) {
+        throw Exception(
+          '物料【$materialCode】批次【$batchNo】在库位【$storeSite】不存在，请确认',
+        );
+      }
+
+      final filtered = <dynamic>[];
+      for (final item in list) {
+        final map = item as Map<String, dynamic>?;
+        if (map == null) continue;
+        final itemBatch = (map['batchno']?.toString() ?? '').toUpperCase();
+        final itemErp = (map['erpStoreroom']?.toString() ?? '').toUpperCase();
+        if (erpRoom.isNotEmpty) {
+          if (itemErp == erpRoom.toUpperCase() && itemBatch == batchNo) {
+            filtered.add(map);
+          }
+        } else {
+          if (itemBatch == batchNo) {
+            filtered.add(map);
+          }
+        }
+      }
+
+      if (filtered.isEmpty) {
+        throw Exception(
+          '物料【$materialCode】批次【$batchNo】在库位【$storeSite】不存在，请确认',
+        );
+      }
+
+      availableQty = filtered.fold<double>(
+        0,
+        (sum, item) => sum + _parseQty((item as Map)['repqty']),
+      );
+
+      final first = filtered.first as Map;
+      final erpCandidate = (first['erpStoreroom']?.toString() ?? '').toUpperCase();
+      if (erpCandidate.isNotEmpty) {
+        if (erpRoom.isNotEmpty && erpCandidate != erpRoom.toUpperCase()) {
+          throw Exception(
+            '当前物料明细指定子库【$erpRoom】与当前库位的物料批次子库【$erpCandidate】存在不一致，请确认',
+          );
+        }
+        erpStore = erpCandidate;
+      }
+    } else {
+      final responseSn = await _collectionService.getRepertoryByStoreSiteSn(
+        storeSiteNo: storeSite,
+        materialCode: materialCode,
+        erpStoreroom: null,
+        batchNo: null,
+        serialNumber: null,
+      );
+
+      final codeSn = responseSn['code'] as int?;
+      if (codeSn != 200) {
+        throw Exception(responseSn['msg']?.toString() ?? '库存校验失败');
+      }
+
+      final dataSn = responseSn['data'];
+      if (dataSn is! List || dataSn.isEmpty) {
+        throw Exception(
+          '物料【$materialCode】序列【$serialNumber】在库位【$storeSite】不存在，请确认',
+        );
+      }
+
+      final baseQty = _parseQty((dataSn.first as Map)['repqty']);
+      if (baseQty <= 0) {
+        throw Exception(
+          '物料【$materialCode】序列【$serialNumber】在库位【$storeSite】不存在，请确认',
+        );
+      }
+
+      double matchedQty = baseQty;
+
+      if (erpRoom.isNotEmpty) {
+        final responseErp = await _collectionService.getRepertoryByStoreSiteSn(
+          storeSiteNo: storeSite,
+          materialCode: materialCode,
+          erpStoreroom: erpRoom,
+          batchNo: batchNo.isEmpty ? null : batchNo,
+          serialNumber: serialNumber.isEmpty ? null : serialNumber,
+        );
+        final dataErp = responseErp['data'];
+        if (dataErp is List && dataErp.isNotEmpty) {
+          matchedQty = _parseQty((dataErp.first as Map)['repqty']);
+        }
+      } else {
+        final responseBatch = await _collectionService.getRepertoryByStoreSiteSn(
+          storeSiteNo: storeSite,
+          materialCode: materialCode,
+          erpStoreroom: null,
+          batchNo: batchNo.isEmpty ? null : batchNo,
+          serialNumber: serialNumber.isEmpty ? null : serialNumber,
+        );
+        final dataBatch = responseBatch['data'];
+        if (dataBatch is List && dataBatch.isNotEmpty) {
+          matchedQty = _parseQty((dataBatch.first as Map)['repqty']);
+        }
+      }
+
+      if (matchedQty <= 0) {
+        throw Exception(
+          '物料【$materialCode】序列【$serialNumber】在库位【$storeSite】不存在，请确认',
+        );
+      }
+
+      final erpResponse = await _collectionService.getRepertoryByStoreSiteErp(
+        storeSiteNo: storeSite,
+        materialCode: materialCode,
+      );
+      final erpCode = erpResponse['code'] as int?;
+      if (erpCode == 200) {
+        final erpData = erpResponse['data'];
+        if (erpData is List && erpData.isNotEmpty) {
+          final erpCandidate =
+              (erpData.first['erpStoreroom']?.toString() ?? '').toUpperCase();
+          if (erpRoom.isNotEmpty && erpCandidate.isNotEmpty &&
+              erpCandidate != erpRoom.toUpperCase()) {
+            throw Exception(
+              '当前物料明细指定子库【$erpRoom】与当前库位的物料批次子库【$erpCandidate】存在不一致，请确认',
+            );
+          }
+          if (erpCandidate.isNotEmpty) {
+            erpStore = erpCandidate;
+          }
+        }
+      }
+
+      availableQty = matchedQty;
+    }
+
+    return _InventoryLoadResult(
+      quantity: availableQty,
+      erpStore: erpStore,
+    );
+  }
+
+  String _buildInventoryKey({
+    required String storeSite,
+    required String materialCode,
+    required String batchOrSn,
+  }) {
+    final site = storeSite.toUpperCase();
+    final material = materialCode.toUpperCase();
+    final suffix = batchOrSn.toUpperCase();
+    return '$site|$material|$suffix';
+  }
+
+  OnlinePickBarcodeContent _normalizeBarcodeContent(
+    OnlinePickBarcodeContent content,
+  ) {
+    final matControl = content.sequenceControl?.trim() ?? '';
+    final legacy = content.legacyId?.trim() ?? '';
+    var batchNo = content.batchNo ?? '';
+    var serial = content.serialNumber ?? '';
+
+    if ((matControl == '0' || matControl == '1' || matControl == '2') &&
+        batchNo.isEmpty &&
+        legacy == '0' &&
+        serial.isNotEmpty) {
+      batchNo = serial;
+    }
+
+    return content.copyWith(
+      batchNo: batchNo,
+      serialNumber: serial,
+    );
   }
 
   void _onChangeTab(
@@ -419,18 +1049,37 @@ class OnlinePickCollectionBloc
     for (final stock in removedStocks) {
       final key = stock.outTaskItemId;
       final entry = updatedDicMtlQty[key];
-      if (entry != null && entry.length >= 2) {
-        final remaining = (entry[1] - stock.collectQty).toDouble();
-        updatedDicMtlQty[key] = [entry[0], remaining < 0 ? 0 : remaining];
+      if (entry != null && entry.isNotEmpty) {
+        final base = entry[0];
+        final collected = entry.length > 1 ? entry[1] : 0;
+        final remaining = (collected - stock.collectQty).toDouble();
+        updatedDicMtlQty[key] = [base, remaining < 0 ? 0 : remaining];
       }
     }
 
     final updatedDicInv = Map<String, double>.from(state.dicInvMtlQty);
     for (final stock in removedStocks) {
-      final key = stock.outTaskItemId;
-      if (updatedDicInv.containsKey(key)) {
-        final value = (updatedDicInv[key] ?? 0) - stock.collectQty.toDouble();
-        updatedDicInv[key] = value < 0 ? 0 : value;
+      final key = _buildInventoryKey(
+        storeSite: (stock.storeSite ?? '').toUpperCase(),
+        materialCode: stock.materialCode,
+        batchOrSn: (stock.serialNumber ?? '').isNotEmpty
+            ? stock.serialNumber ?? ''
+            : stock.batchNo ?? '',
+      );
+      final value = (updatedDicInv[key] ?? 0) - stock.collectQty.toDouble();
+      updatedDicInv[key] = value < 0 ? 0 : value;
+    }
+
+    var availableInventory = state.availableInventory;
+    if (availableInventory > 0 && state.currentBarcode != null) {
+      final site = state.currentStoreSite.toUpperCase();
+      final mat = (state.currentBarcode!.materialCode ?? '').toUpperCase();
+      for (final stock in removedStocks) {
+        final stockSite = (stock.storeSite ?? '').toUpperCase();
+        final stockMat = stock.materialCode.toUpperCase();
+        if (stockSite == site && stockMat == mat) {
+          availableInventory += stock.collectQty.toDouble();
+        }
       }
     }
 
@@ -448,6 +1097,7 @@ class OnlinePickCollectionBloc
         dicSeq: updatedDicSeq,
         dicMtlQty: updatedDicMtlQty,
         dicInvMtlQty: updatedDicInv,
+        availableInventory: availableInventory,
       ),
     );
     add(const PersistCollectionCacheEvent());
@@ -472,6 +1122,16 @@ class OnlinePickCollectionBloc
       emit(
         state.copyWith(
           status: CollectionStatus.error('缺少任务信息，无法提交'),
+          focus: true,
+        ),
+      );
+      return;
+    }
+
+    if (state.inventoryCheckRecords.isEmpty) {
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('请采集结余库存后再提交！'),
           focus: true,
         ),
       );
@@ -529,7 +1189,7 @@ class OnlinePickCollectionBloc
         }
       }
 
-      final inventoryCheckInfos = state.pendingCheckItems
+      final inventoryCheckInfos = state.inventoryCheckRecords
           .map((item) => item.toJson())
           .toList();
 
@@ -564,10 +1224,13 @@ class OnlinePickCollectionBloc
           dicMtlQty: const {},
           dicInvMtlQty: const {},
           currentTrayCode: '',
+          currentStoreSite: '',
           currentBarcode: null,
           placeholder: '请扫描库位',
           step: OnlinePickCollectionStep.location,
           focus: true,
+          inventoryCheckRecords: const [],
+          availableInventory: 0,
         ),
       );
 
@@ -1087,6 +1750,18 @@ class OnlinePickCollectionBloc
               ? snapshot.location
               : state.selectedLocation,
           mode: _mapMode(snapshot.mode),
+          currentStoreSite: snapshot.currentStoreSite.isNotEmpty
+              ? snapshot.currentStoreSite
+              : state.currentStoreSite,
+          roomMatControl: snapshot.roomMatControl,
+          matControlFlag: snapshot.matControlFlag,
+          matSendControl: snapshot.matSendControl,
+          erpRoom: snapshot.erpRoom,
+          erpStoreInv: snapshot.erpStoreInv.isNotEmpty
+              ? snapshot.erpStoreInv
+              : state.erpStoreInv,
+          availableInventory: snapshot.availableInventory,
+          inventoryCheckRecords: snapshot.inventoryChecks,
           issuedTrayNos: issued,
           status: snapshot.stocks.isNotEmpty
               ? CollectionStatus.success('已恢复未提交的采集记录')
@@ -1132,6 +1807,15 @@ class OnlinePickCollectionBloc
         userId: _userManager.userInfo?.userId ?? 0,
         pendingQuantity: state.currentBarcode?.quantity,
         mode: state.mode.name,
+        expectedErpStore: state.erpStoreInv,
+        inventoryChecks: state.inventoryCheckRecords,
+        roomMatControl: state.roomMatControl,
+        currentStoreSite: state.currentStoreSite,
+        matControlFlag: state.matControlFlag,
+        matSendControl: state.matSendControl,
+        erpRoom: state.erpRoom,
+        erpStoreInv: state.erpStoreInv,
+        availableInventory: state.availableInventory,
       );
 
       await _cacheManager.saveSnapshot(task.outTaskId.toString(), snapshot);
@@ -1174,4 +1858,14 @@ class OnlinePickCollectionBloc
         .where((item) => (item.palletNo ?? '').toUpperCase() == trayNo)
         .toList();
   }
+}
+
+class _InventoryLoadResult {
+  const _InventoryLoadResult({
+    required this.quantity,
+    required this.erpStore,
+  });
+
+  final double quantity;
+  final String erpStore;
 }

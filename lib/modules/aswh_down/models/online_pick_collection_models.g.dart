@@ -127,6 +127,53 @@ class OnlinePickCollectionStockAdapter
           typeId == other.typeId;
 }
 
+class OnlinePickInventoryCheckRecordAdapter
+    extends TypeAdapter<OnlinePickInventoryCheckRecord> {
+  @override
+  final int typeId = 43;
+
+  @override
+  OnlinePickInventoryCheckRecord read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return OnlinePickInventoryCheckRecord(
+      recordId: fields[0] as String? ?? '',
+      materialCode: fields[1] as String,
+      trayNo: fields[2] as String,
+      storeSite: fields[3] as String,
+      quantity: fields[4] as num,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, OnlinePickInventoryCheckRecord obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.recordId)
+      ..writeByte(1)
+      ..write(obj.materialCode)
+      ..writeByte(2)
+      ..write(obj.trayNo)
+      ..writeByte(3)
+      ..write(obj.storeSite)
+      ..writeByte(4)
+      ..write(obj.quantity);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is OnlinePickInventoryCheckRecordAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class OnlinePickCollectionCacheSnapshotAdapter
     extends TypeAdapter<OnlinePickCollectionCacheSnapshot> {
   @override
@@ -151,13 +198,23 @@ class OnlinePickCollectionCacheSnapshotAdapter
       pendingQuantity: fields[8] as num?,
       mode: fields[9] as String,
       expectedErpStore: fields[10] as String,
+      inventoryChecks:
+          (fields[11] as List?)?.cast<OnlinePickInventoryCheckRecord>() ??
+              const [],
+      roomMatControl: fields[12] as String,
+      currentStoreSite: fields[13] as String,
+      matControlFlag: fields[14] as String,
+      matSendControl: fields[15] as String,
+      erpRoom: fields[16] as String,
+      erpStoreInv: fields[17] as String,
+      availableInventory: (fields[18] as num?)?.toDouble() ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, OnlinePickCollectionCacheSnapshot obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.stocks)
       ..writeByte(1)
@@ -179,7 +236,23 @@ class OnlinePickCollectionCacheSnapshotAdapter
       ..writeByte(9)
       ..write(obj.mode)
       ..writeByte(10)
-      ..write(obj.expectedErpStore);
+      ..write(obj.expectedErpStore)
+      ..writeByte(11)
+      ..write(obj.inventoryChecks)
+      ..writeByte(12)
+      ..write(obj.roomMatControl)
+      ..writeByte(13)
+      ..write(obj.currentStoreSite)
+      ..writeByte(14)
+      ..write(obj.matControlFlag)
+      ..writeByte(15)
+      ..write(obj.matSendControl)
+      ..writeByte(16)
+      ..write(obj.erpRoom)
+      ..writeByte(17)
+      ..write(obj.erpStoreInv)
+      ..writeByte(18)
+      ..write(obj.availableInventory);
   }
 
   @override
@@ -362,6 +435,19 @@ _$OnlinePickCollectionCacheSnapshotImpl
           pendingQuantity: json['pendingQuantity'] as num?,
           mode: json['mode'] as String? ?? 'outbound',
           expectedErpStore: json['expectedErpStore'] as String? ?? '',
+          inventoryChecks: (json['inventoryChecks'] as List<dynamic>?)
+                  ?.map((e) => OnlinePickInventoryCheckRecord.fromJson(
+                      e as Map<String, dynamic>))
+                  .toList() ??
+              const <OnlinePickInventoryCheckRecord>[],
+          roomMatControl: json['roomMatControl'] as String? ?? '0',
+          currentStoreSite: json['currentStoreSite'] as String? ?? '',
+          matControlFlag: json['matControlFlag'] as String? ?? '',
+          matSendControl: json['matSendControl'] as String? ?? '',
+          erpRoom: json['erpRoom'] as String? ?? '',
+          erpStoreInv: json['erpStoreInv'] as String? ?? '',
+          availableInventory:
+              (json['availableInventory'] as num?)?.toDouble() ?? 0,
         );
 
 Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
@@ -378,4 +464,13 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'pendingQuantity': instance.pendingQuantity,
       'mode': instance.mode,
       'expectedErpStore': instance.expectedErpStore,
+      'inventoryChecks':
+          instance.inventoryChecks.map((e) => e.toJson()).toList(),
+      'roomMatControl': instance.roomMatControl,
+      'currentStoreSite': instance.currentStoreSite,
+      'matControlFlag': instance.matControlFlag,
+      'matSendControl': instance.matSendControl,
+      'erpRoom': instance.erpRoom,
+      'erpStoreInv': instance.erpStoreInv,
+      'availableInventory': instance.availableInventory,
     };

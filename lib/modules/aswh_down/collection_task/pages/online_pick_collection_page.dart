@@ -90,7 +90,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                     children: [
                       _buildTaskGrid(state, state.taskItems),
                       _buildTaskGrid(state, state.currentTrayItems),
-                      _buildTaskGrid(state, state.pendingCheckItems),
+                      _buildInventoryCheckList(state),
                     ],
                   ),
                 ),
@@ -236,7 +236,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
         tabs: const [
           Tab(text: '任务列表'),
           Tab(text: '当前托盘'),
-          Tab(text: '待校验'),
+          Tab(text: '库存核对'),
         ],
         onTap: (index) {
           _bloc.add(ChangeCollectionTabEvent(index));
@@ -269,6 +269,76 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
   }
 
+  Widget _buildInventoryCheckList(OnlinePickCollectionState state) {
+    final records = state.inventoryCheckRecords;
+    if (records.isEmpty) {
+      return _buildEmptyPlaceholder('暂无库存核对记录');
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: records.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final record = records[index];
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x14000000),
+                offset: Offset(0, 2),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '物料：${record.materialCode}',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                children: [
+                  _buildInfoChip(
+                    '托盘',
+                    record.trayNo.isEmpty ? '-' : record.trayNo,
+                  ),
+                  _buildInfoChip(
+                    '库位',
+                    record.storeSite.isEmpty ? '-' : record.storeSite,
+                  ),
+                  _buildInfoChip(
+                    '结余数量',
+                    record.quantity.toString(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyPlaceholder(String message) {
+    return Center(
+      child: Text(
+        message,
+        style: const TextStyle(color: Colors.grey),
+      ),
+    );
+  }
+
   Widget _buildBottomBar(OnlinePickCollectionState state) {
     return SafeArea(
       child: Container(
@@ -295,7 +365,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
             Expanded(
               child: ElevatedButton(
                 style: _primaryActionStyle(),
-                onPressed: state.collectedStocks.isEmpty
+                onPressed: state.collectedStocks.isEmpty ||
+                        state.inventoryCheckRecords.isEmpty
                     ? null
                     : () => _confirmSubmit(state),
                 child: const Text('提交采集'),

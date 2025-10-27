@@ -70,6 +70,76 @@ class OnlinePickCollectionStock with _$OnlinePickCollectionStock {
       _$OnlinePickCollectionStockFromJson(json);
 }
 
+/// 库存核对记录。
+@HiveType(typeId: 43)
+class OnlinePickInventoryCheckRecord {
+  const OnlinePickInventoryCheckRecord({
+    @HiveField(0) this.recordId = '',
+    @HiveField(1) @JsonKey(name: 'matCode') required this.materialCode,
+    @HiveField(2) @JsonKey(name: 'trayNo') required this.trayNo,
+    @HiveField(3) @JsonKey(name: 'storeSite') required this.storeSite,
+    @HiveField(4) @JsonKey(name: 'collectQty') this.quantity = 0,
+  });
+
+  factory OnlinePickInventoryCheckRecord.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return OnlinePickInventoryCheckRecord(
+      recordId: json['stockid']?.toString() ?? '',
+      materialCode: json['matCode']?.toString() ?? '',
+      trayNo: json['trayNo']?.toString() ?? '',
+      storeSite: json['storeSite']?.toString() ?? '',
+      quantity: json['collectQty'] is num
+          ? json['collectQty'] as num
+          : num.tryParse(json['collectQty']?.toString() ?? '0') ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'stockid': recordId,
+        'matCode': materialCode,
+        'trayNo': trayNo,
+        'storeSite': storeSite,
+        'collectQty': quantity,
+      };
+
+  OnlinePickInventoryCheckRecord copyWith({
+    String? recordId,
+    String? materialCode,
+    String? trayNo,
+    String? storeSite,
+    num? quantity,
+  }) {
+    return OnlinePickInventoryCheckRecord(
+      recordId: recordId ?? this.recordId,
+      materialCode: materialCode ?? this.materialCode,
+      trayNo: trayNo ?? this.trayNo,
+      storeSite: storeSite ?? this.storeSite,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  @HiveField(0)
+  @JsonKey(name: 'stockid')
+  final String recordId;
+
+  @HiveField(1)
+  @JsonKey(name: 'matCode')
+  final String materialCode;
+
+  @HiveField(2)
+  @JsonKey(name: 'trayNo')
+  final String trayNo;
+
+  @HiveField(3)
+  @JsonKey(name: 'storeSite')
+  final String storeSite;
+
+  @HiveField(4)
+  @JsonKey(name: 'collectQty')
+  final num quantity;
+}
+
 /// 自动化仓库拣选模式。
 @freezed
 class OnlinePickCollectionMode with _$OnlinePickCollectionMode {
@@ -154,6 +224,16 @@ class OnlinePickCollectionCacheSnapshot
     @HiveField(8) num? pendingQuantity,
     @HiveField(9) @Default('outbound') String mode,
     @HiveField(10) @Default('') String expectedErpStore,
+    @HiveField(11)
+    @Default(<OnlinePickInventoryCheckRecord>[])
+    List<OnlinePickInventoryCheckRecord> inventoryChecks,
+    @HiveField(12) @Default('0') String roomMatControl,
+    @HiveField(13) @Default('') String currentStoreSite,
+    @HiveField(14) @Default('') String matControlFlag,
+    @HiveField(15) @Default('') String matSendControl,
+    @HiveField(16) @Default('') String erpRoom,
+    @HiveField(17) @Default('') String erpStoreInv,
+    @HiveField(18) @Default(0) double availableInventory,
   }) = _OnlinePickCollectionCacheSnapshot;
 
   factory OnlinePickCollectionCacheSnapshot.fromJson(
