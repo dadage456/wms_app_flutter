@@ -15,10 +15,10 @@ class OnlinePickTaskBloc
   OnlinePickTaskBloc({
     required AswhDownTaskService taskService,
     required UserManager userManager,
-  })  : _taskService = taskService,
-        _userManager = userManager,
-        super(const OnlinePickTaskState()) {
-    _currentQuery = _buildDefaultQuery();
+  }) : _taskService = taskService,
+       _userManager = userManager,
+       super(const OnlinePickTaskState()) {
+    currentQuery = _buildDefaultQuery();
     gridBloc = CommonDataGridBloc<OnlinePickTask>(
       dataLoader: _createDataLoader(),
     );
@@ -32,13 +32,13 @@ class OnlinePickTaskBloc
   final AswhDownTaskService _taskService;
   final UserManager _userManager;
 
-  late OnlinePickTaskQuery _currentQuery;
+  late OnlinePickTaskQuery currentQuery;
   late final CommonDataGridBloc<OnlinePickTask> gridBloc;
 
   DataGridLoader<OnlinePickTask> _createDataLoader() {
     return (pageIndex) async {
-      final nextQuery = _currentQuery.copyWith(pageIndex: pageIndex);
-      _currentQuery = nextQuery;
+      final nextQuery = currentQuery.copyWith(pageIndex: pageIndex);
+      currentQuery = nextQuery;
       final result = await _taskService.fetchTaskList(query: nextQuery);
 
       final totalPagesRaw = (result.total / nextQuery.pageSize).ceil();
@@ -54,34 +54,29 @@ class OnlinePickTaskBloc
   Future<void> _onInitialized(
     OnlinePickTaskInitialized event,
     Emitter<OnlinePickTaskState> emit,
-  ) async {
-    gridBloc.add(LoadDataEvent(0));
-  }
+  ) async {}
 
   Future<void> _onSearchSubmitted(
     OnlinePickTaskSearchSubmitted event,
     Emitter<OnlinePickTaskState> emit,
   ) async {
-    _currentQuery = _currentQuery.copyWith(
+    currentQuery = currentQuery.copyWith(
       searchKey: event.keyword,
-      pageIndex: 0,
+      pageIndex: 1,
     );
-    emit(state.copyWith(searchKeyword: event.keyword));
-    gridBloc.add(LoadDataEvent(0));
+    gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
   }
 
   Future<void> _onFinishFlagChanged(
     OnlinePickTaskFinishFlagChanged event,
     Emitter<OnlinePickTaskState> emit,
   ) async {
-    _currentQuery = _currentQuery.copyWith(
+    currentQuery = currentQuery.copyWith(
       finishFlag: event.finishFlag,
-      pageIndex: 0,
+      pageIndex: 1,
     );
-    emit(state.copyWith(finishFlag: event.finishFlag));
-
     final completer = Completer<DataGridResponseData<OnlinePickTask>>();
-    gridBloc.add(LoadDataEvent(0, completer: completer));
+    gridBloc.add(LoadDataEvent(currentQuery.pageIndex, completer: completer));
     try {
       await completer.future;
     } catch (_) {}
@@ -91,7 +86,7 @@ class OnlinePickTaskBloc
     OnlinePickTaskRefreshRequested event,
     Emitter<OnlinePickTaskState> emit,
   ) async {
-    gridBloc.add(LoadDataEvent(_currentQuery.pageIndex));
+    gridBloc.add(LoadDataEvent(currentQuery.pageIndex));
   }
 
   OnlinePickTaskQuery _buildDefaultQuery() {
@@ -104,7 +99,7 @@ class OnlinePickTaskBloc
       roleOrUserId: userId,
       roomTag: '1',
       finishFlag: '0',
-      pageIndex: 0,
+      pageIndex: 1,
       pageSize: 100,
     );
   }

@@ -49,29 +49,29 @@ class _OnlinePickTaskListPageState extends State<OnlinePickTaskListPage>
         actions: [
           IconButton(
             onPressed: () => Modular.to.pushNamed('/aswh-down/receive'),
-            icon: const Icon(Icons.assignment_turned_in, color: Colors.white),
+            icon: const Icon(Icons.add, color: Colors.white, size: 28),
           ),
         ],
       ).appBar,
       body: Column(
         children: [
-          _buildScanner(),
-          const SizedBox(height: 4),
+          _buildScanInput(),
+          const SizedBox(height: 0),
           Expanded(child: _buildDataGrid()),
         ],
       ),
     );
   }
 
-  Widget _buildScanner() {
+  Widget _buildScanInput() {
     final config = ScannerConfig().copyWith(
       placeholder: '请扫描单号',
       clearOnSubmit: true,
     );
 
     return ScannerWidget(
-      controller: _scannerController,
       config: config,
+      controller: _scannerController,
       onScanResult: (value) {
         _bloc.add(OnlinePickTaskSearchSubmitted(value));
       },
@@ -79,11 +79,13 @@ class _OnlinePickTaskListPageState extends State<OnlinePickTaskListPage>
         LoadingDialogManager.instance.showErrorDialog(context, message);
       },
       suffix: IconButton(
-        icon: SvgPicture.asset('assets/images/icon_filter.svg'),
+        icon: SvgPicture.asset(
+          'assets/images/icon_filter.svg', // SVG 文件路径
+        ),
         onPressed: () {
           OnlinePickTaskFilterDialog.show(
             context: context,
-            currentFilter: _bloc.state.finishFlag,
+            currentFilter: _bloc.currentQuery.finishFlag,
             onFilterChanged: (value) {
               _bloc.add(OnlinePickTaskFinishFlagChanged(value));
             },
@@ -96,62 +98,62 @@ class _OnlinePickTaskListPageState extends State<OnlinePickTaskListPage>
   Widget _buildDataGrid() {
     return BlocProvider.value(
       value: _gridBloc,
-      child: BlocConsumer<
-          CommonDataGridBloc<OnlinePickTask>,
-          CommonDataGridState<OnlinePickTask>>(
-        listener: (context, state) {
-          if (state.status == GridStatus.loading) {
-            LoadingDialogManager.instance.showLoadingDialog(context);
-          } else {
-            LoadingDialogManager.instance.hideLoadingDialog(context);
-          }
+      child:
+          BlocConsumer<
+            CommonDataGridBloc<OnlinePickTask>,
+            CommonDataGridState<OnlinePickTask>
+          >(
+            listener: (context, state) {
+              if (state.status == GridStatus.loading) {
+                LoadingDialogManager.instance.showLoadingDialog(context);
+              } else {
+                LoadingDialogManager.instance.hideLoadingDialog(context);
+              }
 
-          if (state.status == GridStatus.error) {
-            LoadingDialogManager.instance.showErrorDialog(
-              context,
-              state.errorMessage ?? '加载失败',
-            );
-          }
-        },
-        builder: (context, state) {
-          final grid = CommonDataGrid<OnlinePickTask>(
-            columns: OnlinePickTaskGridConfig.columns(
-              (task, actionIndex) {
-                if (actionIndex == 0) {
-                  _navigateToCollect(task);
-                } else {
-                  _navigateToDetail(task);
-                }
-              },
-            ),
-            currentPage: state.currentPage,
-            totalPages: state.totalPages,
-            datas: state.data,
-            allowPager: false,
-            allowSelect: false,
-            headerHeight: 44,
-            rowHeight: 48,
-            onLoadData: (pageIndex) async {
-              _gridBloc.add(LoadDataEvent(pageIndex));
+              if (state.status == GridStatus.error) {
+                LoadingDialogManager.instance.showErrorDialog(
+                  context,
+                  state.errorMessage ?? '加载失败',
+                );
+              }
             },
-            onSelectionChanged: (_) {},
-          );
+            builder: (context, state) {
+              final grid = CommonDataGrid<OnlinePickTask>(
+                columns: OnlinePickTaskGridConfig.columns((task, actionIndex) {
+                  if (actionIndex == 0) {
+                    _navigateToCollect(task);
+                  } else {
+                    _navigateToDetail(task);
+                  }
+                }),
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                datas: state.data,
+                allowPager: false,
+                allowSelect: false,
+                headerHeight: 44,
+                rowHeight: 48,
+                onLoadData: (pageIndex) async {
+                  _gridBloc.add(LoadDataEvent(pageIndex));
+                },
+                onSelectionChanged: (_) {},
+              );
 
-          final isEmpty =
-              state.status == GridStatus.loaded && state.data.isEmpty;
+              final isEmpty =
+                  state.status == GridStatus.loaded && state.data.isEmpty;
 
-          if (isEmpty) {
-            return Stack(
-              children: [
-                grid,
-                const Center(child: Text('当前任务列表没有待处理任务')),
-              ],
-            );
-          }
+              if (isEmpty) {
+                return Stack(
+                  children: [
+                    grid,
+                    const Center(child: Text('当前任务列表没有待处理任务')),
+                  ],
+                );
+              }
 
-          return grid;
-        },
-      ),
+              return grid;
+            },
+          ),
     );
   }
 

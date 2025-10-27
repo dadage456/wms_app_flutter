@@ -4,9 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_bloc.dart';
 import 'package:wms_app/common_widgets/common_grid/grid_event.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_task_models.dart';
-import 'package:wms_app/models/page_status.dart';
 import 'package:wms_app/services/user_manager.dart';
-import 'package:wms_app/utils/error_handler.dart';
 
 import '../../services/aswh_down_task_service.dart';
 import 'online_pick_receive_event.dart';
@@ -24,22 +22,15 @@ class OnlinePickReceiveBloc
       dataLoader: _createDataLoader(),
     );
 
-    _gridSubscription = gridBloc.stream.listen((gridState) {
-      add(OnlinePickReceiveRecordCountChanged(gridState.data.length));
-    });
-
     on<OnlinePickReceiveStarted>(_onStarted);
     on<OnlinePickReceiveSearchRequested>(_onSearch);
     on<OnlinePickReceiveRefreshRequested>(_onRefresh);
-    on<OnlinePickReceiveStatusCleared>(_onStatusCleared);
-    on<OnlinePickReceiveRecordCountChanged>(_onRecordCountChanged);
   }
 
   final AswhDownTaskService _taskService;
   final UserManager _userManager;
 
   late final CommonDataGridBloc<OnlinePickTask> gridBloc;
-  late final StreamSubscription _gridSubscription;
 
   late OnlinePickTaskQuery _currentQuery = _buildDefaultQuery();
 
@@ -62,9 +53,7 @@ class OnlinePickReceiveBloc
   Future<void> _onStarted(
     OnlinePickReceiveStarted event,
     Emitter<OnlinePickReceiveState> emit,
-  ) async {
-    gridBloc.add(const LoadDataEvent(1));
-  }
+  ) async {}
 
   Future<void> _onSearch(
     OnlinePickReceiveSearchRequested event,
@@ -74,24 +63,7 @@ class OnlinePickReceiveBloc
       searchKey: event.keyword,
       pageIndex: 1,
     );
-    emit(
-      state.copyWith(
-        searchKeyword: event.keyword,
-        status: CollectionStatus.loading(),
-      ),
-    );
-    final completer = Completer<DataGridResponseData<OnlinePickTask>>();
-    gridBloc.add(LoadDataEvent(_currentQuery.pageIndex, completer: completer));
-    try {
-      await completer.future;
-      emit(state.copyWith(status: CollectionStatus.success()));
-    } catch (error) {
-      emit(
-        state.copyWith(
-          status: CollectionStatus.error(ErrorHandler.handleError(error)),
-        ),
-      );
-    }
+    gridBloc.add(LoadDataEvent(_currentQuery.pageIndex));
   }
 
   Future<void> _onRefresh(
@@ -99,20 +71,6 @@ class OnlinePickReceiveBloc
     Emitter<OnlinePickReceiveState> emit,
   ) async {
     gridBloc.add(LoadDataEvent(_currentQuery.pageIndex));
-  }
-
-  Future<void> _onStatusCleared(
-    OnlinePickReceiveStatusCleared event,
-    Emitter<OnlinePickReceiveState> emit,
-  ) async {
-    emit(state.copyWith(status: CollectionStatus.normal()));
-  }
-
-  Future<void> _onRecordCountChanged(
-    OnlinePickReceiveRecordCountChanged event,
-    Emitter<OnlinePickReceiveState> emit,
-  ) async {
-    emit(state.copyWith(recordCount: event.count));
   }
 
   OnlinePickTaskQuery _buildDefaultQuery() {
@@ -127,12 +85,5 @@ class OnlinePickReceiveBloc
       pageSize: 100,
       finishFlag: '0',
     );
-  }
-
-  @override
-  Future<void> close() async {
-    await _gridSubscription.cancel();
-    await gridBloc.close();
-    return super.close();
   }
 }
