@@ -9,9 +9,7 @@ abstract class OnlinePickTaskDetailEvent extends Equatable {
 }
 
 class OnlinePickTaskDetailInitialized extends OnlinePickTaskDetailEvent {
-  const OnlinePickTaskDetailInitialized({
-    required this.task,
-  });
+  const OnlinePickTaskDetailInitialized({required this.task});
 
   final OnlinePickTask task;
 
@@ -28,23 +26,11 @@ class OnlinePickTaskDetailSearchSubmitted extends OnlinePickTaskDetailEvent {
   List<Object?> get props => [keyword];
 }
 
-class OnlinePickTaskDetailScanRequested extends OnlinePickTaskDetailEvent {
-  const OnlinePickTaskDetailScanRequested(this.scanContent);
-
-  final String scanContent;
-
-  @override
-  List<Object?> get props => [scanContent];
-}
-
 class OnlinePickTaskDetailCancelSubmitted extends OnlinePickTaskDetailEvent {
-  const OnlinePickTaskDetailCancelSubmitted();
+  final List<int> selectedRows;
+  const OnlinePickTaskDetailCancelSubmitted(this.selectedRows);
 }
 
 class OnlinePickTaskDetailRefreshRequested extends OnlinePickTaskDetailEvent {
   const OnlinePickTaskDetailRefreshRequested();
-}
-
-class OnlinePickTaskDetailStatusReset extends OnlinePickTaskDetailEvent {
-  const OnlinePickTaskDetailStatusReset();
 }

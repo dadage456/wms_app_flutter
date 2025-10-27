@@ -17,16 +17,20 @@ class OnlinePickReceiveGridConfig {
         cellBuilder: (task, _, __) => Align(
           alignment: Alignment.center,
           child: SizedBox(
-            height: 32,
+            height: 30,
             child: ElevatedButton(
               onPressed: () => onDetail?.call(task),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                backgroundColor: const Color(0xFF007AFF),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 0,
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              child: const Text('明细', style: TextStyle(fontSize: 13)),
+              child: const Text('明细', style: TextStyle(color: Colors.white)),
             ),
           ),
         ),

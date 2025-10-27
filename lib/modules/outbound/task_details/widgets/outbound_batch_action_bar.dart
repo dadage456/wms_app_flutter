@@ -94,15 +94,11 @@ class OutboundBatchActionBar extends StatelessWidget {
             const SizedBox(width: 8),
             // 撤销按钮
             ElevatedButton.icon(
-              onPressed: hasSelection ? () => _showCancelConfirmDialog(context) : null,
-              icon: const Icon(
-                Icons.delete_outline,
-                size: 20,
-              ),
-              label: const Text(
-                '撤销',
-                style: TextStyle(fontSize: 14),
-              ),
+              onPressed: hasSelection
+                  ? () => _showCancelConfirmDialog(context)
+                  : null,
+              icon: const Icon(Icons.delete_outline, size: 20),
+              label: const Text('撤销', style: TextStyle(fontSize: 14)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: hasSelection ? Colors.red : Colors.grey[300],
                 foregroundColor: hasSelection ? Colors.white : Colors.grey[500],
@@ -129,13 +125,10 @@ class OutboundBatchActionBar extends StatelessWidget {
         return AlertDialog(
           title: const Text(
             '撤销确认',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           content: Text(
-            '确定要撤销选中的 $selectedCount 项任务吗？\n\n此操作不可撤销，请谨慎操作。',
+            '确定要撤销选中的 $selectedCount 项任务吗？\n',
             style: const TextStyle(fontSize: 16),
           ),
           actions: [
@@ -143,10 +136,7 @@ class OutboundBatchActionBar extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
               child: const Text(
                 '取消',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
             ElevatedButton(
@@ -162,10 +152,7 @@ class OutboundBatchActionBar extends StatelessWidget {
                   vertical: 10.0,
                 ),
               ),
-              child: const Text(
-                '确认撤销',
-                style: TextStyle(fontSize: 16),
-              ),
+              child: const Text('确认撤销', style: TextStyle(fontSize: 16)),
             ),
           ],
         );
