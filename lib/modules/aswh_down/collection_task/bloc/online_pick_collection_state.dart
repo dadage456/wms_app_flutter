@@ -14,6 +14,7 @@ class OnlinePickCollectionState {
   final OnlinePickCollectionStep step;
   final String placeholder;
   final String currentTrayCode;
+  final String currentStoreSite;
   final int currentTab;
   final List<int> selectedItemIds;
   final bool focus;
@@ -26,6 +27,13 @@ class OnlinePickCollectionState {
   final Map<String, List<double>> dicMtlQty;
   final Map<String, double> dicInvMtlQty;
   final List<String> issuedTrayNos;
+  final List<OnlinePickInventoryCheckRecord> inventoryCheckRecords;
+  final String roomMatControl;
+  final String matControlFlag;
+  final String matSendControl;
+  final String erpRoom;
+  final String erpStoreInv;
+  final double availableInventory;
 
   const OnlinePickCollectionState({
     this.status = const CollectionStatus(CollectionStatusType.normal),
@@ -38,6 +46,7 @@ class OnlinePickCollectionState {
     this.step = OnlinePickCollectionStep.location,
     this.placeholder = '请扫描库位',
     this.currentTrayCode = '',
+    this.currentStoreSite = '',
     this.currentTab = 0,
     this.selectedItemIds = const [],
     this.focus = false,
@@ -66,6 +75,13 @@ class OnlinePickCollectionState {
     this.dicMtlQty = const {},
     this.dicInvMtlQty = const {},
     this.issuedTrayNos = const [],
+    this.inventoryCheckRecords = const [],
+    this.roomMatControl = '0',
+    this.matControlFlag = '',
+    this.matSendControl = '0',
+    this.erpRoom = '',
+    this.erpStoreInv = '',
+    this.availableInventory = 0,
   });
 
   OnlinePickCollectionState copyWith({
@@ -79,6 +95,7 @@ class OnlinePickCollectionState {
     OnlinePickCollectionStep? step,
     String? placeholder,
     String? currentTrayCode,
+    String? currentStoreSite,
     int? currentTab,
     List<int>? selectedItemIds,
     bool? focus,
@@ -92,6 +109,13 @@ class OnlinePickCollectionState {
     Map<String, List<double>>? dicMtlQty,
     Map<String, double>? dicInvMtlQty,
     List<String>? issuedTrayNos,
+    List<OnlinePickInventoryCheckRecord>? inventoryCheckRecords,
+    String? roomMatControl,
+    String? matControlFlag,
+    String? matSendControl,
+    String? erpRoom,
+    String? erpStoreInv,
+    double? availableInventory,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -106,6 +130,7 @@ class OnlinePickCollectionState {
       step: step ?? this.step,
       placeholder: placeholder ?? this.placeholder,
       currentTrayCode: currentTrayCode ?? this.currentTrayCode,
+      currentStoreSite: currentStoreSite ?? this.currentStoreSite,
       currentTab: currentTab ?? this.currentTab,
       selectedItemIds: selectedItemIds ?? this.selectedItemIds,
       focus: focus ?? this.focus,
@@ -118,6 +143,14 @@ class OnlinePickCollectionState {
       dicMtlQty: dicMtlQty ?? this.dicMtlQty,
       dicInvMtlQty: dicInvMtlQty ?? this.dicInvMtlQty,
       issuedTrayNos: issuedTrayNos ?? this.issuedTrayNos,
+      inventoryCheckRecords:
+          inventoryCheckRecords ?? this.inventoryCheckRecords,
+      roomMatControl: roomMatControl ?? this.roomMatControl,
+      matControlFlag: matControlFlag ?? this.matControlFlag,
+      matSendControl: matSendControl ?? this.matSendControl,
+      erpRoom: erpRoom ?? this.erpRoom,
+      erpStoreInv: erpStoreInv ?? this.erpStoreInv,
+      availableInventory: availableInventory ?? this.availableInventory,
     );
   }
 }

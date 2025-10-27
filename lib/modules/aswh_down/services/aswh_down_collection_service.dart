@@ -79,10 +79,11 @@ class AswhDownCollectionService {
       queryParameters: {'storesiteno': storeSiteNo, 'matcode': materialCode},
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(data);
+    }
+    throw Exception('获取库存信息失败：响应格式错误');
   }
 
   /// 根据库位查询库存（对应 `getMtlRepertoryByStoresiteNoSn`）。
@@ -104,10 +105,11 @@ class AswhDownCollectionService {
       },
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(data);
+    }
+    throw Exception('获取序列号库存失败：响应格式错误');
   }
 
   /// 根据库位查询库存（ERP 子库校验，`getRepertoryByStoresiteNoErp`）。
@@ -120,10 +122,11 @@ class AswhDownCollectionService {
       queryParameters: {'storesiteno': storeSiteNo, 'matcode': materialCode},
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(data);
+    }
+    throw Exception('获取ERP子库信息失败：响应格式错误');
   }
 
   /// 提交自动化仓库下架（对应 `CommitASWHDownShelves`）。

@@ -1847,6 +1847,23 @@ mixin _$OnlinePickCollectionCacheSnapshot {
   String get mode => throw _privateConstructorUsedError;
   @HiveField(10)
   String get expectedErpStore => throw _privateConstructorUsedError;
+  @HiveField(11)
+  List<OnlinePickInventoryCheckRecord> get inventoryChecks =>
+      throw _privateConstructorUsedError;
+  @HiveField(12)
+  String get roomMatControl => throw _privateConstructorUsedError;
+  @HiveField(13)
+  String get currentStoreSite => throw _privateConstructorUsedError;
+  @HiveField(14)
+  String get matControlFlag => throw _privateConstructorUsedError;
+  @HiveField(15)
+  String get matSendControl => throw _privateConstructorUsedError;
+  @HiveField(16)
+  String get erpRoom => throw _privateConstructorUsedError;
+  @HiveField(17)
+  String get erpStoreInv => throw _privateConstructorUsedError;
+  @HiveField(18)
+  double get availableInventory => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1873,7 +1890,15 @@ abstract class $OnlinePickCollectionCacheSnapshotCopyWith<$Res> {
       @HiveField(7) int userId,
       @HiveField(8) num? pendingQuantity,
       @HiveField(9) String mode,
-      @HiveField(10) String expectedErpStore});
+      @HiveField(10) String expectedErpStore,
+      @HiveField(11) List<OnlinePickInventoryCheckRecord> inventoryChecks,
+      @HiveField(12) String roomMatControl,
+      @HiveField(13) String currentStoreSite,
+      @HiveField(14) String matControlFlag,
+      @HiveField(15) String matSendControl,
+      @HiveField(16) String erpRoom,
+      @HiveField(17) String erpStoreInv,
+      @HiveField(18) double availableInventory});
 
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
 }
@@ -1903,6 +1928,14 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
     Object? pendingQuantity = freezed,
     Object? mode = null,
     Object? expectedErpStore = null,
+    Object? inventoryChecks = null,
+    Object? roomMatControl = null,
+    Object? currentStoreSite = null,
+    Object? matControlFlag = null,
+    Object? matSendControl = null,
+    Object? erpRoom = null,
+    Object? erpStoreInv = null,
+    Object? availableInventory = null,
   }) {
     return _then(_value.copyWith(
       stocks: null == stocks
@@ -1949,6 +1982,38 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           ? _value.expectedErpStore
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryChecks: null == inventoryChecks
+          ? _value._inventoryChecks
+          : inventoryChecks // ignore: cast_nullable_to_non_nullable
+              as List<OnlinePickInventoryCheckRecord>,
+      roomMatControl: null == roomMatControl
+          ? _value.roomMatControl
+          : roomMatControl // ignore: cast_nullable_to_non_nullable
+              as String,
+      currentStoreSite: null == currentStoreSite
+          ? _value.currentStoreSite
+          : currentStoreSite // ignore: cast_nullable_to_non_nullable
+              as String,
+      matControlFlag: null == matControlFlag
+          ? _value.matControlFlag
+          : matControlFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      matSendControl: null == matSendControl
+          ? _value.matSendControl
+          : matSendControl // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpRoom: null == erpRoom
+          ? _value.erpRoom
+          : erpRoom // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpStoreInv: null == erpStoreInv
+          ? _value.erpStoreInv
+          : erpStoreInv // ignore: cast_nullable_to_non_nullable
+              as String,
+      availableInventory: null == availableInventory
+          ? _value.availableInventory
+          : availableInventory // ignore: cast_nullable_to_non_nullable
+              as double,
     ) as $Val);
   }
 
@@ -1986,7 +2051,15 @@ abstract class _$$OnlinePickCollectionCacheSnapshotImplCopyWith<$Res>
       @HiveField(7) int userId,
       @HiveField(8) num? pendingQuantity,
       @HiveField(9) String mode,
-      @HiveField(10) String expectedErpStore});
+      @HiveField(10) String expectedErpStore,
+      @HiveField(11) List<OnlinePickInventoryCheckRecord> inventoryChecks,
+      @HiveField(12) String roomMatControl,
+      @HiveField(13) String currentStoreSite,
+      @HiveField(14) String matControlFlag,
+      @HiveField(15) String matSendControl,
+      @HiveField(16) String erpRoom,
+      @HiveField(17) String erpStoreInv,
+      @HiveField(18) double availableInventory});
 
   @override
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
@@ -2016,6 +2089,14 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
     Object? pendingQuantity = freezed,
     Object? mode = null,
     Object? expectedErpStore = null,
+    Object? inventoryChecks = null,
+    Object? roomMatControl = null,
+    Object? currentStoreSite = null,
+    Object? matControlFlag = null,
+    Object? matSendControl = null,
+    Object? erpRoom = null,
+    Object? erpStoreInv = null,
+    Object? availableInventory = null,
   }) {
     return _then(_$OnlinePickCollectionCacheSnapshotImpl(
       stocks: null == stocks
@@ -2062,6 +2143,38 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           ? _value.expectedErpStore
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryChecks: null == inventoryChecks
+          ? _value.inventoryChecks
+          : inventoryChecks // ignore: cast_nullable_to_non_nullable
+              as List<OnlinePickInventoryCheckRecord>,
+      roomMatControl: null == roomMatControl
+          ? _value.roomMatControl
+          : roomMatControl // ignore: cast_nullable_to_non_nullable
+              as String,
+      currentStoreSite: null == currentStoreSite
+          ? _value.currentStoreSite
+          : currentStoreSite // ignore: cast_nullable_to_non_nullable
+              as String,
+      matControlFlag: null == matControlFlag
+          ? _value.matControlFlag
+          : matControlFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      matSendControl: null == matSendControl
+          ? _value.matSendControl
+          : matSendControl // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpRoom: null == erpRoom
+          ? _value.erpRoom
+          : erpRoom // ignore: cast_nullable_to_non_nullable
+              as String,
+      erpStoreInv: null == erpStoreInv
+          ? _value.erpStoreInv
+          : erpStoreInv // ignore: cast_nullable_to_non_nullable
+              as String,
+      availableInventory: null == availableInventory
+          ? _value.availableInventory
+          : availableInventory // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }
@@ -2084,11 +2197,22 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       @HiveField(7) this.userId = 0,
       @HiveField(8) this.pendingQuantity,
       @HiveField(9) this.mode = 'outbound',
-      @HiveField(10) this.expectedErpStore = ''})
+      @HiveField(10) this.expectedErpStore = '',
+      @HiveField(11)
+      final List<OnlinePickInventoryCheckRecord> inventoryChecks =
+          const <OnlinePickInventoryCheckRecord>[],
+      @HiveField(12) this.roomMatControl = '0',
+      @HiveField(13) this.currentStoreSite = '',
+      @HiveField(14) this.matControlFlag = '',
+      @HiveField(15) this.matSendControl = '',
+      @HiveField(16) this.erpRoom = '',
+      @HiveField(17) this.erpStoreInv = '',
+      @HiveField(18) this.availableInventory = 0})
       : _stocks = stocks,
         _dicSeq = dicSeq,
         _dicMtlQty = dicMtlQty,
-        _dicInvMtlQty = dicInvMtlQty;
+        _dicInvMtlQty = dicInvMtlQty,
+        _inventoryChecks = inventoryChecks;
 
   factory _$OnlinePickCollectionCacheSnapshotImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -2134,6 +2258,16 @@ class _$OnlinePickCollectionCacheSnapshotImpl
     return EqualUnmodifiableMapView(_dicInvMtlQty);
   }
 
+  final List<OnlinePickInventoryCheckRecord> _inventoryChecks;
+  @override
+  @JsonKey()
+  @HiveField(11)
+  List<OnlinePickInventoryCheckRecord> get inventoryChecks {
+    if (_inventoryChecks is EqualUnmodifiableListView) return _inventoryChecks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_inventoryChecks);
+  }
+
   @override
   @HiveField(4)
   final OnlinePickBarcodeContent? lastBarcode;
@@ -2160,10 +2294,38 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @JsonKey()
   @HiveField(10)
   final String expectedErpStore;
+  @override
+  @JsonKey()
+  @HiveField(12)
+  final String roomMatControl;
+  @override
+  @JsonKey()
+  @HiveField(13)
+  final String currentStoreSite;
+  @override
+  @JsonKey()
+  @HiveField(14)
+  final String matControlFlag;
+  @override
+  @JsonKey()
+  @HiveField(15)
+  final String matSendControl;
+  @override
+  @JsonKey()
+  @HiveField(16)
+  final String erpRoom;
+  @override
+  @JsonKey()
+  @HiveField(17)
+  final String erpStoreInv;
+  @override
+  @JsonKey()
+  @HiveField(18)
+  final double availableInventory;
 
   @override
   String toString() {
-    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore)';
+    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, roomMatControl: $roomMatControl, currentStoreSite: $currentStoreSite, matControlFlag: $matControlFlag, matSendControl: $matSendControl, erpRoom: $erpRoom, erpStoreInv: $erpStoreInv, availableInventory: $availableInventory)';
   }
 
   @override
@@ -2177,6 +2339,8 @@ class _$OnlinePickCollectionCacheSnapshotImpl
                 .equals(other._dicMtlQty, _dicMtlQty) &&
             const DeepCollectionEquality()
                 .equals(other._dicInvMtlQty, _dicInvMtlQty) &&
+            const DeepCollectionEquality()
+                .equals(other._inventoryChecks, _inventoryChecks) &&
             (identical(other.lastBarcode, lastBarcode) ||
                 other.lastBarcode == lastBarcode) &&
             (identical(other.location, location) ||
@@ -2187,7 +2351,20 @@ class _$OnlinePickCollectionCacheSnapshotImpl
                 other.pendingQuantity == pendingQuantity) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.expectedErpStore, expectedErpStore) ||
-                other.expectedErpStore == expectedErpStore));
+                other.expectedErpStore == expectedErpStore) &&
+            (identical(other.roomMatControl, roomMatControl) ||
+                other.roomMatControl == roomMatControl) &&
+            (identical(other.currentStoreSite, currentStoreSite) ||
+                other.currentStoreSite == currentStoreSite) &&
+            (identical(other.matControlFlag, matControlFlag) ||
+                other.matControlFlag == matControlFlag) &&
+            (identical(other.matSendControl, matSendControl) ||
+                other.matSendControl == matSendControl) &&
+            (identical(other.erpRoom, erpRoom) || other.erpRoom == erpRoom) &&
+            (identical(other.erpStoreInv, erpStoreInv) ||
+                other.erpStoreInv == erpStoreInv) &&
+            (identical(other.availableInventory, availableInventory) ||
+                other.availableInventory == availableInventory));
   }
 
   @JsonKey(ignore: true)
@@ -2198,13 +2375,21 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       const DeepCollectionEquality().hash(_dicSeq),
       const DeepCollectionEquality().hash(_dicMtlQty),
       const DeepCollectionEquality().hash(_dicInvMtlQty),
+      const DeepCollectionEquality().hash(_inventoryChecks),
       lastBarcode,
       location,
       trayNo,
       userId,
       pendingQuantity,
       mode,
-      expectedErpStore);
+      expectedErpStore,
+      roomMatControl,
+      currentStoreSite,
+      matControlFlag,
+      matSendControl,
+      erpRoom,
+      erpStoreInv,
+      availableInventory);
 
   @JsonKey(ignore: true)
   @override
@@ -2235,7 +2420,16 @@ abstract class _OnlinePickCollectionCacheSnapshot
           @HiveField(7) final int userId,
           @HiveField(8) final num? pendingQuantity,
           @HiveField(9) final String mode,
-          @HiveField(10) final String expectedErpStore}) =
+          @HiveField(10) final String expectedErpStore,
+          @HiveField(11)
+          final List<OnlinePickInventoryCheckRecord> inventoryChecks,
+          @HiveField(12) final String roomMatControl,
+          @HiveField(13) final String currentStoreSite,
+          @HiveField(14) final String matControlFlag,
+          @HiveField(15) final String matSendControl,
+          @HiveField(16) final String erpRoom,
+          @HiveField(17) final String erpStoreInv,
+          @HiveField(18) final double availableInventory}) =
       _$OnlinePickCollectionCacheSnapshotImpl;
 
   factory _OnlinePickCollectionCacheSnapshot.fromJson(
