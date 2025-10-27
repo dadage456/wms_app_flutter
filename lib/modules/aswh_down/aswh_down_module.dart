@@ -4,6 +4,10 @@ import 'package:wms_app/app_module.dart';
 import 'package:wms_app/services/dio_client.dart';
 import 'package:wms_app/services/user_manager.dart';
 
+import 'collection_task/bloc/online_pick_collection_bloc.dart';
+import 'collection_task/pages/online_pick_collection_page.dart';
+import 'collection_task/pages/online_pick_collection_result_page.dart';
+import 'collection_task/services/collection_cache_manager.dart';
 import 'services/aswh_down_collection_service.dart';
 import 'services/aswh_down_task_service.dart';
 import 'models/online_pick_task_models.dart';
@@ -32,6 +36,9 @@ class AswhDownModule extends Module {
     i.addSingleton<AswhDownCollectionService>(
       () => AswhDownCollectionService(i.get<DioClient>().dio),
     );
+    i.addSingleton<OnlinePickCollectionCacheManager>(
+      OnlinePickCollectionCacheManager.new,
+    );
 
     // Blocs
     i.add<OnlinePickTaskBloc>(
@@ -47,13 +54,13 @@ class AswhDownModule extends Module {
         userManager: i.get<UserManager>(),
       ),
     );
-    // i.add<OnlinePickCollectionBloc>(
-    //   () => OnlinePickCollectionBloc(
-    //     taskService: i.get<AswhDownTaskService>(),
-    //     collectionService: i.get<AswhDownCollectionService>(),
-    //     userManager: i.get<UserManager>(),
-    //   ),
-    // );
+    i.add<OnlinePickCollectionBloc>(
+      () => OnlinePickCollectionBloc(
+        collectionService: i.get<AswhDownCollectionService>(),
+        userManager: i.get<UserManager>(),
+        cacheManager: i.get<OnlinePickCollectionCacheManager>(),
+      ),
+    );
     i.add<OnlinePickReceiveBloc>(
       () => OnlinePickReceiveBloc(
         taskService: i.get<AswhDownTaskService>(),
@@ -110,27 +117,44 @@ class AswhDownModule extends Module {
       },
     );
 
-    // r.child(
-    //   '/collect',
-    //   child: (_) {
-    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
-    //     return BlocProvider(
-    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-    //       child: OnlinePickCollectionPage(initialArgs: args),
-    //     );
-    //   },
-    // );
+    r.child(
+      '/collect',
+      child: (_) {
+        final args = Modular.args.data as Map<String, dynamic>? ?? {};
+        final task = args['task'];
+        if (task is! OnlinePickTask) {
+          throw ArgumentError('缺少在线拣选任务数据');
+        }
 
-    // r.child(
-    //   '/collect/result',
-    //   child: (_) {
-    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
-    //     return BlocProvider(
-    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-    //       child: OnlinePickCollectionResultPage(initialArgs: args),
-    //     );
-    //   },
-    // );
+        return BlocProvider(
+          create: (_) => Modular.get<OnlinePickCollectionBloc>(),
+          child: OnlinePickCollectionPage(
+            task: task,
+            initialArgs: args,
+          ),
+        );
+      },
+    );
+
+    r.child(
+      '/collect/result',
+      child: (_) {
+        final args = Modular.args.data as Map<String, dynamic>? ?? {};
+        final bloc = args['bloc'];
+
+        if (bloc is OnlinePickCollectionBloc) {
+          return BlocProvider.value(
+            value: bloc,
+            child: const OnlinePickCollectionResultPage(),
+          );
+        }
+
+        return BlocProvider(
+          create: (_) => Modular.get<OnlinePickCollectionBloc>(),
+          child: const OnlinePickCollectionResultPage(),
+        );
+      },
+    );
 
     r.child(
       '/receive',
