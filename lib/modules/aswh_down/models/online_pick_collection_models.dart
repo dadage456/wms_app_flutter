@@ -161,3 +161,86 @@ class OnlinePickCollectionCacheSnapshot
   ) =>
       _$OnlinePickCollectionCacheSnapshotFromJson(json);
 }
+
+/// 物料控制配置。
+class OnlinePickMaterialControl {
+  const OnlinePickMaterialControl({
+    required this.controlFlag,
+    this.sendControl = '0',
+  });
+
+  /// 物料控制模式：0-序列号、1/2-批次。
+  final int controlFlag;
+
+  /// 物料发送控制标记。
+  final String sendControl;
+
+  bool get isSerialControl => controlFlag == 0;
+
+  bool get isBatchControl => controlFlag == 1 || controlFlag == 2;
+
+  OnlinePickMaterialControl copyWith({
+    int? controlFlag,
+    String? sendControl,
+  }) {
+    return OnlinePickMaterialControl(
+      controlFlag: controlFlag ?? this.controlFlag,
+      sendControl: sendControl ?? this.sendControl,
+    );
+  }
+}
+
+/// 库存核对记录。
+class OnlinePickInventoryRecord {
+  const OnlinePickInventoryRecord({
+    required this.outTaskItemId,
+    required this.materialCode,
+    this.materialName,
+    this.storeSite,
+    this.trayNo,
+    this.batchNo,
+    this.serialNumber,
+    this.erpStore,
+    this.taskQty = 0,
+    this.collectedQty = 0,
+  });
+
+  final String outTaskItemId;
+  final String materialCode;
+  final String? materialName;
+  final String? storeSite;
+  final String? trayNo;
+  final String? batchNo;
+  final String? serialNumber;
+  final String? erpStore;
+  final num taskQty;
+  final num collectedQty;
+
+  num get difference => taskQty - collectedQty;
+
+  OnlinePickInventoryRecord copyWith({
+    String? outTaskItemId,
+    String? materialCode,
+    String? materialName,
+    String? storeSite,
+    String? trayNo,
+    String? batchNo,
+    String? serialNumber,
+    String? erpStore,
+    num? taskQty,
+    num? collectedQty,
+  }) {
+    return OnlinePickInventoryRecord(
+      outTaskItemId: outTaskItemId ?? this.outTaskItemId,
+      materialCode: materialCode ?? this.materialCode,
+      materialName: materialName ?? this.materialName,
+      storeSite: storeSite ?? this.storeSite,
+      trayNo: trayNo ?? this.trayNo,
+      batchNo: batchNo ?? this.batchNo,
+      serialNumber: serialNumber ?? this.serialNumber,
+      erpStore: erpStore ?? this.erpStore,
+      taskQty: taskQty ?? this.taskQty,
+      collectedQty: collectedQty ?? this.collectedQty,
+    );
+  }
+}
