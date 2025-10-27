@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:wms_app/models/page_status.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
+import 'package:wms_app/modules/aswh_down/models/online_pick_task_item_models.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_task_models.dart';
 import 'package:wms_app/modules/aswh_down/utils/online_pick_scanner_parser.dart';
 
@@ -25,6 +26,14 @@ class OnlinePickCollectionState extends Equatable {
     this.inventoryQtyMap = const {},
     this.expectedErpStore = '',
     this.currentMode = OnlinePickCollectionModeType.outbound,
+    this.taskItems = const [],
+    this.collectedQtyByItemId = const {},
+    this.inventoryRecords = const [],
+    this.roomMatControl = '0',
+    this.forceSiteCheck = false,
+    this.forceBatchCheck = false,
+    this.materialControls = const {},
+    this.currentMaterialControl,
   });
 
   final CollectionStatus status;
@@ -44,6 +53,14 @@ class OnlinePickCollectionState extends Equatable {
   final Map<String, double> inventoryQtyMap;
   final String expectedErpStore;
   final OnlinePickCollectionModeType currentMode;
+  final List<OnlinePickTaskItem> taskItems;
+  final Map<String, double> collectedQtyByItemId;
+  final List<OnlinePickInventoryRecord> inventoryRecords;
+  final String roomMatControl;
+  final bool forceSiteCheck;
+  final bool forceBatchCheck;
+  final Map<String, OnlinePickMaterialControl> materialControls;
+  final OnlinePickMaterialControl? currentMaterialControl;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -63,6 +80,14 @@ class OnlinePickCollectionState extends Equatable {
     Map<String, double>? inventoryQtyMap,
     String? expectedErpStore,
     OnlinePickCollectionModeType? currentMode,
+    List<OnlinePickTaskItem>? taskItems,
+    Map<String, double>? collectedQtyByItemId,
+    List<OnlinePickInventoryRecord>? inventoryRecords,
+    String? roomMatControl,
+    bool? forceSiteCheck,
+    bool? forceBatchCheck,
+    Map<String, OnlinePickMaterialControl>? materialControls,
+    Object? currentMaterialControl = _unset,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -91,6 +116,17 @@ class OnlinePickCollectionState extends Equatable {
       inventoryQtyMap: inventoryQtyMap ?? this.inventoryQtyMap,
       expectedErpStore: expectedErpStore ?? this.expectedErpStore,
       currentMode: currentMode ?? this.currentMode,
+      taskItems: taskItems ?? this.taskItems,
+      collectedQtyByItemId:
+          collectedQtyByItemId ?? this.collectedQtyByItemId,
+      inventoryRecords: inventoryRecords ?? this.inventoryRecords,
+      roomMatControl: roomMatControl ?? this.roomMatControl,
+      forceSiteCheck: forceSiteCheck ?? this.forceSiteCheck,
+      forceBatchCheck: forceBatchCheck ?? this.forceBatchCheck,
+      materialControls: materialControls ?? this.materialControls,
+      currentMaterialControl: currentMaterialControl == _unset
+          ? this.currentMaterialControl
+          : currentMaterialControl as OnlinePickMaterialControl?,
     );
   }
 
@@ -113,5 +149,13 @@ class OnlinePickCollectionState extends Equatable {
         inventoryQtyMap,
         expectedErpStore,
         currentMode,
+        taskItems,
+        collectedQtyByItemId,
+        inventoryRecords,
+        roomMatControl,
+        forceSiteCheck,
+        forceBatchCheck,
+        materialControls,
+        currentMaterialControl,
       ];
 }
