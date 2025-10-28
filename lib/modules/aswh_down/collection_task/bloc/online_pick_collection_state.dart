@@ -38,6 +38,7 @@ class OnlinePickCollectionState {
   final String siteFlag;
   final String batchFlag;
   final String mtlCheckMode;
+  final double collectedQuantity;
 
   const OnlinePickCollectionState({
     this.status = const CollectionStatus(CollectionStatusType.normal),
@@ -90,6 +91,7 @@ class OnlinePickCollectionState {
     this.siteFlag = '',
     this.batchFlag = '',
     this.mtlCheckMode = '',
+    this.collectedQuantity = 0,
   });
 
   OnlinePickCollectionState copyWith({
@@ -128,6 +130,7 @@ class OnlinePickCollectionState {
     String? siteFlag,
     String? batchFlag,
     String? mtlCheckMode,
+    double? collectedQuantity,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -168,6 +171,7 @@ class OnlinePickCollectionState {
       siteFlag: siteFlag ?? this.siteFlag,
       batchFlag: batchFlag ?? this.batchFlag,
       mtlCheckMode: mtlCheckMode ?? this.mtlCheckMode,
+      collectedQuantity: collectedQuantity ?? this.collectedQuantity,
     );
   }
 }

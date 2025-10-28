@@ -6,13 +6,6 @@ import 'package:wms_app/modules/aswh_down/models/online_pick_task_item_models.da
 List<GridColumnConfig<OnlinePickTaskItem>> buildTaskItemColumns() {
   return [
     GridColumnConfig<OnlinePickTaskItem>(
-      name: 'outTaskItemId',
-      headerText: '任务行',
-      width: 90,
-      textAlign: TextAlign.center,
-      valueGetter: (row) => row.outTaskItemId,
-    ),
-    GridColumnConfig<OnlinePickTaskItem>(
       name: 'materialCode',
       headerText: '物料编码',
       width: 140,
@@ -20,22 +13,8 @@ List<GridColumnConfig<OnlinePickTaskItem>> buildTaskItemColumns() {
       valueGetter: (row) => row.materialCode ?? '-',
     ),
     GridColumnConfig<OnlinePickTaskItem>(
-      name: 'materialName',
-      headerText: '物料名称',
-      width: 180,
-      enableSelectableText: true,
-      valueGetter: (row) => row.materialName ?? '-',
-    ),
-    GridColumnConfig<OnlinePickTaskItem>(
-      name: 'storeSiteNo',
-      headerText: '库位',
-      width: 120,
-      textAlign: TextAlign.center,
-      valueGetter: (row) => row.storeSiteNo ?? '-',
-    ),
-    GridColumnConfig<OnlinePickTaskItem>(
       name: 'palletNo',
-      headerText: '托盘',
+      headerText: '托盘号',
       width: 120,
       textAlign: TextAlign.center,
       valueGetter: (row) => row.palletNo ?? '-',
@@ -49,23 +28,87 @@ List<GridColumnConfig<OnlinePickTaskItem>> buildTaskItemColumns() {
     ),
     GridColumnConfig<OnlinePickTaskItem>(
       name: 'collectedQty',
-      headerText: '已采集',
+      headerText: '采集数量',
       width: 110,
       textAlign: TextAlign.center,
       valueGetter: (row) => row.collectedQty,
     ),
     GridColumnConfig<OnlinePickTaskItem>(
       name: 'repositoryQty',
-      headerText: '库存数量',
+      headerText: '库存',
       width: 110,
       textAlign: TextAlign.center,
       valueGetter: (row) => row.repositoryQty,
+      textStyle: const TextStyle(color: Color(0xFF1976D2)),
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'batchNo',
+      headerText: '批次',
+      width: 160,
+      enableSelectableText: true,
+      valueGetter: (row) => row.batchNo ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'serialNumber',
+      headerText: '序列',
+      width: 160,
+      enableSelectableText: true,
+      valueGetter: (row) => row.serialNumber ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'storeRoomNo',
+      headerText: '库房',
+      width: 100,
+      textAlign: TextAlign.center,
+      valueGetter: (row) => row.storeRoomNo ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'storeSiteNo',
+      headerText: '库位',
+      width: 120,
+      textAlign: TextAlign.center,
+      valueGetter: (row) => row.storeSiteNo ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'subinventoryCode',
+      headerText: '子库',
+      width: 100,
+      textAlign: TextAlign.center,
+      valueGetter: (row) => row.subInventoryCode ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'orderNo',
+      headerText: '出库单号',
+      width: 140,
+      enableSelectableText: true,
+      valueGetter: (row) => row.orderNo ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'materialName',
+      headerText: '物料名称',
+      width: 180,
+      enableSelectableText: true,
+      valueGetter: (row) => row.materialName ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'materialInnerCode',
+      headerText: '物料旧编码',
+      width: 140,
+      enableSelectableText: true,
+      valueGetter: (row) => row.oldMaterialCode ?? '-',
+    ),
+    GridColumnConfig<OnlinePickTaskItem>(
+      name: 'outTaskItemId',
+      headerText: '任务id',
+      width: 90,
+      textAlign: TextAlign.center,
+      valueGetter: (row) => row.outTaskItemId,
     ),
   ];
 }
 
 List<GridColumnConfig<OnlinePickCollectionStock>>
-    buildCollectionStockColumns() {
+buildCollectionStockColumns() {
   return [
     GridColumnConfig<OnlinePickCollectionStock>(
       name: 'stockId',

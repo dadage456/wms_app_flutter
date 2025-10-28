@@ -132,33 +132,46 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
   PreferredSizeWidget _buildAppBar(OnlinePickCollectionState state) {
     return AppBar(
-      title: const Text('自动化仓库下架采集'),
+      backgroundColor: const Color(0xFF1976D2),
+      centerTitle: true,
+      elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
         onPressed: () => _handleBackPress(state),
+      ),
+      title: const Text(
+        '在线拣选采集',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => _showMoreOptions(state),
-          child: const Text('更多', style: TextStyle(color: Colors.white)),
+          child: const Text(
+            '更多',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildScanInput(OnlinePickCollectionState state) {
+    final config = ScannerConfig(
+      placeholder: state.placeholder,
+      keyboardType: TextInputType.number,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
       color: Colors.white,
       child: ScannerWidget(
         controller: _scannerController,
-        config: ScannerConfig(
-          placeholder: state.placeholder,
-          keyboardType:
-              state.step == OnlinePickCollectionStep.quantity
-                  ? TextInputType.number
-                  : TextInputType.text,
-        ),
+        config: config,
         onScanResult: (value) {
           _bloc.add(PerformScanEvent(value));
         },
@@ -169,78 +182,174 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   Widget _buildInfoCard(OnlinePickCollectionState state) {
     final task = state.task ?? widget.task;
     final modeLabel = _modeLabel(state);
-    final availableInventoryText = state.availableInventory <= 0 &&
+    final availableInventoryText =
+        state.availableInventory <= 0 &&
             (state.currentBarcode == null ||
                 (state.currentBarcode?.materialCode ?? '').isEmpty)
         ? '-'
         : _formatQuantityDisplay(state.availableInventory);
 
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            offset: Offset(0, 2),
-            blurRadius: 6,
-          ),
-        ],
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '任务号：${task.outTaskNo}',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          // 4-column grid layout matching UniApp design
+          _buildInfoGrid(
+            '库存',
+            availableInventoryText,
+            '拣选位置',
+            state.selectedLocation.isEmpty
+                ? (task.taskComment ?? '-')
+                : state.selectedLocation,
           ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 16,
-            runSpacing: 8,
-            children: [
-              _buildInfoChip('库房', task.storeRoomNo ?? '-'),
-              _buildInfoChip('工位', task.workStation ?? '-'),
-              _buildInfoChip(
-                '拣选口',
-                state.selectedLocation.isEmpty
-                    ? (task.taskComment ?? '-')
-                    : state.selectedLocation,
-              ),
-              _buildInfoChip(
-                '托盘',
-                state.currentTrayCode.isEmpty ? '-' : state.currentTrayCode,
-              ),
-              _buildInfoChip(
-                '库位',
-                state.currentStoreSite.isEmpty ? '-' : state.currentStoreSite,
-              ),
-              _buildInfoChip(
-                '可用库存',
-                availableInventoryText,
-              ),
-              _buildInfoChip('模式', modeLabel),
-              _buildInfoChip('任务行数', state.taskItems.length.toString()),
-            ],
+          _buildDottedDivider(),
+          _buildInfoGrid(
+            '模式',
+            modeLabel,
+            '托盘号',
+            state.currentTrayCode.isEmpty ? '-' : state.currentTrayCode,
           ),
-          const SizedBox(height: 12),
-          _buildCurrentMaterialSummary(state),
+          _buildDottedDivider(),
+          _buildInfoGrid(
+            '库位编码',
+            state.currentStoreSite.isEmpty ? '-' : state.currentStoreSite,
+            '物料',
+            state.currentBarcode?.materialCode ?? '-',
+          ),
+          _buildDottedDivider(),
+          _buildInfoGrid(
+            '采集数量',
+            state.currentBarcode == null
+                ? '-'
+                : _formatQuantityDisplay(state.collectedQuantity),
+            '名称',
+            state.currentBarcode?.materialName ?? '-',
+          ),
+          _buildDottedDivider(),
+          _buildInfoGrid(
+            '结余数量',
+            state.currentBarcode == null
+                ? '-'
+                : _formatQuantityDisplay(state.availableInventory),
+            '批次',
+            state.currentBarcode?.batchNo ?? '-',
+          ),
+          _buildDottedDivider(),
+          _buildInfoGrid(
+            '序列',
+            state.currentBarcode?.serialNumber ?? '-',
+            '任务行数',
+            state.taskItems.length.toString(),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoChip(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F4F9),
-        borderRadius: BorderRadius.circular(20),
+  // Grid layout matching UniApp's 4-column design
+  Widget _buildInfoGrid(
+    String label1,
+    String value1,
+    String label2,
+    String value2,
+  ) {
+    return SizedBox(
+      height: 32,
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 10,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1976D2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  '$label1：',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    value1,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 10,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1976D2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  '$label2：',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    value2,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      child: Text('$label：$value'),
+    );
+  }
+
+  Widget _buildDottedDivider() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boxWidth = constraints.constrainWidth();
+        const dashWidth = 5.0;
+        const dashSpace = 3.0;
+        final dashCount = (boxWidth / (dashWidth + dashSpace)).floor();
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(dashCount, (_) {
+            return const SizedBox(
+              width: dashWidth,
+              height: 1,
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: Color(0xFF1976D2)),
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 
@@ -297,75 +406,73 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       return _buildEmptyPlaceholder('暂无库存核对记录');
     }
 
-    return ListView.separated(
+    // 定义列配置
+    final columns = [
+      GridColumnConfig<OnlinePickInventoryCheckRecord>(
+        name: 'materialCode',
+        headerText: '物料编码',
+        width: 200,
+        valueGetter: (record) => record.materialCode,
+        textAlign: TextAlign.left,
+      ),
+      GridColumnConfig<OnlinePickInventoryCheckRecord>(
+        name: 'trayNo',
+        headerText: '托盘号',
+        width: 150,
+        valueGetter: (record) => record.trayNo.isEmpty ? '-' : record.trayNo,
+        textAlign: TextAlign.center,
+        formatter: (value, record) => value.isEmpty ? '-' : value.toString(),
+      ),
+      GridColumnConfig<OnlinePickInventoryCheckRecord>(
+        name: 'storeSite',
+        headerText: '库位',
+        width: 120,
+        valueGetter: (record) =>
+            record.storeSite.isEmpty ? '-' : record.storeSite,
+        textAlign: TextAlign.center,
+        formatter: (value, record) => value.isEmpty ? '-' : value.toString(),
+      ),
+      GridColumnConfig<OnlinePickInventoryCheckRecord>(
+        name: 'quantity',
+        headerText: '结余数量',
+        width: 120,
+        valueGetter: (record) => record.quantity,
+        textAlign: TextAlign.right,
+        formatter: (value, record) => value.toString(),
+      ),
+    ];
+
+    return Container(
       padding: const EdgeInsets.all(16),
-      itemCount: records.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final record = records[index];
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x14000000),
-                offset: Offset(0, 2),
-                blurRadius: 6,
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '物料：${record.materialCode}',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                children: [
-                  _buildInfoChip(
-                    '托盘',
-                    record.trayNo.isEmpty ? '-' : record.trayNo,
-                  ),
-                  _buildInfoChip(
-                    '库位',
-                    record.storeSite.isEmpty ? '-' : record.storeSite,
-                  ),
-                  _buildInfoChip(
-                    '结余数量',
-                    record.quantity.toString(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+      child: CommonDataGrid<OnlinePickInventoryCheckRecord>(
+        columns: columns,
+        datas: records,
+        currentPage: 1,
+        totalPages: 1,
+        height: 400,
+        headerHeight: 40,
+        rowHeight: 40,
+        onLoadData: (pageIndex) async {
+          // 库存核对记录不需要分页加载
+        },
+        allowPager: false,
+        allowSelect: false,
+      ),
     );
   }
 
   Widget _buildEmptyPlaceholder(String message) {
     return Center(
-      child: Text(
-        message,
-        style: const TextStyle(color: Colors.grey),
-      ),
+      child: Text(message, style: const TextStyle(color: Colors.grey)),
     );
   }
 
   Widget _buildBottomBar(OnlinePickCollectionState state) {
     return SafeArea(
       child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        decoration: const BoxDecoration(color: Colors.white),
+        height: 40,
         child: Row(
           children: [
             Expanded(
@@ -387,19 +494,12 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
             Expanded(
               child: ElevatedButton(
                 style: _primaryActionStyle(),
-                onPressed: state.collectedStocks.isEmpty ||
+                onPressed:
+                    state.collectedStocks.isEmpty ||
                         state.inventoryCheckRecords.isEmpty
                     ? null
                     : () => _confirmSubmit(state),
-                child: const Text('提交采集'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: OutlinedButton(
-                style: _outlinedActionStyle(),
-                onPressed: () => _showMoreOptions(state),
-                child: const Text('更多'),
+                child: const Text('提交'),
               ),
             ),
           ],
@@ -521,8 +621,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       context: context,
       builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: ListView(
             children: [
               ListTile(
                 leading: const Icon(Icons.tune),
@@ -643,8 +742,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
 
     if (confirmed == true) {
-      final defaultCount =
-          state.selectedItemIds.isNotEmpty ? state.selectedItemIds.length : 10;
+      final defaultCount = state.selectedItemIds.isNotEmpty
+          ? state.selectedItemIds.length
+          : 10;
       final parsed = int.tryParse(_trayCountController.text.trim());
       final count = parsed != null && parsed > 0 ? parsed : defaultCount;
       _bloc.add(RequestAllTrayEvent(count));
@@ -688,8 +788,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   ButtonStyle _outlinedActionStyle() {
     return OutlinedButton.styleFrom(
       foregroundColor: const Color(0xFF1976D2),
+      backgroundColor: Colors.transparent,
       side: const BorderSide(color: Color(0xFF1976D2)),
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: EdgeInsets.zero,
     );
   }
 
@@ -697,7 +799,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     return ElevatedButton.styleFrom(
       backgroundColor: const Color(0xFF1976D2),
       foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 
@@ -750,100 +853,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     final entries = summary.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
     return entries
-        .map(
-          (entry) => '${entry.key}剩余${entry.value.toStringAsFixed(3)}',
-        )
+        .map((entry) => '${entry.key}剩余${entry.value.toStringAsFixed(3)}')
         .toList();
-  }
-
-  Widget _buildCurrentMaterialSummary(OnlinePickCollectionState state) {
-    final barcode = state.currentBarcode;
-    final hasBarcode = barcode != null && (barcode.materialCode ?? '').isNotEmpty;
-    final materialCode = hasBarcode ? (barcode!.materialCode ?? '-') : '-';
-    final materialName = hasBarcode ? (barcode!.materialName ?? '-') : '-';
-    final batchNo = hasBarcode ? (barcode!.batchNo ?? '') : '';
-    final serialNo = hasBarcode ? (barcode!.serialNumber ?? '') : '';
-
-    final tray = state.currentTrayCode.toUpperCase();
-    final storeSite = state.currentStoreSite.toUpperCase();
-    final batchKey = batchNo.toUpperCase();
-    final serialKey = serialNo.toUpperCase();
-
-    double collectedQty = 0;
-    double inventoryQty = 0;
-
-    if (hasBarcode) {
-      for (final stock in state.collectedStocks) {
-        if ((stock.materialCode).toUpperCase() != materialCode.toUpperCase()) {
-          continue;
-        }
-        if (tray.isNotEmpty && (stock.trayNo ?? '').toUpperCase() != tray) {
-          continue;
-        }
-        if (storeSite.isNotEmpty &&
-            (stock.storeSite ?? '').toUpperCase() != storeSite) {
-          continue;
-        }
-        if (serialKey.isNotEmpty) {
-          if ((stock.serialNumber ?? '').toUpperCase() != serialKey) {
-            continue;
-          }
-        } else if (batchKey.isNotEmpty) {
-          if ((stock.batchNo ?? '').toUpperCase() != batchKey) {
-            continue;
-          }
-        }
-        collectedQty += stock.collectQty.toDouble();
-      }
-
-      for (final record in state.inventoryCheckRecords) {
-        if (record.materialCode.toUpperCase() != materialCode.toUpperCase()) {
-          continue;
-        }
-        if (tray.isNotEmpty && record.trayNo.toUpperCase() != tray) {
-          continue;
-        }
-        if (storeSite.isNotEmpty && record.storeSite.toUpperCase() != storeSite) {
-          continue;
-        }
-        inventoryQty += record.quantity.toDouble();
-      }
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          '当前物料信息',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          children: [
-            _buildInfoChip('物料编码', materialCode.isEmpty ? '-' : materialCode),
-            _buildInfoChip('物料名称', materialName.isEmpty ? '-' : materialName),
-            _buildInfoChip(
-              '批次',
-              batchNo.isEmpty ? '-' : batchNo,
-            ),
-            _buildInfoChip(
-              '序列号',
-              serialNo.isEmpty ? '-' : serialNo,
-            ),
-            _buildInfoChip(
-              '已采集数量',
-              hasBarcode ? _formatQuantityDisplay(collectedQty) : '-',
-            ),
-            _buildInfoChip(
-              '结余数量',
-              hasBarcode ? _formatQuantityDisplay(inventoryQty) : '-',
-            ),
-          ],
-        ),
-      ],
-    );
   }
 
   String _formatQuantityDisplay(num value) {
