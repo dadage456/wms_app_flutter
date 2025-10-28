@@ -4,9 +4,6 @@ import 'package:wms_app/app_module.dart';
 import 'package:wms_app/services/dio_client.dart';
 import 'package:wms_app/services/user_manager.dart';
 
-import 'collection_task/bloc/online_pick_collection_bloc.dart';
-import 'collection_task/pages/online_pick_collection_page.dart';
-import 'collection_task/pages/online_pick_collection_result_page.dart';
 import 'services/aswh_down_collection_service.dart';
 import 'services/aswh_down_task_service.dart';
 import 'models/online_pick_task_models.dart';
@@ -50,13 +47,7 @@ class AswhDownModule extends Module {
         userManager: i.get<UserManager>(),
       ),
     );
-    i.add<OnlinePickCollectionBloc>(
-      () => OnlinePickCollectionBloc(
-        taskService: i.get<AswhDownTaskService>(),
-        collectionService: i.get<AswhDownCollectionService>(),
-        userManager: i.get<UserManager>(),
-      ),
-    );
+
     i.add<OnlinePickReceiveBloc>(
       () => OnlinePickReceiveBloc(
         taskService: i.get<AswhDownTaskService>(),
@@ -113,27 +104,27 @@ class AswhDownModule extends Module {
       },
     );
 
-    r.child(
-      '/collect',
-      child: (_) {
-        final args = Modular.args.data as Map<String, dynamic>? ?? {};
-        return BlocProvider(
-          create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-          child: OnlinePickCollectionPage(initialArgs: args),
-        );
-      },
-    );
+    // r.child(
+    //   '/collect',
+    //   child: (_) {
+    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
+    //     return BlocProvider(
+    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
+    //       child: OnlinePickCollectionPage(initialArgs: args),
+    //     );
+    //   },
+    // );
 
-    r.child(
-      '/collect/result',
-      child: (_) {
-        final args = Modular.args.data as Map<String, dynamic>? ?? {};
-        return BlocProvider(
-          create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-          child: OnlinePickCollectionResultPage(initialArgs: args),
-        );
-      },
-    );
+    // r.child(
+    //   '/collect/result',
+    //   child: (_) {
+    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
+    //     return BlocProvider(
+    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
+    //       child: OnlinePickCollectionResultPage(initialArgs: args),
+    //     );
+    //   },
+    // );
 
     r.child(
       '/receive',
@@ -154,10 +145,7 @@ class AswhDownModule extends Module {
 
         return BlocProvider(
           create: (_) => Modular.get<OnlinePickReceiveDetailBloc>(),
-          child: OnlinePickReceiveDetailPage(
-            outTaskId: taskId,
-            taskData: data,
-          ),
+          child: OnlinePickReceiveDetailPage(outTaskId: taskId, taskData: data),
         );
       },
     );
