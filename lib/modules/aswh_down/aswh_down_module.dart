@@ -7,6 +7,7 @@ import 'package:wms_app/services/user_manager.dart';
 import 'services/aswh_down_collection_service.dart';
 import 'services/aswh_down_task_service.dart';
 import 'models/online_pick_task_models.dart';
+import 'models/online_pick_collection_models.dart';
 import 'task_details/bloc/online_pick_task_detail_bloc.dart';
 import 'task_details/pages/online_pick_task_detail_page.dart';
 import 'task_list/bloc/online_pick_task_bloc.dart';
@@ -43,6 +44,13 @@ class AswhDownModule extends Module {
     i.add<OnlinePickTaskDetailBloc>(
       () => OnlinePickTaskDetailBloc(
         taskService: i.get<AswhDownTaskService>(),
+        collectionService: i.get<AswhDownCollectionService>(),
+        userManager: i.get<UserManager>(),
+      ),
+    );
+
+    i.add<OnlinePickCollectionBloc>(
+      () => OnlinePickCollectionBloc(
         collectionService: i.get<AswhDownCollectionService>(),
         userManager: i.get<UserManager>(),
       ),
@@ -104,27 +112,36 @@ class AswhDownModule extends Module {
       },
     );
 
-    // r.child(
-    //   '/collect',
-    //   child: (_) {
-    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
-    //     return BlocProvider(
-    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-    //       child: OnlinePickCollectionPage(initialArgs: args),
-    //     );
-    //   },
-    // );
+    r.child(
+      '/collect',
+      child: (_) {
+        final args = Modular.args.data as Map<String, dynamic>? ?? {};
+        final task = args['task'];
+        if (task is! OnlinePickTask) {
+          throw ArgumentError('缺少在线拣选任务数据');
+        }
+        return BlocProvider(
+          create: (_) => Modular.get<OnlinePickCollectionBloc>(),
+          child: OnlinePickCollectionPage(task: task),
+        );
+      },
+    );
 
-    // r.child(
-    //   '/collect/result',
-    //   child: (_) {
-    //     final args = Modular.args.data as Map<String, dynamic>? ?? {};
-    //     return BlocProvider(
-    //       create: (_) => Modular.get<OnlinePickCollectionBloc>(),
-    //       child: OnlinePickCollectionResultPage(initialArgs: args),
-    //     );
-    //   },
-    // );
+    r.child(
+      '/collect/result',
+      child: (_) {
+        final args = Modular.args.data as Map<String, dynamic>? ?? {};
+        final stockPayload = args['stocks'] as List<dynamic>? ?? const [];
+        final stocks = stockPayload
+            .map((item) => item is OnlinePickCollectionStock
+                ? item
+                : OnlinePickCollectionStock.fromJson(
+                    Map<String, dynamic>.from(item as Map),
+                  ))
+            .toList(growable: false);
+        return OnlinePickCollectionResultPage(initialStocks: stocks);
+      },
+    );
 
     r.child(
       '/receive',
