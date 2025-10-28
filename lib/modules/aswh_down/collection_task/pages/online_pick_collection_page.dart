@@ -161,9 +161,16 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   }
 
   Widget _buildScanInput(OnlinePickCollectionState state) {
+    final isNumericStep =
+        state.requireInventoryCheck ||
+        state.step == OnlinePickCollectionStep.quantity;
+    final keyboardType = isNumericStep
+        ? const TextInputType.numberWithOptions(decimal: true)
+        : TextInputType.text;
+
     final config = ScannerConfig(
       placeholder: state.placeholder,
-      keyboardType: TextInputType.number,
+      keyboardType: keyboardType,
     );
 
     return Container(
