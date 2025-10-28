@@ -234,6 +234,10 @@ class OnlinePickCollectionCacheSnapshot
     @HiveField(16) @Default('') String erpRoom,
     @HiveField(17) @Default('') String erpStoreInv,
     @HiveField(18) @Default(0) double availableInventory,
+    @HiveField(19) @Default(false) bool requireInventoryCheck,
+    @HiveField(20) @Default('') String siteFlag,
+    @HiveField(21) @Default('') String batchFlag,
+    @HiveField(22) @Default('') String mtlCheckMode,
   }) = _OnlinePickCollectionCacheSnapshot;
 
   factory OnlinePickCollectionCacheSnapshot.fromJson(

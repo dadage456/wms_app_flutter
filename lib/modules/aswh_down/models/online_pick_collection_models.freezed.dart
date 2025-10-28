@@ -1864,6 +1864,14 @@ mixin _$OnlinePickCollectionCacheSnapshot {
   String get erpStoreInv => throw _privateConstructorUsedError;
   @HiveField(18)
   double get availableInventory => throw _privateConstructorUsedError;
+  @HiveField(19)
+  bool get requireInventoryCheck => throw _privateConstructorUsedError;
+  @HiveField(20)
+  String get siteFlag => throw _privateConstructorUsedError;
+  @HiveField(21)
+  String get batchFlag => throw _privateConstructorUsedError;
+  @HiveField(22)
+  String get mtlCheckMode => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1898,7 +1906,11 @@ abstract class $OnlinePickCollectionCacheSnapshotCopyWith<$Res> {
       @HiveField(15) String matSendControl,
       @HiveField(16) String erpRoom,
       @HiveField(17) String erpStoreInv,
-      @HiveField(18) double availableInventory});
+      @HiveField(18) double availableInventory,
+      @HiveField(19) bool requireInventoryCheck,
+      @HiveField(20) String siteFlag,
+      @HiveField(21) String batchFlag,
+      @HiveField(22) String mtlCheckMode});
 
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
 }
@@ -1936,6 +1948,10 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
     Object? erpRoom = null,
     Object? erpStoreInv = null,
     Object? availableInventory = null,
+    Object? requireInventoryCheck = null,
+    Object? siteFlag = null,
+    Object? batchFlag = null,
+    Object? mtlCheckMode = null,
   }) {
     return _then(_value.copyWith(
       stocks: null == stocks
@@ -2014,6 +2030,22 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           ? _value.availableInventory
           : availableInventory // ignore: cast_nullable_to_non_nullable
               as double,
+      requireInventoryCheck: null == requireInventoryCheck
+          ? _value.requireInventoryCheck
+          : requireInventoryCheck // ignore: cast_nullable_to_non_nullable
+              as bool,
+      siteFlag: null == siteFlag
+          ? _value.siteFlag
+          : siteFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchFlag: null == batchFlag
+          ? _value.batchFlag
+          : batchFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      mtlCheckMode: null == mtlCheckMode
+          ? _value.mtlCheckMode
+          : mtlCheckMode // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -2097,6 +2129,10 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
     Object? erpRoom = null,
     Object? erpStoreInv = null,
     Object? availableInventory = null,
+    Object? requireInventoryCheck = null,
+    Object? siteFlag = null,
+    Object? batchFlag = null,
+    Object? mtlCheckMode = null,
   }) {
     return _then(_$OnlinePickCollectionCacheSnapshotImpl(
       stocks: null == stocks
@@ -2175,6 +2211,22 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           ? _value.availableInventory
           : availableInventory // ignore: cast_nullable_to_non_nullable
               as double,
+      requireInventoryCheck: null == requireInventoryCheck
+          ? _value.requireInventoryCheck
+          : requireInventoryCheck // ignore: cast_nullable_to_non_nullable
+              as bool,
+      siteFlag: null == siteFlag
+          ? _value.siteFlag
+          : siteFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      batchFlag: null == batchFlag
+          ? _value.batchFlag
+          : batchFlag // ignore: cast_nullable_to_non_nullable
+              as String,
+      mtlCheckMode: null == mtlCheckMode
+          ? _value.mtlCheckMode
+          : mtlCheckMode // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -2207,7 +2259,11 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       @HiveField(15) this.matSendControl = '',
       @HiveField(16) this.erpRoom = '',
       @HiveField(17) this.erpStoreInv = '',
-      @HiveField(18) this.availableInventory = 0})
+      @HiveField(18) this.availableInventory = 0,
+      @HiveField(19) this.requireInventoryCheck = false,
+      @HiveField(20) this.siteFlag = '',
+      @HiveField(21) this.batchFlag = '',
+      @HiveField(22) this.mtlCheckMode = ''})
       : _stocks = stocks,
         _dicSeq = dicSeq,
         _dicMtlQty = dicMtlQty,
@@ -2322,10 +2378,26 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @JsonKey()
   @HiveField(18)
   final double availableInventory;
+  @override
+  @JsonKey()
+  @HiveField(19)
+  final bool requireInventoryCheck;
+  @override
+  @JsonKey()
+  @HiveField(20)
+  final String siteFlag;
+  @override
+  @JsonKey()
+  @HiveField(21)
+  final String batchFlag;
+  @override
+  @JsonKey()
+  @HiveField(22)
+  final String mtlCheckMode;
 
   @override
   String toString() {
-    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, roomMatControl: $roomMatControl, currentStoreSite: $currentStoreSite, matControlFlag: $matControlFlag, matSendControl: $matSendControl, erpRoom: $erpRoom, erpStoreInv: $erpStoreInv, availableInventory: $availableInventory)';
+    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, roomMatControl: $roomMatControl, currentStoreSite: $currentStoreSite, matControlFlag: $matControlFlag, matSendControl: $matSendControl, erpRoom: $erpRoom, erpStoreInv: $erpStoreInv, availableInventory: $availableInventory, requireInventoryCheck: $requireInventoryCheck, siteFlag: $siteFlag, batchFlag: $batchFlag, mtlCheckMode: $mtlCheckMode)';
   }
 
   @override
@@ -2364,7 +2436,15 @@ class _$OnlinePickCollectionCacheSnapshotImpl
             (identical(other.erpStoreInv, erpStoreInv) ||
                 other.erpStoreInv == erpStoreInv) &&
             (identical(other.availableInventory, availableInventory) ||
-                other.availableInventory == availableInventory));
+                other.availableInventory == availableInventory) &&
+            (identical(other.requireInventoryCheck, requireInventoryCheck) ||
+                other.requireInventoryCheck == requireInventoryCheck) &&
+            (identical(other.siteFlag, siteFlag) ||
+                other.siteFlag == siteFlag) &&
+            (identical(other.batchFlag, batchFlag) ||
+                other.batchFlag == batchFlag) &&
+            (identical(other.mtlCheckMode, mtlCheckMode) ||
+                other.mtlCheckMode == mtlCheckMode));
   }
 
   @JsonKey(ignore: true)
@@ -2389,7 +2469,11 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       matSendControl,
       erpRoom,
       erpStoreInv,
-      availableInventory);
+      availableInventory,
+      requireInventoryCheck,
+      siteFlag,
+      batchFlag,
+      mtlCheckMode);
 
   @JsonKey(ignore: true)
   @override

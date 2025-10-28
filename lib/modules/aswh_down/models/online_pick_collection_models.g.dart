@@ -208,13 +208,17 @@ class OnlinePickCollectionCacheSnapshotAdapter
       erpRoom: fields[16] as String,
       erpStoreInv: fields[17] as String,
       availableInventory: (fields[18] as num?)?.toDouble() ?? 0,
+      requireInventoryCheck: fields[19] as bool? ?? false,
+      siteFlag: fields[20] as String? ?? '',
+      batchFlag: fields[21] as String? ?? '',
+      mtlCheckMode: fields[22] as String? ?? '',
     );
   }
 
   @override
   void write(BinaryWriter writer, OnlinePickCollectionCacheSnapshot obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(23)
       ..writeByte(0)
       ..write(obj.stocks)
       ..writeByte(1)
@@ -252,7 +256,15 @@ class OnlinePickCollectionCacheSnapshotAdapter
       ..writeByte(17)
       ..write(obj.erpStoreInv)
       ..writeByte(18)
-      ..write(obj.availableInventory);
+      ..write(obj.availableInventory)
+      ..writeByte(19)
+      ..write(obj.requireInventoryCheck)
+      ..writeByte(20)
+      ..write(obj.siteFlag)
+      ..writeByte(21)
+      ..write(obj.batchFlag)
+      ..writeByte(22)
+      ..write(obj.mtlCheckMode);
   }
 
   @override
@@ -448,6 +460,11 @@ _$OnlinePickCollectionCacheSnapshotImpl
           erpStoreInv: json['erpStoreInv'] as String? ?? '',
           availableInventory:
               (json['availableInventory'] as num?)?.toDouble() ?? 0,
+          requireInventoryCheck:
+              json['requireInventoryCheck'] as bool? ?? false,
+          siteFlag: json['siteFlag'] as String? ?? '',
+          batchFlag: json['batchFlag'] as String? ?? '',
+          mtlCheckMode: json['mtlCheckMode'] as String? ?? '',
         );
 
 Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
@@ -473,4 +490,8 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'erpRoom': instance.erpRoom,
       'erpStoreInv': instance.erpStoreInv,
       'availableInventory': instance.availableInventory,
+      'requireInventoryCheck': instance.requireInventoryCheck,
+      'siteFlag': instance.siteFlag,
+      'batchFlag': instance.batchFlag,
+      'mtlCheckMode': instance.mtlCheckMode,
     };

@@ -34,6 +34,10 @@ class OnlinePickCollectionState {
   final String erpRoom;
   final String erpStoreInv;
   final double availableInventory;
+  final bool requireInventoryCheck;
+  final String siteFlag;
+  final String batchFlag;
+  final String mtlCheckMode;
 
   const OnlinePickCollectionState({
     this.status = const CollectionStatus(CollectionStatusType.normal),
@@ -82,6 +86,10 @@ class OnlinePickCollectionState {
     this.erpRoom = '',
     this.erpStoreInv = '',
     this.availableInventory = 0,
+    this.requireInventoryCheck = false,
+    this.siteFlag = '',
+    this.batchFlag = '',
+    this.mtlCheckMode = '',
   });
 
   OnlinePickCollectionState copyWith({
@@ -116,6 +124,10 @@ class OnlinePickCollectionState {
     String? erpRoom,
     String? erpStoreInv,
     double? availableInventory,
+    bool? requireInventoryCheck,
+    String? siteFlag,
+    String? batchFlag,
+    String? mtlCheckMode,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -151,6 +163,11 @@ class OnlinePickCollectionState {
       erpRoom: erpRoom ?? this.erpRoom,
       erpStoreInv: erpStoreInv ?? this.erpStoreInv,
       availableInventory: availableInventory ?? this.availableInventory,
+      requireInventoryCheck:
+          requireInventoryCheck ?? this.requireInventoryCheck,
+      siteFlag: siteFlag ?? this.siteFlag,
+      batchFlag: batchFlag ?? this.batchFlag,
+      mtlCheckMode: mtlCheckMode ?? this.mtlCheckMode,
     );
   }
 }
