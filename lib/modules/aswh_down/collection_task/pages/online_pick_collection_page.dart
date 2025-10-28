@@ -36,7 +36,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   late OnlinePickCollectionBloc _bloc;
   final ScannerController _scannerController = ScannerController();
   final TextEditingController _trayCountController = TextEditingController(
-    text: '1',
+    text: '10',
   );
 
   @override
@@ -152,7 +152,13 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       color: Colors.white,
       child: ScannerWidget(
         controller: _scannerController,
-        config: const ScannerConfig(),
+        config: ScannerConfig(
+          placeholder: state.placeholder,
+          keyboardType:
+              state.step == OnlinePickCollectionStep.quantity
+                  ? TextInputType.number
+                  : TextInputType.text,
+        ),
         onScanResult: (value) {
           _bloc.add(PerformScanEvent(value));
         },
@@ -163,6 +169,12 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   Widget _buildInfoCard(OnlinePickCollectionState state) {
     final task = state.task ?? widget.task;
     final modeLabel = _modeLabel(state);
+    final availableInventoryText = state.availableInventory <= 0 &&
+            (state.currentBarcode == null ||
+                (state.currentBarcode?.materialCode ?? '').isEmpty)
+        ? '-'
+        : _formatQuantityDisplay(state.availableInventory);
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -202,10 +214,20 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 '托盘',
                 state.currentTrayCode.isEmpty ? '-' : state.currentTrayCode,
               ),
+              _buildInfoChip(
+                '库位',
+                state.currentStoreSite.isEmpty ? '-' : state.currentStoreSite,
+              ),
+              _buildInfoChip(
+                '可用库存',
+                availableInventoryText,
+              ),
               _buildInfoChip('模式', modeLabel),
               _buildInfoChip('任务行数', state.taskItems.length.toString()),
             ],
           ),
+          const SizedBox(height: 12),
+          _buildCurrentMaterialSummary(state),
         ],
       ),
     );
@@ -471,11 +493,12 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   }
 
   void _confirmSubmit(OnlinePickCollectionState state) {
+    final message = _buildSubmitConfirmMessage(state);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('提交确认'),
-        content: Text('确认提交当前的 ${state.collectedStocks.length} 条采集记录吗？'),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -595,7 +618,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   Future<void> _showAllTrayDialog(OnlinePickCollectionState state) async {
     _trayCountController.text = state.selectedItemIds.isNotEmpty
         ? state.selectedItemIds.length.toString()
-        : '1';
+        : '10';
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -620,8 +643,13 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
 
     if (confirmed == true) {
-      final count = int.tryParse(_trayCountController.text.trim()) ?? 0;
+      final defaultCount =
+          state.selectedItemIds.isNotEmpty ? state.selectedItemIds.length : 10;
+      final parsed = int.tryParse(_trayCountController.text.trim());
+      final count = parsed != null && parsed > 0 ? parsed : defaultCount;
       _bloc.add(RequestAllTrayEvent(count));
+    } else {
+      _trayCountController.text = '10';
     }
   }
 
@@ -680,5 +708,152 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       }
     }
     return state.mode.name;
+  }
+
+  String _buildSubmitConfirmMessage(OnlinePickCollectionState state) {
+    final base = '确认提交当前的 ${state.collectedStocks.length} 条采集记录吗？';
+    final pendingLines = _pendingSummaryLines(state);
+    if (pendingLines.isEmpty) {
+      return base;
+    }
+
+    final buffer = StringBuffer(base)
+      ..writeln()
+      ..writeln('当前托盘仍有未完成任务：');
+    for (final line in pendingLines) {
+      buffer.writeln(line);
+    }
+    return buffer.toString();
+  }
+
+  List<String> _pendingSummaryLines(OnlinePickCollectionState state) {
+    final tray = state.currentTrayCode.toUpperCase();
+    if (tray.isEmpty) {
+      return const [];
+    }
+
+    final summary = <String, double>{};
+    for (final item in state.pendingCheckItems) {
+      if ((item.palletNo ?? '').toUpperCase() != tray) {
+        continue;
+      }
+      final remaining = (item.taskQty - item.collectedQty).toDouble();
+      if (remaining <= 1e-6) {
+        continue;
+      }
+      final material = (item.materialCode ?? '').toUpperCase();
+      final site = (item.storeSiteNo ?? '').toUpperCase();
+      final label = '物料【$material】库位【$site】';
+      summary[label] = (summary[label] ?? 0) + remaining;
+    }
+
+    final entries = summary.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    return entries
+        .map(
+          (entry) => '${entry.key}剩余${entry.value.toStringAsFixed(3)}',
+        )
+        .toList();
+  }
+
+  Widget _buildCurrentMaterialSummary(OnlinePickCollectionState state) {
+    final barcode = state.currentBarcode;
+    final hasBarcode = barcode != null && (barcode.materialCode ?? '').isNotEmpty;
+    final materialCode = hasBarcode ? (barcode!.materialCode ?? '-') : '-';
+    final materialName = hasBarcode ? (barcode!.materialName ?? '-') : '-';
+    final batchNo = hasBarcode ? (barcode!.batchNo ?? '') : '';
+    final serialNo = hasBarcode ? (barcode!.serialNumber ?? '') : '';
+
+    final tray = state.currentTrayCode.toUpperCase();
+    final storeSite = state.currentStoreSite.toUpperCase();
+    final batchKey = batchNo.toUpperCase();
+    final serialKey = serialNo.toUpperCase();
+
+    double collectedQty = 0;
+    double inventoryQty = 0;
+
+    if (hasBarcode) {
+      for (final stock in state.collectedStocks) {
+        if ((stock.materialCode).toUpperCase() != materialCode.toUpperCase()) {
+          continue;
+        }
+        if (tray.isNotEmpty && (stock.trayNo ?? '').toUpperCase() != tray) {
+          continue;
+        }
+        if (storeSite.isNotEmpty &&
+            (stock.storeSite ?? '').toUpperCase() != storeSite) {
+          continue;
+        }
+        if (serialKey.isNotEmpty) {
+          if ((stock.serialNumber ?? '').toUpperCase() != serialKey) {
+            continue;
+          }
+        } else if (batchKey.isNotEmpty) {
+          if ((stock.batchNo ?? '').toUpperCase() != batchKey) {
+            continue;
+          }
+        }
+        collectedQty += stock.collectQty.toDouble();
+      }
+
+      for (final record in state.inventoryCheckRecords) {
+        if (record.materialCode.toUpperCase() != materialCode.toUpperCase()) {
+          continue;
+        }
+        if (tray.isNotEmpty && record.trayNo.toUpperCase() != tray) {
+          continue;
+        }
+        if (storeSite.isNotEmpty && record.storeSite.toUpperCase() != storeSite) {
+          continue;
+        }
+        inventoryQty += record.quantity.toDouble();
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '当前物料信息',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 16,
+          runSpacing: 8,
+          children: [
+            _buildInfoChip('物料编码', materialCode.isEmpty ? '-' : materialCode),
+            _buildInfoChip('物料名称', materialName.isEmpty ? '-' : materialName),
+            _buildInfoChip(
+              '批次',
+              batchNo.isEmpty ? '-' : batchNo,
+            ),
+            _buildInfoChip(
+              '序列号',
+              serialNo.isEmpty ? '-' : serialNo,
+            ),
+            _buildInfoChip(
+              '已采集数量',
+              hasBarcode ? _formatQuantityDisplay(collectedQty) : '-',
+            ),
+            _buildInfoChip(
+              '结余数量',
+              hasBarcode ? _formatQuantityDisplay(inventoryQty) : '-',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  String _formatQuantityDisplay(num value) {
+    final number = value.toDouble();
+    if (number == 0) {
+      return '0';
+    }
+    if (number == number.roundToDouble()) {
+      return number.toInt().toString();
+    }
+    return number.toStringAsFixed(3);
   }
 }
