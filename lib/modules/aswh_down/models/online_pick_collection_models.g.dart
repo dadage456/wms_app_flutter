@@ -139,7 +139,7 @@ class OnlinePickInventoryCheckRecordAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return OnlinePickInventoryCheckRecord(
-      recordId: fields[0] as String? ?? '',
+      recordId: fields[0] as String,
       materialCode: fields[1] as String,
       trayNo: fields[2] as String,
       storeSite: fields[3] as String,
@@ -199,19 +199,18 @@ class OnlinePickCollectionCacheSnapshotAdapter
       mode: fields[9] as String,
       expectedErpStore: fields[10] as String,
       inventoryChecks:
-          (fields[11] as List?)?.cast<OnlinePickInventoryCheckRecord>() ??
-              const [],
+          (fields[11] as List).cast<OnlinePickInventoryCheckRecord>(),
       roomMatControl: fields[12] as String,
       currentStoreSite: fields[13] as String,
       matControlFlag: fields[14] as String,
       matSendControl: fields[15] as String,
       erpRoom: fields[16] as String,
       erpStoreInv: fields[17] as String,
-      availableInventory: (fields[18] as num?)?.toDouble() ?? 0,
-      requireInventoryCheck: fields[19] as bool? ?? false,
-      siteFlag: fields[20] as String? ?? '',
-      batchFlag: fields[21] as String? ?? '',
-      mtlCheckMode: fields[22] as String? ?? '',
+      availableInventory: fields[18] as double,
+      requireInventoryCheck: fields[19] as bool,
+      siteFlag: fields[20] as String,
+      batchFlag: fields[21] as String,
+      mtlCheckMode: fields[22] as String,
     );
   }
 
@@ -481,8 +480,7 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'pendingQuantity': instance.pendingQuantity,
       'mode': instance.mode,
       'expectedErpStore': instance.expectedErpStore,
-      'inventoryChecks':
-          instance.inventoryChecks.map((e) => e.toJson()).toList(),
+      'inventoryChecks': instance.inventoryChecks,
       'roomMatControl': instance.roomMatControl,
       'currentStoreSite': instance.currentStoreSite,
       'matControlFlag': instance.matControlFlag,

@@ -1999,7 +1999,7 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
       inventoryChecks: null == inventoryChecks
-          ? _value._inventoryChecks
+          ? _value.inventoryChecks
           : inventoryChecks // ignore: cast_nullable_to_non_nullable
               as List<OnlinePickInventoryCheckRecord>,
       roomMatControl: null == roomMatControl
@@ -2091,7 +2091,11 @@ abstract class _$$OnlinePickCollectionCacheSnapshotImplCopyWith<$Res>
       @HiveField(15) String matSendControl,
       @HiveField(16) String erpRoom,
       @HiveField(17) String erpStoreInv,
-      @HiveField(18) double availableInventory});
+      @HiveField(18) double availableInventory,
+      @HiveField(19) bool requireInventoryCheck,
+      @HiveField(20) String siteFlag,
+      @HiveField(21) String batchFlag,
+      @HiveField(22) String mtlCheckMode});
 
   @override
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
@@ -2180,7 +2184,7 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
       inventoryChecks: null == inventoryChecks
-          ? _value.inventoryChecks
+          ? _value._inventoryChecks
           : inventoryChecks // ignore: cast_nullable_to_non_nullable
               as List<OnlinePickInventoryCheckRecord>,
       roomMatControl: null == roomMatControl
@@ -2314,16 +2318,6 @@ class _$OnlinePickCollectionCacheSnapshotImpl
     return EqualUnmodifiableMapView(_dicInvMtlQty);
   }
 
-  final List<OnlinePickInventoryCheckRecord> _inventoryChecks;
-  @override
-  @JsonKey()
-  @HiveField(11)
-  List<OnlinePickInventoryCheckRecord> get inventoryChecks {
-    if (_inventoryChecks is EqualUnmodifiableListView) return _inventoryChecks;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_inventoryChecks);
-  }
-
   @override
   @HiveField(4)
   final OnlinePickBarcodeContent? lastBarcode;
@@ -2350,6 +2344,16 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @JsonKey()
   @HiveField(10)
   final String expectedErpStore;
+  final List<OnlinePickInventoryCheckRecord> _inventoryChecks;
+  @override
+  @JsonKey()
+  @HiveField(11)
+  List<OnlinePickInventoryCheckRecord> get inventoryChecks {
+    if (_inventoryChecks is EqualUnmodifiableListView) return _inventoryChecks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_inventoryChecks);
+  }
+
   @override
   @JsonKey()
   @HiveField(12)
@@ -2411,8 +2415,6 @@ class _$OnlinePickCollectionCacheSnapshotImpl
                 .equals(other._dicMtlQty, _dicMtlQty) &&
             const DeepCollectionEquality()
                 .equals(other._dicInvMtlQty, _dicInvMtlQty) &&
-            const DeepCollectionEquality()
-                .equals(other._inventoryChecks, _inventoryChecks) &&
             (identical(other.lastBarcode, lastBarcode) ||
                 other.lastBarcode == lastBarcode) &&
             (identical(other.location, location) ||
@@ -2424,6 +2426,8 @@ class _$OnlinePickCollectionCacheSnapshotImpl
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.expectedErpStore, expectedErpStore) ||
                 other.expectedErpStore == expectedErpStore) &&
+            const DeepCollectionEquality()
+                .equals(other._inventoryChecks, _inventoryChecks) &&
             (identical(other.roomMatControl, roomMatControl) ||
                 other.roomMatControl == roomMatControl) &&
             (identical(other.currentStoreSite, currentStoreSite) ||
@@ -2449,31 +2453,32 @@ class _$OnlinePickCollectionCacheSnapshotImpl
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_stocks),
-      const DeepCollectionEquality().hash(_dicSeq),
-      const DeepCollectionEquality().hash(_dicMtlQty),
-      const DeepCollectionEquality().hash(_dicInvMtlQty),
-      const DeepCollectionEquality().hash(_inventoryChecks),
-      lastBarcode,
-      location,
-      trayNo,
-      userId,
-      pendingQuantity,
-      mode,
-      expectedErpStore,
-      roomMatControl,
-      currentStoreSite,
-      matControlFlag,
-      matSendControl,
-      erpRoom,
-      erpStoreInv,
-      availableInventory,
-      requireInventoryCheck,
-      siteFlag,
-      batchFlag,
-      mtlCheckMode);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        const DeepCollectionEquality().hash(_stocks),
+        const DeepCollectionEquality().hash(_dicSeq),
+        const DeepCollectionEquality().hash(_dicMtlQty),
+        const DeepCollectionEquality().hash(_dicInvMtlQty),
+        lastBarcode,
+        location,
+        trayNo,
+        userId,
+        pendingQuantity,
+        mode,
+        expectedErpStore,
+        const DeepCollectionEquality().hash(_inventoryChecks),
+        roomMatControl,
+        currentStoreSite,
+        matControlFlag,
+        matSendControl,
+        erpRoom,
+        erpStoreInv,
+        availableInventory,
+        requireInventoryCheck,
+        siteFlag,
+        batchFlag,
+        mtlCheckMode
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -2494,27 +2499,30 @@ class _$OnlinePickCollectionCacheSnapshotImpl
 abstract class _OnlinePickCollectionCacheSnapshot
     implements OnlinePickCollectionCacheSnapshot {
   const factory _OnlinePickCollectionCacheSnapshot(
-          {@HiveField(0) final List<OnlinePickCollectionStock> stocks,
-          @HiveField(1) final Map<String, String> dicSeq,
-          @HiveField(2) final Map<String, List<double>> dicMtlQty,
-          @HiveField(3) final Map<String, double> dicInvMtlQty,
-          @HiveField(4) final OnlinePickBarcodeContent? lastBarcode,
-          @HiveField(5) final String location,
-          @HiveField(6) final String trayNo,
-          @HiveField(7) final int userId,
-          @HiveField(8) final num? pendingQuantity,
-          @HiveField(9) final String mode,
-          @HiveField(10) final String expectedErpStore,
-          @HiveField(11)
-          final List<OnlinePickInventoryCheckRecord> inventoryChecks,
-          @HiveField(12) final String roomMatControl,
-          @HiveField(13) final String currentStoreSite,
-          @HiveField(14) final String matControlFlag,
-          @HiveField(15) final String matSendControl,
-          @HiveField(16) final String erpRoom,
-          @HiveField(17) final String erpStoreInv,
-          @HiveField(18) final double availableInventory}) =
-      _$OnlinePickCollectionCacheSnapshotImpl;
+      {@HiveField(0) final List<OnlinePickCollectionStock> stocks,
+      @HiveField(1) final Map<String, String> dicSeq,
+      @HiveField(2) final Map<String, List<double>> dicMtlQty,
+      @HiveField(3) final Map<String, double> dicInvMtlQty,
+      @HiveField(4) final OnlinePickBarcodeContent? lastBarcode,
+      @HiveField(5) final String location,
+      @HiveField(6) final String trayNo,
+      @HiveField(7) final int userId,
+      @HiveField(8) final num? pendingQuantity,
+      @HiveField(9) final String mode,
+      @HiveField(10) final String expectedErpStore,
+      @HiveField(11) final List<OnlinePickInventoryCheckRecord> inventoryChecks,
+      @HiveField(12) final String roomMatControl,
+      @HiveField(13) final String currentStoreSite,
+      @HiveField(14) final String matControlFlag,
+      @HiveField(15) final String matSendControl,
+      @HiveField(16) final String erpRoom,
+      @HiveField(17) final String erpStoreInv,
+      @HiveField(18) final double availableInventory,
+      @HiveField(19) final bool requireInventoryCheck,
+      @HiveField(20) final String siteFlag,
+      @HiveField(21) final String batchFlag,
+      @HiveField(22)
+      final String mtlCheckMode}) = _$OnlinePickCollectionCacheSnapshotImpl;
 
   factory _OnlinePickCollectionCacheSnapshot.fromJson(
           Map<String, dynamic> json) =
@@ -2553,6 +2561,42 @@ abstract class _OnlinePickCollectionCacheSnapshot
   @override
   @HiveField(10)
   String get expectedErpStore;
+  @override
+  @HiveField(11)
+  List<OnlinePickInventoryCheckRecord> get inventoryChecks;
+  @override
+  @HiveField(12)
+  String get roomMatControl;
+  @override
+  @HiveField(13)
+  String get currentStoreSite;
+  @override
+  @HiveField(14)
+  String get matControlFlag;
+  @override
+  @HiveField(15)
+  String get matSendControl;
+  @override
+  @HiveField(16)
+  String get erpRoom;
+  @override
+  @HiveField(17)
+  String get erpStoreInv;
+  @override
+  @HiveField(18)
+  double get availableInventory;
+  @override
+  @HiveField(19)
+  bool get requireInventoryCheck;
+  @override
+  @HiveField(20)
+  String get siteFlag;
+  @override
+  @HiveField(21)
+  String get batchFlag;
+  @override
+  @HiveField(22)
+  String get mtlCheckMode;
   @override
   @JsonKey(ignore: true)
   _$$OnlinePickCollectionCacheSnapshotImplCopyWith<
