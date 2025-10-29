@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive/hive.dart';
 
@@ -68,6 +69,63 @@ class OnlinePickCollectionStock with _$OnlinePickCollectionStock {
 
   factory OnlinePickCollectionStock.fromJson(Map<String, dynamic> json) =>
       _$OnlinePickCollectionStockFromJson(json);
+}
+
+/// 库存核对明细，记录库位、物料与结余数量。
+class OnlinePickInventoryCheckDetail extends Equatable {
+  const OnlinePickInventoryCheckDetail({
+    required this.key,
+    required this.storeSite,
+    required this.materialCode,
+    this.batchNo,
+    this.trayNo,
+    required this.quantity,
+  });
+
+  factory OnlinePickInventoryCheckDetail.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return OnlinePickInventoryCheckDetail(
+      key: json['key'] as String? ?? '',
+      storeSite: json['storeSite'] as String? ?? '',
+      materialCode: json['materialCode'] as String? ?? '',
+      batchNo: json['batchNo'] as String?,
+      trayNo: json['trayNo'] as String?,
+      quantity: (json['quantity'] as num?)?.toDouble() ?? 0,
+    );
+  }
+
+  final String key;
+  final String storeSite;
+  final String materialCode;
+  final String? batchNo;
+  final String? trayNo;
+  final double quantity;
+
+  Map<String, dynamic> toJson() => {
+        'key': key,
+        'storeSite': storeSite,
+        'materialCode': materialCode,
+        if (batchNo != null) 'batchNo': batchNo,
+        if (trayNo != null) 'trayNo': trayNo,
+        'quantity': quantity,
+      };
+
+  OnlinePickInventoryCheckDetail copyWith({
+    double? quantity,
+  }) {
+    return OnlinePickInventoryCheckDetail(
+      key: key,
+      storeSite: storeSite,
+      materialCode: materialCode,
+      batchNo: batchNo,
+      trayNo: trayNo,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  @override
+  List<Object?> get props => [key, storeSite, materialCode, batchNo, trayNo, quantity];
 }
 
 /// 自动化仓库拣选模式。
@@ -154,6 +212,9 @@ class OnlinePickCollectionCacheSnapshot
     @HiveField(8) num? pendingQuantity,
     @HiveField(9) @Default('outbound') String mode,
     @HiveField(10) @Default('') String expectedErpStore,
+    @HiveField(11) @Default(<Map<String, dynamic>>[])
+    List<Map<String, dynamic>> inventoryChecks,
+    @HiveField(12) @Default('') String destination,
   }) = _OnlinePickCollectionCacheSnapshot;
 
   factory OnlinePickCollectionCacheSnapshot.fromJson(

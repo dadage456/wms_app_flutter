@@ -12,6 +12,8 @@ class OnlinePickCollectionState extends Equatable {
     this.serialMap = const <String, String>{},
     this.materialQtyMap = const <String, List<double>>{},
     this.inventoryQtyMap = const <String, double>{},
+    this.inventoryCheckDetails = const <OnlinePickInventoryCheckDetail>[],
+    this.locationOptions = const <OnlinePickLocationOption>[],
     this.barcodeContent,
     this.pendingQuantity,
     this.currentMode = const OnlinePickCollectionMode(
@@ -19,13 +21,14 @@ class OnlinePickCollectionState extends Equatable {
       label: '正常出库',
       type: OnlinePickCollectionModeType.outbound,
     ),
-    this.currentStep = OnlinePickCollectionStep.location,
+    this.currentStep = OnlinePickCollectionStep.tray,
     this.currentLocation = '',
     this.currentTray = '',
-    this.placeholder = '请扫描库位',
+    this.placeholder = '请扫描托盘',
     this.currentTab = 0,
     this.isScannerFocused = false,
     this.expectedErpStore,
+    this.selectedDestination = '',
   });
 
   final CollectionStatus status;
@@ -35,6 +38,8 @@ class OnlinePickCollectionState extends Equatable {
   final Map<String, String> serialMap;
   final Map<String, List<double>> materialQtyMap;
   final Map<String, double> inventoryQtyMap;
+  final List<OnlinePickInventoryCheckDetail> inventoryCheckDetails;
+  final List<OnlinePickLocationOption> locationOptions;
   final OnlinePickBarcodeContent? barcodeContent;
   final num? pendingQuantity;
   final OnlinePickCollectionMode currentMode;
@@ -45,6 +50,7 @@ class OnlinePickCollectionState extends Equatable {
   final int currentTab;
   final bool isScannerFocused;
   final String? expectedErpStore;
+  final String selectedDestination;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -54,6 +60,8 @@ class OnlinePickCollectionState extends Equatable {
     Map<String, String>? serialMap,
     Map<String, List<double>>? materialQtyMap,
     Map<String, double>? inventoryQtyMap,
+    List<OnlinePickInventoryCheckDetail>? inventoryCheckDetails,
+    List<OnlinePickLocationOption>? locationOptions,
     OnlinePickBarcodeContent? barcodeContent,
     bool clearBarcodeContent = false,
     num? pendingQuantity,
@@ -66,6 +74,7 @@ class OnlinePickCollectionState extends Equatable {
     int? currentTab,
     bool? isScannerFocused,
     String? expectedErpStore,
+    String? selectedDestination,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -75,6 +84,9 @@ class OnlinePickCollectionState extends Equatable {
       serialMap: serialMap ?? this.serialMap,
       materialQtyMap: materialQtyMap ?? this.materialQtyMap,
       inventoryQtyMap: inventoryQtyMap ?? this.inventoryQtyMap,
+      inventoryCheckDetails:
+          inventoryCheckDetails ?? this.inventoryCheckDetails,
+      locationOptions: locationOptions ?? this.locationOptions,
       barcodeContent: clearBarcodeContent ? null : (barcodeContent ?? this.barcodeContent),
       pendingQuantity: clearPendingQuantity ? null : (pendingQuantity ?? this.pendingQuantity),
       currentMode: currentMode ?? this.currentMode,
@@ -85,6 +97,7 @@ class OnlinePickCollectionState extends Equatable {
       currentTab: currentTab ?? this.currentTab,
       isScannerFocused: isScannerFocused ?? this.isScannerFocused,
       expectedErpStore: expectedErpStore ?? this.expectedErpStore,
+      selectedDestination: selectedDestination ?? this.selectedDestination,
     );
   }
 
@@ -97,6 +110,8 @@ class OnlinePickCollectionState extends Equatable {
         serialMap,
         materialQtyMap,
         inventoryQtyMap,
+        inventoryCheckDetails,
+        locationOptions,
         barcodeContent,
         pendingQuantity,
         currentMode,
@@ -107,5 +122,6 @@ class OnlinePickCollectionState extends Equatable {
         currentTab,
         isScannerFocused,
         expectedErpStore,
+        selectedDestination,
       ];
 }

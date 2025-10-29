@@ -70,6 +70,50 @@ class OnlinePickCollectionInventoryRecorded extends OnlinePickCollectionEvent {
   List<Object?> get props => [materialCode, storeSite, batchNo, trayNo, quantity];
 }
 
+/// 更新拣选口位置
+class OnlinePickCollectionDestinationUpdated extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionDestinationUpdated(this.destination);
+
+  final String destination;
+
+  @override
+  List<Object?> get props => [destination];
+}
+
+/// 下发空托盘出库指令
+class OnlinePickCollectionEmptyTrayOutRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionEmptyTrayOutRequested();
+}
+
+/// 下发空托盘入库指令
+class OnlinePickCollectionEmptyTrayInRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionEmptyTrayInRequested();
+}
+
+/// 请求单个托盘指令
+class OnlinePickCollectionSingleTrayRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionSingleTrayRequested();
+}
+
+/// 请求全部托盘指令
+class OnlinePickCollectionAllTrayRequested extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionAllTrayRequested(this.limit);
+
+  final int limit;
+
+  @override
+  List<Object?> get props => [limit];
+}
+
+/// 托盘回库指令
+class OnlinePickCollectionReturnTrayRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionReturnTrayRequested();
+}
+
 /// 切换采集模式
 class OnlinePickCollectionModeChanged extends OnlinePickCollectionEvent {
   const OnlinePickCollectionModeChanged(this.mode);
