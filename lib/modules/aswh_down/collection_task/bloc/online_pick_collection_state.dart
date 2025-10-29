@@ -29,6 +29,8 @@ class OnlinePickCollectionState extends Equatable {
     this.isScannerFocused = false,
     this.expectedErpStore,
     this.selectedDestination = '',
+    this.isInventoryEntryPending = false,
+    this.pendingInventoryDetail,
   });
 
   final CollectionStatus status;
@@ -51,6 +53,8 @@ class OnlinePickCollectionState extends Equatable {
   final bool isScannerFocused;
   final String? expectedErpStore;
   final String selectedDestination;
+  final bool isInventoryEntryPending;
+  final OnlinePickInventoryCheckDetail? pendingInventoryDetail;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -75,6 +79,9 @@ class OnlinePickCollectionState extends Equatable {
     bool? isScannerFocused,
     String? expectedErpStore,
     String? selectedDestination,
+    bool? isInventoryEntryPending,
+    OnlinePickInventoryCheckDetail? pendingInventoryDetail,
+    bool clearPendingInventoryDetail = false,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -98,6 +105,11 @@ class OnlinePickCollectionState extends Equatable {
       isScannerFocused: isScannerFocused ?? this.isScannerFocused,
       expectedErpStore: expectedErpStore ?? this.expectedErpStore,
       selectedDestination: selectedDestination ?? this.selectedDestination,
+      isInventoryEntryPending:
+          isInventoryEntryPending ?? this.isInventoryEntryPending,
+      pendingInventoryDetail: clearPendingInventoryDetail
+          ? null
+          : (pendingInventoryDetail ?? this.pendingInventoryDetail),
     );
   }
 
@@ -123,5 +135,7 @@ class OnlinePickCollectionState extends Equatable {
         isScannerFocused,
         expectedErpStore,
         selectedDestination,
+        isInventoryEntryPending,
+        pendingInventoryDetail,
       ];
 }

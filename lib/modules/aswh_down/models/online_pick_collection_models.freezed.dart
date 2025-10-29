@@ -1852,6 +1852,16 @@ mixin _$OnlinePickCollectionCacheSnapshot {
       throw _privateConstructorUsedError;
   @HiveField(12)
   String get destination => throw _privateConstructorUsedError;
+  @HiveField(13)
+  bool get inventoryPending => throw _privateConstructorUsedError;
+  @HiveField(14)
+  String? get pendingStoreSite => throw _privateConstructorUsedError;
+  @HiveField(15)
+  String? get pendingMaterialCode => throw _privateConstructorUsedError;
+  @HiveField(16)
+  String? get pendingBatchNo => throw _privateConstructorUsedError;
+  @HiveField(17)
+  String? get pendingTrayNo => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1880,7 +1890,12 @@ abstract class $OnlinePickCollectionCacheSnapshotCopyWith<$Res> {
       @HiveField(9) String mode,
       @HiveField(10) String expectedErpStore,
       @HiveField(11) List<Map<String, dynamic>> inventoryChecks,
-      @HiveField(12) String destination});
+      @HiveField(12) String destination,
+      @HiveField(13) bool inventoryPending,
+      @HiveField(14) String? pendingStoreSite,
+      @HiveField(15) String? pendingMaterialCode,
+      @HiveField(16) String? pendingBatchNo,
+      @HiveField(17) String? pendingTrayNo});
 
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
 }
@@ -1912,6 +1927,11 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
     Object? expectedErpStore = null,
     Object? inventoryChecks = null,
     Object? destination = null,
+    Object? inventoryPending = null,
+    Object? pendingStoreSite = freezed,
+    Object? pendingMaterialCode = freezed,
+    Object? pendingBatchNo = freezed,
+    Object? pendingTrayNo = freezed,
   }) {
     return _then(_value.copyWith(
       stocks: null == stocks
@@ -1966,6 +1986,26 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           ? _value.destination
           : destination // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryPending: null == inventoryPending
+          ? _value.inventoryPending
+          : inventoryPending // ignore: cast_nullable_to_non_nullable
+              as bool,
+      pendingStoreSite: freezed == pendingStoreSite
+          ? _value.pendingStoreSite
+          : pendingStoreSite // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingMaterialCode: freezed == pendingMaterialCode
+          ? _value.pendingMaterialCode
+          : pendingMaterialCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingBatchNo: freezed == pendingBatchNo
+          ? _value.pendingBatchNo
+          : pendingBatchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingTrayNo: freezed == pendingTrayNo
+          ? _value.pendingTrayNo
+          : pendingTrayNo // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -2005,7 +2045,12 @@ abstract class _$$OnlinePickCollectionCacheSnapshotImplCopyWith<$Res>
       @HiveField(9) String mode,
       @HiveField(10) String expectedErpStore,
       @HiveField(11) List<Map<String, dynamic>> inventoryChecks,
-      @HiveField(12) String destination});
+      @HiveField(12) String destination,
+      @HiveField(13) bool inventoryPending,
+      @HiveField(14) String? pendingStoreSite,
+      @HiveField(15) String? pendingMaterialCode,
+      @HiveField(16) String? pendingBatchNo,
+      @HiveField(17) String? pendingTrayNo});
 
   @override
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
@@ -2037,6 +2082,11 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
     Object? expectedErpStore = null,
     Object? inventoryChecks = null,
     Object? destination = null,
+    Object? inventoryPending = null,
+    Object? pendingStoreSite = freezed,
+    Object? pendingMaterialCode = freezed,
+    Object? pendingBatchNo = freezed,
+    Object? pendingTrayNo = freezed,
   }) {
     return _then(_$OnlinePickCollectionCacheSnapshotImpl(
       stocks: null == stocks
@@ -2091,6 +2141,26 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           ? _value.destination
           : destination // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryPending: null == inventoryPending
+          ? _value.inventoryPending
+          : inventoryPending // ignore: cast_nullable_to_non_nullable
+              as bool,
+      pendingStoreSite: freezed == pendingStoreSite
+          ? _value.pendingStoreSite
+          : pendingStoreSite // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingMaterialCode: freezed == pendingMaterialCode
+          ? _value.pendingMaterialCode
+          : pendingMaterialCode // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingBatchNo: freezed == pendingBatchNo
+          ? _value.pendingBatchNo
+          : pendingBatchNo // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pendingTrayNo: freezed == pendingTrayNo
+          ? _value.pendingTrayNo
+          : pendingTrayNo // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -2117,7 +2187,12 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       @HiveField(11)
       final List<Map<String, dynamic>> inventoryChecks =
           const <Map<String, dynamic>>[],
-      @HiveField(12) this.destination = ''})
+      @HiveField(12) this.destination = '',
+      @HiveField(13) this.inventoryPending = false,
+      @HiveField(14) this.pendingStoreSite,
+      @HiveField(15) this.pendingMaterialCode,
+      @HiveField(16) this.pendingBatchNo,
+      @HiveField(17) this.pendingTrayNo})
       : _stocks = stocks,
         _dicSeq = dicSeq,
         _dicMtlQty = dicMtlQty,
@@ -2210,10 +2285,26 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @JsonKey()
   @HiveField(12)
   final String destination;
+  @override
+  @JsonKey()
+  @HiveField(13)
+  final bool inventoryPending;
+  @override
+  @HiveField(14)
+  final String? pendingStoreSite;
+  @override
+  @HiveField(15)
+  final String? pendingMaterialCode;
+  @override
+  @HiveField(16)
+  final String? pendingBatchNo;
+  @override
+  @HiveField(17)
+  final String? pendingTrayNo;
 
   @override
   String toString() {
-    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, destination: $destination)';
+    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, destination: $destination, inventoryPending: $inventoryPending, pendingStoreSite: $pendingStoreSite, pendingMaterialCode: $pendingMaterialCode, pendingBatchNo: $pendingBatchNo, pendingTrayNo: $pendingTrayNo)';
   }
 
   @override
@@ -2241,7 +2332,17 @@ class _$OnlinePickCollectionCacheSnapshotImpl
             const DeepCollectionEquality()
                 .equals(other._inventoryChecks, _inventoryChecks) &&
             (identical(other.destination, destination) ||
-                other.destination == destination));
+                other.destination == destination) &&
+            (identical(other.inventoryPending, inventoryPending) ||
+                other.inventoryPending == inventoryPending) &&
+            (identical(other.pendingStoreSite, pendingStoreSite) ||
+                other.pendingStoreSite == pendingStoreSite) &&
+            (identical(other.pendingMaterialCode, pendingMaterialCode) ||
+                other.pendingMaterialCode == pendingMaterialCode) &&
+            (identical(other.pendingBatchNo, pendingBatchNo) ||
+                other.pendingBatchNo == pendingBatchNo) &&
+            (identical(other.pendingTrayNo, pendingTrayNo) ||
+                other.pendingTrayNo == pendingTrayNo));
   }
 
   @JsonKey(ignore: true)
@@ -2260,7 +2361,12 @@ class _$OnlinePickCollectionCacheSnapshotImpl
           mode,
           expectedErpStore,
           const DeepCollectionEquality().hash(_inventoryChecks),
-          destination);
+          destination,
+          inventoryPending,
+          pendingStoreSite,
+          pendingMaterialCode,
+          pendingBatchNo,
+          pendingTrayNo);
 
   @JsonKey(ignore: true)
   @override
@@ -2293,7 +2399,12 @@ abstract class _OnlinePickCollectionCacheSnapshot
           @HiveField(9) final String mode,
           @HiveField(10) final String expectedErpStore,
           @HiveField(11) final List<Map<String, dynamic>> inventoryChecks,
-          @HiveField(12) final String destination}) =
+          @HiveField(12) final String destination,
+          @HiveField(13) final bool inventoryPending,
+          @HiveField(14) final String? pendingStoreSite,
+          @HiveField(15) final String? pendingMaterialCode,
+          @HiveField(16) final String? pendingBatchNo,
+          @HiveField(17) final String? pendingTrayNo}) =
       _$OnlinePickCollectionCacheSnapshotImpl;
 
   factory _OnlinePickCollectionCacheSnapshot.fromJson(
@@ -2339,6 +2450,21 @@ abstract class _OnlinePickCollectionCacheSnapshot
   @override
   @HiveField(12)
   String get destination;
+  @override
+  @HiveField(13)
+  bool get inventoryPending;
+  @override
+  @HiveField(14)
+  String? get pendingStoreSite;
+  @override
+  @HiveField(15)
+  String? get pendingMaterialCode;
+  @override
+  @HiveField(16)
+  String? get pendingBatchNo;
+  @override
+  @HiveField(17)
+  String? get pendingTrayNo;
   @override
   @JsonKey(ignore: true)
   _$$OnlinePickCollectionCacheSnapshotImplCopyWith<
