@@ -162,3 +162,23 @@ class OnlinePickCollectionTrayReturnRequested
     extends OnlinePickCollectionEvent {
   const OnlinePickCollectionTrayReturnRequested();
 }
+
+class OnlinePickCollectionInventoryCheckSubmitted
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionInventoryCheckSubmitted(this.quantity);
+
+  final num quantity;
+
+  @override
+  List<Object?> get props => [quantity];
+}
+
+class OnlinePickCollectionEmptyTrayInboundRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionEmptyTrayInboundRequested();
+}
+
+class OnlinePickCollectionSingleTrayRequested
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionSingleTrayRequested();
+}

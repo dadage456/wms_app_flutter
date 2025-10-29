@@ -505,6 +505,60 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     }
   }
 
+  Future<void> _confirmEmptyIn(OnlinePickCollectionState state) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('空托盘入库'),
+              content: const Text('请确认空托盘入库吗？'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('确认'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    if (confirmed) {
+      _bloc.add(const OnlinePickCollectionEmptyTrayInboundRequested());
+    }
+  }
+
+  Future<void> _confirmSingleTray(OnlinePickCollectionState state) async {
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('单托下发'),
+              content: const Text('请确认下发单托托盘指令吗？'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('确认'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    if (confirmed) {
+      _bloc.add(const OnlinePickCollectionSingleTrayRequested());
+    }
+  }
+
   Future<void> _confirmTrayReturn(OnlinePickCollectionState state) async {
     final confirmed = await showDialog<bool>(
           context: context,
@@ -572,8 +626,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
         _confirmEmptyOut(state);
         break;
       case _MoreAction.emptyIn:
+        _confirmEmptyIn(state);
+        break;
       case _MoreAction.singleTray:
-        _showNotImplemented();
+        _confirmSingleTray(state);
         break;
       case _MoreAction.reset:
         _confirmTrayReturn(state);
@@ -867,12 +923,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 ),
                 PopupMenuItem(
                   value: _MoreAction.emptyIn,
-                  enabled: false,
                   child: _buildMenuItem(Icons.move_to_inbox_outlined, '空盘入库'),
                 ),
                 PopupMenuItem(
                   value: _MoreAction.singleTray,
-                  enabled: false,
                   child: _buildMenuItem(Icons.one_k_plus_outlined, '单个托盘'),
                 ),
                 PopupMenuItem(

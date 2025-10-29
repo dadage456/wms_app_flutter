@@ -5,6 +5,21 @@ import 'package:wms_app/modules/aswh_down/models/online_pick_task_item_models.da
 import 'package:wms_app/modules/aswh_down/models/online_pick_task_models.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_wcs_models.dart';
 
+class OnlinePickInventoryPrompt extends Equatable {
+  const OnlinePickInventoryPrompt({
+    required this.materialCode,
+    this.storeSite = '',
+    this.trayNo = '',
+  });
+
+  final String materialCode;
+  final String storeSite;
+  final String trayNo;
+
+  @override
+  List<Object?> get props => [materialCode, storeSite, trayNo];
+}
+
 /// 提交接口通道枚举。
 enum OnlinePickSubmissionChannel {
   /// 自动化立库下架（CommitASWHDownShelves）。
@@ -62,6 +77,9 @@ class OnlinePickCollectionState extends Equatable {
     this.selectedLocation,
     this.requestedPallets = const [],
     this.submitChannel = OnlinePickSubmissionChannel.aswh,
+    this.inventoryChecks = const [],
+    this.pendingInventoryPrompt,
+    this.roomMatControl = '0',
   });
 
   factory OnlinePickCollectionState.initial(
@@ -101,6 +119,9 @@ class OnlinePickCollectionState extends Equatable {
   final OnlinePickLocationOption? selectedLocation;
   final List<String> requestedPallets;
   final OnlinePickSubmissionChannel submitChannel;
+  final List<OnlinePickInventoryCheck> inventoryChecks;
+  final OnlinePickInventoryPrompt? pendingInventoryPrompt;
+  final String roomMatControl;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -128,9 +149,13 @@ class OnlinePickCollectionState extends Equatable {
     OnlinePickLocationOption? selectedLocation,
     List<String>? requestedPallets,
     OnlinePickSubmissionChannel? submitChannel,
+    List<OnlinePickInventoryCheck>? inventoryChecks,
+    OnlinePickInventoryPrompt? pendingInventoryPrompt,
+    String? roomMatControl,
     bool clearBarcode = false,
     bool clearCurrentItem = false,
     bool clearPendingQuantity = false,
+    bool clearPendingInventoryPrompt = false,
   }) {
     return OnlinePickCollectionState(
       task: task,
@@ -160,6 +185,11 @@ class OnlinePickCollectionState extends Equatable {
       selectedLocation: selectedLocation ?? this.selectedLocation,
       requestedPallets: requestedPallets ?? this.requestedPallets,
       submitChannel: submitChannel ?? this.submitChannel,
+      inventoryChecks: inventoryChecks ?? this.inventoryChecks,
+      pendingInventoryPrompt: clearPendingInventoryPrompt
+          ? null
+          : pendingInventoryPrompt ?? this.pendingInventoryPrompt,
+      roomMatControl: roomMatControl ?? this.roomMatControl,
     );
   }
 
@@ -191,5 +221,8 @@ class OnlinePickCollectionState extends Equatable {
         selectedLocation,
         requestedPallets,
         submitChannel,
+        inventoryChecks,
+        pendingInventoryPrompt,
+        roomMatControl,
       ];
 }
