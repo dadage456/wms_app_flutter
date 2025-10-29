@@ -50,6 +50,28 @@ class OnlinePickCollectionStocksDeleted extends OnlinePickCollectionEvent {
   List<Object?> get props => [deletedStocks];
 }
 
+/// 任务列表勾选变化
+class OnlinePickCollectionTaskSelectionChanged
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionTaskSelectionChanged({this.selectedItemId});
+
+  final int? selectedItemId;
+
+  @override
+  List<Object?> get props => [selectedItemId];
+}
+
+/// 正在采集列表勾选变化
+class OnlinePickCollectionCollectingSelectionChanged
+    extends OnlinePickCollectionEvent {
+  const OnlinePickCollectionCollectingSelectionChanged({this.selectedItemId});
+
+  final int? selectedItemId;
+
+  @override
+  List<Object?> get props => [selectedItemId];
+}
+
 /// 新增或更新库存核对记录
 class OnlinePickCollectionInventoryRecorded extends OnlinePickCollectionEvent {
   const OnlinePickCollectionInventoryRecorded({
