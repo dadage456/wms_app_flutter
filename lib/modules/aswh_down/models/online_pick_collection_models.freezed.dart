@@ -1847,6 +1847,11 @@ mixin _$OnlinePickCollectionCacheSnapshot {
   String get mode => throw _privateConstructorUsedError;
   @HiveField(10)
   String get expectedErpStore => throw _privateConstructorUsedError;
+  @HiveField(11)
+  List<Map<String, dynamic>> get inventoryChecks =>
+      throw _privateConstructorUsedError;
+  @HiveField(12)
+  String get destination => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1873,7 +1878,9 @@ abstract class $OnlinePickCollectionCacheSnapshotCopyWith<$Res> {
       @HiveField(7) int userId,
       @HiveField(8) num? pendingQuantity,
       @HiveField(9) String mode,
-      @HiveField(10) String expectedErpStore});
+      @HiveField(10) String expectedErpStore,
+      @HiveField(11) List<Map<String, dynamic>> inventoryChecks,
+      @HiveField(12) String destination});
 
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
 }
@@ -1903,6 +1910,8 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
     Object? pendingQuantity = freezed,
     Object? mode = null,
     Object? expectedErpStore = null,
+    Object? inventoryChecks = null,
+    Object? destination = null,
   }) {
     return _then(_value.copyWith(
       stocks: null == stocks
@@ -1949,6 +1958,14 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           ? _value.expectedErpStore
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryChecks: null == inventoryChecks
+          ? _value.inventoryChecks
+          : inventoryChecks // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
+      destination: null == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -1986,7 +2003,9 @@ abstract class _$$OnlinePickCollectionCacheSnapshotImplCopyWith<$Res>
       @HiveField(7) int userId,
       @HiveField(8) num? pendingQuantity,
       @HiveField(9) String mode,
-      @HiveField(10) String expectedErpStore});
+      @HiveField(10) String expectedErpStore,
+      @HiveField(11) List<Map<String, dynamic>> inventoryChecks,
+      @HiveField(12) String destination});
 
   @override
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
@@ -2016,6 +2035,8 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
     Object? pendingQuantity = freezed,
     Object? mode = null,
     Object? expectedErpStore = null,
+    Object? inventoryChecks = null,
+    Object? destination = null,
   }) {
     return _then(_$OnlinePickCollectionCacheSnapshotImpl(
       stocks: null == stocks
@@ -2062,6 +2083,14 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           ? _value.expectedErpStore
           : expectedErpStore // ignore: cast_nullable_to_non_nullable
               as String,
+      inventoryChecks: null == inventoryChecks
+          ? _value._inventoryChecks
+          : inventoryChecks // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
+      destination: null == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -2084,11 +2113,16 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       @HiveField(7) this.userId = 0,
       @HiveField(8) this.pendingQuantity,
       @HiveField(9) this.mode = 'outbound',
-      @HiveField(10) this.expectedErpStore = ''})
+      @HiveField(10) this.expectedErpStore = '',
+      @HiveField(11)
+      final List<Map<String, dynamic>> inventoryChecks =
+          const <Map<String, dynamic>>[],
+      @HiveField(12) this.destination = ''})
       : _stocks = stocks,
         _dicSeq = dicSeq,
         _dicMtlQty = dicMtlQty,
-        _dicInvMtlQty = dicInvMtlQty;
+        _dicInvMtlQty = dicInvMtlQty,
+        _inventoryChecks = inventoryChecks;
 
   factory _$OnlinePickCollectionCacheSnapshotImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -2160,10 +2194,26 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @JsonKey()
   @HiveField(10)
   final String expectedErpStore;
+  final List<Map<String, dynamic>> _inventoryChecks;
+  @override
+  @JsonKey()
+  @HiveField(11)
+  List<Map<String, dynamic>> get inventoryChecks {
+    if (_inventoryChecks is EqualUnmodifiableListView) {
+      return _inventoryChecks;
+    }
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_inventoryChecks);
+  }
+
+  @override
+  @JsonKey()
+  @HiveField(12)
+  final String destination;
 
   @override
   String toString() {
-    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore)';
+    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, destination: $destination)';
   }
 
   @override
@@ -2187,7 +2237,11 @@ class _$OnlinePickCollectionCacheSnapshotImpl
                 other.pendingQuantity == pendingQuantity) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.expectedErpStore, expectedErpStore) ||
-                other.expectedErpStore == expectedErpStore));
+                other.expectedErpStore == expectedErpStore) &&
+            const DeepCollectionEquality()
+                .equals(other._inventoryChecks, _inventoryChecks) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination));
   }
 
   @JsonKey(ignore: true)
@@ -2197,14 +2251,16 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       const DeepCollectionEquality().hash(_stocks),
       const DeepCollectionEquality().hash(_dicSeq),
       const DeepCollectionEquality().hash(_dicMtlQty),
-      const DeepCollectionEquality().hash(_dicInvMtlQty),
-      lastBarcode,
-      location,
-      trayNo,
-      userId,
-      pendingQuantity,
-      mode,
-      expectedErpStore);
+          const DeepCollectionEquality().hash(_dicInvMtlQty),
+          lastBarcode,
+          location,
+          trayNo,
+          userId,
+          pendingQuantity,
+          mode,
+          expectedErpStore,
+          const DeepCollectionEquality().hash(_inventoryChecks),
+          destination);
 
   @JsonKey(ignore: true)
   @override
@@ -2235,7 +2291,9 @@ abstract class _OnlinePickCollectionCacheSnapshot
           @HiveField(7) final int userId,
           @HiveField(8) final num? pendingQuantity,
           @HiveField(9) final String mode,
-          @HiveField(10) final String expectedErpStore}) =
+          @HiveField(10) final String expectedErpStore,
+          @HiveField(11) final List<Map<String, dynamic>> inventoryChecks,
+          @HiveField(12) final String destination}) =
       _$OnlinePickCollectionCacheSnapshotImpl;
 
   factory _OnlinePickCollectionCacheSnapshot.fromJson(
@@ -2275,6 +2333,12 @@ abstract class _OnlinePickCollectionCacheSnapshot
   @override
   @HiveField(10)
   String get expectedErpStore;
+  @override
+  @HiveField(11)
+  List<Map<String, dynamic>> get inventoryChecks;
+  @override
+  @HiveField(12)
+  String get destination;
   @override
   @JsonKey(ignore: true)
   _$$OnlinePickCollectionCacheSnapshotImplCopyWith<

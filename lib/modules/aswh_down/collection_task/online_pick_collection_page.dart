@@ -215,6 +215,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
   Widget _buildInfoCard(OnlinePickCollectionState state) {
     final barcode = state.barcodeContent;
+    final destinationLabel = _destinationLabel(state);
+    final inventoryCount = state.inventoryCheckDetails.length;
 
     return Container(
       width: double.infinity,
@@ -230,7 +232,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
               _buildModeChip(state.currentMode),
               const Spacer(),
               Text(
-                '库存核对：${state.inventoryQtyMap.length}',
+                '库存核对：$inventoryCount',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF666666),
@@ -239,6 +241,37 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
             ],
           ),
           const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    text: '拣选口：',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF555555),
+                    ),
+                    children: [
+                      TextSpan(
+                        text: destinationLabel,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF222222),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_location_alt, color: Color(0xFF1976D2)),
+                tooltip: '选择拣选口',
+                onPressed: () => _selectDestination(state),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           _buildInfoRow('库位', state.currentLocation, '托盘', state.currentTray),
           const SizedBox(height: 8),
           _buildInfoRow(
@@ -406,6 +439,14 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
               label: const Text('提交'),
             ),
           ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _openMoreActions(state),
+              icon: const Icon(Icons.more_horiz),
+              label: const Text('更多'),
+            ),
+          ),
         ],
       ),
     );
@@ -452,6 +493,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     }
 
     final optionsMap = LinkedHashMap<String, _InventoryOption>();
+    final detailMap = {
+      for (final detail in state.inventoryCheckDetails) detail.key: detail
+    };
     for (final stock in state.collectedStocks) {
       final site = (stock.storeSite ?? '').trim();
       final material = (stock.materialCode).trim();
@@ -474,6 +518,19 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       );
     }
 
+    for (final detail in state.inventoryCheckDetails) {
+      optionsMap.putIfAbsent(
+        detail.key,
+        () => _InventoryOption(
+          key: detail.key,
+          storeSite: detail.storeSite,
+          materialCode: detail.materialCode,
+          batchNo: detail.batchNo ?? '',
+          trayNo: detail.trayNo ?? '',
+        ),
+      );
+    }
+
     if (optionsMap.isEmpty) {
       LoadingDialogManager.instance.showErrorDialog(
         context,
@@ -484,7 +541,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
     String selectedKey = optionsMap.keys.first;
     final controller = TextEditingController(
-      text: state.inventoryQtyMap[selectedKey]?.toFormatString() ?? '',
+      text: (detailMap[selectedKey]?.quantity ??
+              state.inventoryQtyMap[selectedKey] ??
+              0)
+          .toFormatString(),
     );
     String? errorText;
 
@@ -516,8 +576,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       if (value == null) return;
                       setState(() {
                         selectedKey = value;
-                        controller.text =
-                            state.inventoryQtyMap[selectedKey]?.toFormatString() ?? '';
+                        final detail = detailMap[selectedKey];
+                        controller.text = (detail?.quantity ??
+                                state.inventoryQtyMap[selectedKey] ??
+                                0)
+                            .toFormatString();
                         errorText = null;
                       });
                     },
@@ -534,6 +597,53 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       errorText: errorText,
                     ),
                   ),
+                  if (state.inventoryCheckDetails.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Text(
+                      '已记录的结余：',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF666666),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 140,
+                      child: ListView.builder(
+                        itemCount: state.inventoryCheckDetails.length,
+                        itemBuilder: (context, index) {
+                          final detail = state.inventoryCheckDetails[index];
+                          return ListTile(
+                            dense: true,
+                            title: Text(
+                              '库位 ${detail.storeSite} · 物料 ${detail.materialCode}',
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            subtitle: (detail.batchNo?.isNotEmpty ?? false) ||
+                                    (detail.trayNo?.isNotEmpty ?? false)
+                                ? Text(
+                                    [
+                                      if (detail.batchNo?.isNotEmpty ?? false)
+                                        '批次 ${detail.batchNo}',
+                                      if (detail.trayNo?.isNotEmpty ?? false)
+                                        '托盘 ${detail.trayNo}',
+                                    ].join(' · '),
+                                    style: const TextStyle(fontSize: 12),
+                                  )
+                                : null,
+                            trailing: Text(
+                              detail.quantity.toFormatString(),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF1976D2),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ],
               ),
               actions: [
@@ -591,6 +701,199 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
         quantity: quantity,
       ),
     );
+  }
+
+  String _destinationLabel(OnlinePickCollectionState state) {
+    if (state.locationOptions.isEmpty) {
+      return state.selectedDestination.isEmpty ? '未维护' : state.selectedDestination;
+    }
+
+    final normalized = state.selectedDestination.trim().toUpperCase();
+    if (normalized.isEmpty) {
+      return '未选择';
+    }
+
+    final option = state.locationOptions.firstWhere(
+      (element) => element.value.trim().toUpperCase() == normalized,
+      orElse: () => state.locationOptions.first,
+    );
+    return option.label;
+  }
+
+  Future<void> _selectDestination(OnlinePickCollectionState state) async {
+    if (state.locationOptions.isEmpty) {
+      LoadingDialogManager.instance.showErrorDialog(
+        context,
+        '立体库进出口相关位置未维护!',
+      );
+      return;
+    }
+
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return SimpleDialog(
+          title: const Text('选择拣选口'),
+          children: state.locationOptions
+              .map(
+                (option) => SimpleDialogOption(
+                  onPressed: () => Navigator.of(dialogContext).pop(option.value),
+                  child: Text(option.label),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+
+    if (selected == null || selected.isEmpty) {
+      return;
+    }
+
+    _bloc.add(OnlinePickCollectionDestinationUpdated(selected));
+  }
+
+  Future<void> _openMoreActions(OnlinePickCollectionState state) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.place_outlined),
+                title: const Text('拣选位置'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _selectDestination(state);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: const Text('查询指令'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _navigateToWcs(state);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.exit_to_app),
+                title: const Text('空盘出库'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _bloc.add(const OnlinePickCollectionEmptyTrayOutRequested());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.download_outlined),
+                title: const Text('空盘入库'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _bloc.add(const OnlinePickCollectionEmptyTrayInRequested());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.move_to_inbox),
+                title: const Text('单个托盘'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _bloc.add(const OnlinePickCollectionSingleTrayRequested());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.assignment_return_outlined),
+                title: const Text('回库'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _bloc.add(const OnlinePickCollectionReturnTrayRequested());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.all_inbox),
+                title: const Text('全部托盘'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _promptAllTrayCount();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _navigateToWcs(OnlinePickCollectionState state) async {
+    if (state.collectedStocks.isNotEmpty) {
+      LoadingDialogManager.instance.showErrorDialog(
+        context,
+        '采集数据未提交,不允许查看指令！',
+      );
+      return;
+    }
+
+    await Modular.to.pushNamed(
+      '/aswh-down/wcs',
+      arguments: {
+        'taskComment': widget.task.taskComment ?? '',
+        'taskId': widget.task.outTaskId.toString(),
+        'taskType': '00',
+      },
+    );
+  }
+
+  Future<void> _promptAllTrayCount() async {
+    final controller = TextEditingController(text: '1');
+    String? errorText;
+
+    final result = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('获取来料托盘数量'),
+              content: TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: '托盘数量',
+                  errorText: errorText,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final value = int.tryParse(controller.text.trim());
+                    if (value == null || value <= 0) {
+                      setState(() {
+                        errorText = '请输入大于 0 的整数';
+                      });
+                      return;
+                    }
+                    Navigator.of(dialogContext).pop(value);
+                  },
+                  child: const Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    controller.dispose();
+
+    if (result == null) {
+      return;
+    }
+
+    _bloc.add(OnlinePickCollectionAllTrayRequested(result));
   }
 
   Widget _buildModeAction(OnlinePickCollectionMode currentMode) {

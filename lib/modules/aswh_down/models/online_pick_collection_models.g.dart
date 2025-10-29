@@ -151,13 +151,20 @@ class OnlinePickCollectionCacheSnapshotAdapter
       pendingQuantity: fields[8] as num?,
       mode: fields[9] as String,
       expectedErpStore: fields[10] as String,
+      inventoryChecks: (fields[11] as List?)
+              ?.map((dynamic e) =>
+                  (e as Map).map((key, value) => MapEntry(key as String, value)))
+              .cast<Map<String, dynamic>>()
+              .toList() ??
+          const <Map<String, dynamic>>[],
+      destination: fields[12] as String? ?? '',
     );
   }
 
   @override
   void write(BinaryWriter writer, OnlinePickCollectionCacheSnapshot obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.stocks)
       ..writeByte(1)
@@ -179,7 +186,11 @@ class OnlinePickCollectionCacheSnapshotAdapter
       ..writeByte(9)
       ..write(obj.mode)
       ..writeByte(10)
-      ..write(obj.expectedErpStore);
+      ..write(obj.expectedErpStore)
+      ..writeByte(11)
+      ..write(obj.inventoryChecks)
+      ..writeByte(12)
+      ..write(obj.destination);
   }
 
   @override
@@ -362,6 +373,12 @@ _$OnlinePickCollectionCacheSnapshotImpl
           pendingQuantity: json['pendingQuantity'] as num?,
           mode: json['mode'] as String? ?? 'outbound',
           expectedErpStore: json['expectedErpStore'] as String? ?? '',
+          inventoryChecks: (json['inventoryChecks'] as List<dynamic>?)
+                  ?.map((dynamic e) =>
+                      (e as Map<String, dynamic>).map((key, value) => MapEntry(key, value)))
+                  .toList() ??
+              const <Map<String, dynamic>>[],
+          destination: json['destination'] as String? ?? '',
         );
 
 Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
@@ -378,4 +395,6 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'pendingQuantity': instance.pendingQuantity,
       'mode': instance.mode,
       'expectedErpStore': instance.expectedErpStore,
+      'inventoryChecks': instance.inventoryChecks,
+      'destination': instance.destination,
     };

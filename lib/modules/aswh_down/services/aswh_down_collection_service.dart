@@ -81,10 +81,7 @@ class AswhDownCollectionService {
       },
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    return response.data ?? <String, dynamic>{};
   }
 
   /// 根据库位查询库存（对应 `getMtlRepertoryByStoresiteNoSn`）。
@@ -106,10 +103,7 @@ class AswhDownCollectionService {
       },
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    return response.data ?? <String, dynamic>{};
   }
 
   /// 根据库位查询库存（ERP 子库校验，`getRepertoryByStoresiteNoErp`）。
@@ -125,10 +119,7 @@ class AswhDownCollectionService {
       },
     );
 
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
-    );
+    return response.data ?? <String, dynamic>{};
   }
 
   /// 提交自动化仓库下架（对应 `CommitASWHDownShelves`）。
