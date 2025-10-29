@@ -7,6 +7,7 @@ import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_colle
 import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_collection_event.dart';
 import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_collection_state.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
+import 'package:wms_app/modules/aswh_down/models/online_pick_task_models.dart';
 import 'package:wms_app/modules/aswh_down/services/aswh_down_collection_service.dart';
 import 'package:wms_app/modules/aswh_down/services/aswh_down_task_service.dart';
 import 'package:wms_app/services/user_manager.dart';
@@ -22,6 +23,10 @@ void main() {
 
   setUp(() {
     bloc = OnlinePickCollectionBloc(
+      task: const OnlinePickTask(
+        outTaskId: 1,
+        outTaskNo: 'TASK-001',
+      ),
       taskService: _MockTaskService(),
       collectionService: _MockCollectionService(),
       userManager: _MockUserManager(),

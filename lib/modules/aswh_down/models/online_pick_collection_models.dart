@@ -134,6 +134,52 @@ class OnlinePickTrayConfirm with _$OnlinePickTrayConfirm {
       _$OnlinePickTrayConfirmFromJson(json);
 }
 
+/// 异常补录提交信息。
+class OnlinePickExceptionSubmission {
+  const OnlinePickExceptionSubmission({
+    required this.materialCode,
+    required this.quantity,
+    this.materialName = '',
+    this.unit = '',
+    this.storeSite = '',
+    this.batchNo = '',
+    this.serialNumber = '',
+    this.exceptionType = '',
+    this.description = '',
+    this.trayNo = '',
+  });
+
+  /// 物料编码。
+  final String materialCode;
+
+  /// 物料名称。
+  final String materialName;
+
+  /// 异常数量。
+  final num quantity;
+
+  /// 计量单位。
+  final String unit;
+
+  /// 库位编码。
+  final String storeSite;
+
+  /// 批次号。
+  final String batchNo;
+
+  /// 序列号。
+  final String serialNumber;
+
+  /// 异常类型编码。
+  final String exceptionType;
+
+  /// 异常描述。
+  final String description;
+
+  /// 托盘号。
+  final String trayNo;
+}
+
 /// 采集缓存快照，用于 Hive 存储与恢复。
 @freezed
 @HiveType(typeId: 42)
