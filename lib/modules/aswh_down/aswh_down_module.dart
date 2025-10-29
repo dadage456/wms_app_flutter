@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:wms_app/app_module.dart';
+import 'package:wms_app/modules/aswh_down/collection_task/bloc/online_pick_collection_bloc.dart';
+import 'package:wms_app/modules/aswh_down/collection_task/online_pick_collection_page.dart';
+import 'package:wms_app/modules/aswh_down/collection_task/online_pick_collection_result_page.dart';
 import 'package:wms_app/services/dio_client.dart';
 import 'package:wms_app/services/user_manager.dart';
 
@@ -133,11 +136,13 @@ class AswhDownModule extends Module {
         final args = Modular.args.data as Map<String, dynamic>? ?? {};
         final stockPayload = args['stocks'] as List<dynamic>? ?? const [];
         final stocks = stockPayload
-            .map((item) => item is OnlinePickCollectionStock
-                ? item
-                : OnlinePickCollectionStock.fromJson(
-                    Map<String, dynamic>.from(item as Map),
-                  ))
+            .map(
+              (item) => item is OnlinePickCollectionStock
+                  ? item
+                  : OnlinePickCollectionStock.fromJson(
+                      Map<String, dynamic>.from(item as Map),
+                    ),
+            )
             .toList(growable: false);
         return OnlinePickCollectionResultPage(initialStocks: stocks);
       },

@@ -62,7 +62,6 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   @override
   void dispose() {
     _tabController.dispose();
-    _scannerController.dispose();
     super.dispose();
   }
 
@@ -149,9 +148,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 onPressed: () => _handleBack(state),
               ),
-              actions: [
-                _buildModeAction(state.currentMode),
-              ],
+              actions: [_buildModeAction(state.currentMode)],
             ),
             body: Column(
               children: [
@@ -205,10 +202,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
         _bloc.add(OnlinePickCollectionScanSubmitted(value));
       },
       onError: (message) {
-        LoadingDialogManager.instance.showErrorDialog(
-          context,
-          message,
-        );
+        LoadingDialogManager.instance.showErrorDialog(context, message);
       },
     );
   }
@@ -233,10 +227,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
               const Spacer(),
               Text(
                 '库存核对：$inventoryCount',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF666666),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
               ),
             ],
           ),
@@ -265,7 +256,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.edit_location_alt, color: Color(0xFF1976D2)),
+                icon: const Icon(
+                  Icons.edit_location_alt,
+                  color: Color(0xFF1976D2),
+                ),
                 tooltip: '选择拣选口',
                 onPressed: () => _selectDestination(state),
               ),
@@ -281,11 +275,16 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
             state.expectedErpStore ?? '-',
           ),
           const SizedBox(height: 8),
-          _buildInfoRow('批次', barcode?.batchNo ?? '-', '序列', barcode?.serialNumber ?? '-'),
+          _buildInfoRow(
+            '批次',
+            barcode?.batchNo ?? '-',
+            '序列',
+            barcode?.serialNumber ?? '-',
+          ),
           const SizedBox(height: 8),
           _buildInfoRow(
             '数量',
-            (state.pendingQuantity ?? 0).toFormatString(),
+            (state.pendingQuantity ?? 0).toDouble().toFormatString(),
             '已采集',
             state.collectedStocks.length.toString(),
           ),
@@ -294,17 +293,19 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
   }
 
-  Widget _buildInfoRow(String leftLabel, String leftValue, String rightLabel, String rightValue) {
+  Widget _buildInfoRow(
+    String leftLabel,
+    String leftValue,
+    String rightLabel,
+    String rightValue,
+  ) {
     return Row(
       children: [
         Expanded(
           child: Text.rich(
             TextSpan(
               text: '$leftLabel：',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF555555),
-              ),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF555555)),
               children: [
                 TextSpan(
                   text: leftValue.isEmpty ? '-' : leftValue,
@@ -322,10 +323,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
           child: Text.rich(
             TextSpan(
               text: '$rightLabel：',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF555555),
-              ),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF555555)),
               children: [
                 TextSpan(
                   text: rightValue.isEmpty ? '-' : rightValue,
@@ -405,7 +403,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -1)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, -1),
+          ),
         ],
       ),
       child: Row(
@@ -430,11 +432,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: state.collectedStocks.isEmpty ||
-                      state.inventoryQtyMap.isEmpty
+              onPressed:
+                  state.collectedStocks.isEmpty || state.inventoryQtyMap.isEmpty
                   ? null
                   : () =>
-                      _bloc.add(const OnlinePickCollectionCommitRequested()),
+                        _bloc.add(const OnlinePickCollectionCommitRequested()),
               icon: const Icon(Icons.cloud_upload_outlined),
               label: const Text('提交'),
             ),
@@ -455,18 +457,18 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   Future<void> _openCollectionResult(OnlinePickCollectionState state) async {
     final result = await Modular.to.pushNamed<Map<String, dynamic>>(
       '/aswh-down/collect/result',
-      arguments: {
-        'stocks': state.collectedStocks,
-      },
+      arguments: {'stocks': state.collectedStocks},
     );
 
     if (result == null) return;
 
-    final remaining = (result['stocks'] as List?)
+    final remaining =
+        (result['stocks'] as List?)
             ?.whereType<OnlinePickCollectionStock>()
             .toList(growable: false) ??
         const <OnlinePickCollectionStock>[];
-    final deleted = (result['deleted'] as List?)
+    final deleted =
+        (result['deleted'] as List?)
             ?.whereType<OnlinePickCollectionStock>()
             .toList(growable: false) ??
         const <OnlinePickCollectionStock>[];
@@ -475,26 +477,18 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       _bloc.add(OnlinePickCollectionStocksDeleted(deleted));
     }
 
-    _bloc.add(
-      OnlinePickCollectionStocksSynced(
-        remaining,
-        shouldReplace: true,
-      ),
-    );
+    _bloc.add(OnlinePickCollectionStocksSynced(remaining, shouldReplace: true));
   }
 
   Future<void> _openInventoryDialog(OnlinePickCollectionState state) async {
     if (state.collectedStocks.isEmpty) {
-      LoadingDialogManager.instance.showErrorDialog(
-        context,
-        '暂无采集数据，无法核对库存',
-      );
+      LoadingDialogManager.instance.showErrorDialog(context, '暂无采集数据，无法核对库存');
       return;
     }
 
     final optionsMap = LinkedHashMap<String, _InventoryOption>();
     final detailMap = {
-      for (final detail in state.inventoryCheckDetails) detail.key: detail
+      for (final detail in state.inventoryCheckDetails) detail.key: detail,
     };
     for (final stock in state.collectedStocks) {
       final site = (stock.storeSite ?? '').trim();
@@ -541,10 +535,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
     String selectedKey = optionsMap.keys.first;
     final controller = TextEditingController(
-      text: (detailMap[selectedKey]?.quantity ??
-              state.inventoryQtyMap[selectedKey] ??
-              0)
-          .toFormatString(),
+      text:
+          (detailMap[selectedKey]?.quantity ??
+                  state.inventoryQtyMap[selectedKey] ??
+                  0)
+              .toFormatString(),
     );
     String? errorText;
 
@@ -561,9 +556,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 children: [
                   DropdownButtonFormField<String>(
                     value: selectedKey,
-                    decoration: const InputDecoration(
-                      labelText: '选择核对对象',
-                    ),
+                    decoration: const InputDecoration(labelText: '选择核对对象'),
                     items: optionsMap.values
                         .map(
                           (option) => DropdownMenuItem<String>(
@@ -577,10 +570,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       setState(() {
                         selectedKey = value;
                         final detail = detailMap[selectedKey];
-                        controller.text = (detail?.quantity ??
-                                state.inventoryQtyMap[selectedKey] ??
-                                0)
-                            .toFormatString();
+                        controller.text =
+                            (detail?.quantity ??
+                                    state.inventoryQtyMap[selectedKey] ??
+                                    0)
+                                .toFormatString();
                         errorText = null;
                       });
                     },
@@ -601,10 +595,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                     const SizedBox(height: 12),
                     const Text(
                       '已记录的结余：',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF666666),
-                      ),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
                     ),
                     const SizedBox(height: 6),
                     SizedBox(
@@ -619,7 +610,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                               '库位 ${detail.storeSite} · 物料 ${detail.materialCode}',
                               style: const TextStyle(fontSize: 13),
                             ),
-                            subtitle: (detail.batchNo?.isNotEmpty ?? false) ||
+                            subtitle:
+                                (detail.batchNo?.isNotEmpty ?? false) ||
                                     (detail.trayNo?.isNotEmpty ?? false)
                                 ? Text(
                                     [
@@ -661,10 +653,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       });
                       return;
                     }
-                    Navigator.of(context).pop({
-                      'key': selectedKey,
-                      'quantity': value,
-                    });
+                    Navigator.of(
+                      context,
+                    ).pop({'key': selectedKey, 'quantity': value});
                   },
                   child: const Text('保存'),
                 ),
@@ -705,7 +696,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
   String _destinationLabel(OnlinePickCollectionState state) {
     if (state.locationOptions.isEmpty) {
-      return state.selectedDestination.isEmpty ? '未维护' : state.selectedDestination;
+      return state.selectedDestination.isEmpty
+          ? '未维护'
+          : state.selectedDestination;
     }
 
     final normalized = state.selectedDestination.trim().toUpperCase();
@@ -722,10 +715,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
   Future<void> _selectDestination(OnlinePickCollectionState state) async {
     if (state.locationOptions.isEmpty) {
-      LoadingDialogManager.instance.showErrorDialog(
-        context,
-        '立体库进出口相关位置未维护!',
-      );
+      LoadingDialogManager.instance.showErrorDialog(context, '立体库进出口相关位置未维护!');
       return;
     }
 
@@ -737,7 +727,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
           children: state.locationOptions
               .map(
                 (option) => SimpleDialogOption(
-                  onPressed: () => Navigator.of(dialogContext).pop(option.value),
+                  onPressed: () =>
+                      Navigator.of(dialogContext).pop(option.value),
                   child: Text(option.label),
                 ),
               )
@@ -909,7 +900,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 child: Row(
                   children: [
                     if (mode.code == currentMode.code)
-                      const Icon(Icons.check, color: Color(0xFF1976D2), size: 18)
+                      const Icon(
+                        Icons.check,
+                        color: Color(0xFF1976D2),
+                        size: 18,
+                      )
                     else
                       const SizedBox(width: 18),
                     const SizedBox(width: 8),
