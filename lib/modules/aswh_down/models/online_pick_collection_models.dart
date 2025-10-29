@@ -93,6 +93,108 @@ class OnlinePickLocationOption with _$OnlinePickLocationOption {
       _$OnlinePickLocationOptionFromJson(json);
 }
 
+/// 结余库存采集记录。
+class OnlinePickInventoryCheck {
+  const OnlinePickInventoryCheck({
+    required this.checkId,
+    required this.materialCode,
+    this.trayNo,
+    this.storeSite,
+    this.quantity = 0,
+  });
+
+  /// 记录唯一标识，对应后端 `stockid`。
+  final String checkId;
+
+  /// 物料编码。
+  final String materialCode;
+
+  /// 托盘号。
+  final String? trayNo;
+
+  /// 库位编码。
+  final String? storeSite;
+
+  /// 结余数量。
+  final num quantity;
+
+  OnlinePickInventoryCheck copyWith({
+    String? checkId,
+    String? materialCode,
+    String? trayNo,
+    String? storeSite,
+    num? quantity,
+  }) {
+    return OnlinePickInventoryCheck(
+      checkId: checkId ?? this.checkId,
+      materialCode: materialCode ?? this.materialCode,
+      trayNo: trayNo ?? this.trayNo,
+      storeSite: storeSite ?? this.storeSite,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  factory OnlinePickInventoryCheck.fromJson(Map<String, dynamic> json) {
+    final rawCheckId = json['stockid'] ?? json['checkId'];
+    final rawMaterial = json['matCode'] ?? json['materialCode'];
+    final rawQuantity = json['collectQty'] ?? json['quantity'] ?? 0;
+
+    num parsedQuantity;
+    if (rawQuantity is num) {
+      parsedQuantity = rawQuantity;
+    } else if (rawQuantity is String) {
+      parsedQuantity = double.tryParse(rawQuantity) ?? 0;
+    } else {
+      parsedQuantity = 0;
+    }
+
+    return OnlinePickInventoryCheck(
+      checkId: rawCheckId is String ? rawCheckId : rawCheckId?.toString() ?? '',
+      materialCode:
+          rawMaterial is String ? rawMaterial : rawMaterial?.toString() ?? '',
+      trayNo: json['trayNo'] as String?,
+      storeSite: json['storeSite'] as String?,
+      quantity: parsedQuantity,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'stockid': checkId,
+      'matCode': materialCode,
+      'trayNo': trayNo,
+      'storeSite': storeSite,
+      'collectQty': quantity,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'OnlinePickInventoryCheck(checkId: $checkId, materialCode: $materialCode, trayNo: $trayNo, storeSite: $storeSite, quantity: $quantity)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is OnlinePickInventoryCheck &&
+        other.checkId == checkId &&
+        other.materialCode == materialCode &&
+        other.trayNo == trayNo &&
+        other.storeSite == storeSite &&
+        other.quantity == quantity;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        checkId,
+        materialCode,
+        trayNo,
+        storeSite,
+        quantity,
+      );
+}
+
 @freezed
 class OnlinePickCollectionQuery with _$OnlinePickCollectionQuery {
   const factory OnlinePickCollectionQuery({

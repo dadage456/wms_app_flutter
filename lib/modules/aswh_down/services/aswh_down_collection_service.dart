@@ -217,12 +217,14 @@ class AswhDownCollectionService {
   Future<Map<String, dynamic>> commitDownShelves({
     required List<Map<String, dynamic>> downShelvesInfos,
     required List<Map<String, dynamic>> itemListInfos,
+    List<Map<String, dynamic>> inventoryCheckInfos = const [],
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitDownShelves',
       data: {
         'downShelvesInfos': downShelvesInfos,
         'itemListInfos': itemListInfos,
+        'invCheckInfos': inventoryCheckInfos,
       },
       options: Options(
         headers: {'content-type': 'application/json;charset=UTF-8'},
@@ -239,12 +241,14 @@ class AswhDownCollectionService {
   Future<Map<String, dynamic>> commitTrayDownShelves({
     required List<Map<String, dynamic>> downShelvesInfos,
     required List<Map<String, dynamic>> itemListInfos,
+    List<Map<String, dynamic>> inventoryCheckInfos = const [],
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       '/system/terminal/commitTrayDownShelves',
       data: {
         'downShelvesInfos': downShelvesInfos,
         'itemListInfos': itemListInfos,
+        'invCheckInfos': inventoryCheckInfos,
       },
       options: Options(
         headers: {'content-type': 'application/json;charset=UTF-8'},
@@ -405,23 +409,4 @@ class AswhDownCollectionService {
     );
   }
 
-  /// 获取出入库位置（对应 `getInOutLocation`）。
-  Future<List<OnlinePickLocationOption>> fetchInOutLocations({
-    required String locationType,
-  }) async {
-    final response = await _dio.get<Map<String, dynamic>>(
-      '/system/terminal/getInOutLocation',
-      queryParameters: {'locationType': locationType},
-    );
-
-    return ApiResponseHandler.handleResponse(
-      response: response,
-      dataExtractor: (data) => (data as List<dynamic>)
-          .map(
-            (item) =>
-                OnlinePickLocationOption.fromJson(item as Map<String, dynamic>),
-          )
-          .toList(),
-    );
-  }
 }
