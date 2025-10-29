@@ -36,6 +36,7 @@ class OnlinePickCollectionState extends Equatable {
     this.selectedTaskItemId,
     this.selectedCollectingItemId,
     this.activeSelectionSource,
+    this.dispatchedTrayNos = const <String>{},
   });
 
   final CollectionStatus status;
@@ -63,6 +64,7 @@ class OnlinePickCollectionState extends Equatable {
   final int? selectedTaskItemId;
   final int? selectedCollectingItemId;
   final OnlinePickSelectionSource? activeSelectionSource;
+  final Set<String> dispatchedTrayNos;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -96,6 +98,7 @@ class OnlinePickCollectionState extends Equatable {
     bool clearSelectedCollectingItem = false,
     OnlinePickSelectionSource? activeSelectionSource,
     bool clearActiveSelectionSource = false,
+    Set<String>? dispatchedTrayNos,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -133,6 +136,7 @@ class OnlinePickCollectionState extends Equatable {
       activeSelectionSource: clearActiveSelectionSource
           ? null
           : (activeSelectionSource ?? this.activeSelectionSource),
+      dispatchedTrayNos: dispatchedTrayNos ?? this.dispatchedTrayNos,
     );
   }
 
@@ -163,5 +167,6 @@ class OnlinePickCollectionState extends Equatable {
         selectedTaskItemId,
         selectedCollectingItemId,
         activeSelectionSource,
+        dispatchedTrayNos,
       ];
 }

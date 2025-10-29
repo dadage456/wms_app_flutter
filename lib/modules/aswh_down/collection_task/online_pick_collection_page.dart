@@ -213,6 +213,10 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     final barcode = state.barcodeContent;
     final destinationLabel = _destinationLabel(state);
     final inventoryCount = state.inventoryCheckDetails.length;
+    final isDestinationSelected = state.selectedDestination.trim().isNotEmpty;
+    final destinationColor = isDestinationSelected
+        ? const Color(0xFF222222)
+        : const Color(0xFFD32F2F);
 
     return Container(
       width: double.infinity,
@@ -247,9 +251,9 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                     children: [
                       TextSpan(
                         text: destinationLabel,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF222222),
+                          color: destinationColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -804,8 +808,11 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
     final option = state.locationOptions.firstWhere(
       (element) => element.value.trim().toUpperCase() == normalized,
-      orElse: () => state.locationOptions.first,
+      orElse: () => const OnlinePickLocationOption(label: '', value: ''),
     );
+    if (option.value.trim().isEmpty) {
+      return '未选择';
+    }
     return option.label;
   }
 
@@ -876,41 +883,61 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
               ListTile(
                 leading: const Icon(Icons.exit_to_app),
                 title: const Text('空盘出库'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  _bloc.add(const OnlinePickCollectionEmptyTrayOutRequested());
+                  await _handleWcsCommand(
+                    actionName: '空盘出库',
+                    onConfirmed: () async {
+                      _bloc.add(const OnlinePickCollectionEmptyTrayOutRequested());
+                    },
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.download_outlined),
                 title: const Text('空盘入库'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  _bloc.add(const OnlinePickCollectionEmptyTrayInRequested());
+                  await _handleWcsCommand(
+                    actionName: '空盘入库',
+                    onConfirmed: () async {
+                      _bloc.add(const OnlinePickCollectionEmptyTrayInRequested());
+                    },
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.move_to_inbox),
                 title: const Text('单个托盘'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  _bloc.add(const OnlinePickCollectionSingleTrayRequested());
+                  await _handleWcsCommand(
+                    actionName: '单个托盘',
+                    onConfirmed: () async {
+                      _bloc.add(const OnlinePickCollectionSingleTrayRequested());
+                    },
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.assignment_return_outlined),
                 title: const Text('回库'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  _bloc.add(const OnlinePickCollectionReturnTrayRequested());
+                  await _handleWcsCommand(
+                    actionName: '托盘回库',
+                    onConfirmed: () async {
+                      _bloc.add(const OnlinePickCollectionReturnTrayRequested());
+                    },
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.all_inbox),
                 title: const Text('全部托盘'),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(sheetContext).pop();
-                  _promptAllTrayCount();
+                  await _handleAllTrayCommand();
                 },
               ),
             ],
@@ -939,7 +966,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
   }
 
-  Future<void> _promptAllTrayCount() async {
+  Future<int?> _promptAllTrayCount() async {
     final controller = TextEditingController(text: '1');
     String? errorText;
 
@@ -985,11 +1012,104 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
 
     controller.dispose();
 
+    return result;
+  }
+
+  Future<void> _handleAllTrayCommand() async {
+    if (!await _ensureDestinationSelected()) {
+      return;
+    }
+
+    final result = await _promptAllTrayCount();
     if (result == null) {
       return;
     }
 
+    final confirmed = await _showWcsConfirmDialog(
+      '全部托盘',
+      extraMessage: '本次将尝试下发$result个托盘',
+    );
+    if (!confirmed) {
+      return;
+    }
+
     _bloc.add(OnlinePickCollectionAllTrayRequested(result));
+  }
+
+  Future<void> _handleWcsCommand({
+    required String actionName,
+    required Future<void> Function() onConfirmed,
+    String? extraMessage,
+  }) async {
+    if (!await _ensureDestinationSelected()) {
+      return;
+    }
+
+    final confirmed = await _showWcsConfirmDialog(
+      actionName,
+      extraMessage: extraMessage,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    await onConfirmed();
+  }
+
+  Future<bool> _ensureDestinationSelected() async {
+    var currentState = _bloc.state;
+    if (currentState.locationOptions.isEmpty) {
+      LoadingDialogManager.instance
+          .showErrorDialog(context, '立体库进出口相关位置未维护!');
+      return false;
+    }
+
+    if (currentState.selectedDestination.trim().isNotEmpty) {
+      return true;
+    }
+
+    await _selectDestination(currentState);
+    currentState = _bloc.state;
+    if (currentState.selectedDestination.trim().isNotEmpty) {
+      return true;
+    }
+
+    LoadingDialogManager.instance
+        .showErrorDialog(context, '请先选择拣选口后再下达指令');
+    return false;
+  }
+
+  Future<bool> _showWcsConfirmDialog(
+    String actionName, {
+    String? extraMessage,
+  }) async {
+    final destinationLabel = _destinationLabel(_bloc.state);
+    final buffer = StringBuffer('确认下达【$actionName】指令？\n拣选口：$destinationLabel');
+    if (extraMessage != null && extraMessage.isNotEmpty) {
+      buffer.write('\n$extraMessage');
+    }
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('确认$actionName'),
+          content: Text(buffer.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   Future<void> _showModeSelector(OnlinePickCollectionState state) async {

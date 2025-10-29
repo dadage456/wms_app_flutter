@@ -163,13 +163,17 @@ class OnlinePickCollectionCacheSnapshotAdapter
       pendingMaterialCode: fields[15] as String?,
       pendingBatchNo: fields[16] as String?,
       pendingTrayNo: fields[17] as String?,
+      dispatchedTrayNos: (fields[18] as List?)
+              ?.map((dynamic e) => e as String)
+              .toList() ??
+          const <String>[],
     );
   }
 
   @override
   void write(BinaryWriter writer, OnlinePickCollectionCacheSnapshot obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.stocks)
       ..writeByte(1)
@@ -205,7 +209,9 @@ class OnlinePickCollectionCacheSnapshotAdapter
       ..writeByte(16)
       ..write(obj.pendingBatchNo)
       ..writeByte(17)
-      ..write(obj.pendingTrayNo);
+      ..write(obj.pendingTrayNo)
+      ..writeByte(18)
+      ..write(obj.dispatchedTrayNos);
   }
 
   @override
@@ -399,6 +405,10 @@ _$OnlinePickCollectionCacheSnapshotImpl
           pendingMaterialCode: json['pendingMaterialCode'] as String?,
           pendingBatchNo: json['pendingBatchNo'] as String?,
           pendingTrayNo: json['pendingTrayNo'] as String?,
+          dispatchedTrayNos: (json['dispatchedTrayNos'] as List<dynamic>?)
+                  ?.map((e) => e as String)
+                  .toList() ??
+              const <String>[],
         );
 
 Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
@@ -422,4 +432,5 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'pendingMaterialCode': instance.pendingMaterialCode,
       'pendingBatchNo': instance.pendingBatchNo,
       'pendingTrayNo': instance.pendingTrayNo,
+      'dispatchedTrayNos': instance.dispatchedTrayNos,
     };
