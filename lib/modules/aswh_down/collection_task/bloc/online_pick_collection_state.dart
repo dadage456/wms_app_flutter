@@ -3,6 +3,8 @@ import 'package:wms_app/models/page_status.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_collection_models.dart';
 import 'package:wms_app/modules/aswh_down/models/online_pick_task_item_models.dart';
 
+enum OnlinePickSelectionSource { taskList, collectingList }
+
 class OnlinePickCollectionState extends Equatable {
   const OnlinePickCollectionState({
     this.status = const CollectionStatus(CollectionStatusType.normal),
@@ -31,6 +33,9 @@ class OnlinePickCollectionState extends Equatable {
     this.selectedDestination = '',
     this.isInventoryEntryPending = false,
     this.pendingInventoryDetail,
+    this.selectedTaskItemId,
+    this.selectedCollectingItemId,
+    this.activeSelectionSource,
   });
 
   final CollectionStatus status;
@@ -55,6 +60,9 @@ class OnlinePickCollectionState extends Equatable {
   final String selectedDestination;
   final bool isInventoryEntryPending;
   final OnlinePickInventoryCheckDetail? pendingInventoryDetail;
+  final int? selectedTaskItemId;
+  final int? selectedCollectingItemId;
+  final OnlinePickSelectionSource? activeSelectionSource;
 
   OnlinePickCollectionState copyWith({
     CollectionStatus? status,
@@ -82,6 +90,12 @@ class OnlinePickCollectionState extends Equatable {
     bool? isInventoryEntryPending,
     OnlinePickInventoryCheckDetail? pendingInventoryDetail,
     bool clearPendingInventoryDetail = false,
+    int? selectedTaskItemId,
+    bool clearSelectedTaskItem = false,
+    int? selectedCollectingItemId,
+    bool clearSelectedCollectingItem = false,
+    OnlinePickSelectionSource? activeSelectionSource,
+    bool clearActiveSelectionSource = false,
   }) {
     return OnlinePickCollectionState(
       status: status ?? this.status,
@@ -110,6 +124,15 @@ class OnlinePickCollectionState extends Equatable {
       pendingInventoryDetail: clearPendingInventoryDetail
           ? null
           : (pendingInventoryDetail ?? this.pendingInventoryDetail),
+      selectedTaskItemId: clearSelectedTaskItem
+          ? null
+          : (selectedTaskItemId ?? this.selectedTaskItemId),
+      selectedCollectingItemId: clearSelectedCollectingItem
+          ? null
+          : (selectedCollectingItemId ?? this.selectedCollectingItemId),
+      activeSelectionSource: clearActiveSelectionSource
+          ? null
+          : (activeSelectionSource ?? this.activeSelectionSource),
     );
   }
 
@@ -137,5 +160,8 @@ class OnlinePickCollectionState extends Equatable {
         selectedDestination,
         isInventoryEntryPending,
         pendingInventoryDetail,
+        selectedTaskItemId,
+        selectedCollectingItemId,
+        activeSelectionSource,
       ];
 }

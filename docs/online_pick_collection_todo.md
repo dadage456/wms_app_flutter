@@ -60,3 +60,16 @@
 - [x] **采集页面交互测试补齐**
   为“更多”操作栏与库存核对弹窗添加 Widget 测试，验证缺失功能入口与结余记录渲染逻辑。
   - ✅ `online_pick_collection_page_more_test.dart` 覆盖操作栏指令触发与库存核对弹窗的数据回填、保存事件。【F:test/modules/aswh_down/collection_task/online_pick_collection_page_more_test.dart†L1-L173】
+
+- [x] **托盘指令支持任务行选择**
+  任务列表与正在采集列表需提供勾选能力，优先使用选中行的库位/托盘发起“单个托盘”等 WCS 指令，未勾选时回退到扫码托盘信息。
+  - ✅ 任务与采集中数据网格开启复选列，Bloc 状态记录所选明细并在单托盘指令中优先取用选中库位/托盘，未选中时回退当前扫码托盘。【F:lib/modules/aswh_down/collection_task/online_pick_collection_page.dart†L371-L456】【F:lib/modules/aswh_down/collection_task/bloc/online_pick_collection_state.dart†L6-L136】【F:lib/modules/aswh_down/collection_task/bloc/online_pick_collection_bloc.dart†L990-L1263】
+- [x] **提交成功恢复默认采集模式**
+  成功提交后，应清空选中状态并将采集模式重置为“正常出库”，占位提示恢复到托盘起始步骤。
+  - ✅ 提交成功分支重置采集模式、步骤占位与选中行状态，返回任务列表页签保持初始态，避免遗留异常模式与勾选记录。【F:lib/modules/aswh_down/collection_task/bloc/online_pick_collection_bloc.dart†L1600-L1629】
+- [x] **“更多”菜单补充采集模式入口**
+  除 AppBar 快捷菜单外，底部“更多”弹层需要提供采集模式选择，以对齐 UniApp 的操作路径。
+  - ✅ “更多”菜单新增采集模式入口并共享同一 `OnlinePickCollectionModeChanged` 事件，确保 AppBar 菜单与底部弹层状态同步。【F:lib/modules/aswh_down/collection_task/online_pick_collection_page.dart†L843-L1029】
+- [x] **库存结余累加策略**
+  同库位/物料/批次(托盘)重复录入结余数量时，需要在内存与列表中累计显示，配合数量校验逻辑扣减正确的剩余额。
+  - ✅ 核对记录按库位/物料/批次(托盘)累加结余数量并回写列表，同时库存核对弹窗改为录入“新增结余数量”以匹配累计策略。【F:lib/modules/aswh_down/collection_task/bloc/online_pick_collection_bloc.dart†L1066-L1099】【F:lib/modules/aswh_down/collection_task/online_pick_collection_page.dart†L642-L688】

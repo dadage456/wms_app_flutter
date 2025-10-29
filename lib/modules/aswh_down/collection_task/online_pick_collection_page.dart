@@ -175,8 +175,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildTaskGrid(state.taskItems),
-                      _buildCollectingGrid(state.collectingItems),
+                      _buildTaskGrid(state),
+                      _buildCollectingGrid(state),
                       _buildInventoryGrid(state.inventoryCheckDetails),
                     ],
                   ),
@@ -368,33 +368,92 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     );
   }
 
-  Widget _buildTaskGrid(List<OnlinePickTaskItem> items) {
+  List<int> _selectedRowsFor(
+    List<OnlinePickTaskItem> items,
+    int? selectedId,
+  ) {
+    if (selectedId == null) {
+      return const <int>[];
+    }
+
+    final index = items.indexWhere((item) => item.outTaskItemId == selectedId);
+    if (index < 0) {
+      return const <int>[];
+    }
+
+    return <int>[index];
+  }
+
+  Widget _buildTaskGrid(OnlinePickCollectionState state) {
+    final items = state.taskItems;
+    final selectedRows = _selectedRowsFor(items, state.selectedTaskItemId);
+
     return CommonDataGrid<OnlinePickTaskItem>(
       columns: OnlinePickCollectionGridConfig.taskColumns(),
       datas: items,
       allowPager: false,
-      allowSelect: false,
+      allowSelect: true,
       currentPage: 1,
       totalPages: 1,
       onLoadData: (_) async {},
-      selectedRows: const [],
+      selectedRows: selectedRows,
+      onSelectionChanged: (rows) {
+        if (rows.isEmpty) {
+          _bloc.add(const OnlinePickCollectionTaskSelectionChanged());
+          return;
+        }
+
+        final index = rows.last;
+        if (index < 0 || index >= items.length) {
+          return;
+        }
+
+        final selectedItem = items[index];
+        _bloc.add(
+          OnlinePickCollectionTaskSelectionChanged(
+            selectedItemId: selectedItem.outTaskItemId,
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildCollectingGrid(List<OnlinePickTaskItem> items) {
+  Widget _buildCollectingGrid(OnlinePickCollectionState state) {
+    final items = state.collectingItems;
     if (items.isEmpty) {
       return const Center(child: Text('暂无采集中记录'));
     }
 
+    final selectedRows =
+        _selectedRowsFor(items, state.selectedCollectingItemId);
+
     return CommonDataGrid<OnlinePickTaskItem>(
       columns: OnlinePickCollectionGridConfig.taskColumns(),
       datas: items,
       allowPager: false,
-      allowSelect: false,
+      allowSelect: true,
       currentPage: 1,
       totalPages: 1,
       onLoadData: (_) async {},
-      selectedRows: const [],
+      selectedRows: selectedRows,
+      onSelectionChanged: (rows) {
+        if (rows.isEmpty) {
+          _bloc.add(const OnlinePickCollectionCollectingSelectionChanged());
+          return;
+        }
+
+        final index = rows.last;
+        if (index < 0 || index >= items.length) {
+          return;
+        }
+
+        final selectedItem = items[index];
+        _bloc.add(
+          OnlinePickCollectionCollectingSelectionChanged(
+            selectedItemId: selectedItem.outTaskItemId,
+          ),
+        );
+      },
     );
   }
 
@@ -581,13 +640,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     }
 
     String selectedKey = optionsMap.keys.first;
-    final controller = TextEditingController(
-      text:
-          (detailMap[selectedKey]?.quantity ??
-                  state.inventoryQtyMap[selectedKey] ??
-                  0)
-              .toFormatString(),
-    );
+    final controller = TextEditingController(text: '0');
     String? errorText;
 
     final result = await showDialog<Map<String, dynamic>>(
@@ -617,11 +670,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       setState(() {
                         selectedKey = value;
                         final detail = detailMap[selectedKey];
-                        controller.text =
-                            (detail?.quantity ??
-                                    state.inventoryQtyMap[selectedKey] ??
-                                    0)
-                                .toFormatString();
+                        controller.text = '0';
                         errorText = null;
                       });
                     },
@@ -633,8 +682,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                       decimal: true,
                     ),
                     decoration: InputDecoration(
-                      labelText: '结余数量',
-                      hintText: '请输入当前库位结余数量',
+                      labelText: '新增结余数量',
+                      hintText: '请输入本次新增的结余数量',
                       errorText: errorText,
                     ),
                   ),
@@ -808,6 +857,15 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.tune),
+                title: const Text('采集模式'),
+                subtitle: Text(state.currentMode.label),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _showModeSelector(state);
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.history),
                 title: const Text('查询指令'),
                 onTap: () {
@@ -932,6 +990,43 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
     }
 
     _bloc.add(OnlinePickCollectionAllTrayRequested(result));
+  }
+
+  Future<void> _showModeSelector(OnlinePickCollectionState state) async {
+    final selected = await showDialog<OnlinePickCollectionMode>(
+      context: context,
+      builder: (dialogContext) {
+        return SimpleDialog(
+          title: const Text('选择采集模式'),
+          children: _availableModes
+              .map(
+                (mode) => SimpleDialogOption(
+                  onPressed: () => Navigator.of(dialogContext).pop(mode),
+                  child: Row(
+                    children: [
+                      if (mode.code == state.currentMode.code)
+                        const Icon(
+                          Icons.check,
+                          color: Color(0xFF1976D2),
+                        )
+                      else
+                        const SizedBox(width: 24),
+                      const SizedBox(width: 8),
+                      Text(mode.label),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+
+    if (selected == null) {
+      return;
+    }
+
+    _bloc.add(OnlinePickCollectionModeChanged(selected));
   }
 
   Widget _buildModeAction(OnlinePickCollectionMode currentMode) {

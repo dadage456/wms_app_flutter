@@ -30,6 +30,9 @@ class OnlinePickCollectionBloc
     on<OnlinePickCollectionScanSubmitted>(_onScanSubmitted);
     on<OnlinePickCollectionStocksSynced>(_onStocksSynced);
     on<OnlinePickCollectionStocksDeleted>(_onStocksDeleted);
+    on<OnlinePickCollectionTaskSelectionChanged>(_onTaskSelectionChanged);
+    on<OnlinePickCollectionCollectingSelectionChanged>(
+        _onCollectingSelectionChanged);
     on<OnlinePickCollectionTabChanged>(_onTabChanged);
     on<OnlinePickCollectionStatusResetRequested>(_onStatusResetRequested);
     on<OnlinePickCollectionFocusRequested>(_onFocusRequested);
@@ -984,6 +987,82 @@ class OnlinePickCollectionBloc
     await _persistSnapshot();
   }
 
+  void _onTaskSelectionChanged(
+    OnlinePickCollectionTaskSelectionChanged event,
+    Emitter<OnlinePickCollectionState> emit,
+  ) {
+    final selectedId = event.selectedItemId;
+
+    if (selectedId == null) {
+      if (state.activeSelectionSource ==
+          OnlinePickSelectionSource.taskList) {
+        if (state.selectedCollectingItemId != null) {
+          emit(
+            state.copyWith(
+              clearSelectedTaskItem: true,
+              activeSelectionSource: OnlinePickSelectionSource.collectingList,
+            ),
+          );
+        } else {
+          emit(
+            state.copyWith(
+              clearSelectedTaskItem: true,
+              clearActiveSelectionSource: true,
+            ),
+          );
+        }
+      } else {
+        emit(state.copyWith(clearSelectedTaskItem: true));
+      }
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        selectedTaskItemId: selectedId,
+        activeSelectionSource: OnlinePickSelectionSource.taskList,
+      ),
+    );
+  }
+
+  void _onCollectingSelectionChanged(
+    OnlinePickCollectionCollectingSelectionChanged event,
+    Emitter<OnlinePickCollectionState> emit,
+  ) {
+    final selectedId = event.selectedItemId;
+
+    if (selectedId == null) {
+      if (state.activeSelectionSource ==
+          OnlinePickSelectionSource.collectingList) {
+        if (state.selectedTaskItemId != null) {
+          emit(
+            state.copyWith(
+              clearSelectedCollectingItem: true,
+              activeSelectionSource: OnlinePickSelectionSource.taskList,
+            ),
+          );
+        } else {
+          emit(
+            state.copyWith(
+              clearSelectedCollectingItem: true,
+              clearActiveSelectionSource: true,
+            ),
+          );
+        }
+      } else {
+        emit(state.copyWith(clearSelectedCollectingItem: true));
+      }
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        selectedCollectingItemId: selectedId,
+        activeSelectionSource: OnlinePickSelectionSource.collectingList,
+      ),
+    );
+  }
+
   Future<void> _onInventoryRecorded(
     OnlinePickCollectionInventoryRecorded event,
     Emitter<OnlinePickCollectionState> emit,
@@ -994,18 +1073,20 @@ class OnlinePickCollectionBloc
       batchNo: event.batchNo,
       trayNo: event.trayNo,
     );
-
-    _manualInventoryMap[key] = event.quantity.toDouble();
+    final normalizedKey = key.toUpperCase();
+    final delta = event.quantity.toDouble();
+    final accumulated = (_manualInventoryMap[normalizedKey] ?? 0.0) + delta;
+    _manualInventoryMap[normalizedKey] = accumulated;
 
     final detail = OnlinePickInventoryCheckDetail(
-      key: key,
+      key: normalizedKey,
       storeSite: event.storeSite.toUpperCase(),
       materialCode: event.materialCode.toUpperCase(),
       batchNo: event.batchNo?.toUpperCase(),
       trayNo: event.trayNo?.toUpperCase(),
-      quantity: event.quantity.toDouble(),
+      quantity: accumulated,
     );
-    _inventoryCheckDetailMap[key.toUpperCase()] = detail;
+    _inventoryCheckDetailMap[normalizedKey] = detail;
 
     emit(
       state.copyWith(
@@ -1134,15 +1215,31 @@ class OnlinePickCollectionBloc
     OnlinePickCollectionSingleTrayRequested event,
     Emitter<OnlinePickCollectionState> emit,
   ) async {
-    final error = _commandPrecheck();
+    final selectedItem = _resolveSelectedTaskItem();
+    final hasSelectedTray =
+        (selectedItem?.palletNo?.trim().isNotEmpty ?? false);
+
+    final error = _commandPrecheck(requireTray: !hasSelectedTray);
     if (error != null) {
       emit(state.copyWith(status: CollectionStatus.error(error)));
       return;
     }
 
-    final tray = state.currentTray.toUpperCase();
-    final taskItem = _findTaskItemByTray(tray);
-    final startAddr = taskItem?.storeSiteNo ?? '';
+    final tray = (hasSelectedTray
+            ? selectedItem!.palletNo!.trim()
+            : state.currentTray.trim())
+        .toUpperCase();
+    if (tray.isEmpty) {
+      emit(state.copyWith(status: CollectionStatus.error('请采集托盘号！')));
+      return;
+    }
+
+    OnlinePickTaskItem? taskItem = selectedItem;
+    if (taskItem == null || (taskItem.storeSiteNo ?? '').trim().isEmpty) {
+      taskItem = _findTaskItemByTray(tray) ?? taskItem;
+    }
+
+    final startAddr = (taskItem?.storeSiteNo ?? '').trim().toUpperCase();
     if (startAddr.isEmpty) {
       emit(state.copyWith(status: CollectionStatus.error('目标地址为空，请核对托盘号')));
       return;
@@ -1501,6 +1598,11 @@ class OnlinePickCollectionBloc
 
       if (success) {
         await _clearSnapshot();
+        const defaultMode = OnlinePickCollectionMode(
+          code: 'outbound',
+          label: '正常出库',
+          type: OnlinePickCollectionModeType.outbound,
+        );
         emit(
           state.copyWith(
             status: CollectionStatus.success(message),
@@ -1508,6 +1610,7 @@ class OnlinePickCollectionBloc
             serialMap: const {},
             materialQtyMap: const {},
             inventoryQtyMap: const {},
+            inventoryCheckDetails: const [],
             collectingItems: const [],
             currentLocation: '',
             currentTray: '',
@@ -1516,6 +1619,13 @@ class OnlinePickCollectionBloc
             clearPendingQuantity: true,
             placeholder: '请扫描托盘',
             currentStep: OnlinePickCollectionStep.tray,
+            currentMode: defaultMode,
+            isInventoryEntryPending: false,
+            clearPendingInventoryDetail: true,
+            clearSelectedTaskItem: true,
+            clearSelectedCollectingItem: true,
+            clearActiveSelectionSource: true,
+            currentTab: 0,
           ),
         );
       } else {
@@ -2051,6 +2161,47 @@ class OnlinePickCollectionBloc
     }
 
     return '';
+  }
+
+  OnlinePickTaskItem? _resolveSelectedTaskItem() {
+    switch (state.activeSelectionSource) {
+      case OnlinePickSelectionSource.taskList:
+        return _findTaskItemById(
+              state.taskItems,
+              state.selectedTaskItemId,
+            ) ??
+            _findTaskItemById(
+              state.collectingItems,
+              state.selectedTaskItemId,
+            );
+      case OnlinePickSelectionSource.collectingList:
+        return _findTaskItemById(
+              state.collectingItems,
+              state.selectedCollectingItemId,
+            ) ??
+            _findTaskItemById(
+              state.taskItems,
+              state.selectedCollectingItemId,
+            );
+      default:
+        return null;
+    }
+  }
+
+  OnlinePickTaskItem? _findTaskItemById(
+    List<OnlinePickTaskItem> items,
+    int? id,
+  ) {
+    if (id == null) {
+      return null;
+    }
+
+    for (final item in items) {
+      if (item.outTaskItemId == id) {
+        return item;
+      }
+    }
+    return null;
   }
 
   OnlinePickTaskItem? _findTaskItemByTray(String trayNo) {
