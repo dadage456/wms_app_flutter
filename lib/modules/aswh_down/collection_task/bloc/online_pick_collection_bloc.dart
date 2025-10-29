@@ -61,6 +61,7 @@ class OnlinePickCollectionBloc
   List<OnlinePickLocationOption> _locationOptions =
       const <OnlinePickLocationOption>[];
   final Map<String, String> _materialSendControlCache = {};
+  final Set<String> _dispatchedTrayNos = <String>{};
   String _roomMaterialControl = '0';
   String _currentMaterialSendControl = '0';
 
@@ -162,6 +163,14 @@ class OnlinePickCollectionBloc
       snapshot.stocks,
     );
 
+    _dispatchedTrayNos
+      ..clear()
+      ..addAll(
+        snapshot.dispatchedTrayNos
+            .map((tray) => tray.trim().toUpperCase())
+            .where((tray) => tray.isNotEmpty),
+      );
+
     OnlinePickInventoryCheckDetail? pendingDetail;
     if (snapshot.inventoryPending) {
       final storeSite = snapshot.pendingStoreSite?.trim() ?? '';
@@ -209,6 +218,7 @@ class OnlinePickCollectionBloc
             ? null
             : snapshot.expectedErpStore,
         selectedDestination: snapshot.destination,
+        dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos),
         currentMode: OnlinePickCollectionMode(
           code: snapshot.mode,
           label: _modeLabelFrom(snapshot.mode),
@@ -303,9 +313,12 @@ class OnlinePickCollectionBloc
     }
 
     final normalized = current.trim().toUpperCase();
+    if (normalized.isEmpty) {
+      return '';
+    }
     final matched = _locationOptions.firstWhere(
       (option) => option.value.trim().toUpperCase() == normalized,
-      orElse: () => _locationOptions.first,
+      orElse: () => const OnlinePickLocationOption(label: '', value: ''),
     );
     return matched.value.trim();
   }
@@ -1352,11 +1365,18 @@ class OnlinePickCollectionBloc
       if (tray.isEmpty || site.isEmpty) {
         continue;
       }
+      if (_dispatchedTrayNos.contains(tray)) {
+        continue;
+      }
       trayMap.putIfAbsent(tray, () => site);
     }
 
     if (trayMap.isEmpty) {
-      emit(state.copyWith(status: CollectionStatus.error('获取来料盘数据不能为空！')));
+      emit(
+        state.copyWith(
+          status: CollectionStatus.error('未找到新的托盘可下发，请确认是否已全部下发'),
+        ),
+      );
       return;
     }
 
@@ -1364,17 +1384,13 @@ class OnlinePickCollectionBloc
 
     var remaining = event.limit;
     final failed = <String>[];
-    final processed = <String>{};
+    final successTrays = <String>[];
 
     try {
       for (final entry in trayMap.entries) {
         if (remaining <= 0) {
           break;
         }
-        if (processed.contains(entry.key)) {
-          continue;
-        }
-        processed.add(entry.key);
 
         final response = await _collectionService.commitDownWmsToWcs(
           taskId: _task!.outTaskId.toString(),
@@ -1389,30 +1405,41 @@ class OnlinePickCollectionBloc
         final success = code == 200 || code == '200';
         if (success) {
           remaining -= 1;
+          successTrays.add(entry.key);
+          _dispatchedTrayNos.add(entry.key);
         } else {
           failed.add(entry.key);
         }
       }
 
-      final completed = event.limit - remaining;
+      final completed = successTrays.length;
       if (completed > 0 && failed.isEmpty) {
-        emit(state.copyWith(status: CollectionStatus.success('获取来料托盘成功,请等待')));
+        emit(
+          state.copyWith(
+            status: CollectionStatus.success('获取来料托盘成功,请等待'),
+            dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos),
+          ),
+        );
+        await _persistSnapshot();
       } else if (completed > 0 && failed.isNotEmpty) {
         emit(
           state.copyWith(
             status: CollectionStatus.success(
-              '部分托盘已下发，失败托盘：${failed.join('、')}',
+              '部分托盘已下发，托盘【${failed.join('、')}】下发失败，请逐个选择这些托盘进行下发',
             ),
+            dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos),
           ),
         );
+        await _persistSnapshot();
       } else {
         emit(
           state.copyWith(
             status: CollectionStatus.error(
               failed.isEmpty
                   ? '未找到可用托盘下发指令'
-                  : '托盘【${failed.join('、')}】下发失败，请确认',
+                  : '托盘【${failed.join('、')}】下发失败，请逐个选择这些托盘进行下发',
             ),
+            dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos),
           ),
         );
       }
@@ -1420,6 +1447,7 @@ class OnlinePickCollectionBloc
       emit(
         state.copyWith(
           status: CollectionStatus.error(ErrorHandler.handleError(error)),
+          dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos),
         ),
       );
     }
@@ -1626,6 +1654,7 @@ class OnlinePickCollectionBloc
             clearSelectedCollectingItem: true,
             clearActiveSelectionSource: true,
             currentTab: 0,
+            dispatchedTrayNos: const <String>{},
           ),
         );
       } else {
@@ -2259,6 +2288,7 @@ class OnlinePickCollectionBloc
       pendingMaterialCode: state.pendingInventoryDetail?.materialCode,
       pendingBatchNo: state.pendingInventoryDetail?.batchNo,
       pendingTrayNo: state.pendingInventoryDetail?.trayNo,
+      dispatchedTrayNos: state.dispatchedTrayNos.toList(growable: false),
     );
 
     await box.put('snapshot', snapshot);
@@ -2272,6 +2302,7 @@ class OnlinePickCollectionBloc
     Map<String, double>? inventoryMap,
     Map<String, List<double>>? materialQtyMap,
     List<OnlinePickTaskItem>? taskItems,
+    Iterable<String>? dispatchedTrayNos,
   }) {
     if (task != null) {
       _task = task;
@@ -2342,11 +2373,19 @@ class OnlinePickCollectionBloc
     } else if (taskItems != null) {
       emit(state.copyWith(taskItems: taskItems));
     }
+
+    if (dispatchedTrayNos != null) {
+      _dispatchedTrayNos
+        ..clear()
+        ..addAll(dispatchedTrayNos.map((tray) => tray.toUpperCase()));
+      emit(state.copyWith(dispatchedTrayNos: Set<String>.from(_dispatchedTrayNos)));
+    }
   }
 
   Future<void> _clearSnapshot() async {
     _manualInventoryMap.clear();
     _inventoryCheckDetailMap.clear();
+    _dispatchedTrayNos.clear();
     final box = _cacheBox;
     if (box != null) {
       await box.delete('snapshot');

@@ -221,6 +221,7 @@ class OnlinePickCollectionCacheSnapshot
     @HiveField(15) String? pendingMaterialCode,
     @HiveField(16) String? pendingBatchNo,
     @HiveField(17) String? pendingTrayNo,
+    @HiveField(18) @Default(<String>[]) List<String> dispatchedTrayNos,
   }) = _OnlinePickCollectionCacheSnapshot;
 
   factory OnlinePickCollectionCacheSnapshot.fromJson(

@@ -1862,6 +1862,8 @@ mixin _$OnlinePickCollectionCacheSnapshot {
   String? get pendingBatchNo => throw _privateConstructorUsedError;
   @HiveField(17)
   String? get pendingTrayNo => throw _privateConstructorUsedError;
+  @HiveField(18)
+  List<String> get dispatchedTrayNos => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -1895,7 +1897,8 @@ abstract class $OnlinePickCollectionCacheSnapshotCopyWith<$Res> {
       @HiveField(14) String? pendingStoreSite,
       @HiveField(15) String? pendingMaterialCode,
       @HiveField(16) String? pendingBatchNo,
-      @HiveField(17) String? pendingTrayNo});
+      @HiveField(17) String? pendingTrayNo,
+      @HiveField(18) List<String> dispatchedTrayNos});
 
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
 }
@@ -1932,6 +1935,7 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
     Object? pendingMaterialCode = freezed,
     Object? pendingBatchNo = freezed,
     Object? pendingTrayNo = freezed,
+    Object? dispatchedTrayNos = null,
   }) {
     return _then(_value.copyWith(
       stocks: null == stocks
@@ -2006,6 +2010,10 @@ class _$OnlinePickCollectionCacheSnapshotCopyWithImpl<$Res,
           ? _value.pendingTrayNo
           : pendingTrayNo // ignore: cast_nullable_to_non_nullable
               as String?,
+      dispatchedTrayNos: null == dispatchedTrayNos
+          ? _value.dispatchedTrayNos
+          : dispatchedTrayNos // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 
@@ -2050,7 +2058,8 @@ abstract class _$$OnlinePickCollectionCacheSnapshotImplCopyWith<$Res>
       @HiveField(14) String? pendingStoreSite,
       @HiveField(15) String? pendingMaterialCode,
       @HiveField(16) String? pendingBatchNo,
-      @HiveField(17) String? pendingTrayNo});
+      @HiveField(17) String? pendingTrayNo,
+      @HiveField(18) List<String> dispatchedTrayNos});
 
   @override
   $OnlinePickBarcodeContentCopyWith<$Res>? get lastBarcode;
@@ -2087,6 +2096,7 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
     Object? pendingMaterialCode = freezed,
     Object? pendingBatchNo = freezed,
     Object? pendingTrayNo = freezed,
+    Object? dispatchedTrayNos = null,
   }) {
     return _then(_$OnlinePickCollectionCacheSnapshotImpl(
       stocks: null == stocks
@@ -2161,6 +2171,10 @@ class __$$OnlinePickCollectionCacheSnapshotImplCopyWithImpl<$Res>
           ? _value.pendingTrayNo
           : pendingTrayNo // ignore: cast_nullable_to_non_nullable
               as String?,
+      dispatchedTrayNos: null == dispatchedTrayNos
+          ? _value._dispatchedTrayNos
+          : dispatchedTrayNos // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -2192,12 +2206,15 @@ class _$OnlinePickCollectionCacheSnapshotImpl
       @HiveField(14) this.pendingStoreSite,
       @HiveField(15) this.pendingMaterialCode,
       @HiveField(16) this.pendingBatchNo,
-      @HiveField(17) this.pendingTrayNo})
+      @HiveField(17) this.pendingTrayNo,
+      @HiveField(18) final List<String> dispatchedTrayNos =
+          const <String>[]})
       : _stocks = stocks,
         _dicSeq = dicSeq,
         _dicMtlQty = dicMtlQty,
         _dicInvMtlQty = dicInvMtlQty,
-        _inventoryChecks = inventoryChecks;
+        _inventoryChecks = inventoryChecks,
+        _dispatchedTrayNos = dispatchedTrayNos;
 
   factory _$OnlinePickCollectionCacheSnapshotImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -2302,9 +2319,21 @@ class _$OnlinePickCollectionCacheSnapshotImpl
   @HiveField(17)
   final String? pendingTrayNo;
 
+  final List<String> _dispatchedTrayNos;
+  @override
+  @JsonKey()
+  @HiveField(18)
+  List<String> get dispatchedTrayNos {
+    if (_dispatchedTrayNos is EqualUnmodifiableListView) {
+      return _dispatchedTrayNos;
+    }
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_dispatchedTrayNos);
+  }
+
   @override
   String toString() {
-    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, destination: $destination, inventoryPending: $inventoryPending, pendingStoreSite: $pendingStoreSite, pendingMaterialCode: $pendingMaterialCode, pendingBatchNo: $pendingBatchNo, pendingTrayNo: $pendingTrayNo)';
+    return 'OnlinePickCollectionCacheSnapshot(stocks: $stocks, dicSeq: $dicSeq, dicMtlQty: $dicMtlQty, dicInvMtlQty: $dicInvMtlQty, lastBarcode: $lastBarcode, location: $location, trayNo: $trayNo, userId: $userId, pendingQuantity: $pendingQuantity, mode: $mode, expectedErpStore: $expectedErpStore, inventoryChecks: $inventoryChecks, destination: $destination, inventoryPending: $inventoryPending, pendingStoreSite: $pendingStoreSite, pendingMaterialCode: $pendingMaterialCode, pendingBatchNo: $pendingBatchNo, pendingTrayNo: $pendingTrayNo, dispatchedTrayNos: $dispatchedTrayNos)';
   }
 
   @override
@@ -2342,7 +2371,9 @@ class _$OnlinePickCollectionCacheSnapshotImpl
             (identical(other.pendingBatchNo, pendingBatchNo) ||
                 other.pendingBatchNo == pendingBatchNo) &&
             (identical(other.pendingTrayNo, pendingTrayNo) ||
-                other.pendingTrayNo == pendingTrayNo));
+                other.pendingTrayNo == pendingTrayNo) &&
+            const DeepCollectionEquality()
+                .equals(other._dispatchedTrayNos, _dispatchedTrayNos));
   }
 
   @JsonKey(ignore: true)
@@ -2366,7 +2397,8 @@ class _$OnlinePickCollectionCacheSnapshotImpl
           pendingStoreSite,
           pendingMaterialCode,
           pendingBatchNo,
-          pendingTrayNo);
+          pendingTrayNo,
+          const DeepCollectionEquality().hash(_dispatchedTrayNos));
 
   @JsonKey(ignore: true)
   @override
@@ -2404,7 +2436,8 @@ abstract class _OnlinePickCollectionCacheSnapshot
           @HiveField(14) final String? pendingStoreSite,
           @HiveField(15) final String? pendingMaterialCode,
           @HiveField(16) final String? pendingBatchNo,
-          @HiveField(17) final String? pendingTrayNo}) =
+          @HiveField(17) final String? pendingTrayNo,
+          @HiveField(18) final List<String> dispatchedTrayNos}) =
       _$OnlinePickCollectionCacheSnapshotImpl;
 
   factory _OnlinePickCollectionCacheSnapshot.fromJson(
@@ -2465,6 +2498,9 @@ abstract class _OnlinePickCollectionCacheSnapshot
   @override
   @HiveField(17)
   String? get pendingTrayNo;
+  @override
+  @HiveField(18)
+  List<String> get dispatchedTrayNos;
   @override
   @JsonKey(ignore: true)
   _$$OnlinePickCollectionCacheSnapshotImplCopyWith<
