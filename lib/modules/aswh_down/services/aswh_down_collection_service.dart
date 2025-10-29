@@ -55,6 +55,51 @@ class AswhDownCollectionService {
     );
   }
 
+  /// 获取拣选出/入口配置列表（对应 `getInOutLocation`）。
+  Future<List<OnlinePickLocationOption>> fetchInOutLocations({
+    String locationType = '1',
+  }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/system/terminal/getInOutLocation',
+      queryParameters: {
+        'locationType': locationType,
+      },
+    );
+
+    return ApiResponseHandler.handleResponse(
+      response: response,
+      dataExtractor: (data) {
+        if (data is! List) {
+          throw Exception('拣选口数据格式异常');
+        }
+
+        return data
+            .map((item) {
+              if (item is Map<String, dynamic>) {
+                final label =
+                    (item['label'] ?? item['text'] ?? item['value'] ?? '')
+                        .toString();
+                final value =
+                    (item['value'] ?? item['code'] ?? item['label'] ?? label)
+                        .toString();
+                if (label.isEmpty && value.isEmpty) {
+                  return null;
+                }
+                return OnlinePickLocationOption(label: label, value: value);
+              }
+
+              final text = item?.toString() ?? '';
+              if (text.isEmpty) {
+                return null;
+              }
+              return OnlinePickLocationOption(label: text, value: text);
+            })
+            .whereType<OnlinePickLocationOption>()
+            .toList();
+      },
+    );
+  }
+
   /// 获取物料控制模式（对应 `GetMatControl`）。
   Future<String> getMatControl(String materialCode) async {
     final response = await _dio.get<Map<String, dynamic>>(
@@ -69,26 +114,35 @@ class AswhDownCollectionService {
   }
 
   /// 根据库位查询库存（对应 `getRepertoryByStoresiteNo`）。
-  Future<Map<String, dynamic>> getRepertoryByStoreSite({
+  Future<List<Map<String, dynamic>>> getRepertoryByStoreSite({
     required String storeSiteNo,
     required String materialCode,
+    String? erpStoreroom,
+    String? batchNo,
+    String? serialNumber,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/system/terminal/getRepertoryByStoresiteNo',
       queryParameters: {
         'storesiteno': storeSiteNo,
         'matcode': materialCode,
+        if (erpStoreroom != null && erpStoreroom.isNotEmpty)
+          'erpStoreroom': erpStoreroom,
+        if (batchNo != null && batchNo.isNotEmpty) 'batchno': batchNo,
+        if (serialNumber != null && serialNumber.isNotEmpty) 'sn': serialNumber,
       },
     );
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
+      dataExtractor: (data) => (data as List<dynamic>)
+          .map((item) => item as Map<String, dynamic>)
+          .toList(),
     );
   }
 
   /// 根据库位查询库存（对应 `getMtlRepertoryByStoresiteNoSn`）。
-  Future<Map<String, dynamic>> getRepertoryByStoreSiteSn({
+  Future<List<Map<String, dynamic>>> getRepertoryByStoreSiteSn({
     required String storeSiteNo,
     required String materialCode,
     String? erpStoreroom,
@@ -108,12 +162,14 @@ class AswhDownCollectionService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
+      dataExtractor: (data) => (data as List<dynamic>)
+          .map((item) => item as Map<String, dynamic>)
+          .toList(),
     );
   }
 
   /// 根据库位查询库存（ERP 子库校验，`getRepertoryByStoresiteNoErp`）。
-  Future<Map<String, dynamic>> getRepertoryByStoreSiteErp({
+  Future<List<Map<String, dynamic>>> getRepertoryByStoreSiteErp({
     required String storeSiteNo,
     required String materialCode,
   }) async {
@@ -127,7 +183,9 @@ class AswhDownCollectionService {
 
     return ApiResponseHandler.handleResponse(
       response: response,
-      dataExtractor: (data) => data as Map<String, dynamic>,
+      dataExtractor: (data) => (data as List<dynamic>)
+          .map((item) => item as Map<String, dynamic>)
+          .toList(),
     );
   }
 
