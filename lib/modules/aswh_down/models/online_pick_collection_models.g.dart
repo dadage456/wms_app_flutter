@@ -158,13 +158,18 @@ class OnlinePickCollectionCacheSnapshotAdapter
               .toList() ??
           const <Map<String, dynamic>>[],
       destination: fields[12] as String? ?? '',
+      inventoryPending: fields[13] as bool? ?? false,
+      pendingStoreSite: fields[14] as String?,
+      pendingMaterialCode: fields[15] as String?,
+      pendingBatchNo: fields[16] as String?,
+      pendingTrayNo: fields[17] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, OnlinePickCollectionCacheSnapshot obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.stocks)
       ..writeByte(1)
@@ -190,7 +195,17 @@ class OnlinePickCollectionCacheSnapshotAdapter
       ..writeByte(11)
       ..write(obj.inventoryChecks)
       ..writeByte(12)
-      ..write(obj.destination);
+      ..write(obj.destination)
+      ..writeByte(13)
+      ..write(obj.inventoryPending)
+      ..writeByte(14)
+      ..write(obj.pendingStoreSite)
+      ..writeByte(15)
+      ..write(obj.pendingMaterialCode)
+      ..writeByte(16)
+      ..write(obj.pendingBatchNo)
+      ..writeByte(17)
+      ..write(obj.pendingTrayNo);
   }
 
   @override
@@ -379,6 +394,11 @@ _$OnlinePickCollectionCacheSnapshotImpl
                   .toList() ??
               const <Map<String, dynamic>>[],
           destination: json['destination'] as String? ?? '',
+          inventoryPending: json['inventoryPending'] as bool? ?? false,
+          pendingStoreSite: json['pendingStoreSite'] as String?,
+          pendingMaterialCode: json['pendingMaterialCode'] as String?,
+          pendingBatchNo: json['pendingBatchNo'] as String?,
+          pendingTrayNo: json['pendingTrayNo'] as String?,
         );
 
 Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
@@ -397,4 +417,9 @@ Map<String, dynamic> _$$OnlinePickCollectionCacheSnapshotImplToJson(
       'expectedErpStore': instance.expectedErpStore,
       'inventoryChecks': instance.inventoryChecks,
       'destination': instance.destination,
+      'inventoryPending': instance.inventoryPending,
+      'pendingStoreSite': instance.pendingStoreSite,
+      'pendingMaterialCode': instance.pendingMaterialCode,
+      'pendingBatchNo': instance.pendingBatchNo,
+      'pendingTrayNo': instance.pendingTrayNo,
     };

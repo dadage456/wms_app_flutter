@@ -54,7 +54,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
   void initState() {
     super.initState();
     _scannerController = ScannerController();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _bloc = BlocProvider.of<OnlinePickCollectionBloc>(context);
     _bloc.add(OnlinePickCollectionInitialized(widget.task));
   }
@@ -165,6 +165,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                     tabs: const [
                       Tab(text: '任务列表'),
                       Tab(text: '正在采集'),
+                      Tab(text: '库存核对'),
                     ],
                     onTap: (index) =>
                         _bloc.add(OnlinePickCollectionTabChanged(index)),
@@ -176,6 +177,7 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
                     children: [
                       _buildTaskGrid(state.taskItems),
                       _buildCollectingGrid(state.collectingItems),
+                      _buildInventoryGrid(state.inventoryCheckDetails),
                     ],
                   ),
                 ),
@@ -393,6 +395,51 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
       totalPages: 1,
       onLoadData: (_) async {},
       selectedRows: const [],
+    );
+  }
+
+  Widget _buildInventoryGrid(
+    List<OnlinePickInventoryCheckDetail> details,
+  ) {
+    if (details.isEmpty) {
+      return const Center(child: Text('暂无结余记录'));
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemBuilder: (context, index) {
+        final detail = details[index];
+        final subtitleParts = <String>[];
+        if (detail.batchNo?.isNotEmpty ?? false) {
+          subtitleParts.add('批次 ${detail.batchNo}');
+        }
+        if (detail.trayNo?.isNotEmpty ?? false) {
+          subtitleParts.add('托盘 ${detail.trayNo}');
+        }
+        return ListTile(
+          dense: true,
+          title: Text(
+            '库位 ${detail.storeSite} · 物料 ${detail.materialCode}',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          subtitle: subtitleParts.isEmpty
+              ? null
+              : Text(
+                  subtitleParts.join(' · '),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
+                ),
+          trailing: Text(
+            detail.quantity.toFormatString(),
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF1976D2),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (_, __) => const Divider(height: 1),
+      itemCount: details.length,
     );
   }
 

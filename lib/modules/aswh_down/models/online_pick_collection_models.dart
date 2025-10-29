@@ -24,6 +24,7 @@ enum OnlinePickCollectionStep {
   material,
   quantity,
   review,
+  inventory,
 }
 
 /// 扫码解析后的条码信息。
@@ -215,6 +216,11 @@ class OnlinePickCollectionCacheSnapshot
     @HiveField(11) @Default(<Map<String, dynamic>>[])
     List<Map<String, dynamic>> inventoryChecks,
     @HiveField(12) @Default('') String destination,
+    @HiveField(13) @Default(false) bool inventoryPending,
+    @HiveField(14) String? pendingStoreSite,
+    @HiveField(15) String? pendingMaterialCode,
+    @HiveField(16) String? pendingBatchNo,
+    @HiveField(17) String? pendingTrayNo,
   }) = _OnlinePickCollectionCacheSnapshot;
 
   factory OnlinePickCollectionCacheSnapshot.fromJson(
