@@ -249,8 +249,8 @@ class _OnlinePickCollectionPageState extends State<OnlinePickCollectionPage>
           _buildInfoGrid(
             '序列',
             state.currentBarcode?.serialNumber ?? '-',
-            '任务行数',
-            state.taskItems.length.toString(),
+            '',
+            '',
           ),
         ],
       ),

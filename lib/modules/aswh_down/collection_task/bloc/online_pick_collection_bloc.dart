@@ -65,7 +65,7 @@ class OnlinePickCollectionBloc
       state.copyWith(
         status: CollectionStatus.loading(),
         task: event.task,
-        placeholder: '请扫描库位',
+        placeholder: '请扫描托盘号',
         step: OnlinePickCollectionStep.location,
         currentTrayCode: '',
         currentTab: 0,
@@ -119,8 +119,8 @@ class OnlinePickCollectionBloc
         ),
       );
 
-      await _restoreCache(event.task, collectorId, emit);
-      add(const LoadPickLocationsEvent());
+      //await _restoreCache(event.task, collectorId, emit);
+      //add(const LoadPickLocationsEvent());
     } on DioException catch (error) {
       emit(
         state.copyWith(

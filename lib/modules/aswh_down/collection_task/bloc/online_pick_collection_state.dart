@@ -67,11 +67,6 @@ class OnlinePickCollectionState {
         label: '库存核对',
         type: OnlinePickCollectionModeType.inventory,
       ),
-      OnlinePickCollectionMode(
-        code: 'exception',
-        label: '异常采集',
-        type: OnlinePickCollectionModeType.exception,
-      ),
     ],
     this.selectedLocation = '',
     this.locationOptions = const [],
